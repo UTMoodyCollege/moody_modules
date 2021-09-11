@@ -1,0 +1,6 @@
+name: 'Moody Quotation'
+type: module
+description: 'A styled quotation'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: 'Moody'

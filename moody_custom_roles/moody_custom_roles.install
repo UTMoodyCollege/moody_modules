@@ -1,0 +1,184 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_custom_roles.install.
+ */
+
+// use Drupal\Core\Database\Database;
+use Drupal\user\RoleInterface;
+// use Drupal\Core\Block\BlockBase;
+// use Drupal\Core\Block\BlockPluginInterface;
+// use Drupal\block\Entity;
+// use Drupal\block\Entity\Block;
+// use Drupal\block_content\Entity\BlockContent;
+use Drupal\user\Entity\User;
+use Drupal\user\Entity\Role;
+
+/**
+ * Implements hook_install().
+ *
+ * Perform actions to set up the site for Moody RTF.
+ */
+function moody_custom_roles_install() {
+
+  // Add permissions to anonymous role.
+  $anon_perms = [
+    'access content',
+    'search Google CSE',
+    'search content',
+    'use text format restricted_html',
+    'view media',
+  ];
+  user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, $anon_perms);
+  user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, $anon_perms);
+
+  // Delete some migrated roles.
+  $roles_to_delete = [
+    'home_video_editor',
+    'feature_temp_role',
+  ];
+  foreach ($roles_to_delete as $role_to_delete) {
+    if ($role = Role::load($role_to_delete)) {
+      $role->delete();
+    }
+  }
+
+  // Transfer moody_subsite_content_editors to moody_subsite_editors.
+  $old_rid = 'moody_subsite_content_editor';
+  $new_rid = 'moody_subsite_editor';
+  // Find users that have moody_subsite_content_editor role.
+  $uids = \Drupal::entityQuery('user')
+    ->condition('status', 1)
+    ->condition('roles', $old_rid)
+    ->execute();
+  $site_managers = User::loadMultiple($uids);
+  if (!empty($site_managers)) {
+    // Assign the moody_subsite_editor role to the identified users.
+    // Remove moody_subsite_content_editor role from these users.
+    foreach ($site_managers as $user) {
+      $user->addRole($new_rid);
+      $user->removeRole($old_rid);
+      $user->save();
+    }
+  }
+  // Delete moody_subsite_content_editor role.
+  if ($role = Role::load('moody_subsite_content_editor')) {
+    $role->delete();
+  }
+
+  // Transfer moody_faculty_bio_editors to faculty_bio_editors.
+  $old_rid = 'moody_faculty_bio_editor';
+  $new_rid = 'faculty_bio_editor';
+  // Find users that have moody_subsite_content_editor role.
+  $uids = \Drupal::entityQuery('user')
+    ->condition('status', 1)
+    ->condition('roles', $old_rid)
+    ->execute();
+  $site_managers = User::loadMultiple($uids);
+  if (!empty($site_managers)) {
+    // Assign the faculty_bio_editors role to the identified users.
+    // Remove moody_faculty_bio_editor role from these users.
+    foreach ($site_managers as $user) {
+      $user->addRole($new_rid);
+      $user->removeRole($old_rid);
+      $user->save();
+    }
+  }
+  // Delete moody_faculty_bio_editor role.
+  if ($role = Role::load('moody_faculty_bio_editor')) {
+    $role->delete();
+  }
+
+  // Transfer moody_feature_page_editors to feature_page_editors.
+  $old_rid = 'moody_feature_page_editor';
+  $new_rid = 'feature_page_editor';
+  // Find users that have moody_subsite_content_editor role.
+  $uids = \Drupal::entityQuery('user')
+    ->condition('status', 1)
+    ->condition('roles', $old_rid)
+    ->execute();
+  $site_managers = User::loadMultiple($uids);
+  if (!empty($site_managers)) {
+    // Assign the feature_page_editor role to the identified users.
+    // Remove moody_feature_page_editor role from these users.
+    foreach ($site_managers as $user) {
+      $user->addRole($new_rid);
+      $user->removeRole($old_rid);
+      $user->save();
+    }
+  }
+  // Delete moody_feature_page_editor role.
+  if ($role = Role::load('moody_feature_page_editor')) {
+    $role->delete();
+  }
+
+  // Transfer standard editor roles to standard_content_editors.
+  $old_rids = ['moody_standard_content_editor', 'moody_standard_user'];
+  $new_rid = 'standard_content_editor';
+  foreach ($old_rids as $old_rid) {
+    // Find users that have moody_subsite_content_editor role.
+    $uids = \Drupal::entityQuery('user')
+      ->condition('status', 1)
+      ->condition('roles', $old_rid)
+      ->execute();
+    $site_managers = User::loadMultiple($uids);
+    if (!empty($site_managers)) {
+      // Assign the standard_content_editor role to the identified users.
+      // Remove old roles from these users.
+      foreach ($site_managers as $user) {
+        $user->addRole($new_rid);
+        $user->removeRole($old_rid);
+        $user->save();
+      }
+    }
+    // Delete moody_feature_page_editor role.
+    if ($role = Role::load($old_rid)) {
+      $role->delete();
+    }
+  }
+
+  // Transfer site manager/builder roles to standard_content_managerss.
+  $old_rids = ['moody_site_manager', 'moody_site_builder', 'moody_content_coordinator'];
+  $new_rid = 'standard_content_manager';
+  foreach ($old_rids as $old_rid) {
+    // Find users that have managerial roles.
+    $uids = \Drupal::entityQuery('user')
+      ->condition('status', 1)
+      ->condition('roles', $old_rid)
+      ->execute();
+    $site_managers = User::loadMultiple($uids);
+    if (!empty($site_managers)) {
+      // Assign the standard_content_managerr role to the identified users.
+      // Remove old roles from these users.
+      foreach ($site_managers as $user) {
+        $user->addRole($new_rid);
+        $user->removeRole($old_rid);
+        $user->save();
+      }
+    }
+    // Delete moody_feature_page_editor role.
+    if ($role = Role::load($old_rid)) {
+      $role->delete();
+    }
+  }
+
+  // Transfer adminstrator roles to moody_administrators.
+  $old_rid = 'administrator';
+  $new_rid = 'moody_administrator';
+  // Find users that have adminstrator roles.
+  $uids = \Drupal::entityQuery('user')
+    ->condition('status', 1)
+    ->condition('roles', $old_rid)
+    ->execute();
+  $site_managers = User::loadMultiple($uids);
+  if (!empty($site_managers)) {
+    // Assign the moody_adminstrator role to the identified users.
+    foreach ($site_managers as $user) {
+      $user->addRole($new_rid);
+      $user->removeRole($old_rid);
+      $user->save();
+    }
+  }
+
+}

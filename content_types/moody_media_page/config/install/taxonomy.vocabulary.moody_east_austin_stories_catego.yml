@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'East Austin Stories Categories'
+vid: moody_east_austin_stories_catego
+description: 'Categories for East Austin Stories'
+weight: 0

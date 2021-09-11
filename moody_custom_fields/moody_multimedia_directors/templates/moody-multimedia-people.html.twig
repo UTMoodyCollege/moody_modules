@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Custom theme implementation for the Moody Multimedia Directors field.
+ *
+ * Available variables:
+ * - first_name: The director's first name.
+ * - last_name: The director's last name.
+ * - title: The director's title.
+ *
+ * @ingroup themeable
+ */
+#}
+
+<div class="moody-media-people">
+  <div class="moody-media-people-name">
+    <strong><div><span>{{ first_name }}</span> <span>{{ last_name }}</span></div></strong>
+    {% if title %}
+      <em>{{ title }}</em>
+    {% endif %}
+  </div>
+  {% if body %}
+    <div class="moody-media-people-body">
+      {{ body }}
+    </div>
+  {% endif %}
+</div>

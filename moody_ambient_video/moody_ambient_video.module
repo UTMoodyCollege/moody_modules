@@ -1,0 +1,115 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_ambient_video.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\image\Entity\ImageStyle;
+use Drupal\media\Entity\Media;
+use Drupal\file\Entity\File;
+
+/**
+ * Implements hook_help().
+ */
+function moody_ambient_video_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the ambient_video module.
+    case 'help.page.moody_ambient_video':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Custom block type displaying muted background video') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function moody_ambient_video_preprocess_block(&$variables) {
+  if ($variables['base_plugin_id'] == 'block_content' || $variables['derivative_plugin_id'] == 'ambient_video') {
+    if (!empty($variables['elements']['content']['#block_content']->bundle()) && $variables['elements']['content']['#block_content']->bundle() == 'ambient_video') {
+      $entity_manager = \Drupal::entityTypeManager();
+      // Variables to pass to Twig. //
+      //----------------------------//
+      // Pass the file URL of the poster image.
+      if (isset($variables['content']['field_mav_poster'])) {
+        $mid = $variables['content']['#block_content']->get('field_mav_poster')->getString(); // Get mid.
+        $media = Media::load($mid); // Load media.
+        $fid = $media->getSource()->getSourceFieldValue($media); // Get fid.
+        $file = File::load($fid); // Get file.
+        $poster_url = ImageStyle::load('moody_image_style_960w_x_540h')->buildUrl($file->getFileUri()); // Create URL.
+      }
+      $variables['poster'] = $poster_url ?? FALSE;
+
+      // Pass the file entity of the descriptions file.
+      if (isset($variables['content']['field_mav_descriptions']['0']['#file'])) {
+        $descriptions_uri = $variables['content']['field_mav_descriptions']['0']['#file']->getFileUri();
+        $descriptions_url = file_create_url($descriptions_uri);
+      }
+      $variables['descriptions'] = $descriptions_url ?? FALSE;
+
+      // Pass the overlay mask color.
+      $mask = isset($variables['content']['field_mav_mask']['#items']) ? ('#' . $variables['content']['field_mav_mask']['#items']->getString()) : 'transparent';
+      $variables['mask'] = $mask;
+
+      // Pass the overlay opacity.
+      $opacity = isset($variables['content']['field_mav_opacity']['0']['#markup']) ? $variables['content']['field_mav_opacity']['0']['#markup'] : 'transparent';
+      $variables['opacity'] = $opacity;
+
+      // Pass the hedline text positioning.
+      $text_position = isset($variables['content']['field_mav_text_position']['0']) ? $variables['content']['field_mav_text_position']['0']['#markup'] : FALSE;
+      $variables['text_position'] = $text_position;
+
+      // Variables to pass to drupalSettings. //
+      //----------------------------//
+      // Pass video URL.
+      $video_url = $variables['content']['field_mav_url']['0']['#url']->getUri();
+      $variables['#attached']['drupalSettings']['ambientVideo']['ambientVideoUrl'] = $video_url;
+
+      // Pass the fallback image URL.
+      if (isset($variables['content']['field_mav_fallback'])) {
+        $mid = $variables['content']['#block_content']->get('field_mav_fallback')->getString(); // Get mid.
+        $media = Media::load($mid); // Load media.
+        $fid = $media->getSource()->getSourceFieldValue($media); // Get fid.
+        $file = File::load($fid); // Get file.
+        $fallback_url = ImageStyle::load('moody_image_style_650w_x_700h')->buildUrl($file->getFileUri()); // Create URL.
+      }
+      $variables['#attached']['drupalSettings']['ambientVideo']['ambientVideoFallback'] = isset($fallback_url) ? $fallback_url : '';
+
+      // Pass which js file to add via the template.
+      $library = $variables['content']['field_mav_height']['#items']->getValue();
+      $variables['js_library'] = isset($library[0]['value']) ? $library[0]['value'] : 0;
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ * @param array $suggestions
+ * @param array $variables
+ */
+function moody_ambient_video_theme_suggestions_block_alter(array &$suggestions, array $variables) {
+  // Block suggestions for ambient-video block bundles.
+  if (isset($variables['elements']['content']['#block_content'])) {
+    $bundle = $variables['elements']['content']['#block_content']->bundle();
+    if ($bundle == 'ambient_video') {
+      $suggestions[] = 'block__ambient_video';
+    }
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_ambient_video_theme() {
+  return [
+    'block__ambient_video' => [
+      'base hook' => 'block',
+      'template' => 'block--ambient-video',
+    ],
+  ];
+}

@@ -1,0 +1,56 @@
+id: moody_redirects
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+label: 'Moody Redirects'
+source:
+  plugin: moody_redirects_source
+  constants:
+    prefix: node
+process:
+  _nid:
+    -
+      plugin: migration_lookup
+      source: nid
+      migration:
+        - moody_feature_page
+        - moody_standard_page
+        - moody_landing_page
+        - moody_subsite_page
+        - moody_media_page
+        - utexas_faculty_bio
+      no_stub: true
+    -
+      plugin: skip_on_empty
+      method: row
+  _redirect:
+    plugin: concat
+    source:
+      - constants/prefix
+      - '@_nid'
+    delimiter: /
+  uid:
+    plugin: default_value
+    default_value: 1
+  language:
+    plugin: default_value
+    source: language
+    default_value: und
+  status_code:
+    plugin: default_value
+    default_value: 301
+  redirect_source/path: alias
+  redirect_redirect/uri:
+    plugin: d7_path_redirect
+    source:
+      - '@_redirect'
+destination:
+  plugin: entity:redirect
+migration_dependencies:
+  required:
+    - moody_feature_page
+    - moody_standard_page
+    - moody_landing_page
+    - moody_subsite_page
+    - moody_media_page
+    - utexas_faculty_bio

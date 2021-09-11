@@ -1,0 +1,5 @@
+entity.moody_subsite.add_form:
+  route_name: entity.moody_subsite.add_form
+  title: 'Add Moody subsite'
+  appears_on:
+    - entity.moody_subsite.collection

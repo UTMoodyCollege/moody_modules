@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_east_austin_stories_catego
+    - node.type.moody_media_page
+    - taxonomy.vocabulary.moody_east_austin_stories_catego
+id: node.moody_media_page.field_east_austin_stories_catego
+field_name: field_east_austin_stories_catego
+entity_type: node
+bundle: moody_media_page
+label: 'East Austin Stories Category'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      moody_east_austin_stories_catego: moody_east_austin_stories_catego
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

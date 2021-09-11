@@ -1,0 +1,125 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.field.block_content.ambient_video.field_mav_cta
+    - field.field.block_content.ambient_video.field_mav_descriptions
+    - field.field.block_content.ambient_video.field_mav_fallback
+    - field.field.block_content.ambient_video.field_mav_headline
+    - field.field.block_content.ambient_video.field_mav_headline_line_two
+    - field.field.block_content.ambient_video.field_mav_height
+    - field.field.block_content.ambient_video.field_mav_mask
+    - field.field.block_content.ambient_video.field_mav_opacity
+    - field.field.block_content.ambient_video.field_mav_poster
+    - field.field.block_content.ambient_video.field_mav_text_position
+    - field.field.block_content.ambient_video.field_mav_url
+  module:
+    - file
+    - link
+    - options
+    - utexas_call_to_action
+id: block_content.ambient_video.default
+targetEntityType: block_content
+bundle: ambient_video
+mode: default
+content:
+  field_mav_cta:
+    weight: 5
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: utexas_call_to_action_formatter
+    region: content
+  field_mav_descriptions:
+    weight: 1
+    label: hidden
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
+    type: file_default
+    region: content
+  field_mav_fallback:
+    type: entity_reference_entity_view
+    weight: 10
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    region: content
+  field_mav_headline:
+    weight: 2
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_mav_headline_line_two:
+    weight: 3
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_mav_height:
+    weight: 8
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+    region: content
+  field_mav_mask:
+    weight: 6
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+    region: content
+  field_mav_opacity:
+    weight: 7
+    label: hidden
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    type: number_decimal
+    region: content
+  field_mav_poster:
+    type: entity_reference_entity_view
+    weight: 9
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    region: content
+  field_mav_text_position:
+    weight: 4
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: list_key
+    region: content
+  field_mav_url:
+    weight: 0
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+    region: content
+hidden: {  }

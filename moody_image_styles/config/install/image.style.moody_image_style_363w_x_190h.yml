@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_363w_x_190h
+label: '363w x 190h'
+effects:
+  a04b0e4e-6b0d-465c-a919-16bffd13422f:
+    uuid: a04b0e4e-6b0d-465c-a919-16bffd13422f
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 363
+      height: 190
+      anchor: center-center

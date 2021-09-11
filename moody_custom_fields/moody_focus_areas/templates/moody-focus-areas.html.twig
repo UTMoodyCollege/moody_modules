@@ -1,0 +1,62 @@
+{#
+/**
+ * @file
+ * Custom theme implementation for the Moody Focus Areas.
+ *
+ * Available variables:
+ * - headline: The Moody Focus Areas overall headline field.
+ * - style: The color of the lined background design.
+ * - cta: The Moody Focus Areas overall CTA button.
+ * - focus_areas_items: An array containing the Moody Focus Areas individual item contents.
+ *   - image: The Focus Areas image.
+ *   - headline: The Focus Areas headline.
+ *   - copy: The Focus Areas copy field.
+ *   - link: The Focus Areas link field.
+ *
+ * @ingroup themeable
+ */
+#}
+
+<div class="focus-areas-wrapper">
+  <div class="content-bottom">
+    {% if focus_areas_items_title %}
+      <h3 class="focus-areas-title"><span>{{ focus_areas_items_title }}</span></h3>
+    {% endif %}
+    {% if focus_areas_items %}
+      <div class="focus-areas-items {{ items_style }}">
+        {% for item in focus_areas_items %}
+          <div class="focus-areas-item">
+            {% if item.link %}
+            <a href="{{ item.link }}" class="linked-focus-area-item">
+              <span class="sr-only">{{ item.headline }}</span>
+            {% endif %}
+            {% if item.image %}
+              <div class="image-wrapper">
+                <div class="image-overflow">
+                  {{ item.image }}
+                </div>
+              </div>
+            {% endif %}
+            <div class="content">
+              {% if item.headline %}
+                <h3 class="ut-headline">{{ item.headline }}</h3>
+              {% endif %}
+              {% if item.copy %}
+                <div class="ut-copy">
+                  {{ item.copy }}
+                </div>
+              {% endif %}
+            </div>
+            {% if item.link %}
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="clearfix"></div>
+    {% if cta %}
+      {{ cta }}
+    {% endif %}
+  </div>
+</div>

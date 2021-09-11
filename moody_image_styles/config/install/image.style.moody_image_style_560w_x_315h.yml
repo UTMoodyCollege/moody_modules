@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_560w_x_315h
+label: '560w x 315h'
+effects:
+  b3b2ff37-ad35-4896-9dc7-cf6a69e541fc:
+    uuid: b3b2ff37-ad35-4896-9dc7-cf6a69e541fc
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 560
+      height: 315
+      anchor: center-center

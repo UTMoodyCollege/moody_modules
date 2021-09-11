@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.storage.block_content.field_mav_headline
+id: block_content.ambient_video.field_mav_headline
+field_name: field_mav_headline
+entity_type: block_content
+bundle: ambient_video
+label: Headline
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 'Experience the Entertainment Capital of the World'
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,20 @@
+add moody subsite entities:
+  title: 'Create new Moody subsite entities'
+
+administer moody subsite entities:
+  title: 'Administer Moody subsite entities'
+  description: 'Allow to access the administration form to configure Moody subsite entities.'
+  restrict access: true
+
+delete moody subsite entities:
+  title: 'Delete Moody subsite entities'
+
+edit moody subsite entities:
+  title: 'Edit Moody subsite entities'
+
+view published moody subsite entities:
+  title: 'View published Moody subsite entities'
+
+view unpublished moody subsite entities:
+  title: 'View unpublished Moody subsite entities'
+

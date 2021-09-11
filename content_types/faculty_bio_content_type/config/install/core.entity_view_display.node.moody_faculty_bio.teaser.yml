@@ -1,0 +1,67 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.moody_faculty_bio.body
+    - field.field.node.moody_faculty_bio.field_affiliations_faculty_bio
+    - field.field.node.moody_faculty_bio.field_biography_faculty_bio
+    - field.field.node.moody_faculty_bio.field_courses_faculty_bio
+    - field.field.node.moody_faculty_bio.field_custom_tab_content_faculty
+    - field.field.node.moody_faculty_bio.field_custom_tab_title_faculty
+    - field.field.node.moody_faculty_bio.field_cv_pdf_faculty_bio
+    - field.field.node.moody_faculty_bio.field_degrees_faculty_bio
+    - field.field.node.moody_faculty_bio.field_department_association_fac
+    - field.field.node.moody_faculty_bio.field_eid_faculty_bio
+    - field.field.node.moody_faculty_bio.field_email_address_faculty_bio
+    - field.field.node.moody_faculty_bio.field_email_faculty_bio
+    - field.field.node.moody_faculty_bio.field_expertise_faculty_bio
+    - field.field.node.moody_faculty_bio.field_first_name_faculty_bio
+    - field.field.node.moody_faculty_bio.field_headshot_faculty_bio
+    - field.field.node.moody_faculty_bio.field_last_name_faculty_bio
+    - field.field.node.moody_faculty_bio.field_middle_name_facutly_bio
+    - field.field.node.moody_faculty_bio.field_office_number_faculty_bio
+    - field.field.node.moody_faculty_bio.field_personal_link_faculty_bio
+    - field.field.node.moody_faculty_bio.field_position_faculty_bio
+    - field.field.node.moody_faculty_bio.field_show_eid_faculty_bio
+    - field.field.node.moody_faculty_bio.field_social_faculty_bio
+    - field.field.node.moody_faculty_bio.field_telephone_faculty_bio
+    - node.type.moody_faculty_bio
+  module:
+    - user
+id: node.moody_faculty_bio.teaser
+targetEntityType: node
+bundle: moody_faculty_bio
+mode: teaser
+content:
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  body: true
+  display_breadcrumbs: true
+  display_page_title: true
+  field_affiliations_faculty_bio: true
+  field_biography_faculty_bio: true
+  field_courses_faculty_bio: true
+  field_custom_tab_content_faculty: true
+  field_custom_tab_title_faculty: true
+  field_cv_pdf_faculty_bio: true
+  field_degrees_faculty_bio: true
+  field_department_association_fac: true
+  field_eid_faculty_bio: true
+  field_email_address_faculty_bio: true
+  field_email_faculty_bio: true
+  field_expertise_faculty_bio: true
+  field_first_name_faculty_bio: true
+  field_headshot_faculty_bio: true
+  field_last_name_faculty_bio: true
+  field_middle_name_facutly_bio: true
+  field_office_number_faculty_bio: true
+  field_personal_link_faculty_bio: true
+  field_position_faculty_bio: true
+  field_show_eid_faculty_bio: true
+  field_social_faculty_bio: true
+  field_telephone_faculty_bio: true

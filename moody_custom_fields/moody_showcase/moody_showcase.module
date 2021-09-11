@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_showcase.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_showcase_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_showcase module.
+    case 'help.page.moody_showcase':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Repeatable Moody Showcase units') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_showcase_theme() {
+  return [
+    'moody_showcase' => [
+      'variables' => [
+        'image' => NULL,
+        'headline' => NULL,
+        'copy' => NULL,
+        'cta' => NULL,
+      ],
+      'template' => 'moody-showcase',
+    ],
+    'field__moody_showcase' => [
+      'base hook' => 'field',
+      'template' => 'field--moody-showcase',
+    ]
+  ];
+}

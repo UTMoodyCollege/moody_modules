@@ -1,0 +1,10 @@
+field.widget.settings.moody_focus_areas_widget:
+  type: mapping
+  label: 'Moody Focus Areas Widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'

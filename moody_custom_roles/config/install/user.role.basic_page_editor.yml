@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies: {  }
+id: basic_page_editor
+label: 'Basic Page Editor'
+weight: 36
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'access content overview'
+  - 'access contextual links'
+  - 'access media overview'
+  - 'configure all page node layout overrides'
+  - 'configure editable page node layout overrides'
+  - 'create and edit custom blocks'
+  - 'create and edit reusable blocks'
+  - 'create media'
+  - 'create page content'
+  - 'delete media'
+  - 'delete own page content'
+  - 'delete page revisions'
+  - 'edit any page content'
+  - 'edit terms in tags'
+  - 'revert page revisions'
+  - 'update media'
+  - 'use text format basic_html'
+  - 'use text format flex_html'
+  - 'view all media revisions'
+  - 'view own unpublished content'
+  - 'view own unpublished media'
+  - 'view page revisions'
+  - 'view the administration theme'

@@ -1,0 +1,65 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_feature_page
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+label: 'Moody Feature Page node import'
+source:
+  plugin: moody_feature_page_source
+  node_type: moody_feature_page
+process:
+  nid: nid
+  title: title
+  language: language
+  created: created
+  changed: changed
+  status: status
+  sticky: sticky
+  promote: promote
+  body: field_body
+  field_moody_subtitle: field_subtitle
+  field_thumbnail_image_for_summar: field_moody_feature_page_thumbnail
+  tmp_field_feature_page_author:
+    plugin: get
+    source:
+      - credit
+  field_feature_page_author:
+    plugin: sub_process
+    source: credit
+    process:
+      first_name: credit_first_name
+      last_name: credit_last_name
+      title: credit_author_title
+  display_breadcrumbs:
+    plugin: default_value
+    default_value: 0
+  # save this in case we use paragraphs elsewhere
+  # pseudo_author:
+  #   plugin: migration
+  #   migration: moody_paragraph_source
+  #   source: nid
+  # field_feature_page_author:
+  #   plugin: iterator
+  #   source:
+  #     - '@pseudo_author'
+  #   process:
+  #     target_id: '0'
+  #     target_revision_id: '1'
+destination:
+  plugin: entity:node
+  default_bundle: moody_feature_page
+migration_dependencies:
+  required:
+    - utexas_users
+    - utexas_media_image
+    - utexas_media_video
+    - utexas_media_document
+    - utexas_media_audio
+    - utexas_content_blocks
+    - utexas_vocabularies
+    - moody_paragraph_source

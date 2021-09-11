@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_first_name_faculty_bio
+    - node.type.moody_faculty_bio
+id: node.moody_faculty_bio.field_first_name_faculty_bio
+field_name: field_first_name_faculty_bio
+entity_type: node
+bundle: moody_faculty_bio
+label: 'First Name'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: moody_standard_page_pattern
+label: 'Moody Standard Page pattern'
+type: 'canonical_entities:node'
+pattern: '[node:field_moody_url_generator:entity:parents:join-path]/[node:field_moody_url_generator]/[node:title]'
+selection_criteria:
+  1e3de609-4969-4d21-8a36-309053f5b791:
+    id: node_type
+    bundles:
+      moody_standard_page: moody_standard_page
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 1e3de609-4969-4d21-8a36-309053f5b791
+selection_logic: and
+weight: -5
+relationships: {  }

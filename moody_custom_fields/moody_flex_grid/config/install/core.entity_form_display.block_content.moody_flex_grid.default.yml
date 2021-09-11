@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_flex_grid
+    - field.field.block_content.moody_flex_grid.field_block_moody_flex_grid
+  module:
+    - moody_flex_grid
+id: block_content.moody_flex_grid.default
+targetEntityType: block_content
+bundle: moody_flex_grid
+mode: default
+content:
+  field_block_moody_flex_grid:
+    weight: 27
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_flex_grid_widget
+    region: content
+  info:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

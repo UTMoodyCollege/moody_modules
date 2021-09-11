@@ -1,0 +1,128 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.moody_media_page.body
+    - field.field.node.moody_media_page.field_east_austin_stories_catego
+    - field.field.node.moody_media_page.field_media_location
+    - field.field.node.moody_media_page.field_media_page_copy
+    - field.field.node.moody_media_page.field_media_page_description
+    - field.field.node.moody_media_page.field_media_page_directors
+    - field.field.node.moody_media_page.field_media_page_directors_text
+    - field.field.node.moody_media_page.field_media_page_featured_audio
+    - field.field.node.moody_media_page.field_media_page_people
+    - field.field.node.moody_media_page.field_media_page_thumbnail_image
+    - field.field.node.moody_media_page.field_media_page_video
+    - field.field.node.moody_media_page.field_moody_url_generator
+    - field.field.node.moody_media_page.field_tags_media_page
+    - node.type.moody_media_page
+  module:
+    - layout_builder
+    - layout_builder_restrictions
+    - text
+    - user
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+  layout_builder_restrictions:
+    entity_view_mode_restriction:
+      allowed_blocks: {  }
+      allowed_layouts: {  }
+      whitelisted_blocks: {  }
+      blacklisted_blocks: {  }
+    allowed_block_categories: {  }
+id: node.moody_media_page.default
+targetEntityType: node
+bundle: moody_media_page
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_east_austin_stories_catego:
+    weight: 6
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_media_location:
+    weight: 9
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_media_page_copy:
+    weight: 2
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_media_page_description:
+    weight: 3
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_media_page_directors:
+    type: moody_directors_formatter
+    weight: 4
+    region: content
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+  field_media_page_directors_text:
+    weight: 10
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_media_page_featured_audio:
+    type: entity_reference_entity_view
+    weight: 12
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    region: content
+  field_media_page_people:
+    weight: 11
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_multimedia_people_formatter
+    region: content
+  field_media_page_video:
+    weight: 5
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  links:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  addtoany: true
+  display_breadcrumbs: true
+  display_page_title: true
+  field_media_page_thumbnail_image: true
+  field_moody_url_generator: true
+  field_tags_media_page: true
+  layout_builder__layout: true

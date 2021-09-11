@@ -1,0 +1,79 @@
+{#
+/**
+ * @file
+ * Theme override for a field.
+ *
+ * To override output, copy the "field.html.twig" from the templates directory
+ * to your theme's directory and customize it, just like customizing other
+ * Drupal templates such as page.html.twig or node.html.twig.
+ *
+ * Instead of overriding the theming for all fields, you can also just override
+ * theming for a subset of fields using
+ * @link themeable Theme hook suggestions. @endlink For example,
+ * here are some theme hook suggestions that can be used for a field_foo field
+ * on an article node type:
+ * - field--node--field-foo--article.html.twig
+ * - field--node--field-foo.html.twig
+ * - field--node--article.html.twig
+ * - field--field-foo.html.twig
+ * - field--text-with-summary.html.twig
+ * - field.html.twig
+ *
+ * Available variables:
+ * - attributes: HTML attributes for the containing element.
+ * - label_hidden: Whether to show the field label or not.
+ * - title_attributes: HTML attributes for the title.
+ * - label: The label for the field.
+ * - multiple: TRUE if a field can contain multiple items.
+ * - items: List of all the field items. Each item contains:
+ *   - attributes: List of HTML attributes for each item.
+ *   - content: The field item's content.
+ * - entity_type: The entity type to which the field belongs.
+ * - field_name: The name of the field.
+ * - field_type: The type of the field.
+ * - label_display: The display settings for the label.
+ *
+ *
+ * @see template_preprocess_field()
+ */
+#}
+{%
+  set classes = [
+    'field',
+    'field--name-' ~ field_name|clean_class,
+    'field--type-' ~ field_type|clean_class,
+    'field--label-' ~ label_display,
+  ]
+%}
+
+	{# <div class="list-group list-group-horizontal" id="list-tab" role="tablist">
+		{% for key, value in tab_titles %}
+			{% set active = set_active[key] ? 'active' : '' %}
+			<a class="list-group-item list-group-item-action {{ active }}" id="list-{{ key }}-list" data-toggle="list" href="#list-{{ key }}" role="tab" aria-controls="{{ key }}">{{ value }} {{ set_active }}</a>
+		{% endfor %}
+	</div>
+	<hr>
+	<div class="tab-content" id="nav-tabContent">
+		{% for key, value in tab_contents %}
+			{% set active = set_active[key] ? 'active' : '' %}
+			<div class="tab-pane fade show {{ active }}" id="list-{{ key }}" role="tabpanel" aria-labelledby="list-{{ key }}-list">{{ value }}</div>
+		{% endfor %}
+	</div> #}
+
+
+<div{{attributes.addClass(classes,'field__items')}}>
+	<nav>
+		<div class="nav nav-tabs" id="nav-tab" role="tablist">
+			{% for key, value in tab_titles %}
+				{% set active = set_active[key] ? 'active' : '' %}
+				<a class="nav-item nav-link {{ active }}" id="nav-{{ key }}-tab" data-toggle="tab" href="#nav-{{ key }}" role="tab" aria-controls="nav-{{ key }}">{{ value }}</a>
+			{% endfor %}
+		</div>
+	</nav>
+	<div class="tab-content" id="nav-tabContent">
+		{% for key, value in tab_contents %}
+			{% set active = set_active[key] ? 'active' : '' %}
+			<div class="tab-pane fade show {{ active }}" id="nav-{{ key }}" role="tabpanel" aria-labelledby="nav-{{ key }}-tab">{{ value }}</div>
+		{% endfor %}
+	</div>
+</div>

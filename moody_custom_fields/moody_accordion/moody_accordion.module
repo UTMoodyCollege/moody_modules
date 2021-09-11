@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_accordion.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_accordion_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_accordion module.
+    case 'help.page.moody_accordion':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Compoun field for creating themed accordions') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_accordion_theme() {
+  return [
+    'field__moody_accordion' => [
+      'base hook' => 'field',
+      'template' => 'field--moody-accordion',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function moody_accordion_preprocess_field(&$variables) {
+  // Pass a random number to differentiate multiple accordions if placed on the same page.
+  if ($variables['field_name'] == 'field_block_moody_accordion') {
+    $rand_str = mt_rand();
+    $variables['rand'] = $rand_str;
+  }
+}

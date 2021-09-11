@@ -1,0 +1,6 @@
+name: 'Moody Social Accounts'
+type: module
+description: 'Themed and configurable social icons'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: 'Moody'

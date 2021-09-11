@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies: {  }
+id: utexas_media_document
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+label: 'Media - Document migration'
+source:
+  plugin: utexas_media_document_source
+destination:
+  plugin: utexas_media_document_destination
+process:
+  # Find the destination UID; accessible via
+  # $row->getDestinationProperty('uid');
+  uid:
+    plugin: migration_lookup
+    source: uid
+    migration:
+      - utexas_users
+migration_dependencies:
+  required:
+    - utexas_users

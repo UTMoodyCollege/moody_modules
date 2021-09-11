@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+id: block_content.moody_showcase_style_three
+label: 'Moody Showcase Marketing Style'
+targetEntityType: block_content
+cache: true

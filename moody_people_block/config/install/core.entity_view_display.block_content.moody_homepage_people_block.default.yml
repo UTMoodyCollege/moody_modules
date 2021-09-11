@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_homepage_people_block
+    - field.field.block_content.moody_homepage_people_block.field_moody_prominent_story
+id: block_content.moody_homepage_people_block.default
+targetEntityType: block_content
+bundle: moody_homepage_people_block
+mode: default
+content:
+  field_moody_prominent_story:
+    weight: 1
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_card_formatter2
+    region: content
+hidden: {  }

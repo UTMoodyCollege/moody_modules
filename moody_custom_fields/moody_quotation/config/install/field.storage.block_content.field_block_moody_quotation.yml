@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_quotation
+id: block_content.field_block_moody_quotation
+field_name: field_block_moody_quotation
+entity_type: block_content
+type: moody_quotation
+settings: {  }
+module: moody_quotation
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

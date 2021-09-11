@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_position_faculty_bio
+    - node.type.moody_faculty_bio
+    - taxonomy.vocabulary.moody_faculty_titles
+id: node.moody_faculty_bio.field_position_faculty_bio
+field_name: field_position_faculty_bio
+entity_type: node
+bundle: moody_faculty_bio
+label: Position
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      moody_faculty_titles: moody_faculty_titles
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: moody_faculty_titles
+field_type: entity_reference

@@ -1,0 +1,10 @@
+field.widget.settings.moody_quotation_widget:
+  type: mapping
+  label: 'Moody quotation widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'

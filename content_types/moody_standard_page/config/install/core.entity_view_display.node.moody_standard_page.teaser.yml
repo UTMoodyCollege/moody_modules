@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.moody_standard_page.body
+    - field.field.node.moody_standard_page.field_moody_url_generator
+    - field.field.node.moody_standard_page.layout_builder__layout
+    - node.type.moody_standard_page
+  module:
+    - user
+id: node.moody_standard_page.teaser
+targetEntityType: node
+bundle: moody_standard_page
+mode: teaser
+content:
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  addtoany: true
+  body: true
+  display_breadcrumbs: true
+  display_page_title: true
+  field_moody_url_generator: true
+  layout_builder__layout: true

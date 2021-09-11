@@ -1,0 +1,6 @@
+name: Inner Rail Filter
+description: Provide a filter for users to enter inner rail content into WYSIWYG editor.
+type: module
+package: Moody
+core: 8.x
+core_version_requirement: ^8 || ^9

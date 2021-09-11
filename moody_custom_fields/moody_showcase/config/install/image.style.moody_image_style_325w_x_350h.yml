@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_325w_x_350h
+label: '325w x 350h'
+effects:
+  92973476-0840-4cfe-8d56-de0a75e1b30a:
+    uuid: 92973476-0840-4cfe-8d56-de0a75e1b30a
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 325
+      height: 350
+      anchor: center-center
+

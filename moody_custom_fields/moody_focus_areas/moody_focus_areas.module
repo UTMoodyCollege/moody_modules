@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_focus_areas.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_focus_areas_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_focus_areas module.
+    case 'help.page.moody_focus_areas':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Themed and configurable focus areas') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_focus_areas_theme() {
+  return [
+    'moody_focus_areas' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'items_style' => NULL,
+        'cta' => NULL,
+        'focus_areas_items_title' => NULL,
+        'focus_areas_items' => NULL,
+      ],
+      'template' => 'moody-focus-areas',
+    ],
+  ];
+}

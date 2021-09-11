@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_primary_subsite_hero
+    - node.type.moody_subsite_page
+  module:
+    - moody_subsite_hero
+id: node.moody_subsite_page.field_primary_subsite_hero
+field_name: field_primary_subsite_hero
+entity_type: node
+bundle: moody_subsite_page
+label: 'Primary Subsite Hero'
+description: 'If set, this image will take precedence over the default subsite hero image.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_subsite_hero

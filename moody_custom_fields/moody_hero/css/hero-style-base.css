@@ -1,0 +1,15 @@
+.moody-hero {
+  position: relative;
+}
+
+.moody-hero .hero-content {
+  height: 100%;
+  margin: auto;
+  padding: 0 1rem;
+}
+
+.moody-hero img {
+  width: 100%;
+  max-height: 650px;
+  object-fit: cover;
+}

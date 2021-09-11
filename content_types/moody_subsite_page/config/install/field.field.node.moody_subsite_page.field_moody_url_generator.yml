@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_moody_url_generator
+    - node.type.moody_subsite_page
+    - taxonomy.vocabulary.directory_structure
+id: node.moody_subsite_page.field_moody_url_generator
+field_name: field_moody_url_generator
+entity_type: node
+bundle: moody_subsite_page
+label: 'Moody URL Generator'
+description: "<b>Select content directory for URL generation.</b>\r\n<br /><br />\r\n<b>Content Types:</b><br />\r\n<em><b>Landing Page Content Type</b> - yoursite.utexas.edu/your-dropdown/selection</em><br />\r\n<em><b>Standard Page Content Type</b> - yoursite.utexas.edu/your-dropdown/selection/your-page-title</em><br />\r\n<em><b>Subsite Page Content Type</b> - yoursite.utexas.edu/your-dropdown/selection/your-page-title</em><br />\r\n<em><b>Media Page Content Type</b> - yoursite.utexas.edu/your-dropdown/selection/your-page-title</em><br />\r\n<br />"
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      directory_structure: directory_structure
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

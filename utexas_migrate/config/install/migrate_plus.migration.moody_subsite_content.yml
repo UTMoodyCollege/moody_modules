@@ -1,0 +1,90 @@
+# process:
+#   id: id
+#   display_name: reference
+#   base_url: link
+#   # display_name: overall_center
+#   # hero__target_id: default_hero_photo
+#   # : info_bar_data
+#   # : corresponding_url_generator_tids
+#   # : overall_center_link
+#   # subsite_logo__target_id: subsite_logo
+#   # : subsite_social_accounts
+#   # : subsite_hero_display
+#   # : subsite_title_display
+#   # subsite_footer_text: subsite_footer_info
+#   # give_link: subsite_give_link
+#   # title_display_option: subsite_title_style
+#   # display_breadcrumbs: show_breadcrumb
+#   # Find the destination UID; accessible via
+#   # $row->getDestinationProperty('uid');
+#   user_id:
+#     plugin: migration_lookup
+#     source: uid
+#     migration:
+#       - utexas_users
+#   directory_structure: url_generator
+
+id: moody_subsite_content
+label: Moody Subsites
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+class: null
+source:
+  plugin: moody_subsite_source
+process:
+  id: id
+  name:
+    plugin: get
+    source:
+      - 'reference'
+  display_name:
+    plugin: get
+    source:
+      - 'overall_center'
+  base_url:
+    plugin: get
+    source:
+      - 'overall_center_link'
+  subsite_nav:
+    plugin: sub_process
+    source: subsite_nav
+    process:
+      title: link_title
+      link: link_url
+  hero:
+    plugin: get
+    source:
+      - 'hero_mid'
+  title_display_option:
+    plugin: get
+    source:
+      - 'subsite_title_style'
+  subsite_footer_text:
+    plugin: get
+    source:
+      - 'subsite_footer_info'
+  give_link:
+    plugin: get
+    source:
+      - 'subsite_give_link'
+  'custom_logo/media': logo_mid
+  'custom_logo/size': logo_style
+  subsite_info_bars:
+    plugin: sub_process
+    source: infobars
+    process:
+      title: link_title
+      link: link_url
+  subsite_social_links: social_links
+  directory_structure:
+    plugin: get
+    source:
+      - 'tid'
+destination:
+  plugin: entity:moody_subsite
+migration_dependencies:
+  required:
+    - moody_subsite_page
+    - utexas_terms
+    - utexas_media_image

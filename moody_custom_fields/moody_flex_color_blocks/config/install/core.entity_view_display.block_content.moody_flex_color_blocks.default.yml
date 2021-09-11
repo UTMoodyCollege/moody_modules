@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_flex_color_blocks
+    - field.field.block_content.moody_flex_color_blocks.field_block_flex_color_blocks
+  module:
+    - moody_flex_color_blocks
+id: block_content.moody_flex_color_blocks.default
+targetEntityType: block_content
+bundle: moody_flex_color_blocks
+mode: default
+content:
+  field_block_flex_color_blocks:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_flex_color_blocks_formatter
+    region: content
+hidden: {  }

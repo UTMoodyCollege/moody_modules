@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_flex_grid
+    - core.entity_view_mode.block_content.flex_grid_circular_style
+    - field.field.block_content.moody_flex_grid.field_block_moody_flex_grid
+  module:
+    - layout_builder
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: block_content.moody_flex_grid.flex_grid_circular_style
+targetEntityType: block_content
+bundle: moody_flex_grid
+mode: flex_grid_circular_style
+content:
+  field_block_moody_flex_grid:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_flex_grid_formatter2
+    region: content
+hidden: {  }

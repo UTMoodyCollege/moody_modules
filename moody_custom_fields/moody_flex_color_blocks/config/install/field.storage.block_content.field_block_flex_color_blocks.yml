@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_flex_color_blocks
+id: block_content.field_block_flex_color_blocks
+field_name: field_block_flex_color_blocks
+entity_type: block_content
+type: moody_flex_color_blocks
+settings: {  }
+module: moody_flex_color_blocks
+locked: false
+cardinality: 4
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,6 @@
+.moody-impact-facts-wrapper .moody-impact-facts {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  text-align: center;
+}

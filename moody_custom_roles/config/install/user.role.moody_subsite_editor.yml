@@ -1,0 +1,43 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_subsite_editor
+label: 'Moody Subsite Editor'
+weight: 12
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'access content overview'
+  - 'access contextual links'
+  - 'access media overview'
+  - 'access taxonomy overview'
+  - 'access workbench'
+  - 'administer moody subsite entities'
+  - 'administer page display visibility config'
+  - 'configure editable moody_subsite_page node layout overrides'
+  - 'create and edit custom blocks'
+  - 'create and edit reusable blocks'
+  - 'create media'
+  - 'create moody_subsite_page content'
+  - 'create terms in tags'
+  - 'delete media'
+  - 'delete moody_subsite_page revisions'
+  - 'delete own moody_subsite_page content'
+  - 'edit any moody_subsite_page content'
+  - 'edit moody subsite entities'
+  - 'edit own moody_subsite_page content'
+  - 'edit terms in tags'
+  - 'revert moody_subsite_page revisions'
+  - 'search Google CSE'
+  - 'update media'
+  - 'use text format basic_html'
+  - 'use text format flex_html'
+  - 'use text format restricted_html'
+  - 'view all media revisions'
+  - 'view moody_subsite_page revisions'
+  - 'view own unpublished content'
+  - 'view own unpublished media'
+  - 'view published moody subsite entities'
+  - 'view the administration theme'
+  - 'view unpublished moody subsite entities'
+  - 'view workbench access information'

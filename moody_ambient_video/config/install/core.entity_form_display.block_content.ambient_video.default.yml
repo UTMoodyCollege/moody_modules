@@ -1,0 +1,112 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.field.block_content.ambient_video.field_mav_cta
+    - field.field.block_content.ambient_video.field_mav_descriptions
+    - field.field.block_content.ambient_video.field_mav_fallback
+    - field.field.block_content.ambient_video.field_mav_headline
+    - field.field.block_content.ambient_video.field_mav_headline_line_two
+    - field.field.block_content.ambient_video.field_mav_height
+    - field.field.block_content.ambient_video.field_mav_mask
+    - field.field.block_content.ambient_video.field_mav_opacity
+    - field.field.block_content.ambient_video.field_mav_poster
+    - field.field.block_content.ambient_video.field_mav_text_position
+    - field.field.block_content.ambient_video.field_mav_url
+  module:
+    - file
+    - link
+    - media_library
+id: block_content.ambient_video.default
+targetEntityType: block_content
+bundle: ambient_video
+mode: default
+content:
+  field_mav_cta:
+    weight: 8
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
+    region: content
+  field_mav_descriptions:
+    weight: 4
+    settings:
+      progress_indicator: throbber
+    third_party_settings: {  }
+    type: file_generic
+    region: content
+  field_mav_fallback:
+    type: media_library_widget
+    weight: 3
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+    region: content
+  field_mav_headline:
+    weight: 6
+    settings:
+      size: 120
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_mav_headline_line_two:
+    weight: 7
+    settings:
+      size: 120
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_mav_height:
+    weight: 5
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
+    region: content
+  field_mav_mask:
+    weight: 10
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
+    region: content
+  field_mav_opacity:
+    weight: 11
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+    region: content
+  field_mav_poster:
+    type: media_library_widget
+    weight: 2
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+    region: content
+  field_mav_text_position:
+    weight: 9
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_mav_url:
+    weight: 1
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
+    region: content
+  info:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

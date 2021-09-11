@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_quotation
+    - field.field.block_content.moody_quotation.field_block_moody_quotation
+  module:
+    - moody_quotation
+id: block_content.moody_quotation.default
+targetEntityType: block_content
+bundle: moody_quotation
+mode: default
+content:
+  field_block_moody_quotation:
+    weight: 27
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_quotation_widget
+    region: content
+  info:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

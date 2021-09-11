@@ -1,0 +1,10 @@
+field.widget.settings.moody_accordion_widget:
+  type: mapping
+  label: 'Moody accordion widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'

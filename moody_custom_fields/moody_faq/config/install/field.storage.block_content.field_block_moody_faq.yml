@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_faq
+id: block_content.field_block_moody_faq
+field_name: field_block_moody_faq
+entity_type: block_content
+type: moody_faq
+settings: {  }
+module: moody_faq
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

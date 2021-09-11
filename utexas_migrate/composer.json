@@ -1,0 +1,16 @@
+{
+  "name": "utexas/utexas_migrate",
+  "description": "Provides migration from UTDK 7 to 8.",
+  "type": "project",
+  "license": "MIT",
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  ],
+  "require": {
+    "drupal/migrate_plus": "^5.1",
+    "drupal/migrate_tools": "4.0-beta3"
+  }
+}

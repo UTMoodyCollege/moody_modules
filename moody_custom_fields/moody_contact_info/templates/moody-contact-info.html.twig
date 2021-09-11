@@ -1,0 +1,17 @@
+
+<div class="moody-contact-info-wrapper">
+  <div class="contact-info-inner-wrapper">
+    {% if headline or copy %}
+      <div class="contact-text">
+        <h2 class="headline">{{ headline }}</h2>
+        {{ copy }}
+      </div>
+    {% endif %}
+    {% if subheadline and cta %}
+      <div class="contact-link">
+        <h3 class="subheadline">{{ subheadline }}</h3>
+        {{ cta }}
+      </div>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_1165w_372h
+label: '1165w x 372h'
+effects:
+  4d74d4e5-e35a-43d2-93c1-ab094e068016:
+    uuid: 4d74d4e5-e35a-43d2-93c1-ab094e068016
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 1165
+      height: 372
+      anchor: center-center

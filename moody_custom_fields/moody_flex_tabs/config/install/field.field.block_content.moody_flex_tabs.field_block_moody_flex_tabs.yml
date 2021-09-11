@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_flex_tabs
+    - field.storage.block_content.field_block_moody_flex_tabs
+  module:
+    - moody_flex_tabs
+id: block_content.moody_flex_tabs.field_block_moody_flex_tabs
+field_name: field_block_moody_flex_tabs
+entity_type: block_content
+bundle: moody_flex_tabs
+label: 'Moody Flex Tabs'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_flex_tabs

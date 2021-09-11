@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: faculty_bio_image
+label: 'Faculty Bio Image'
+effects:
+  101141d9-18e5-4b1c-83f7-375cc06e6e6c:
+    uuid: 101141d9-18e5-4b1c-83f7-375cc06e6e6c
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 400
+      height: 400
+      anchor: center-center

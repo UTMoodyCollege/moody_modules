@@ -1,0 +1,39 @@
+langcode: en
+status: true
+dependencies: {  }
+id: file_manager
+label: 'File Manager'
+weight: 33
+is_admin: null
+permissions:
+  - 'access files overview'
+  - 'access media overview'
+  - 'administer media'
+  - 'administer media types'
+  - 'create audio media'
+  - 'create document media'
+  - 'create media'
+  - 'create utexas_image media'
+  - 'create utexas_video_external media'
+  - 'delete any audio media'
+  - 'delete any document media'
+  - 'delete any media'
+  - 'delete any utexas_image media'
+  - 'delete any utexas_video_external media'
+  - 'delete media'
+  - 'delete own audio media'
+  - 'delete own document media'
+  - 'delete own utexas_image media'
+  - 'delete own utexas_video_external media'
+  - 'edit any audio media'
+  - 'edit any document media'
+  - 'edit any utexas_image media'
+  - 'edit any utexas_video_external media'
+  - 'edit own audio media'
+  - 'edit own document media'
+  - 'edit own utexas_image media'
+  - 'edit own utexas_video_external media'
+  - 'update any media'
+  - 'update media'
+  - 'view all media revisions'
+  - 'view own unpublished media'

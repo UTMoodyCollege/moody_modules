@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_media_page_people
+    - node.type.moody_media_page
+  module:
+    - moody_multimedia_directors
+id: node.moody_media_page.field_media_page_people
+field_name: field_media_page_people
+entity_type: node
+bundle: moody_media_page
+label: People
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_multimedia_people

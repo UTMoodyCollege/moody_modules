@@ -1,0 +1,114 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.moody_standard_page.body
+    - field.field.node.moody_standard_page.field_moody_url_generator
+    - field.field.node.moody_standard_page.layout_builder__layout
+    - node.type.moody_standard_page
+  module:
+    - layout_builder
+    - layout_builder_restrictions
+    - layout_discovery
+    - user
+third_party_settings:
+  layout_builder:
+    allow_custom: true
+    enabled: true
+    sections:
+      -
+        layout_id: layout_onecol
+        layout_settings:
+          label: ''
+        components:
+          fa5d5af0-027a-48b1-a493-6238bbf771a6:
+            uuid: fa5d5af0-027a-48b1-a493-6238bbf771a6
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'extra_field_block:node:moody_standard_page:links'
+            additional: {  }
+            weight: 0
+          1b63b4ad-51a5-42b8-89f7-1d854f52ecd9:
+            uuid: 1b63b4ad-51a5-42b8-89f7-1d854f52ecd9
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:node:moody_standard_page:field_moody_url_generator'
+              formatter:
+                label: above
+                settings:
+                  link: true
+                third_party_settings: {  }
+                type: entity_reference_label
+            additional: {  }
+            weight: 1
+        third_party_settings: {  }
+  layout_builder_restrictions:
+    allowed_block_categories: {  }
+    entity_view_mode_restriction:
+      whitelisted_blocks:
+        AddToAny: {  }
+        'Chaos Tools': {  }
+        'Content fields': {  }
+        Forms: {  }
+        System: {  }
+        UTexas:
+          - utexas_announcement
+        User: {  }
+        'Workbench Access': {  }
+        core: {  }
+      blacklisted_blocks:
+        'Custom block types':
+          - utexas_hero
+        'Lists (Views)':
+          - 'views_block:content_recent-block_1'
+          - 'views_block:who_s_online-who_s_online_block'
+        Menus:
+          - 'menu_block:footer'
+          - 'system_menu_block:footer'
+          - 'menu_block:menu-footer'
+          - 'system_menu_block:menu-footer'
+          - 'menu_block:menu-header'
+          - 'system_menu_block:header'
+          - 'system_menu_block:menu-header'
+          - 'menu_block:header'
+          - 'system_menu_block:admin'
+          - 'menu_block:admin'
+          - 'system_menu_block:tools'
+          - 'menu_block:tools'
+          - 'system_menu_block:account'
+          - 'menu_block:account'
+      allowed_layouts:
+        - layout_utexas_onecol
+        - layout_utexas_twocol
+        - layout_utexas_threecol
+        - layout_utexas_fourcol
+id: node.moody_standard_page.default
+targetEntityType: node
+bundle: moody_standard_page
+mode: default
+content:
+  field_moody_url_generator:
+    weight: 101
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  addtoany: true
+  body: true
+  display_breadcrumbs: true
+  display_page_title: true
+  layout_builder__layout: true

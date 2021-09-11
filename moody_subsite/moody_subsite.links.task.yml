@@ -1,0 +1,21 @@
+# Moody subsite routing definition
+moody_subsite.settings_tab:
+  route_name: moody_subsite.settings
+  title: 'Settings'
+  base_route: moody_subsite.settings
+
+entity.moody_subsite.canonical:
+  route_name: entity.moody_subsite.canonical
+  base_route: entity.moody_subsite.canonical
+  title: 'View'
+
+entity.moody_subsite.edit_form:
+  route_name: entity.moody_subsite.edit_form
+  base_route: entity.moody_subsite.canonical
+  title: 'Edit'
+
+entity.moody_subsite.delete_form:
+  route_name:  entity.moody_subsite.delete_form
+  base_route:  entity.moody_subsite.canonical
+  title: Delete
+  weight: 10

@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: ambient_video
+label: 'Ambient Video'
+revision: 0
+description: 'Ambient background video with configurable headline, CTA and display options.'

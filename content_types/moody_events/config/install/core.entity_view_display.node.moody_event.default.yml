@@ -1,0 +1,89 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.moody_event.field_moodyevent_body
+    - field.field.node.moody_event.field_moodyevent_datetime
+    - field.field.node.moody_event.field_moodyevent_featured
+    - field.field.node.moody_event.field_moodyevent_image
+    - field.field.node.moody_event.field_moodyevent_location
+    - field.field.node.moody_event.field_moodyevent_remote_id
+    - field.field.node.moody_event.field_moodyevent_remote_url
+    - field.field.node.moody_event.field_moodyevent_status
+    - field.field.node.moody_event.field_moodyevent_tags
+    - field.field.node.moody_event.field_remote_last_updated_date
+    - image.style.utexas_image_style_280w_280h
+    - node.type.moody_event
+  module:
+    - media
+    - moody_events
+    - options
+    - text
+    - user
+id: node.moody_event.default
+targetEntityType: node
+bundle: moody_event
+mode: default
+content:
+  field_moodyevent_body:
+    weight: 2
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_moodyevent_datetime:
+    weight: 3
+    label: above
+    settings:
+      format: default
+      force_chronological: false
+      add_classes: 0
+      format_type: medium
+      timezone_override: ''
+      past_display: '2'
+      upcoming_display: '2'
+      show_next: false
+    third_party_settings: {  }
+    type: utevent_smartdate_recurring
+    region: content
+  field_moodyevent_image:
+    type: media_thumbnail
+    weight: 1
+    label: hidden
+    settings:
+      image_style: utexas_image_style_280w_280h
+      image_link: ''
+    third_party_settings: {  }
+    region: content
+  field_moodyevent_location:
+    weight: 4
+    label: visually_hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_moodyevent_status:
+    weight: 0
+    label: visually_hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+    region: content
+  field_moodyevent_tags:
+    weight: 5
+    label: above
+    settings:
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+hidden:
+  display_breadcrumbs: true
+  display_page_title: true
+  field_moodyevent_featured: true
+  field_moodyevent_remote_id: true
+  field_moodyevent_remote_url: true
+  field_remote_last_updated_date: true
+  links: true

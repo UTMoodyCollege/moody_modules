@@ -1,0 +1,264 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_subsite_page.module.
+ */
+
+use Drupal\node\Entity\Node;
+use Drupal\Core\Cache\Cache;
+use Drupal\file\Entity\File;
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\utexas_migrate\MigrateHelper;
+use Drupal\block\Entity\Block;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function moody_subsite_page_preprocess_html(&$variables) {
+  if ($node = \Drupal::request()->attributes->get('node')) {
+    if (is_object($node) && $node->bundle() == 'moody_subsite_page') {
+      $variables['attributes']['class'][] = 'moody-subsite-page';
+    }
+    // For revision pages.
+    if (is_string($node)) {
+      $this_node = Node::load($node);
+      if ($this_node->bundle() == 'moody_subsite_page') {
+        $variables['attributes']['class'][] = 'moody-subsite-page';
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function moody_subsite_page_preprocess_page(&$variables) {
+  $node_type = FALSE;
+  if (isset($variables['node']) && is_object($variables['node'])) {
+    $node = $variables['node'];
+    $node_type = $variables['node']->getType();
+  }
+  // For revision pages.
+  if (isset($variables['node']) && is_string($variables['node'])) {
+    $node = Node::load($variables['node']);
+    $node_type = $node->getType();
+  }
+  if ($node_type == 'moody_subsite_page') {
+    $url_generator = $node->get('field_moody_url_generator');
+    $tid = $url_generator->getString();
+    // Check if there is an associated moody_subsite entity.
+    $subsite_entity_preprocessed = \Drupal::service('entity_type.manager')->getStorage('moody_subsite')->loadByProperties(['directory_structure' => $tid]);
+    $subsite_entity = array_values($subsite_entity_preprocessed);
+    $subsite = $subsite_entity[0];
+    if ($subsite_entity) {
+      // Get subsite ID.
+      $ssid = $subsite->id();
+
+      // Get subsite menu.
+      $subsite_nav = $subsite->get('subsite_nav')->view();
+      $variables['subsite_nav'] = $subsite_nav ;
+
+      // Get subsite title.
+      $subsite_title = $subsite->get('display_name')->getString();
+      $variables['subsite_title'] = $subsite_title;
+
+      // Get subsite hompage URL.
+      $base_url = $subsite->get('base_url')->getString();
+      $variables['subsite_base_url'] = $base_url;
+
+      // If present, pass the page level hero, else pass the subsite default hero.
+      $page_level_hero = $node->get('field_primary_subsite_hero')->view();
+      $subsite_default_hero = $subsite->get('hero')->view();
+      $subsite_hero = (isset($page_level_hero[0])) ? $page_level_hero : $subsite_default_hero;
+      $variables['subsite_hero'] = $subsite_hero;
+
+      // Get subsite footer text.
+      $variables['subsite_footer_text'] = FALSE;
+      $subsite_footer_text = $subsite->get('subsite_footer_text')->getString();
+      if ($subsite_footer_text != NULL) {
+        $variables['subsite_footer_text'] = check_markup($subsite_footer_text, 'flex_html');
+      }
+
+      // Get subsite give link.
+      $give_link = $subsite->get('give_link')->getString();
+      $variables['subsite_give_link'] = $give_link;
+
+      // Custom subsite logo.
+      $subsite_logo = $subsite->get('custom_logo')->getValue();
+      $subsite_logo_media = $subsite_logo[0]['media'];
+      $subsite_logo_size = $subsite_logo[0]['size'];
+      // Pass the default logo URL to use on subsites without custom logo.
+      $variables['default_logo_url'] = file_url_transform_relative(file_create_url(theme_get_setting('logo.url')));
+      // Pass the custom logo height.
+      $variables['subsite_logo_height'] = $subsite_logo_size;
+      $variables['custom_logo'] = FALSE;
+      if ($subsite_logo_media != 0 && $media = \Drupal::service('entity_type.manager')->getStorage('media')->load($subsite_logo_media)) {
+        $media_attributes = $media->get('field_utexas_media_image')->getValue();
+        if ($file = \Drupal::service('entity_type.manager')->getStorage('file')->load($media_attributes[0]['target_id'])) {
+          $image = new \stdClass();
+          $image->title = NULL;
+          $image->alt = $media_attributes[0]['alt'];
+          $image->entity = $file;
+          $image->uri = $file->getFileUri();
+          $image->width = NULL;
+          $image->height = NULL;
+          $image_render_array = [
+            '#uri' => $image->uri,
+            '#alt' => $image->alt,
+            '#theme' => 'image_style',
+            '#attributes' => [
+              'class' => 'img-fluid ut-logo--main',
+            ],
+            '#style_name' => 'utexas_image_style_1000w',
+          ];
+          $variables['custom_logo'] = $image_render_array;
+        }
+      }
+
+      // Get associated directory_structure term.
+      $directory_structure = $subsite->get('directory_structure')->getString();
+      $variables['directory_structure'] = $directory_structure;
+
+      $variables['strauss_link'] = FALSE;
+      $sitename = \Drupal::config('system.site')->get('name');
+      if (isset($sitename) && $sitename == "Moody College of Communication") {
+        // Check if this page belongs to Strauss and process if so.
+        $strauss_link = _process_strauss_page($directory_structure);
+        $variables['strauss_link'] = ($strauss_link) ? $strauss_link : FALSE;
+      }
+
+      // Get info bars.
+      $info_bars = $subsite->get('subsite_info_bars')->view();
+      $variables['info_bars'] = $info_bars;
+
+      // Get social accounts formatted string.
+      $variables['subsite_social'] = FALSE;
+      if (isset($subsite->get('subsite_social_links')->view()[0]['#markup'])) {
+        $variables['subsite_social'] = $subsite->get('subsite_social_links')->view()[0]['#markup'];
+      }
+
+      // Get subtitle from node if present.
+      $subtitle = $node->get('field_subsite_page_subtitle');
+      $variables['page_subtitle'] = isset($subtitle) ? $subtitle->getString() : FALSE;
+
+      // If the custom homepage option is checked and on the subsite homepage
+      // hide the subsite hero, info bars and page title.
+      $custom_homepage = $subsite->get('subsite_home_hero')->getString();
+      if ($custom_homepage) {
+        $current_url = Url::fromRoute('<current>')->toString();
+        if ($current_url == $base_url) {
+          $variables['info_bars'] = FALSE;
+          $variables['subsite_hero'] = FALSE;
+          // Page title is hidden in the moody_subsite_preprocess_page_title function.
+        }
+      }
+    }
+    // Hide page title block from content region on subsite pages.
+    $variables['page']['content']['moody_page_title']['#attributes']['class'][] = 'd-none';
+
+    // Add cache tag to all subsite pages
+    $node->addCacheTags(['moody_subsite:' . $ssid]);
+  }
+}
+
+/**
+ * Implements hook_preprocess_page_title().
+ */
+function moody_subsite_preprocess_page_title(&$variables) {
+  if ($node = \Drupal::request()->attributes->get('node')) {
+    if (is_object($node) && $node->bundle() == 'moody_subsite_page') {
+      // Check if there is an associated moody_subsite entity.
+      $this_node = \Drupal::request()->attributes->get('node');
+      $url_generator = $this_node->get('field_moody_url_generator');
+      $tid = $url_generator->getString();
+      $subsite_entity_preprocessed = \Drupal::service('entity_type.manager')->getStorage('moody_subsite')->loadByProperties(['directory_structure' => $tid]);
+      if (!empty($subsite_entity_preprocessed)) {
+        $subsite_entity = array_values($subsite_entity_preprocessed);
+        $subsite = $subsite_entity[0];
+        $title_display_option = $subsite->get('title_display_option')->getString();
+        switch ($title_display_option) {
+          // Case '1' is page title only so nothing to do here.
+          case '2':
+            // No page title.
+            $variables['title_attributes']['class'][] = 'sr-only';
+            break;
+
+          case '3':
+            // Subsite name prepeneded to page title.
+            $current_title = $this_node->getTitle();
+            $subsite_title = $subsite->get('display_name')->getString();
+            $variables['title'] = $subsite_title . ': ' . $current_title;
+            break;
+
+        }
+        // Hide page title on subsites with custom homepage hero images.
+        $custom_homepage = $subsite->get('subsite_home_hero')->getString();
+        $base_url = $subsite->get('base_url')->getString();
+        if ($custom_homepage) {
+          $current_url = Url::fromRoute('<current>')->toString();
+          if ($current_url == $base_url) {
+            $variables['title_attributes']['class'] = 'sr-only';
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_form_alter().
+ */
+function moody_subsite_page_form_node_form_alter(&$form, FormStateInterface $form_state) {
+  $form['#validate'][] = '_moody_subsite_page_node_form_validate';
+}
+
+/**
+ * Helper function to validate subsite page node edit form.
+ */
+function _moody_subsite_page_node_form_validate($form, FormStateInterface $form_state) {
+  $node = $form_state->getFormObject()->getEntity();
+  if ($node->getType() == 'moody_subsite_page') {
+    // Get user selected term.
+    $url_generator = $form_state->getValue('field_moody_url_generator');
+    $tid = $url_generator[0]['target_id'];
+    // Check if this term is associated with an existing subsite.
+    $query = \Drupal::entityQuery('moody_subsite')
+      ->condition('directory_structure', $tid);
+    $results = $query->execute();
+    // If results is empty throw error.
+    if (empty($results)) {
+      $form_state->setErrorByName('field_moody_url_generator', t('Error: You have chosen a term for "Moody URL Generator" that is not associated with an existing subsite. Please select a different term.'));
+    }
+  }
+}
+
+/**
+ * Helper function to add link to Strauss subsite pages.
+ */
+function _process_strauss_page($tid) {
+  // Strauss: 197
+  // American Trustees: 261
+  // Lessons: 215
+  // State Standards: 175
+  // Trustees: 170
+  // Digital Media Research Program: 173
+  // Executive Communication Training: 259
+  // Lebermann Forum: 161
+  // News: 211
+  // New Politics Forum: 183
+  // Project Vote Smart: 248
+  // Speak-Up Speak-Out: 247
+  // Tex Elects: 167
+  // Texas Civic Health Index: 185
+  // TXSurvey: 168
+  // TX Votes: 237
+  $strauss_tids = [197, 261, 215, 175, 170, 173, 259, 161, 211, 183, 248, 247, 167, 185, 168, 237,];
+  $markup = check_markup('<a href="/centers/strauss">A program of the Annette Strauss Institute for Civic Life</a>', 'flex_html');
+  $output = (in_array($tid, $strauss_tids)) ? $markup : FALSE;
+  return $output;
+}
+
+

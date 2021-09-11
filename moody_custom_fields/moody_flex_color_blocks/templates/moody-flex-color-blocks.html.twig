@@ -1,0 +1,33 @@
+{#
+/**
+ * @file
+ * Custom theme implementation for the Moody Flex CTA field.
+ *
+ * Available variables:
+ * - headline: Flex CTA headline.
+ * - subheadline: Flex CTA subheadline.
+ * - link: Flex CTA link.
+ * - color_scheme: Flex CTA background color.
+ *
+ * @ingroup themeable
+ */
+#}
+{% if link %}
+  <a href="{{ link }}" class="flex-color-blocks-wrapper {{ color_scheme }}">
+{% else %}
+  <div class="flex-color-blocks-wrapper {{ color_scheme }}">
+{% endif %}
+  {% if headline %}
+    <h2 class="headline dont-break-out">{{ headline }}</h2>
+  {% endif %}
+  {% if subheadline %}
+    <p class="subheadline">{{ subheadline }}</p>
+  {% endif %}
+{% if link %}
+  </a>
+{% else %}
+  </div>
+{% endif %}
+
+
+

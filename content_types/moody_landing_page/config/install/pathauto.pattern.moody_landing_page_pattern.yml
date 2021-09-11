@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: moody_landing_page_pattern
+label: 'Moody Landing Page pattern'
+type: 'canonical_entities:node'
+pattern: '[node:field_moody_url_generator:entity:parents:join-path]/[node:field_moody_url_generator]'
+selection_criteria:
+  3ebc099a-0376-4a3b-9b12-c77c17ac2c09:
+    id: node_type
+    bundles:
+      moody_landing_page: moody_landing_page
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 3ebc099a-0376-4a3b-9b12-c77c17ac2c09
+selection_logic: and
+weight: -5
+relationships: {  }

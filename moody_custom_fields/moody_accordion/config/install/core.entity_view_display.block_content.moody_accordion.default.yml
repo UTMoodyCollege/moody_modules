@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_accordion
+    - field.field.block_content.moody_accordion.field_block_moody_accordion
+id: block_content.moody_accordion.default
+targetEntityType: block_content
+bundle: moody_accordion
+mode: default
+content:
+  field_block_moody_accordion:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_accordion_formatter
+    region: content
+hidden: {  }

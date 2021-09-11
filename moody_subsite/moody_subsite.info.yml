@@ -1,0 +1,6 @@
+name: 'Moody Subsite'
+type: module
+description: 'Provide custom entity for Moody Subsite functionality'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: 'Moody'

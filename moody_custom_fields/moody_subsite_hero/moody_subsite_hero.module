@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_subsite_hero.module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function moody_subsite_hero_theme($existing, $type, $theme, $path) {
+  $variables = [
+    'moody_subsite_hero' => [
+      'variables' => [
+        'media' => NULL,
+        'caption' => NULL,
+        'credit' => NULL,
+      ],
+      'template' => 'moody-subsite-hero',
+    ],
+    'field__moody_subsite_hero' => [
+      'base hook' => 'field',
+      'template' => 'field--moody-subsite-hero',
+    ],
+  ];
+  return $variables;
+}

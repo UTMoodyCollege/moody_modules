@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.storage.block_content.field_mav_text_position
+  module:
+    - options
+id: block_content.ambient_video.field_mav_text_position
+field_name: field_mav_text_position
+entity_type: block_content
+bundle: ambient_video
+label: 'Text Position'
+description: 'Select the positioning of the text overlaid on the ambient video. Note: "Centered" positioning is recommended if using the Call to Action.'
+required: true
+translatable: false
+default_value:
+  -
+    value: centered
+default_value_callback: ''
+settings: {  }
+field_type: list_string

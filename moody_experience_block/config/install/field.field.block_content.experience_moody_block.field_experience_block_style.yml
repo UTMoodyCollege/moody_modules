@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.experience_moody_block
+    - field.storage.block_content.field_experience_block_style
+  module:
+    - options
+id: block_content.experience_moody_block.field_experience_block_style
+field_name: field_experience_block_style
+entity_type: block_content
+bundle: experience_moody_block
+label: Style
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: orange
+default_value_callback: ''
+settings: {  }
+field_type: list_string

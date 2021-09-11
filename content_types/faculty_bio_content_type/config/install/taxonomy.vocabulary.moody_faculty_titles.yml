@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Moody Faculty Titles'
+vid: moody_faculty_titles
+description: 'The Moody College of Communication list of Faculty Titles'
+weight: 0

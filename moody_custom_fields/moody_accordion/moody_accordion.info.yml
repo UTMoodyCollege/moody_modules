@@ -1,0 +1,6 @@
+name: 'Moody Accordion'
+type: module
+description: 'Compoun field for creating themed accordions'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: 'Moody'

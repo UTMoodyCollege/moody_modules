@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: moody_media_page_pattern
+label: 'Moody Media Page pattern'
+type: 'canonical_entities:node'
+pattern: '[node:field_moody_url_generator:entity:parents:join-path]/[node:field_moody_url_generator]/[node:title]'
+selection_criteria:
+  0219943c-48aa-4107-866b-7690dcdc2e4f:
+    id: node_type
+    bundles:
+      moody_media_page: moody_media_page
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 0219943c-48aa-4107-866b-7690dcdc2e4f
+selection_logic: and
+weight: -5
+relationships: {  }

@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_moodyevent_featured
+    - node.type.moody_event
+id: node.moody_event.field_moodyevent_featured
+field_name: field_moodyevent_featured
+entity_type: node
+bundle: moody_event
+label: 'Featured Event'
+description: 'This can be used as a filter when creating lists of events.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

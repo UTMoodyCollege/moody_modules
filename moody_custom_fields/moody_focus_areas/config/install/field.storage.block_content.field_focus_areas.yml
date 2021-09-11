@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_focus_areas
+id: block_content.field_focus_areas
+field_name: field_focus_areas
+entity_type: block_content
+type: moody_focus_areas
+settings: {  }
+module: moody_focus_areas
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

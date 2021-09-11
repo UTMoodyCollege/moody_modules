@@ -1,0 +1,62 @@
+langcode: en
+status: true
+id: utexas_faculty_bio
+deriver: Drupal\node\Plugin\migrate\D7NodeDeriver
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+label: 'Faculty Bio node import'
+source:
+  plugin: utexas_faculty_bio_source
+  node_type: moody_faculty_bio_page
+process:
+  title: title
+  language: language
+  created: created
+  changed: changed
+  status: status
+  sticky: sticky
+  promote: promote
+  field_first_name_faculty_bio: field_first_name
+  field_middle_name_facutly_bio: field_middle_name
+  field_last_name_faculty_bio: field_last_name
+  field_office_number_faculty_bio: field_office_number
+  field_email_address_faculty_bio: field_email
+  field_eid_faculty_bio: field_ut_eid
+  field_show_eid_faculty_bio: field_show_eid_on_profile
+  field_telephone_faculty_bio: field_phone
+  field_position_faculty_bio: field_position
+  field_faculty_image: headshot
+  field_department_association_fac: field_field_moody_fac_bio_dept
+  field_degrees_faculty_bio: field_degrees
+  field_courses_faculty_bio: field_courses
+  field_affiliations_faculty_bio: field_affiliations
+  field_custom_tab_title_faculty: field_custom_tab_title
+  field_custom_tab_content_faculty: field_custom_tab_body
+  field_biography_faculty_bio: field_biography
+  field_expertise_faculty_bio: field_expertise
+  'field_personal_link_faculty_bio/uri': personal_link_url
+  'field_personal_link_faculty_bio/title': personal_link_title
+  field_social_faculty_bio: faculty_social_links
+  display_breadcrumbs:
+    plugin: default_value
+    default_value: 0
+  field_cv_faculty_bio: field_ut_cv
+  field_cv_pdf_faculty_bio: field_ut_cv_pdf
+  field_headshot_faculty_bio: headshot_new
+destination:
+  plugin: entity:node
+  default_bundle: moody_faculty_bio
+migration_dependencies:
+  required:
+    - utexas_users
+    - utexas_media_image
+    - utexas_media_video
+    - utexas_media_audio
+    - utexas_media_document
+    - utexas_content_blocks
+    - utexas_terms
+

@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: experience_moody_block
+label: 'Experience Moody'
+revision: 0
+description: 'Block with prominent display for latest stories on Moody homepage'

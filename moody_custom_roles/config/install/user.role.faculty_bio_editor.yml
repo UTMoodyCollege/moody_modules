@@ -1,0 +1,40 @@
+langcode: en
+status: true
+dependencies: {  }
+id: faculty_bio_editor
+label: 'Faculty Bio Editor'
+weight: 29
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'access content overview'
+  - 'access contextual links'
+  - 'access media overview'
+  - 'access taxonomy overview'
+  - 'access workbench'
+  - 'create media'
+  - 'create moody_faculty_bio content'
+  - 'create terms in moody_faculty_titles'
+  - 'create terms in tags'
+  - 'create terms in taxonomy_moody_faculty_titles'
+  - 'delete media'
+  - 'delete moody_faculty_bio revisions'
+  - 'delete own moody_faculty_bio content'
+  - 'delete terms in moody_faculty_titles'
+  - 'delete terms in taxonomy_moody_faculty_titles'
+  - 'edit any moody_faculty_bio content'
+  - 'edit own moody_faculty_bio content'
+  - 'edit terms in moody_faculty_titles'
+  - 'edit terms in tags'
+  - 'edit terms in taxonomy_moody_faculty_titles'
+  - 'revert moody_faculty_bio revisions'
+  - 'search Google CSE'
+  - 'update media'
+  - 'use text format basic_html'
+  - 'use text format flex_html'
+  - 'use text format restricted_html'
+  - 'view all media revisions'
+  - 'view moody_faculty_bio revisions'
+  - 'view own unpublished content'
+  - 'view own unpublished media'
+  - 'view the administration theme'

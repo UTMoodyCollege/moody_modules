@@ -1,0 +1,6 @@
+name: 'Moody Flex Tabs'
+type: module
+description: 'Configurable horizontal tabs'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: 'Moody'

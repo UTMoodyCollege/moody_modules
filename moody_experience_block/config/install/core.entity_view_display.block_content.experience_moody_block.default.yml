@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.experience_moody_block
+    - field.field.block_content.experience_moody_block.field_experience_block_style
+    - field.field.block_content.experience_moody_block.field_moody_experience_items
+id: block_content.experience_moody_block.default
+targetEntityType: block_content
+bundle: experience_moody_block
+mode: default
+content:
+  field_moody_experience_items:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_card_formatter
+    region: content
+hidden:
+  field_experience_block_style: true

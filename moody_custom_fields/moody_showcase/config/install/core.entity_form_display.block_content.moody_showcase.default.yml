@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_showcase
+    - field.field.block_content.moody_showcase.field_block_moody_showcase
+  module:
+    - moody_showcase
+id: block_content.moody_showcase.default
+targetEntityType: block_content
+bundle: moody_showcase
+mode: default
+content:
+  field_block_moody_showcase:
+    weight: 26
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_showcase_widget
+    region: content
+  info:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_multimedia_directors.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_multimedia_directors_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_multimedia_directors module.
+    case 'help.page.moody_multimedia_directors':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Moody Multimedia Directors') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_multimedia_directors_theme($existing, $type, $theme, $path) {
+  return [
+    'moody_multimedia_directors' => [
+      'variables' => [
+        'first_name' => NULL,
+        'last_name' => NULL,
+        'title' => NULL,
+      ],
+      'template' => 'moody-multimedia-directors',
+    ],
+    'moody_multimedia_people' => [
+      'variables' => [
+        'first_name' => NULL,
+        'last_name' => NULL,
+        'title' => NULL,
+        'body' => NULL,
+      ],
+      'template' => 'moody-multimedia-people',
+    ],
+  ];
+}

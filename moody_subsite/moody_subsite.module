@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_subsite.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_subsite_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_subsite module.
+    case 'help.page.moody_subsite':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Provide custom entity for Moody Subsite functionality') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_subsite_theme() {
+  return [
+    'moody_subsite' => [
+      'render element' => 'children',
+    ],
+    'moody_subsite_menu' => [
+      'variables' => [
+        'title' => NULL,
+        'link' => NULL,
+      ],
+      'template' => 'moody-subsite-menu',
+    ],
+    'moody_info_bars' => [
+      'variables' => [
+        'title' => NULL,
+        'link' => NULL,
+      ],
+      'template' => 'moody-info-bars',
+    ],
+    'field__moody_info_bars' => [
+      'base hook' => 'field',
+      'template' => 'field--moody-info-bars',
+    ],
+    'field__moody_subsite_menu' => [
+      'base hook' => 'field',
+      'template' => 'field--moody-subsite-menu',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function moody_subsite_form_moody_subsite_edit_form_alter(&$form, FormStateInterface &$form_state, $form_id) {
+  if ($form_id == 'moody_subsite_edit_form') {
+    // Get roles for currently logged in user.
+    $current_user = \Drupal::currentUser();
+    $roles = $current_user->getRoles();
+    // Disable directory_structure field if user does not have adminstrator role.
+    if (!in_array('moody_administrator', $roles)) {
+      $form['directory_structure']['#attributes']['class'][] = 'visually-hidden';
+    }
+  }
+}

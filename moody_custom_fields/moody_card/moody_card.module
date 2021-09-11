@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_card.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_card_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_card module.
+    case 'help.page.moody_card':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Generic card for use in custom blocks.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_card_theme($existing, $type, $theme, $path) {
+  return [
+    'moody_card' => [
+      'variables' => [
+        'media' => NULL,
+        'title' => NULL,
+        'subtitle' => NULL,
+        'cta' => NULL,
+      ],
+      'template' => 'moody-card',
+    ],
+    'moody_card_two' => [
+      'variables' => [
+        'media' => NULL,
+        'title' => NULL,
+        'subtitle' => NULL,
+        'cta' => NULL,
+      ],
+      'template' => 'moody-card-two',
+    ],
+    'moody_card_three' => [
+      'variables' => [
+        'media' => NULL,
+        'cta' => NULL,
+      ],
+      'template' => 'moody-card-three',
+    ],
+  ];
+}

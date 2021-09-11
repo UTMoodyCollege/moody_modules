@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_flex_color_blocks.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_flex_color_blocks_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_flex_color_blocks module.
+    case 'help.page.moody_flex_color_blocks':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Provide field with multiple calls to action') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_flex_color_blocks_theme() {
+  return [
+    'moody_flex_color_blocks' => [
+      'variables' => [
+        'headline' => NULL,
+        'subheadline' => NULL,
+        'link' => NULL,
+        'color_scheme' => NULL,
+      ],
+      'template' => 'moody-flex-color-blocks',
+    ],
+    'field__moody_flex_color_blocks' => [
+      'base hook' => 'field',
+      'template' => 'field--moody-flex-color-blocks',
+    ],
+  ];
+}

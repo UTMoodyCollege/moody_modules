@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - moody_multimedia_directors
+    - node
+id: node.field_media_page_people
+field_name: field_media_page_people
+entity_type: node
+type: moody_multimedia_people
+settings: {  }
+module: moody_multimedia_directors
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

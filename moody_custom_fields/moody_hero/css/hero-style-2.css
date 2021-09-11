@@ -1,0 +1,32 @@
+.moody-hero.hero--photo-gradient {
+  background-size: cover;
+  height: 300px;
+}
+.moody-hero.hero--photo-gradient.center {
+  background-position: center;
+}
+.moody-hero.hero--photo-gradient.left {
+  background-position: left;
+}
+.moody-hero.hero--photo-gradient.right {
+  background-position: right;
+}
+.moody-hero.hero--photo-gradient + .hero-content {
+    background-color: #333f48;
+    color: #fff;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+@media screen and (min-width: 900px) {
+  .moody-hero.hero--photo-gradient {
+    height: 543px;
+  }
+  .moody-hero.hero--photo-gradient + .hero-content {
+    background: linear-gradient(to bottom, rgba(31, 38, 43, 0.75) 0%, rgba(31, 38, 43, 0.95) 82%, rgba(31, 38, 43, 0.95) 100%);
+    bottom: 0;
+    max-width: 100%;
+    height: auto;
+    position: absolute;
+    width: 100%;
+  }
+}

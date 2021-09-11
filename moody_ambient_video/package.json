@@ -1,0 +1,37 @@
+{
+  "name": "forty_acres",
+  "version": "1.0.0",
+  "description": "Bootstrap based Drupal theme",
+  "main": "gulpfile.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.austin.utexas.edu:eis1-wcs/forty_acres.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "gulp": "./node_modules/gulp/bin/gulp.js default"
+  },
+  "author": "Mike Marsello",
+  "license": "ISC",
+  "dependencies": {
+    "accessible-mega-menu": "git+https://github.com/adobe-accessibility/Accessible-Mega-Menu.git#84b7461e4719e0c33a902b94b1247e0e7f7ea5c9",
+    "bootstrap": "^4.6.0",
+    "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^6.1.0",
+    "gulp-cli": "^2.3.0",
+    "gulp-csscombx": "^4.2.1",
+    "gulp-sass": "^4.1.0",
+    "gulp-stylelint": "^9.0.0",
+    "gulp-uglify": "^3.0.2",
+    "lodash": "^4.17.21",
+    "natives": "^1.1.6",
+    "popper.js": "^1.16.1",
+    "stylelint": "^10.0.1",
+    "stylelint-checkstyle-formatter": "^0.1.2",
+    "stylelint-config-standard": "^18.3.0",
+    "stylelint-no-browser-hacks": "^1.2.1"
+  },
+  "browserslist": [
+    "defaults"
+  ]
+}

@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Moody Event Location'
+vid: moody_event_location
+description: ''
+weight: 0

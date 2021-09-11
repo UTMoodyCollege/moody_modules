@@ -1,0 +1,382 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.moody_faculty_bio.field_affiliations_faculty_bio
+    - field.field.node.moody_faculty_bio.field_biography_faculty_bio
+    - field.field.node.moody_faculty_bio.field_courses_faculty_bio
+    - field.field.node.moody_faculty_bio.field_custom_tab_content_faculty
+    - field.field.node.moody_faculty_bio.field_custom_tab_title_faculty
+    - field.field.node.moody_faculty_bio.field_cv_pdf_faculty_bio
+    - field.field.node.moody_faculty_bio.field_degrees_faculty_bio
+    - field.field.node.moody_faculty_bio.field_department_association_fac
+    - field.field.node.moody_faculty_bio.field_eid_faculty_bio
+    - field.field.node.moody_faculty_bio.field_email_address_faculty_bio
+    - field.field.node.moody_faculty_bio.field_email_faculty_bio
+    - field.field.node.moody_faculty_bio.field_expertise_faculty_bio
+    - field.field.node.moody_faculty_bio.field_first_name_faculty_bio
+    - field.field.node.moody_faculty_bio.field_headshot_faculty_bio
+    - field.field.node.moody_faculty_bio.field_last_name_faculty_bio
+    - field.field.node.moody_faculty_bio.field_middle_name_facutly_bio
+    - field.field.node.moody_faculty_bio.field_office_number_faculty_bio
+    - field.field.node.moody_faculty_bio.field_position_faculty_bio
+    - field.field.node.moody_faculty_bio.field_show_eid_faculty_bio
+    - field.field.node.moody_faculty_bio.field_telephone_faculty_bio
+    - node.type.moody_faculty_bio
+  module:
+    - feeds_tamper
+    - node
+third_party_settings:
+  feeds_tamper:
+    tampers:
+      d81f01f8-0034-47d9-98fd-d3889b9f463b:
+        separator: '|'
+        limit: null
+        plugin: explode
+        source: field_department_association_fac
+        weight: -9
+        label: Explode
+        uuid: d81f01f8-0034-47d9-98fd-d3889b9f463b
+      2ca0f158-03e3-41b0-97bd-84fd2e0a9991:
+        separator: '|'
+        limit: null
+        plugin: explode
+        source: field_expertise_faculty_bio
+        weight: -9
+        label: Explode
+        uuid: 2ca0f158-03e3-41b0-97bd-84fd2e0a9991
+      7dfdfde5-b0a0-4b66-9a89-a78c7dbf997e:
+        separator: '|'
+        limit: null
+        plugin: explode
+        source: field_position_faculty_bio
+        weight: -9
+        label: Explode
+        uuid: 7dfdfde5-b0a0-4b66-9a89-a78c7dbf997e
+      1e5d480c-0743-4ef5-b92a-1bf6d2baa510:
+        character: ''
+        side: trim
+        plugin: trim
+        source: field_department_association_fac
+        weight: -10
+        label: 'Characters to trim'
+        uuid: 1e5d480c-0743-4ef5-b92a-1bf6d2baa510
+      e27756f2-d1e3-4961-9c21-61cfb3bf59f5:
+        character: ''
+        side: trim
+        plugin: trim
+        source: field_department_association_fac
+        weight: -8
+        label: 'Characters to trim'
+        uuid: e27756f2-d1e3-4961-9c21-61cfb3bf59f5
+      a05c3e77-cc4a-436f-ad17-c4d356bd9220:
+        character: ''
+        side: trim
+        plugin: trim
+        source: field_expertise_faculty_bio
+        weight: -10
+        label: 'Characters to trim'
+        uuid: a05c3e77-cc4a-436f-ad17-c4d356bd9220
+      67ff5d16-0235-4987-9d93-0c5cf9a3df42:
+        character: ''
+        side: trim
+        plugin: trim
+        source: field_expertise_faculty_bio
+        weight: -8
+        label: 'Characters to trim'
+        uuid: 67ff5d16-0235-4987-9d93-0c5cf9a3df42
+      752efb67-47dc-4e9a-b0ad-95c0858dcae0:
+        character: ''
+        side: trim
+        plugin: trim
+        source: field_position_faculty_bio
+        weight: -10
+        label: 'Characters to trim'
+        uuid: 752efb67-47dc-4e9a-b0ad-95c0858dcae0
+      03363e68-798d-40bd-b929-b5672ada42e2:
+        character: ''
+        side: trim
+        plugin: trim
+        source: field_position_faculty_bio
+        weight: -8
+        label: 'Characters to trim'
+        uuid: 03363e68-798d-40bd-b929-b5672ada42e2
+id: faculty_bio_importer
+label: 'Faculty Bio Importer'
+description: 'Import Faculty Bio CSV exports from Moody department sites'
+help: ''
+import_period: 3600
+fetcher: http
+fetcher_configuration:
+  auto_detect_feeds: false
+  use_pubsubhubbub: false
+  always_download: false
+  fallback_hub: ''
+  request_timeout: 30
+parser: csv
+parser_configuration:
+  delimiter: ','
+  no_headers: false
+  line_limit: 100
+processor: 'entity:node'
+processor_configuration:
+  langcode: en
+  update_existing: 2
+  update_non_existent: _delete
+  expire: -1
+  owner_feed_author: false
+  owner_id: 0
+  authorize: true
+  skip_hash_check: false
+  values:
+    type: moody_faculty_bio
+custom_sources:
+  title:
+    label: title
+    value: title
+    machine_name: title
+  field_first_name_faculty_bio:
+    label: field_first_name_faculty_bio
+    value: field_first_name_faculty_bio
+    machine_name: field_first_name_faculty_bio
+  field_middle_name_facutly_bio:
+    label: field_middle_name_facutly_bio
+    value: field_middle_name_facutly_bio
+    machine_name: field_middle_name_facutly_bio
+  field_last_name_faculty_bio:
+    label: field_last_name_faculty_bio
+    value: field_last_name_faculty_bio
+    machine_name: field_last_name_faculty_bio
+  field_affiliations_faculty_bio:
+    label: field_affiliations_faculty_bio
+    value: field_affiliations_faculty_bio
+    machine_name: field_affiliations_faculty_bio
+  field_biography_faculty_bio:
+    label: field_biography_faculty_bio
+    value: field_biography_faculty_bio
+    machine_name: field_biography_faculty_bio
+  field_courses_faculty_bio:
+    label: field_courses_faculty_bio
+    value: field_courses_faculty_bio
+    machine_name: field_courses_faculty_bio
+  field_custom_tab_content_faculty:
+    label: field_custom_tab_content_faculty
+    value: field_custom_tab_content_faculty
+    machine_name: field_custom_tab_content_faculty
+  field_custom_tab_title_faculty:
+    label: field_custom_tab_title_faculty
+    value: field_custom_tab_title_faculty
+    machine_name: field_custom_tab_title_faculty
+  field_degrees_faculty_bio:
+    label: field_degrees_faculty_bio
+    value: field_degrees_faculty_bio
+    machine_name: field_degrees_faculty_bio
+  field_department_association_fac:
+    label: field_department_association_fac
+    value: field_department_association_fac
+    machine_name: field_department_association_fac
+  field_eid_faculty_bio:
+    label: field_eid_faculty_bio
+    value: field_eid_faculty_bio
+    machine_name: field_eid_faculty_bio
+  field_email_faculty_bio:
+    label: field_email_faculty_bio
+    value: field_email_faculty_bio
+    machine_name: field_email_faculty_bio
+  field_email_address_faculty_bio:
+    label: field_email_address_faculty_bio
+    value: field_email_address_faculty_bio
+    machine_name: field_email_address_faculty_bio
+  field_expertise_faculty_bio:
+    label: field_expertise_faculty_bio
+    value: field_expertise_faculty_bio
+    machine_name: field_expertise_faculty_bio
+  field_office_number_faculty_bio:
+    label: field_office_number_faculty_bio
+    value: field_office_number_faculty_bio
+    machine_name: field_office_number_faculty_bio
+  field_personal_link_faculty_bio:
+    label: field_personal_link_faculty_bio
+    value: field_personal_link_faculty_bio
+    machine_name: field_personal_link_faculty_bio
+  field_position_faculty_bio:
+    label: field_position_faculty_bio
+    value: field_position_faculty_bio
+    machine_name: field_position_faculty_bio
+  field_show_eid_faculty_bio:
+    label: field_show_eid_faculty_bio
+    value: field_show_eid_faculty_bio
+    machine_name: field_show_eid_faculty_bio
+  field_telephone_faculty_bio:
+    label: field_telephone_faculty_bio
+    value: field_telephone_faculty_bio
+    machine_name: field_telephone_faculty_bio
+  uri_1:
+    label: uri_1
+    value: uri_1
+    machine_name: uri_1
+  uri:
+    label: uri
+    value: uri
+    machine_name: uri
+  field_headshot_faculty_bio_1:
+    label: field_headshot_faculty_bio_1
+    value: field_headshot_faculty_bio_1
+    machine_name: field_headshot_faculty_bio_1
+mappings:
+  -
+    target: title
+    map:
+      value: title
+    unique: {  }
+    settings:
+      language: null
+  -
+    target: field_first_name_faculty_bio
+    map:
+      value: field_first_name_faculty_bio
+    unique: {  }
+    settings:
+      language: null
+  -
+    target: field_middle_name_facutly_bio
+    map:
+      value: field_middle_name_facutly_bio
+    unique: {  }
+    settings:
+      language: null
+  -
+    target: field_last_name_faculty_bio
+    map:
+      value: field_last_name_faculty_bio
+    unique: {  }
+    settings:
+      language: null
+  -
+    target: field_affiliations_faculty_bio
+    map:
+      value: field_affiliations_faculty_bio
+    settings:
+      language: ''
+      format: flex_html
+  -
+    target: field_biography_faculty_bio
+    map:
+      value: field_biography_faculty_bio
+    settings:
+      language: ''
+      format: flex_html
+  -
+    target: field_courses_faculty_bio
+    map:
+      value: field_courses_faculty_bio
+    settings:
+      language: ''
+      format: flex_html
+  -
+    target: field_custom_tab_content_faculty
+    map:
+      value: field_custom_tab_content_faculty
+    settings:
+      language: ''
+      format: flex_html
+  -
+    target: field_custom_tab_title_faculty
+    map:
+      value: field_custom_tab_title_faculty
+    unique: {  }
+    settings:
+      language: null
+  -
+    target: field_degrees_faculty_bio
+    map:
+      value: field_degrees_faculty_bio
+    settings:
+      language: ''
+      format: flex_html
+  -
+    target: field_department_association_fac
+    map:
+      target_id: field_department_association_fac
+    settings:
+      language: ''
+      reference_by: name
+      autocreate: '1'
+  -
+    target: field_eid_faculty_bio
+    map:
+      value: field_eid_faculty_bio
+    unique: {  }
+    settings:
+      language: null
+  -
+    target: field_email_faculty_bio
+    map:
+      value: field_email_faculty_bio
+    unique: {  }
+    settings:
+      language: null
+  -
+    target: field_email_address_faculty_bio
+    map:
+      value: field_email_address_faculty_bio
+    unique: {  }
+    settings:
+      language: null
+      defuse: false
+  -
+    target: field_expertise_faculty_bio
+    map:
+      target_id: field_expertise_faculty_bio
+    settings:
+      language: ''
+      reference_by: name
+      autocreate: '1'
+  -
+    target: field_office_number_faculty_bio
+    map:
+      value: field_office_number_faculty_bio
+    unique: {  }
+    settings:
+      language: null
+  -
+    target: field_position_faculty_bio
+    map:
+      target_id: field_position_faculty_bio
+    settings:
+      language: ''
+      reference_by: name
+      autocreate: '1'
+  -
+    target: field_show_eid_faculty_bio
+    map:
+      value: field_show_eid_faculty_bio
+    settings:
+      language: null
+  -
+    target: field_telephone_faculty_bio
+    map:
+      value: field_telephone_faculty_bio
+    settings:
+      language: null
+  -
+    target: field_cv_pdf_faculty_bio
+    map:
+      target_id: uri_1
+      description: title
+    settings:
+      language: ''
+      reference_by: fid
+      existing: '2'
+      autocreate: 0
+  -
+    target: field_headshot_faculty_bio
+    map:
+      target_id: uri
+      alt: field_headshot_faculty_bio_1
+      title: ''
+    settings:
+      language: ''
+      reference_by: fid
+      existing: '2'
+      autocreate: 0

@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Contains utexas_migrate.install.
+ */
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Removes migration_plus config on uninstall.
+ * Without this, removing the module leaves behind config
+ * values that are meaningless and clutter the database.
+ * This also prevents re-enabling the module, as it will
+ * throw a Drupal\Core\Config\PreExistingConfigException
+ * because of these stale values.
+ */
+function utexas_migrate_uninstall() {
+  // Find all config that has 'migrate_plus' in the name.
+  $query = \Drupal::database()->select('config', 'c')
+    ->fields('c', ['name'])
+    ->condition('name', \Drupal::database()->escapeLike('migrate_plus'))
+    ->execute();
+
+  $config_names = $query->fetchAll();
+
+  // Delete each config using configFactory.
+  foreach ($config_names as $config_name) {
+    \Drupal::configFactory()->getEditable($config_name->name)->delete();
+  }
+}

@@ -1,0 +1,10 @@
+subsite-edit-form:
+  version: 1.x
+  css:
+    theme:
+      theme/subsite-edit-form.css: {}
+
+subsite-admin:
+  css:
+    theme:
+      theme/subsite-admin.css: {}

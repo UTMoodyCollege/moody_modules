@@ -1,0 +1,6 @@
+name: 'Moody Custom Roles'
+type: module
+description: 'All of the roles used by the core and department sites'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: 'Moody'

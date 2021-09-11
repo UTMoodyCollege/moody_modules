@@ -1,0 +1,23 @@
+name: UTexas Migrate
+type: module
+description: Provides a migration path for UTDK 7 to 8.
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: UTexas
+dependencies:
+  - migrate_plus
+  - migrate_tools
+  - migrate_drupal
+  - faculty_bio_content_type
+  - moody_social_accounts
+  - moody_hero
+  - moody_feature_credit
+  - utexas_inner_rail_filter
+  - workbench_access
+  - moody_subsite
+  - moody_subsite_hero
+  - moody_media_page
+  - moody_feature_page
+  - moody_subsite_page
+  - moody_standard_page
+  - moody_landing_page

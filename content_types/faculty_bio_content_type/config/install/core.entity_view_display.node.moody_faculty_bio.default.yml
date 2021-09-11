@@ -1,0 +1,220 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.moody_faculty_bio.body
+    - field.field.node.moody_faculty_bio.field_affiliations_faculty_bio
+    - field.field.node.moody_faculty_bio.field_biography_faculty_bio
+    - field.field.node.moody_faculty_bio.field_courses_faculty_bio
+    - field.field.node.moody_faculty_bio.field_custom_tab_content_faculty
+    - field.field.node.moody_faculty_bio.field_custom_tab_title_faculty
+    - field.field.node.moody_faculty_bio.field_cv_pdf_faculty_bio
+    - field.field.node.moody_faculty_bio.field_degrees_faculty_bio
+    - field.field.node.moody_faculty_bio.field_department_association_fac
+    - field.field.node.moody_faculty_bio.field_eid_faculty_bio
+    - field.field.node.moody_faculty_bio.field_email_address_faculty_bio
+    - field.field.node.moody_faculty_bio.field_email_faculty_bio
+    - field.field.node.moody_faculty_bio.field_expertise_faculty_bio
+    - field.field.node.moody_faculty_bio.field_first_name_faculty_bio
+    - field.field.node.moody_faculty_bio.field_headshot_faculty_bio
+    - field.field.node.moody_faculty_bio.field_last_name_faculty_bio
+    - field.field.node.moody_faculty_bio.field_middle_name_facutly_bio
+    - field.field.node.moody_faculty_bio.field_office_number_faculty_bio
+    - field.field.node.moody_faculty_bio.field_personal_link_faculty_bio
+    - field.field.node.moody_faculty_bio.field_position_faculty_bio
+    - field.field.node.moody_faculty_bio.field_show_eid_faculty_bio
+    - field.field.node.moody_faculty_bio.field_social_faculty_bio
+    - field.field.node.moody_faculty_bio.field_telephone_faculty_bio
+    - image.style.faculty_bio_image
+    - node.type.moody_faculty_bio
+  module:
+    - file
+    - image
+    - link
+    - moody_social_accounts
+    - telephone
+    - text
+    - user
+id: node.moody_faculty_bio.default
+targetEntityType: node
+bundle: moody_faculty_bio
+mode: default
+content:
+  field_affiliations_faculty_bio:
+    weight: 20
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_biography_faculty_bio:
+    weight: 16
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_courses_faculty_bio:
+    weight: 17
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_custom_tab_content_faculty:
+    weight: 19
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_custom_tab_title_faculty:
+    weight: 18
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_cv_pdf_faculty_bio:
+    weight: 25
+    label: hidden
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
+    type: file_default
+    region: content
+  field_degrees_faculty_bio:
+    weight: 15
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_department_association_fac:
+    weight: 6
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_eid_faculty_bio:
+    weight: 10
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_email_address_faculty_bio:
+    weight: 7
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: email_mailto
+    region: content
+  field_expertise_faculty_bio:
+    weight: 13
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_first_name_faculty_bio:
+    weight: 2
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_headshot_faculty_bio:
+    weight: 24
+    label: hidden
+    settings:
+      image_style: faculty_bio_image
+      image_link: ''
+    third_party_settings: {  }
+    type: image
+    region: content
+  field_last_name_faculty_bio:
+    weight: 4
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_middle_name_facutly_bio:
+    weight: 3
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_office_number_faculty_bio:
+    weight: 9
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_personal_link_faculty_bio:
+    weight: 14
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+    region: content
+  field_position_faculty_bio:
+    weight: 5
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_show_eid_faculty_bio:
+    weight: 11
+    label: hidden
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    type: boolean
+    region: content
+  field_social_faculty_bio:
+    weight: 21
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_social_accounts_formatter
+    region: content
+  field_telephone_faculty_bio:
+    weight: 8
+    label: hidden
+    settings:
+      title: ''
+    third_party_settings: {  }
+    type: telephone_link
+    region: content
+  links:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  body: true
+  display_breadcrumbs: true
+  display_page_title: true
+  field_email_faculty_bio: true

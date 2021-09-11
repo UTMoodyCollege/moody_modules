@@ -1,0 +1,23 @@
+{
+    "name": "moody-college/moody_modules",
+    "description": "Drupal 9 custom modules",
+    "type": "drupal-custom-module",
+    "keywords": ["Drupal", "UT Drupal Kit", "Moody College of Communication"],
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://webusersguide.moody.utexas.edu/",
+    "authors": [
+        {
+            "name": "Michael Marsello",
+            "email": "mmarsello@austin.utexas.edu",
+            "homepage": "https://webusersguide.moody.utexas.edu/",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "mmarsello@austin.utexas.edu",
+        "docs": "https://webusersguide.moody.utexas.edu/"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

@@ -1,0 +1,68 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_flex_tabs.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_flex_tabs_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_flex_tabs module.
+    case 'help.page.moody_flex_tabs':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Configurable horizontal tabs') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_flex_tabs_theme() {
+  return [
+    'moody_flex_tabs' => [
+      'variables' => [
+        'set_active' => NULL,
+        'tab_title' => NULL,
+        'tab_content' => NULL,
+      ],
+      'template' => 'moody-flex-tabs',
+    ],
+    'field__moody_flex_tabs' => [
+      'base hook' => 'field',
+      'template' => 'field--moody-flex-tabs',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function moody_flex_tabs_preprocess_field(&$variables) {
+  $field_type = $variables['field_type'];
+  if ($field_type == 'moody_flex_tabs') {
+    $set_active = [];
+    $titles = [];
+    $contents = [];
+    foreach ($variables['items'] as $key => $item) {
+      $active = $item['content']['#set_active'];
+      $set_active[$key] = $active;
+      $title = $item['content']['#tab_title'];
+      $titles[$key] = $title;
+      $content = $item['content']['#tab_content'];
+      $contents[$key] = $content;
+    }
+
+    $variables['set_active'] = $set_active;
+    $variables['tab_titles'] = $titles;
+    $variables['tab_contents'] = $contents;
+  }
+}

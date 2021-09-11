@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_feature_credit.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_feature_credit_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_feature_credit module.
+    case 'help.page.moody_feature_credit':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Author data for feature pages') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_feature_credit_theme($existing, $type, $theme, $path) {
+  return [
+    'moody_feature_credit' => [
+      'variables' => [
+        'first_name' => NULL,
+        'last_name' => NULL,
+        'title' => NULL,
+      ],
+      'template' => 'moody-feature-credit',
+    ],
+  ];
+}

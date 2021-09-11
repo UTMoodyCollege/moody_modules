@@ -1,0 +1,39 @@
+.moody-hero.hero--photo-white-notch {
+  background-size: cover;
+  height: 300px;
+}
+.moody-hero.hero--photo-white-notch.center {
+  background-position: center;
+}
+.moody-hero.hero--photo-white-notch.left {
+  background-position: left;
+}
+.moody-hero.hero--photo-white-notch.right {
+  background-position: right;
+}
+@media screen and (min-width: 900px) {
+  .moody-hero.hero--photo-white-notch {
+    height: 543px;
+  }
+}
+.moody-hero.hero--photo-white-notch + .hero-content .hero-callout {
+  background-color: #fff;
+  margin: auto;
+  max-width: 73.75em;
+  padding: 15px;
+}
+@media screen and (min-width: 900px) {
+  .moody-hero.hero--photo-white-notch + .hero-content {
+    bottom: 0;
+    height: auto;
+    max-width: 100%;
+    position: absolute;
+    width: 100%;
+  }
+  .moody-hero.hero--photo-white-notch + .hero-content .hero-callout {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 20px;
+  }
+}

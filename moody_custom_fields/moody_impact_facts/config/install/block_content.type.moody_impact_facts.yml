@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_impact_facts
+label: 'Moody Impact Facts'
+revision: 0
+description: 'Provide themed and configurable prominent display of impact facts.'

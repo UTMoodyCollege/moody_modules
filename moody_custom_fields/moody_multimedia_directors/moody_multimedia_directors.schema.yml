@@ -1,0 +1,20 @@
+field.widget.settings.moody_directors_widget:
+  type: mapping
+  label: 'Moody directors widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'
+field.widget.settings.moody_multimedia_people_widget:
+  type: mapping
+  label: 'Moody multimedia people widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'

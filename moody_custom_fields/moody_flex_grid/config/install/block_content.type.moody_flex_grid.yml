@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_flex_grid
+label: 'Moody Flex Grid'
+revision: 0
+description: 'Provide multiple items with configurable image, headline, subheadline, link and style option.'

@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_contact_info
+id: block_content.field_block_moody_contact_info
+field_name: field_block_moody_contact_info
+entity_type: block_content
+type: moody_contact_info
+settings: {  }
+module: moody_contact_info
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

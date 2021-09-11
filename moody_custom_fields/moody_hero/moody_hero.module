@@ -1,0 +1,265 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_hero.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\block\BlockForm;
+
+/**
+ * Implements hook_theme().
+ */
+function moody_hero_theme($existing, $type, $theme, $path) {
+  $variables = [
+    'moody_hero' => [
+      'variables' => [
+        'media' => NULL,
+        'heading' => NULL,
+        'subheading' => NULL,
+        'caption' => NULL,
+        'credit' => NULL,
+        'cta' => NULL,
+      ],
+      'template' => 'moody-hero',
+    ],
+    'moody_hero_1' => [
+      'variables' => [
+        'media_identifier' => NULL,
+        'heading' => NULL,
+        'subheading' => NULL,
+        'caption' => NULL,
+        'credit' => NULL,
+        'cta' => NULL,
+        'alt' => NULL,
+        'anchor_position' => NULL,
+      ],
+      'template' => 'moody-hero-1',
+    ],
+    'moody_hero_2' => [
+      'variables' => [
+        'media_identifier' => NULL,
+        'heading' => NULL,
+        'subheading' => NULL,
+        'caption' => NULL,
+        'credit' => NULL,
+        'cta' => NULL,
+        'alt' => NULL,
+        'anchor_position' => NULL,
+      ],
+      'template' => 'moody-hero-2',
+    ],
+    'moody_hero_3' => [
+      'variables' => [
+        'media_identifier' => NULL,
+        'heading' => NULL,
+        'subheading' => NULL,
+        'cta' => NULL,
+        'alt' => NULL,
+        'anchor_position' => NULL,
+      ],
+      'template' => 'moody-hero-3',
+    ],
+    'moody_hero_4' => [
+      'variables' => [
+        'media' => NULL,
+        'heading' => NULL,
+        'subheading' => NULL,
+        'caption' => NULL,
+        'credit' => NULL,
+        'cta' => NULL,
+      ],
+      'template' => 'moody-hero-4',
+    ],
+    'moody_hero_5' => [
+      'variables' => [
+        'media_identifier' => NULL,
+        'heading' => NULL,
+        'subheading' => NULL,
+        'caption' => NULL,
+        'credit' => NULL,
+        'cta' => NULL,
+        'alt' => NULL,
+        'anchor_position' => NULL,
+      ],
+      'template' => 'moody-hero-5',
+    ],
+    'moody_hero_6' => [
+      'variables' => [
+        'media_identifier' => NULL,
+        'heading' => NULL,
+        'subheading' => NULL,
+        'caption' => NULL,
+        'credit' => NULL,
+        'cta' => NULL,
+        'alt' => NULL,
+        'anchor_position' => NULL,
+        'text_color' => NULL,
+        'overlay' => NULL,
+      ],
+      'template' => 'moody-hero-6',
+    ],
+    'moody_hero_7' => [
+      'variables' => [
+        'media_identifier' => NULL,
+        'heading' => NULL,
+        'alt' => NULL,
+        'anchor_position' => NULL,
+        'text_position' => NULL,
+        'text_color' => NULL,
+        'overlay' => NULL,
+      ],
+      'template' => 'moody-hero-7',
+    ],
+    'moody_hero_8' => [
+      'variables' => [
+        'media_identifier' => NULL,
+        'heading' => NULL,
+        'alt' => NULL,
+        'anchor_position' => NULL,
+        'text_position' => NULL,
+        'text_color' => NULL,
+        'overlay' => NULL,
+      ],
+      'template' => 'moody-hero-8',
+    ],
+  ];
+  return $variables;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function moody_hero_form_layout_builder_update_block_alter(&$form, FormStateInterface $form_state, $form_id) {
+  _moody_hero_simplify_layout_form($form);
+  _moody_hero_formatter_split_entity_type_validation($form);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function moody_hero_form_layout_builder_add_block_alter(&$form, FormStateInterface $form_state, $form_id) {
+  _moody_hero_simplify_layout_form($form);
+  _moody_hero_formatter_split_entity_type_validation($form);
+}
+
+/**
+ * Helper function for Layout Builder form alters.
+ */
+function _moody_hero_simplify_layout_form(&$form) {
+  $is_hero = FALSE;
+  // Check inline block view mode labels.
+  if (isset($form['settings']['block_form'])) {
+    $bundle = $form['settings']['block_form']['#block']->bundle();
+    if ($bundle === 'moody_hero') {
+      $is_hero = TRUE;
+    }
+  }
+  // Check reusable block view mode labels.
+  if (isset($form['settings']['provider'])) {
+    if ($form['settings']['provider']['#value'] == 'block_content') {
+      $options = array_keys($form['settings']['view_mode']['#options']);
+      if (in_array('moody_hero_2', $options)) {
+        $is_hero = TRUE;
+      }
+    }
+  }
+  if ($is_hero) {
+    $form['settings']['view_mode']['#options'] = _update_moody_hero_view_mode_labels($form['settings']['view_mode']['#options']);
+  }
+}
+
+/**
+ * Helper function for updating view mode labels.
+ */
+function _update_moody_hero_view_mode_labels($options) {
+  $formatterManager = \Drupal::service('plugin.manager.field.formatter');
+  $definitions = $formatterManager->getDefinitions();
+  $map = _moody_hero_mapping_formatter_labels($definitions, 'moody_hero');
+  // Use keys from the available $options to get the matching key-value pairs.
+  return array_intersect_key($map, $options);
+}
+
+/**
+ * Helper function for generating a mapped array of the widget formatter labels.
+ */
+function _moody_hero_mapping_formatter_labels($definitions, $widget_type) {
+  $map = [];
+  foreach ($definitions as $key => $value) {
+    if (strpos($key, $widget_type) !== FALSE) {
+      $map[$key] = $definitions[$key]['label']->__toString();
+    }
+  }
+  // Convert first key to "default" to be used by view modes.
+  $map['default'] = $map[$widget_type];
+  unset($map[$widget_type]);
+  // Sort the array by machine name.
+  asort($map);
+  return $map;
+}
+
+/**
+ * Helper function for Layout Builder to validate if hero block or node type.
+ */
+function _moody_hero_formatter_split_entity_type_validation(&$form) {
+  // Checking if form contains an inline hero block.
+  if (isset($form['settings']['block_form'])) {
+    $bundle = $form['settings']['block_form']['#block']->bundle();
+    if ($bundle === 'moody_hero') {
+      $form = _add_new_moody_hero_image_form_elements($form, 'block');
+    }
+  }
+  // Checking if form contains a reusable hero block.
+  if (isset($form['settings']['view_mode'])) {
+    $selector = $form['settings']['view_mode']['#options'];
+    $option_keys = array_keys($selector);
+    foreach ($option_keys as $option) {
+      if (strpos($option, 'moody_hero') !== FALSE) {
+        $form = _add_new_moody_hero_image_form_elements($form, 'block');
+        break;
+      }
+    }
+  }
+  // Checking if node form is of type hero.
+  if (isset($form['settings']['formatter'])) {
+    $formatter = $form['settings']['formatter']['type']['#default_value'];
+    if (strpos($formatter, 'moody_hero') !== FALSE) {
+      $form = _add_new_moody_hero_image_form_elements($form, 'node');
+    }
+  }
+}
+
+/**
+ * Helper function that creates the necessary form elements to pick a style.
+ */
+function _add_new_moody_hero_image_form_elements($form, $entity_type) {
+  $form['#attached']['library'][] = 'moody_hero/hero_formatters_split';
+  return $form;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add logic to the place block form.
+ */
+function moody_hero_form_block_form_alter(&$form, &$form_state, $form_id) {
+  $bundle = FALSE;
+  $form_object = $form_state->getFormObject();
+  if ($form_object instanceof BlockForm) {
+    /** @var \Drupal\block\Entity\Block $entity */
+    $entity = $form_object->getEntity();
+    $uuid = $entity->getPlugin()->getDerivativeId();
+    /** @var Drupal\block_content\Entity\BlockContent $block_content */
+    if (isset($uuid)) {
+      $block_content = \Drupal::service('entity.repository')->loadEntityByUuid('block_content', $uuid);
+      if (method_exists($block_content, 'bundle')) {
+        $bundle = $block_content->bundle();
+        if ($bundle == 'moody_hero') {
+          $form['settings']['view_mode']['#options'] = _update_moody_hero_view_mode_labels($form['settings']['view_mode']['#options']);
+          _moody_hero_formatter_split_entity_type_validation($form);
+        }
+      }
+    }
+  }
+}

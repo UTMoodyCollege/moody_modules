@@ -1,0 +1,54 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.moody_feature_page.body
+    - field.field.node.moody_feature_page.field_color_scheme
+    - field.field.node.moody_feature_page.field_feature_page_author
+    - field.field.node.moody_feature_page.field_moody_subtitle
+    - field.field.node.moody_feature_page.field_thumbnail_image_for_summar
+    - node.type.moody_feature_page
+  module:
+    - text
+    - user
+id: node.moody_feature_page.default
+targetEntityType: node
+bundle: moody_feature_page
+mode: default
+content:
+  addtoany:
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  body:
+    label: hidden
+    type: text_default
+    weight: 3
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_feature_page_author:
+    weight: 4
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_feature_credit
+    region: content
+  field_moody_subtitle:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  links:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  display_breadcrumbs: true
+  display_page_title: true
+  field_color_scheme: true
+  field_thumbnail_image_for_summar: true

@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies: {  }
+id: utexas_social_links_sitewide
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+label: 'Social links sitewide migration'
+process: { }
+source:
+  plugin: utexas_social_links_sitewide_source
+destination:
+  plugin: utexas_social_links_sitewide_destination
+migration_dependencies:
+  required:
+    - utexas_users

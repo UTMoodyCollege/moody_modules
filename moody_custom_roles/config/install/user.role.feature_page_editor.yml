@@ -1,0 +1,35 @@
+langcode: en
+status: true
+dependencies: {  }
+id: feature_page_editor
+label: 'Feature Page Editor'
+weight: 30
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'access content overview'
+  - 'access contextual links'
+  - 'access media overview'
+  - 'access taxonomy overview'
+  - 'access workbench'
+  - 'create media'
+  - 'create moody_feature_page content'
+  - 'create terms in tags'
+  - 'delete any moody_feature_page content'
+  - 'delete media'
+  - 'delete moody_feature_page revisions'
+  - 'delete own moody_feature_page content'
+  - 'edit any moody_feature_page content'
+  - 'edit own moody_feature_page content'
+  - 'edit terms in tags'
+  - 'revert moody_feature_page revisions'
+  - 'search Google CSE'
+  - 'update media'
+  - 'use text format basic_html'
+  - 'use text format flex_html'
+  - 'use text format restricted_html'
+  - 'view all media revisions'
+  - 'view moody_feature_page revisions'
+  - 'view own unpublished content'
+  - 'view own unpublished media'
+  - 'view the administration theme'

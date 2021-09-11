@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: moody_feature_page_pattern
+label: 'Moody Feature Page pattern'
+type: 'canonical_entities:node'
+pattern: 'news/[node:title]'
+selection_criteria:
+  17f2741a-12d6-4288-83a5-5467277e988a:
+    id: node_type
+    bundles:
+      moody_feature_page: moody_feature_page
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 17f2741a-12d6-4288-83a5-5467277e988a
+selection_logic: and
+weight: -5
+relationships: {  }

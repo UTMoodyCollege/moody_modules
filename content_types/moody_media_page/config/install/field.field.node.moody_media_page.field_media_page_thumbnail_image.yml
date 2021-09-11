@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_media_page_thumbnail_image
+    - media.type.utexas_image
+    - node.type.moody_media_page
+id: node.moody_media_page.field_media_page_thumbnail_image
+field_name: field_media_page_thumbnail_image
+entity_type: node
+bundle: moody_media_page
+label: 'Thumbnail Image'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      utexas_image: utexas_image
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

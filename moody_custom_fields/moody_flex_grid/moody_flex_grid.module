@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_flex_grid.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_flex_grid_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_flex_grid module.
+    case 'help.page.moody_flex_grid':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Themed and accessible grid creator') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_flex_grid_theme() {
+  return [
+    'moody_flex_grid' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'flex_grid_items' => NULL,
+      ],
+      'template' => 'moody-flex-grid-standard',
+    ],
+    'moody_flex_grid_special' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'flex_grid_items' => NULL,
+      ],
+      'template' => 'moody-flex-grid-special',
+    ],
+    'moody_flex_grid_promo' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'flex_grid_items' => NULL,
+      ],
+      'template' => 'moody-flex-grid-promo',
+    ],
+    'moody_flex_grid_circular' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'flex_grid_items' => NULL,
+      ],
+      'template' => 'moody-flex-grid-circular',
+    ],
+    'moody_flex_grid_rectangular' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'flex_grid_items' => NULL,
+      ],
+      'template' => 'moody-flex-grid-rectangular',
+    ],
+  ];
+}

@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_thumbnail_image_for_summar
+    - media.type.utexas_image
+    - node.type.moody_feature_page
+id: node.moody_feature_page.field_thumbnail_image_for_summar
+field_name: field_thumbnail_image_for_summar
+entity_type: node
+bundle: moody_feature_page
+label: 'Thumbnail Image for Summary Grid'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      utexas_image: utexas_image
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

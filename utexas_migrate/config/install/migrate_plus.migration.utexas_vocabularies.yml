@@ -1,0 +1,26 @@
+id: utexas_vocabularies
+label: Taxonomy vocabularies
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+source:
+  plugin: d7_taxonomy_vocabulary
+process:
+  vid:
+    -
+      plugin: make_unique_entity_field
+      source: machine_name
+      entity_type: taxonomy_vocabulary
+      field: vid
+      length: 32
+      migrated: true
+  label: name
+  name: name
+  description: description
+  hierarchy: hierarchy
+  weight: weight
+destination:
+  plugin: entity:taxonomy_vocabulary
+migration_dependencies:
+  required:
+    - utexas_users

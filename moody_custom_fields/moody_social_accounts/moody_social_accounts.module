@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_social_accounts.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_social_accounts_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_social_accounts module.
+    case 'help.page.moody_social_accounts':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Themed and configurable social icons') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_social_accounts_theme() {
+  return [
+    'moody_social_accounts' => [
+      'render element' => 'children',
+    ],
+  ];
+}

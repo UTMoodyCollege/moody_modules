@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.storage.block_content.field_mav_url
+  module:
+    - link
+id: block_content.ambient_video.field_mav_url
+field_name: field_mav_url
+entity_type: block_content
+bundle: ambient_video
+label: 'Video URL'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    attributes: {  }
+    uri: 'https://player.vimeo.com/external/354646755.hd.mp4?s=e8bff08e9c3ed60af8c2c551a1d648ce0791cd7d&profile_id=174'
+    title: ''
+    options: {  }
+default_value_callback: ''
+settings:
+  link_type: 16
+  title: 0
+field_type: link

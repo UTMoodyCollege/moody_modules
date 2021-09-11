@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_showcase
+    - field.storage.block_content.field_block_moody_showcase
+  module:
+    - moody_showcase
+id: block_content.moody_showcase.field_block_moody_showcase
+field_name: field_block_moody_showcase
+entity_type: block_content
+bundle: moody_showcase
+label: 'Moody Showcase'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_showcase

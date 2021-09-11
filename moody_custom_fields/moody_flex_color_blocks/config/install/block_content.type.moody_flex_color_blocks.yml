@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_flex_color_blocks
+label: 'Moody Flex Color Blocks'
+revision: 0
+description: 'Provide multiple blocks with configurable headline, subheadline, link and color.'

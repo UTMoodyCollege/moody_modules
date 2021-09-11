@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_learn_exp_block.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_learn_exp_block_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_learn_exp_block module.
+    case 'help.page.moody_learn_exp_block':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Static Learn From Experience block') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_learn_exp_block_theme() {
+  $variables = [
+    'block__learn_through_experience_block' => [
+      'variables' => NULL,
+      'base hook' => 'block',
+      'template' => 'block--learn-through-experience-block',
+    ],
+  ];
+  return $variables;
+}
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function moody_learn_exp_block_preprocess_block(&$variables) {
+  if (isset($variables['plugin_id']) && $variables['plugin_id'] == 'learn_through_experience_block') {
+    $module_handler = \Drupal::service('module_handler');
+    $module_path = $module_handler->getModule('moody_learn_exp_block')->getPath();
+    $variables['module_path'] = $module_path;
+  }
+}

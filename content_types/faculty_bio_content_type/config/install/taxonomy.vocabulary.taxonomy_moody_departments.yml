@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Moody Departments'
+vid: taxonomy_moody_departments
+description: ''
+weight: 0

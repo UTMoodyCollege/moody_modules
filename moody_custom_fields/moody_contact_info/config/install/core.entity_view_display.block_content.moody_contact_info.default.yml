@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_contact_info
+    - field.field.block_content.moody_contact_info.field_block_moody_contact_info
+id: block_content.moody_contact_info.default
+targetEntityType: block_content
+bundle: moody_contact_info
+mode: default
+content:
+  field_block_moody_contact_info:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_contact_info_formatter
+    region: content
+hidden: {  }

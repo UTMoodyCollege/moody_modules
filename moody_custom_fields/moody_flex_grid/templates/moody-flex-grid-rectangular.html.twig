@@ -1,0 +1,59 @@
+{#
+/**
+ * @file
+ * Custom theme implementation for the Moody Mission Statement.
+ *
+ * Available variables:
+ * - headline: The Moody Mission Statement overall headline field.
+ * - style: The color of the lined background design.
+ * - cta: The Moody Mission Statement overall CTA button.
+ * - flex_grid_items: An array containing the Moody Mission Statement individual item contents.
+ *   - image: The Mission Statement image.
+ *   - headline: The Mission Statement headline.
+ *   - copy: The Mission Statement copy field.
+ *   - link: The Mission Statement link field.
+ *
+ * @ingroup themeable
+ */
+#}
+
+<div class="flex-grid-wrapper rectangular-display">
+	{% if headline %}
+		<div class="row">
+			<div class="col-12">
+				<div class="ut-h3 headline block-headline-h2">{{ headline }}</div>
+			</div>
+		</div>
+	{% endif %}
+	{% if flex_grid_items %}
+		<div class="flex-grid-items {{ style }}-columns">
+			{% for item in flex_grid_items %}
+				<div class="flex-grid-item">
+					{% if item.link %}
+						<a href="{{ item.link }}" class="linked-flex-grid-item">
+							<span class="sr-only">{{ item.headline }}</span>
+						{% endif %}
+						{% if item.image %}
+							<div class="mfg--image">
+								{{ item.image }}
+							</div>
+						{% endif %}
+						<div class="content">
+							{% if item.headline %}
+								<h3 class="mfg--headline">{{ item.headline }}</h3>
+							{% endif %}
+							{% if item.copy %}
+								<div class="mfg--copy ut-copy">
+									{{ item.copy }}
+								</div>
+							{% endif %}
+						</div>
+						{% if item.link %}
+						</a>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+	{% endif %}
+</div>
+

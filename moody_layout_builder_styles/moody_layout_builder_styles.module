@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_layout_builder_styles.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_layout_builder_styles_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_layout_builder_styles module.
+    case 'help.page.moody_layout_builder_styles':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Add configurable style options to layout builder.') . '</p>';
+      return $output;
+
+    default:
+  }
+}

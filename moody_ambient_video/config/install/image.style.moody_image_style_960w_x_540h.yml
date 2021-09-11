@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_960w_x_540h
+label: '960w x 540h'
+effects:
+  f9e28a91-f4b1-444c-b734-6ba4b540cc4e:
+    uuid: f9e28a91-f4b1-444c-b734-6ba4b540cc4e
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 960
+      height: 540
+      anchor: center-center

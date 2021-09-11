@@ -1,0 +1,7 @@
+name: 'Moody People Block'
+type: module
+core_version_requirement: '^8.9 || ^9'
+dependencies:
+  - block_content
+  - field
+  - moody_card

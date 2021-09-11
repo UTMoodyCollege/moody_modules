@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.storage.block_content.field_mav_height
+  module:
+    - options
+id: block_content.ambient_video.field_mav_height
+field_name: field_mav_height
+entity_type: block_content
+bundle: ambient_video
+label: 'Natural Height'
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: constrained
+default_value_callback: ''
+settings: {  }
+field_type: list_string

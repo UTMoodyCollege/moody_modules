@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_flex_grid
+id: block_content.field_block_moody_flex_grid
+field_name: field_block_moody_flex_grid
+entity_type: block_content
+type: moody_flex_grid
+settings: {  }
+module: moody_flex_grid
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,19 @@
+ambient-video:
+  version: 1.x
+  css:
+    theme:
+      css/ambient-video.css: {}
+  js:
+    js/ambient-video.js: {}
+  dependencies:
+    - core/drupalSettings
+
+ambient-video-natural-height:
+  version: 1.x
+  css:
+    theme:
+      css/ambient-video.css: {}
+  js:
+    js/ambient-video-natural-height.js: {}
+  dependencies:
+    - core/drupalSettings

@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_homepage_people_block
+label: 'Moody People'
+revision: 0
+description: 'Custom block used on Moody homepage to highlight one person''s story.'

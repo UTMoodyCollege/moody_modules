@@ -1,0 +1,22 @@
+name: 'Moody Landing Page'
+description: 'Provides Moody Landing Page content type and related configuration. '
+type: module
+core_version_requirement: '^8.9 || ^9'
+package: 'Moody Content Type'
+dependencies:
+  - 'breadcrumbs_visibility:breadcrumbs_visibility'
+  - 'drupal:field'
+  - 'drupal:layout_builder'
+  - 'drupal:layout_discovery'
+  - 'drupal:menu_ui'
+  - 'drupal:node'
+  - 'drupal:path'
+  - 'drupal:taxonomy'
+  - 'drupal:text'
+  - 'drupal:user'
+  - 'layout_builder_restrictions:layout_builder_restrictions'
+  - 'moody_landing_page:moody_landing_page'
+  - 'page_title_visibility:page_title_visibility'
+  - 'pathauto:pathauto'
+  - 'utexas_content_type_flex_page:utexas_content_type_flex_page'
+core_incompatible: false

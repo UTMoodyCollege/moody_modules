@@ -1,0 +1,10 @@
+///// Global Imports & Styles For Forty Acres
+
+// Functions, Mixins and Variables
+// functions.scss is necessary to import before settings
+@import "../../../node_modules/bootstrap/scss/functions";
+@import "../custom";
+@import "../../../node_modules/bootstrap/scss/variables";
+@import "../mixins/responsive";
+@import "../mixins/general_mixins";
+@import "../hero-video-block";

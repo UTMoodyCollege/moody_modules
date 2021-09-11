@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_faq.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_faq_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_faq module.
+    case 'help.page.moody_faq':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Compound field for creating themed FAQ sections') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_faq_theme() {
+  return [
+    'field__moody_faq' => [
+      'base hook' => 'field',
+      'template' => 'field--moody-faq',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function moody_faq_preprocess_field(&$variables) {
+  // Pass a random number to differentiate multiple faqs if placed on the same page.
+  if ($variables['field_name'] == 'field_block_moody_faq') {
+    $rand_str = mt_rand();
+    $variables['rand'] = $rand_str;
+  }
+}

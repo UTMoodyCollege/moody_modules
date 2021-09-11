@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+id: block_content.moody_hero_8_right
+label: 'Hero : Style 8 Right'
+targetEntityType: block_content
+cache: true

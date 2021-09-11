@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_showcase
+label: 'Moody Showcase'
+revision: 0
+description: 'Provide a compound field with image, headline, copy and CTA.'

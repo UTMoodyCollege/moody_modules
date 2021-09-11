@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_anchors_block
+label: 'Moody Anchors'
+revision: 0
+description: 'Diagonal images with links used on Moody homepage.'

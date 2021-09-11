@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - moody_subsite_hero
+    - node
+id: node.field_primary_subsite_hero
+field_name: field_primary_subsite_hero
+entity_type: node
+type: moody_subsite_hero
+settings: {  }
+module: moody_subsite_hero
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

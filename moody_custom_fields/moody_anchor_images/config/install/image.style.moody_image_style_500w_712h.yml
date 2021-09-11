@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_500w_712h
+label: '500w x 712h'
+effects:
+  03b2ea14-ec27-49ea-8eab-4f91704fb8bf:
+    uuid: 03b2ea14-ec27-49ea-8eab-4f91704fb8bf
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 500
+      height: 712
+      anchor: center-center

@@ -1,0 +1,70 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_media_page
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+label: 'Moody Media Page node import'
+source:
+  plugin: moody_media_page_source
+  node_type: content_type_moody_media_page
+process:
+  nid: nid
+  title: title
+  language: language
+  created: created
+  changed: changed
+  status: status
+  sticky: sticky
+  promote: promote
+  # display_breadcrumbs: show_breadcrumb
+  field_media_page_copy: copy
+  field_media_page_thumbnail_image: thumbnail
+  field_media_page_description: description
+  field_media_page_video: video
+  # Find the destination UID; accessible via
+  # $row->getDestinationProperty('uid');
+  uid:
+    plugin: migration_lookup
+    source: uid
+    migration:
+      - utexas_users
+  field_moody_url_generator: url_generator
+  field_east_austin_stories_catego: eas_category
+  field_media_page_directors:
+    plugin: sub_process
+    source: source
+    process:
+      first_name: director_first_name
+      last_name: director_last_name
+      title: director_title
+  field_media_page_people: people
+    # plugin: sub_process
+    # source: people2
+    # process:
+    #   first_name: field_people_first_name
+    #   last_name: field_people_last_name
+    #   body: field_people_copy
+  field_media_page_audio: audio_file
+  field_media_page_featured_audio: audio_file
+  display_breadcrumbs:
+    plugin: default_value
+    default_value: 0
+  field_tags_media_page: field_tags
+  field_media_location: location
+  field_media_page_directors_text: directors_text
+destination:
+  plugin: entity:node
+  default_bundle: moody_media_page
+migration_dependencies:
+  required:
+    - utexas_users
+    - utexas_media_image
+    - utexas_media_video
+    - utexas_media_audio
+    - utexas_content_blocks
+    - utexas_terms

@@ -1,0 +1,65 @@
+langcode: en
+status: true
+dependencies: {  }
+id: utprof_nodes
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utprof
+label: 'Nodes'
+source:
+  plugin: d7_node
+  node_type: team_member
+process:
+  # Standard D7 node data.
+  title: title
+  language: language
+  created: created
+  changed: changed
+  status: status
+  sticky: sticky
+  promote: promote
+  uid:
+    plugin: migration_lookup
+    source: node_uid
+    migration: utexas_users
+  # Content type-specific fields.
+  field_utprof_eid: field_utexas_eid
+  field_utprof_given_name: field_utexas_member_given_name
+  field_utprof_surname: field_utexas_member_surname
+  field_utprof_content: field_utexas_member_bio
+  # In v2, the designation is a string. There is no reliable way to split what
+  # might be concatenated titles into separate items, so we import the data
+  # as-is, into the zeroth v3 designation value.
+  field_utprof_designation: field_utexas_member_designation
+  field_utprof_basic_media:
+    plugin: sub_process
+    source: field_utexas_member_headshot
+    process:
+      target_id:
+        plugin: migration_lookup
+        migration: utexas_media_image
+        source: fid
+        no_stub: true
+  field_utprof_profile_groups:
+    plugin: sub_process
+    source: field_utexas_member_group
+    process:
+      target_id:
+        plugin: migration_lookup
+        migration: utprof_terms
+        source: target_id
+        no_stub: true
+  # These are prepared in \src\Plugin\migrate\destination\Profile.
+  field_utprof_add_basic_info: field_utexas_quick_links
+  field_utprof_listing_link: field_link_to_profile_page
+  field_utprof_add_contact_info: field_utexas_contact_info
+destination:
+  plugin: utprof:node
+  default_bundle: utprof_profile
+migration_dependencies:
+  required:
+    - utprof_terms
+    - utexas_users

@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_department_association_fac
+    - node.type.moody_faculty_bio
+    - taxonomy.vocabulary.moody_departments
+id: node.moody_faculty_bio.field_department_association_fac
+field_name: field_department_association_fac
+entity_type: node
+bundle: moody_faculty_bio
+label: 'Department Association'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      moody_departments: moody_departments
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

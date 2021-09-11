@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: utprof
+label: 'UTProf'
+description: 'Import UTProf UTDK D2 to UTDK D3'
+source_type: 'Drupal 7'
+module: null
+shared_configuration:
+  source:
+    key: utexas_migrate

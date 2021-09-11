@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_homepage_people_block
+    - field.storage.block_content.field_moody_prominent_story
+  module:
+    - moody_card
+id: block_content.moody_homepage_people_block.field_moody_prominent_story
+field_name: field_moody_prominent_story
+entity_type: block_content
+bundle: moody_homepage_people_block
+label: 'Moody Prominent Story'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_card

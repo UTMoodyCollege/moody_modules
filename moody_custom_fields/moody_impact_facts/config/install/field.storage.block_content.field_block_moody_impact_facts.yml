@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_impact_facts
+id: block_content.field_block_moody_impact_facts
+field_name: field_block_moody_impact_facts
+entity_type: block_content
+type: moody_impact_facts
+settings: {  }
+module: moody_impact_facts
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

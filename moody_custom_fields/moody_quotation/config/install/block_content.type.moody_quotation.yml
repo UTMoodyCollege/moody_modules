@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_quotation
+label: 'Moody Quotation'
+revision: 0
+description: 'Styled quotation with author and style options.'

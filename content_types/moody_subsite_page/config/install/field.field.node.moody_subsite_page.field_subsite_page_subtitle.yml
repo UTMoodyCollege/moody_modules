@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_subsite_page_subtitle
+    - node.type.moody_subsite_page
+id: node.moody_subsite_page.field_subsite_page_subtitle
+field_name: field_subsite_page_subtitle
+entity_type: node
+bundle: moody_subsite_page
+label: Subtitle
+description: 'The subtitle will display underneath the subsite hero image on subsite pages.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

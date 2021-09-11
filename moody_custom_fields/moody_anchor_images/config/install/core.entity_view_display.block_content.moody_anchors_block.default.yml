@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_anchors_block
+    - field.field.block_content.moody_anchors_block.field_anchor_image
+id: block_content.moody_anchors_block.default
+targetEntityType: block_content
+bundle: moody_anchors_block
+mode: default
+content:
+  field_anchor_image:
+    weight: 1
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_card_formatter3
+    region: content
+hidden: {  }

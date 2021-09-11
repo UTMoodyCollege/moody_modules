@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_hero
+    - field.field.block_content.moody_hero.field_block_moody_hero
+  module:
+    - layout_builder
+third_party_settings:
+  layout_builder:
+    sections: {  }
+id: block_content.moody_hero.default
+targetEntityType: block_content
+bundle: moody_hero
+mode: default
+content:
+  field_block_moody_hero:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_hero
+    region: content
+hidden: {  }

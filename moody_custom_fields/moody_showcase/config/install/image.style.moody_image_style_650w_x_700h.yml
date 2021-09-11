@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_650w_x_700h
+label: '650w x 700h'
+effects:
+  a98ec5a5-f065-4562-b9ec-16ee6c6ed553:
+    uuid: a98ec5a5-f065-4562-b9ec-16ee6c6ed553
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 650
+      height: 700
+      anchor: center-center
+

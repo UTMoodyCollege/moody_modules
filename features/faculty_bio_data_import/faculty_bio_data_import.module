@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * @file
+ * Contains faculty_bio_data_import.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_help().
+ */
+function faculty_bio_data_import_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the faculty_bio_data_import module.
+    case 'help.page.faculty_bio_data_import':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Feed importer of Faculty Bio CSV data') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function faculty_bio_data_import_entity_presave(EntityInterface $entity) {
+  // print_r($entity->getFieldDefinitions());
+  // print_r($entity->get('node'));
+  // echo "peanutbutter";
+}
+
+function faculty_bio_data_import_node_presave($node) {
+  // echo "crappers";
+  // print_r($node->title);
+  // if ($node->nid && $node->moderate) {
+
+  //   // Reset votes when node is updated:
+  //   $node->score = 0;
+  //   $node->users = '';
+  //   $node->votes = 0;
+  // }
+}

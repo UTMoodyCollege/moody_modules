@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_impact_facts.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_impact_facts_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_impact_facts module.
+    case 'help.page.moody_impact_facts':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Themed prominent display of impact facts') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_impact_facts_theme() {
+  return [
+    'moody_impact_facts' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'col_number' => NULL,
+        'impact_items' => NULL,
+      ],
+      'template' => 'moody-impact-facts',
+    ],
+  ];
+}

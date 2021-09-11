@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for the Moody Image Styles module.
+ */
+
+/**
+ * Issue #986: Add new image style for consistent square aspect ratio - width and height both 500px.
+ */
+function moody_image_styles_update_8101() {
+  \Drupal::service('features.manager')->import([
+    'moody_image_styles',
+  ], TRUE);
+}

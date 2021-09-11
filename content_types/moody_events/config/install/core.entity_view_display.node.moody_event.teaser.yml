@@ -1,0 +1,83 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.moody_event.field_moodyevent_body
+    - field.field.node.moody_event.field_moodyevent_datetime
+    - field.field.node.moody_event.field_moodyevent_featured
+    - field.field.node.moody_event.field_moodyevent_image
+    - field.field.node.moody_event.field_moodyevent_location
+    - field.field.node.moody_event.field_moodyevent_remote_id
+    - field.field.node.moody_event.field_moodyevent_remote_url
+    - field.field.node.moody_event.field_moodyevent_status
+    - field.field.node.moody_event.field_moodyevent_tags
+    - field.field.node.moody_event.field_remote_last_updated_date
+    - image.style.utexas_image_style_280w_280h
+    - node.type.moody_event
+  module:
+    - media
+    - moody_events
+    - options
+    - user
+id: node.moody_event.teaser
+targetEntityType: node
+bundle: moody_event
+mode: teaser
+content:
+  field_moodyevent_datetime:
+    type: utevent_smartdate_recurring
+    weight: 0
+    region: content
+    label: visually_hidden
+    settings:
+      format: default
+      force_chronological: false
+      add_classes: 0
+      format_type: medium
+      timezone_override: ''
+      past_display: '2'
+      upcoming_display: '2'
+      show_next: false
+    third_party_settings: {  }
+  field_moodyevent_image:
+    type: media_thumbnail
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      image_style: utexas_image_style_280w_280h
+      image_link: ''
+    third_party_settings: {  }
+  field_moodyevent_location:
+    type: entity_reference_label
+    weight: 3
+    region: content
+    label: visually_hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+  field_moodyevent_status:
+    type: list_default
+    weight: 2
+    region: content
+    label: visually_hidden
+    settings: {  }
+    third_party_settings: {  }
+  field_moodyevent_tags:
+    type: entity_reference_label
+    weight: 4
+    region: content
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+hidden:
+  display_breadcrumbs: true
+  display_page_title: true
+  field_moodyevent_body: true
+  field_moodyevent_featured: true
+  field_moodyevent_remote_id: true
+  field_moodyevent_remote_url: true
+  field_remote_last_updated_date: true
+  links: true

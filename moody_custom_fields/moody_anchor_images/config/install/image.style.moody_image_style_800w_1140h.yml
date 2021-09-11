@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_800w_1140h
+label: '800w x 1140h'
+effects:
+  42e18ddb-3600-47da-9974-6507e9534170:
+    uuid: 42e18ddb-3600-47da-9974-6507e9534170
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 800
+      height: 1140
+      anchor: center-center

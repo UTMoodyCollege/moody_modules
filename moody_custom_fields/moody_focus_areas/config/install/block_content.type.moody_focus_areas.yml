@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_focus_areas
+label: 'Moody Focus Areas'
+revision: 0
+description: 'Provides a compound field with heading, repeatable focus items, CTA link and style options.'

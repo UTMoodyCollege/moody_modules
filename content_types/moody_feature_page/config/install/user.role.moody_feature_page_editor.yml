@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_feature_page_editor
+label: 'Moody Feature Page Editor'
+weight: 28
+is_admin: null

@@ -1,0 +1,13 @@
+name: 'Moody Focus Areas'
+type: module
+description: 'Themed and configurable focus areas'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: Moody
+dependencies:
+  - block_content
+  - field
+  - layout_builder
+  - media_library_form_element
+  - responsive_image
+  - utexas_image_styles

@@ -1,0 +1,38 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_color_scheme
+field_name: field_color_scheme
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: gray
+      label: 'Charcoal Gray'
+    -
+      value: light-blue
+      label: 'Light Blue'
+    -
+      value: orange
+      label: Orange
+    -
+      value: dark-blue
+      label: 'Dark Blue'
+    -
+      value: brown
+      label: Brown
+    -
+      value: green
+      label: Green
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

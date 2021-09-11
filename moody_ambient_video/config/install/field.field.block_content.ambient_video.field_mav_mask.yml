@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.storage.block_content.field_mav_mask
+  module:
+    - options
+id: block_content.ambient_video.field_mav_mask
+field_name: field_mav_mask
+entity_type: block_content
+bundle: ambient_video
+label: Mask
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: bf5700
+default_value_callback: ''
+settings: {  }
+field_type: list_string

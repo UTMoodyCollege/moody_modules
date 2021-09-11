@@ -1,0 +1,47 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_subsite_page
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+label: 'Moody Subsite Page node import'
+source:
+  plugin: moody_subsite_page_source
+  node_type: moody_subsite_page
+process:
+  nid: nid
+  title: title
+  language: language
+  created: created
+  changed: changed
+  status: status
+  sticky: sticky
+  promote: promote
+  # display_breadcrumbs: show_breadcrumb
+  # Find the destination UID; accessible via
+  # $row->getDestinationProperty('uid');
+  uid:
+    plugin: migration_lookup
+    source: uid
+    migration:
+      - utexas_users
+  field_moody_url_generator: url_generator
+  display_breadcrumbs:
+    plugin: default_value
+    default_value: 0
+  field_primary_subsite_hero: subsite_hero
+  field_subsite_page_subtitle: subtitle
+destination:
+  plugin: entity:node
+  default_bundle: moody_subsite_page
+migration_dependencies:
+  required:
+    - utexas_users
+    - utexas_media_image
+    - utexas_media_video
+    - utexas_content_blocks
+    - utexas_terms

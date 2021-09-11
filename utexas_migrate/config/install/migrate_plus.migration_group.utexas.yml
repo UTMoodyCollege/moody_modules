@@ -1,0 +1,12 @@
+uuid: 3z0d44ed-3c0f-44e7-bf4f-d15eec1d0133
+langcode: en
+status: true
+dependencies: {  }
+id: utexas
+label: 'Import from UTDK Drupal 7'
+description: 'Provides custom logic import for UTDK D7 to UTDK D8'
+source_type: 'Drupal 7'
+module: null
+shared_configuration:
+  source:
+    key: utexas_migrate

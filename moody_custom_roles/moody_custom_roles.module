@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_custom_roles.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_custom_roles_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_custom_roles module.
+    case 'help.page.moody_custom_roles':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('All of the roles used by the core and department sites') . '</p>';
+      return $output;
+
+    default:
+  }
+}

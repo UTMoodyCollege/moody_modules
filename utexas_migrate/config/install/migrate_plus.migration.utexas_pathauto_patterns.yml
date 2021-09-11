@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies: {  }
+id: utexas_pathauto_patterns
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+label: 'Pathauto path patterns'
+process: { }
+source:
+  plugin: utexas_pathauto_pattern_source
+destination:
+  plugin: utexas_pathauto_pattern_destination

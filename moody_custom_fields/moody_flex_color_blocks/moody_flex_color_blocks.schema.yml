@@ -1,0 +1,10 @@
+field.widget.settings.moody_flex_color_blocks_widget:
+  type: mapping
+  label: 'Moody flex color blocks widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'

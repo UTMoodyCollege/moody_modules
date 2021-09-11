@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_900w_x_970h
+label: '900w x 970h'
+effects:
+  3dd1bb9a-b0d2-49bd-a42c-9311cb60dc08:
+    uuid: 3dd1bb9a-b0d2-49bd-a42c-9311cb60dc08
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 900
+      height: 970
+      anchor: center-center
+

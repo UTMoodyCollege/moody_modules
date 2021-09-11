@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Moody Departments'
+vid: moody_departments
+description: 'The Moody College of Communication list of Departments'
+weight: 0

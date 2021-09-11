@@ -1,0 +1,5 @@
+moody-showcase:
+  version: 1.x
+  css:
+    theme:
+      css/moody-showcase.css: {}

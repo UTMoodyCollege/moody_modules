@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_social_faculty_bio
+    - node.type.moody_faculty_bio
+  module:
+    - moody_social_accounts
+id: node.moody_faculty_bio.field_social_faculty_bio
+field_name: field_social_faculty_bio
+entity_type: node
+bundle: moody_faculty_bio
+label: 'Social Accounts'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    links: 'a:12:{s:8:"facebook";s:0:"";s:7:"twitter";s:0:"";s:7:"youtube";s:0:"";s:9:"instagram";s:0:"";s:10:"googleplus";s:0:"";s:9:"pinterest";s:0:"";s:6:"flickr";s:0:"";s:6:"tumblr";s:0:"";s:5:"vimeo";s:0:"";s:8:"linkedin";s:0:"";s:5:"weibo";s:0:"";s:6:"medium";s:0:"";}'
+default_value_callback: ''
+settings: {  }
+field_type: moody_social_accounts

@@ -1,0 +1,6 @@
+name: 'Moody Card'
+type: module
+description: 'Generic card for use in custom blocks.'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: 'Moody'

@@ -1,0 +1,72 @@
+/* Image */
+.moody-hero.hero--photo-orange-insert .hero-img {
+  background-size: cover;
+  height: 300px;
+}
+@media screen and (min-width: 900px) {
+  .moody-hero.hero--photo-orange-insert .hero-img {
+    height: 543px;
+  }
+}
+.moody-hero .center {
+  background-position: center;
+}
+.moody-hero .left {
+  background-position: left;
+}
+.moody-hero .right {
+  background-position: right;
+}
+
+/* Text */
+.moody-hero.hero--photo-orange-insert .hero-content {
+  background: #bf5700;
+  height: auto;
+  margin: auto;
+  max-width: 73.75em;
+  padding: .75rem 1rem 1.25rem 1rem;
+}
+@media screen and (min-width: 1200px) {
+  .moody-hero.hero--photo-orange-insert .hero-content {
+    right: calc((100% - 72.75rem) / 2);
+    width: 443px;
+  }
+}
+@media screen and (min-width: 900px) {
+  .moody-hero.hero--photo-orange-insert .hero-content {
+    align-self: center;
+    padding: 2rem;
+    position: absolute;
+    right: 1rem;
+    bottom: 10%;
+    width: auto;
+    max-width: 70%;
+  }
+}
+
+.moody-hero.hero--photo-orange-insert .hero-callout {
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+@media screen and (min-width: 900px) {
+  .moody-hero.hero--photo-orange-insert .hero-callout {
+    height: 100%;
+  }
+}
+.moody-hero .ut-btn--hero {
+  color: #fff;
+  display: inline-block;
+  padding: .5rem 1rem;
+}
+.moody-hero.hero--photo-orange-insert .hero-cta {
+  margin-top: 10px;
+}
+.moody-hero.hero--photo-orange-insert .ut-btn--hero {
+  float: none;
+}
+@media screen and (min-width: 900px) {
+  .moody-hero.hero--photo-orange-insert .ut-btn--hero {
+    float: right;
+  }
+}

@@ -1,0 +1,5 @@
+moody-subsite-hero:
+  version: 1.x
+  css:
+    theme:
+      css/moody-subsite-hero.css: {}

@@ -1,0 +1,197 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.moody_media_page.body
+    - field.field.node.moody_media_page.field_east_austin_stories_catego
+    - field.field.node.moody_media_page.field_media_location
+    - field.field.node.moody_media_page.field_media_page_copy
+    - field.field.node.moody_media_page.field_media_page_description
+    - field.field.node.moody_media_page.field_media_page_directors
+    - field.field.node.moody_media_page.field_media_page_directors_text
+    - field.field.node.moody_media_page.field_media_page_featured_audio
+    - field.field.node.moody_media_page.field_media_page_people
+    - field.field.node.moody_media_page.field_media_page_thumbnail_image
+    - field.field.node.moody_media_page.field_media_page_video
+    - field.field.node.moody_media_page.field_moody_url_generator
+    - field.field.node.moody_media_page.field_tags_media_page
+    - node.type.moody_media_page
+  module:
+    - media_library
+    - moody_multimedia_directors
+    - path
+    - text
+id: node.moody_media_page.default
+targetEntityType: node
+bundle: moody_media_page
+mode: default
+content:
+  body:
+    type: text_textarea_with_summary
+    weight: 10
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+      show_summary: false
+    third_party_settings: {  }
+    region: content
+  created:
+    type: datetime_timestamp
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  display_breadcrumbs:
+    type: boolean_checkbox
+    weight: 4
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  display_page_title:
+    type: boolean_checkbox
+    weight: 3
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_east_austin_stories_catego:
+    weight: 26
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
+    region: content
+  field_media_location:
+    weight: 30
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_media_page_copy:
+    weight: 13
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_media_page_description:
+    weight: 14
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_media_page_directors:
+    type: moody_directors_widget
+    weight: 16
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_media_page_directors_text:
+    weight: 31
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_media_page_featured_audio:
+    type: media_library_widget
+    weight: 33
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+    region: content
+  field_media_page_people:
+    weight: 32
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_multimedia_people_widget
+    region: content
+  field_media_page_thumbnail_image:
+    type: media_library_widget
+    weight: 12
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+    region: content
+  field_media_page_video:
+    weight: 15
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_moody_url_generator:
+    weight: 11
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_tags_media_page:
+    weight: 27
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  path:
+    type: path
+    weight: 7
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 5
+    region: content
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 9
+    region: content
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 6
+    region: content
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 1
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+      match_limit: 10
+    region: content
+    third_party_settings: {  }
+  url_redirects:
+    weight: 8
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }

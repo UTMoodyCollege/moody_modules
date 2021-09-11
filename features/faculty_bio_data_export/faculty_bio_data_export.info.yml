@@ -1,0 +1,10 @@
+name: faculty_bio_data_export
+type: module
+core: 8.x
+core_version_requirement: ^8 || ^9
+dependencies:
+  - faculty_bio_content_type
+  - node
+  - user
+  - views
+version: 1.x

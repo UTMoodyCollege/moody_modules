@@ -1,0 +1,43 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.moody_image_style_363w_x_190h
+    - image.style.moody_image_style_560w_x_315h
+  module:
+    - utexas_image_styles
+id: moody_responsive_image_me
+label: 'Moody Experience'
+image_style_mappings:
+  -
+    breakpoint_id: utexas_image_styles.wide
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: moody_image_style_560w_x_315h
+  -
+    breakpoint_id: utexas_image_styles.wide
+    multiplier: 2x
+    image_mapping_type: image_style
+    image_mapping: moody_image_style_560w_x_315h
+  -
+    breakpoint_id: utexas_image_styles.narrow
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: moody_image_style_560w_x_315h
+  -
+    breakpoint_id: utexas_image_styles.narrow
+    multiplier: 2x
+    image_mapping_type: image_style
+    image_mapping: moody_image_style_560w_x_315h
+  -
+    breakpoint_id: utexas_image_styles.mobile
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: moody_image_style_363w_x_190h
+  -
+    breakpoint_id: utexas_image_styles.mobile
+    multiplier: 2x
+    image_mapping_type: image_style
+    image_mapping: moody_image_style_363w_x_190h
+breakpoint_group: utexas_image_styles
+fallback_image_style: moody_image_style_363w_x_190h

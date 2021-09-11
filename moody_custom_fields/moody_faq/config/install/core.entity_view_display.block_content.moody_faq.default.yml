@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_faq
+    - field.field.block_content.moody_faq.field_block_moody_faq
+  module:
+    - moody_faq
+id: block_content.moody_faq.default
+targetEntityType: block_content
+bundle: moody_faq
+mode: default
+content:
+  field_block_moody_faq:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_faq_formatter
+    region: content
+hidden: {  }

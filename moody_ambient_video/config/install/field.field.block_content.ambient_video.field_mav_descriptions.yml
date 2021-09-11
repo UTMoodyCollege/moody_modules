@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.storage.block_content.field_mav_descriptions
+  module:
+    - file
+id: block_content.ambient_video.field_mav_descriptions
+field_name: field_mav_descriptions
+entity_type: block_content
+bundle: ambient_video
+label: Descriptions
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_directory: descriptions-vtt
+  file_extensions: vtt
+  max_filesize: ''
+  description_field: false
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: file

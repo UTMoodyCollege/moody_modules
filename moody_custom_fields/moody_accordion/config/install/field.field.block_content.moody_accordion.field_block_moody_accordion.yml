@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_accordion
+    - field.storage.block_content.field_block_moody_accordion
+  module:
+    - moody_accordion
+id: block_content.moody_accordion.field_block_moody_accordion
+field_name: field_block_moody_accordion
+entity_type: block_content
+bundle: moody_accordion
+label: 'Moody Accordion'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_accordion

@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Directory Structure'
+vid: directory_structure
+description: 'The Moody College of Communication Directory Structure, used for URL Generation and Workbench Access.'
+weight: 0

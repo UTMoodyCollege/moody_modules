@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_hero
+    - core.entity_view_mode.block_content.moody_hero_2_left
+    - field.field.block_content.moody_hero.field_block_moody_hero
+  module:
+    - layout_builder
+third_party_settings:
+  layout_builder:
+    sections: {  }
+    allow_custom: false
+    enabled: false
+id: block_content.moody_hero.moody_hero_2_left
+targetEntityType: block_content
+bundle: moody_hero
+mode: moody_hero_2_left
+content:
+  field_block_moody_hero:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_hero_2_left
+    region: content
+hidden: {  }

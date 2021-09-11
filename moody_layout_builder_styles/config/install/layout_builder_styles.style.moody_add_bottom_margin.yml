@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_add_bottom_margin
+label: 'Add Bottom Margin'
+classes: moody-add-mb
+type: component
+weight: 0
+block_restrictions: {  }
+layout_restrictions: {  }

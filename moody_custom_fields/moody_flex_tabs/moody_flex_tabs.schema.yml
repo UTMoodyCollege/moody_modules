@@ -1,0 +1,10 @@
+field.widget.settings.moody_flex_tabs_widget:
+  type: mapping
+  label: 'Moody Flex Tabs Widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'

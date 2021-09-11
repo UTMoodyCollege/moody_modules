@@ -1,0 +1,35 @@
+.learn-through-experience {
+  background-color: #eaeaea;
+  padding: 50px 0;
+}
+.learn-through-experience img {
+  margin: 20px auto;
+  display: block;
+  height: 100px;
+  width: 100px;
+}
+.learn-through-experience .exp-item {
+  display: block;
+  padding: 20px;
+  max-width: 400px;
+  margin: auto;
+}
+.learn-through-experience .exp-item:hover,
+.learn-through-experience .exp-item:focus {
+  background-color: #d6d2c4;
+  text-decoration: none;
+}
+.learn-through-experience .col-12.col-md-4 + .col-12.col-md-4 .exp-item {
+  border-top: 5px solid #d6d2c4;
+}
+@media screen and (min-width: 900px) {
+  .learn-through-experience .col-12.col-md-4 + .col-12.col-md-4 .exp-item {
+    border-top: none;
+    border-left: 5px solid #d6d2c4;
+  }
+  .learn-through-experience .exp-item {
+    height: 100%;
+    margin: inherit;
+    max-width: none;
+  }
+}

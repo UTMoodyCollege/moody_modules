@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_flex_tabs
+label: 'Moody Flex Tabs'
+revision: 0
+description: 'Provide horizontal tabs with configurable titles and content.'

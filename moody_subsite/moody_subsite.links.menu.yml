@@ -1,0 +1,14 @@
+
+# Moody subsite menu items definition
+entity.moody_subsite.collection:
+  title: 'Moody Subsites'
+  route_name: entity.moody_subsite.collection
+  description: 'List Moody subsite entities'
+  parent: system.admin
+  weight: 100
+
+moody_subsite.admin.structure.settings:
+  title: 'Moody subsite settings'
+  description: 'Configure Moody subsite entities'
+  route_name: moody_subsite.settings
+  parent: system.admin_structure

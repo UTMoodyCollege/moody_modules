@@ -1,0 +1,6 @@
+name: 'Moody FAQ'
+type: module
+description: 'Compoun field for creating themed faqs'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: 'Moody'

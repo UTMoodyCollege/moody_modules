@@ -1,0 +1,56 @@
+# We typically would migrate node fields along with node data.
+# However, since URL alias values require the node to be created,
+# It's cleaner to run this as a separate migration after the
+# node types have been migrated.
+id: utexas_path_aliases
+label: Path Aliases (+ pathauto)
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+source:
+  plugin: utexas_path_alias_source
+  # Update this with the node types that should have pathauto.
+  node_type:
+  - landing_page
+  - standard_page
+  - page
+  - article
+  - moody_landing_page
+  - moody_standard_page
+  - moody_subsite_page
+  - moody_feature_page
+  - content_type_moody_media_page
+process:
+  # Retrieve the destination ID of the corresponding node.
+  #
+  # Since this field will just be used for computing another property,
+  # prefix it with "temp_".
+  temp_nid:
+    plugin: migration_lookup
+    source: nid
+    migration:
+      - utexas_standard_page
+      - utexas_landing_page
+      - utexas_basic_page
+      - utexas_article
+      - moody_landing_page
+      - moody_standard_page
+      - moody_subsite_page
+      - moody_feature_page
+      - moody_media_page
+destination:
+  plugin: utexas_path_alias_destination
+migration_dependencies:
+  required:
+    - utexas_standard_page
+    - utexas_landing_page
+    - utexas_basic_page
+    - utexas_article
+    - moody_landing_page
+    - moody_standard_page
+    - moody_subsite_page
+    - moody_feature_page
+    - moody_media_page

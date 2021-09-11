@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_contact_info
+label: 'Moody Contact Info'
+revision: 0
+description: 'Configurable headline, subheadline, copy and CTA button.'

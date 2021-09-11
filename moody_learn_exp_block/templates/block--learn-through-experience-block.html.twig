@@ -1,0 +1,75 @@
+{#
+/**
+ * @file
+ * Theme override to display a block.
+ *
+ * Available variables:
+ * - plugin_id: The ID of the block implementation.
+ * - label: The configured label of the block if visible.
+ * - configuration: A list of the block's configuration values.
+ *   - label: The configured label for the block.
+ *   - label_display: The display settings for the label.
+ *   - provider: The module or other provider that provided this block plugin.
+ *   - Block plugin specific settings will also be stored here.
+ * - content: The content of this block.
+ * - attributes: array of HTML attributes populated by modules, intended to
+ *   be added to the main container tag of this template.
+ *   - id: A valid HTML ID and guaranteed unique.
+ * - title_attributes: Same as attributes, except applied to the main title
+ *   tag that appears in the template.
+ * - title_prefix: Additional output populated by modules, intended to be
+ *   displayed in front of the main title tag that appears in the template.
+ * - title_suffix: Additional output populated by modules, intended to be
+ *   displayed after the main title tag that appears in the template.
+ *
+ * @see template_preprocess_block()
+ */
+#}
+{{ attach_library('moody_learn_exp_block/learn-through-exp') }}
+
+<div{{ attributes.addClass("block") }}>
+  {{ title_prefix }}
+  {% if label %}
+    <h2{{ title_attributes }}>{{ label }}</h2>
+  {% endif %}
+  {{ title_suffix }}
+  {% block content %}
+    <div class="learn-through-experience">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 exp-title text-center mb-5">
+            <h2 class="ut-h2">LEARNING THROUGH EXPERIENCE</h2>
+            <p class="ut-h4">Enriching resources at your fingertips.</p>
+          </div>
+          <div class="col-12 col-md-4 pl-0 pr-0">
+            <a href="https://moody.utexas.edu/academics/travel-programs" class="exp-item text-center">
+              <img alt="TRAVEL PROGRAMS ICON" src="{{ module_path }}/images/icon_travel.png">
+              <div>
+                <h3 class="ut-h4" style="font-weight:600;">TRAVEL PROGRAMS</h3>
+                <p class="ck-blue-text" style="font-weight:500;">The world is yours.<br>Study in LA, NY and abroad.</p>
+              </div>
+            </a>
+          </div>
+          <div class="col-12 col-md-4 pl-0 pr-0">
+            <a href="https://moody.utexas.edu/prospective/experience" class="exp-item text-center">
+              <img alt="HANDS-ON-LEARNING ICON" src="{{ module_path }}/images/icon_hands.png">
+              <div>
+                <h3 class="ut-h4" style="font-weight:600;">HANDS-ON-LEARNING</h3>
+                <p class="ck-blue-text" style="font-weight:500;">Confidence comes from doing.<br>Practice makes you bold.</p>
+              </div>
+            </a>
+          </div>
+          <div class="col-12 col-md-4 pl-0 pr-0">
+            <a href="https://moody.utexas.edu/students/students-orgs" class="exp-item text-center">
+              <img alt="STUDENT ORGANIZATIONS ICON" src="{{ module_path }}/images/icon_tower.png">
+              <div>
+                <h3 class="ut-h4" style="font-weight:600;">STUDENT ORGANIZATIONS</h3>
+                <p class="ck-blue-text" style="font-weight:500;">Lead where you are.<br>You can make change happen.</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock %}
+</div>

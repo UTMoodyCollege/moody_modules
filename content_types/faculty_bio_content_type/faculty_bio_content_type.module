@@ -1,0 +1,115 @@
+<?php
+
+use Drupal\file\Entity\File;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
+use Drupal\media\Entity\Media;
+
+
+/**
+ * @file
+ * Contains faculty_bio_content_type.module.
+ */
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ * @param array $suggestions
+ * @param array $variables
+ */
+function faculty_bio_content_type_theme_suggestions_node_alter(array &$suggestions, array $variables) {
+  if (isset($variables['elements']['#node']) && $variables['elements']['#node']->bundle() == 'moody_faculty_bio') {
+    $suggestions[] = 'node--faculty-bio';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function faculty_bio_content_type_theme($existing, $type, $theme, $path) {
+  $variables = [
+    'node--faculty-bio' => [
+      'base hook' => 'node',
+      'template' => 'node--faculty-bio',
+    ],
+    'views_view__faculty_bio_view' => [
+      'base hook' => 'views',
+      'template' => 'views-view--faculty-bio-view',
+    ],
+  ];
+  return $variables;
+}
+
+/**
+ * Implements template_preprocess_node().
+ */
+function faculty_bio_content_type_preprocess_node(&$variables) {
+  if ($variables['node']->getType() == 'moody_faculty_bio') {
+    $variables['cv_url'] = FALSE;
+    $cv = $variables['node']->get('field_cv_pdf_faculty_bio')->getValue();
+    if (!empty($cv[0]['target_id'])) {
+      // This value differs on the fed content on moody.utexas. so use regex to get only the leading digits.
+      $numcheck = preg_match('/(?m)^(\d+).*/', $cv[0]['target_id'], $match);
+      $fid = $match[1];
+      $file = File::load($fid);
+      $uri = $file->getFileUri();
+      $file_url = file_create_url($uri);
+      $variables['cv_url'] = $file_url;
+    }
+    $variables['directory_link'] = FALSE;
+    if (isset($variables['elements']['field_show_eid_faculty_bio'][0]['#markup']) && $variables['elements']['field_show_eid_faculty_bio'][0]['#markup'] == 'Yes') {
+      if (isset($variables['elements']['field_eid_faculty_bio']['#items'])) {
+        $eid = $variables['elements']['field_eid_faculty_bio']['#items']->getString();
+        $title = 'View Contact Info (UT Directory)';
+        $url = Url::fromUri('https://directory.utexas.edu/index.php?q=' . $eid);
+        $external_link = Link::fromTextAndUrl($title, $url);
+        $variables['directory_link'] = $external_link;
+      }
+    }
+  }
+}
+
+/**
+ * Implements template_preprocess_node().
+ */
+function faculty_bio_content_type_preprocess_views_view(&$variables) {
+  $view_name = isset($variables['id']) ? $variables['id'] : NULL;
+  if ($view_name == 'faculty_bio_view') {
+    $sitename = \Drupal::config('system.site')->get('name');
+    // Advertising, CommStudies and SLHS do not have customizations.
+    $variables['custom_header'] = FALSE;
+    // Update custom header on sites that need it and hide exposed filter on all
+    // but the Moody core site.
+    switch ($sitename) {
+      case 'Stan Richards School of Advertising':
+        $variables['attributes']['class'][] = 'hide-department-selector';
+        break;
+
+      case 'Department of Communication Studies':
+        $variables['attributes']['class'][] = 'hide-department-selector';
+        break;
+
+      case 'School of Journalism and Media':
+        $variables['custom_header'] = check_markup('<div class="button-list d-flex" role="group" aria-label="Filtered lists of faculty biographies">
+          <a class="ut-btn" href="/faculty">All Faculty</a>
+          <a class="ut-btn ml-2" href="/faculty-emeritus">Emeritus and Retired Faculty</a>
+        </div>', 'flex_html');
+        $variables['attributes']['class'][] = 'hide-department-selector';
+        break;
+
+      case 'Radio, Television and Film':
+        $variables['custom_header'] = check_markup('<div class="button-list d-flex" role="group" aria-label="Filtered lists of faculty biographies">
+          <a class="ut-btn" href="/faculty">All Faculty</a>
+          <a class="ut-btn ml-2" href="/faculty/media-studies">Media Studies</a>
+          <a class="ut-btn ml-2" href="/faculty/production-screenwriting">Production and Screenwriting</a>
+          <a class="ut-btn ml-2" href="/faculty/joint-appointed">Joint Appointed</a>
+        </div>', 'flex_html');
+        $variables['attributes']['class'][] = 'hide-department-selector';
+        break;
+
+      case 'Speech, Language, and Hearing Science':
+        $variables['attributes']['class'][] = 'hide-department-selector';
+        break;
+
+    }
+  }
+}

@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_remove_top_margin
+label: 'Remove Top Margin'
+classes: moody-remove-mt
+type: component
+weight: 0
+block_restrictions: {  }
+layout_restrictions: {  }

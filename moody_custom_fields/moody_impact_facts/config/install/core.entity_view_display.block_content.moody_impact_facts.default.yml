@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_impact_facts
+    - field.field.block_content.moody_impact_facts.field_block_moody_impact_facts
+id: block_content.moody_impact_facts.default
+targetEntityType: block_content
+bundle: moody_impact_facts
+mode: default
+content:
+  field_block_moody_impact_facts:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_impact_facts_default_formatter
+    region: content
+hidden: {  }

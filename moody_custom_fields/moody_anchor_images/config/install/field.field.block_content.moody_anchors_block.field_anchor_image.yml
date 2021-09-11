@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_anchors_block
+    - field.storage.block_content.field_anchor_image
+  module:
+    - moody_card
+id: block_content.moody_anchors_block.field_anchor_image
+field_name: field_anchor_image
+entity_type: block_content
+bundle: moody_anchors_block
+label: 'Anchor Image'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_card

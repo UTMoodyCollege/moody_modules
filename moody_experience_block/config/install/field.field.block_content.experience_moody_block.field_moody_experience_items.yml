@@ -1,0 +1,100 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.experience_moody_block
+    - field.storage.block_content.field_moody_experience_items
+  module:
+    - moody_card
+id: block_content.experience_moody_block.field_moody_experience_items
+field_name: field_moody_experience_items
+entity_type: block_content
+bundle: experience_moody_block
+label: 'Moody Experience Items'
+description: 'Add up to 5 stories. The first item has a more prominent display than the rest.'
+required: false
+translatable: false
+default_value:
+  -
+    cta:
+      link:
+        uri: null
+        title: ''
+        options:
+          attributes:
+            target:
+              _blank: 0
+            class: '0'
+    media: 0
+    title: ''
+    subtitle: ''
+    link_uri: null
+    link_title: null
+    link_options: null
+  -
+    cta:
+      link:
+        uri: null
+        title: ''
+        options:
+          attributes:
+            target:
+              _blank: 0
+            class: '0'
+    media: 0
+    title: ''
+    subtitle: ''
+    link_uri: null
+    link_title: null
+    link_options: null
+  -
+    cta:
+      link:
+        uri: null
+        title: ''
+        options:
+          attributes:
+            target:
+              _blank: 0
+            class: '0'
+    media: 0
+    title: ''
+    subtitle: ''
+    link_uri: null
+    link_title: null
+    link_options: null
+  -
+    cta:
+      link:
+        uri: null
+        title: ''
+        options:
+          attributes:
+            target:
+              _blank: 0
+            class: '0'
+    media: 0
+    title: ''
+    subtitle: ''
+    link_uri: null
+    link_title: null
+    link_options: null
+  -
+    cta:
+      link:
+        uri: null
+        title: ''
+        options:
+          attributes:
+            target:
+              _blank: 0
+            class: '0'
+    media: 0
+    title: ''
+    subtitle: ''
+    link_uri: null
+    link_title: null
+    link_options: null
+default_value_callback: ''
+settings: {  }
+field_type: moody_card

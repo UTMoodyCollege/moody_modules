@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_faq
+    - field.field.block_content.moody_faq.field_block_moody_faq
+  module:
+    - moody_faq
+id: block_content.moody_faq.default
+targetEntityType: block_content
+bundle: moody_faq
+mode: default
+content:
+  field_block_moody_faq:
+    weight: 27
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_faq_widget
+    region: content
+  info:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

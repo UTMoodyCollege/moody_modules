@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies: {  }
+id: twitter_widgets
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: utexas
+label: 'Twitter widgets'
+process: { }
+source:
+  plugin: twitter_widgets
+destination:
+  plugin: twitter_widgets
+migration_dependencies:
+  required:
+    - utexas_site_settings
+    - utexas_users

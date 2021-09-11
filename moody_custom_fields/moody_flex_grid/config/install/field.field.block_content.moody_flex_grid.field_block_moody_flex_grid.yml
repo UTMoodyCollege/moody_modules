@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_flex_grid
+    - field.storage.block_content.field_block_moody_flex_grid
+  module:
+    - moody_flex_grid
+id: block_content.moody_flex_grid.field_block_moody_flex_grid
+field_name: field_block_moody_flex_grid
+entity_type: block_content
+bundle: moody_flex_grid
+label: 'Moody Flex Grid'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_flex_grid

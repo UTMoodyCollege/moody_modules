@@ -1,0 +1,10 @@
+faculty_bio_content_type.content:
+  path: '/node/{node}'
+  defaults:
+    _controller: '\Drupal\faculty_bio_content_type\Controller\FacultyBioController::content'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      node1:
+        type: entity:node

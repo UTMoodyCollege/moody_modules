@@ -1,0 +1,23 @@
+<!-- Add you custom twig html here -->
+<div class="moody-card">
+  {% if title %}
+    <h3 class="moody-card-headline">
+      {{ title }}
+    </h3>
+  {% endif %}
+  {% if subtitle %}
+    <p class="moody-card-subheadline">
+      {{ subtitle }}
+    </p>
+  {% endif %}
+  {% if media %}
+    <div class="moody-card-media">
+      {{ media }}
+    </div>
+  {% endif %}
+  {% if cta %}
+    <div class="moody-card-cta">
+      {{ cta }}
+    </div>
+  {% endif %}
+</div>

@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: moody_subsite_page_pattern
+label: 'Moody Subsite Page pattern'
+type: 'canonical_entities:node'
+pattern: '[node:field_moody_url_generator:entity:parents:join-path]/[node:field_moody_url_generator]/[node:title]'
+selection_criteria:
+  daf00c60-e3b5-49c9-9e13-7c8cdf5f10dc:
+    id: node_type
+    bundles:
+      moody_subsite_page: moody_subsite_page
+    negate: false
+    context_mapping:
+      node: node
+    uuid: daf00c60-e3b5-49c9-9e13-7c8cdf5f10dc
+selection_logic: and
+weight: -5
+relationships: {  }

@@ -1,0 +1,30 @@
+field.widget.settings.moody_subsite_menu_widget:
+  type: mapping
+  label: 'Moody subsite menu widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'
+field.widget.settings.subsite_custom_logo_widget:
+  type: mapping
+  label: 'Subsite custom logo widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'
+field.widget.settings.moody_info_bars_widget:
+  type: mapping
+  label: 'Moody info bars widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'

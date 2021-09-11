@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+id: block_content.moody_showcase_style_two
+label: 'Default 66-33 Display'
+targetEntityType: block_content
+cache: true

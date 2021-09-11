@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_contact_info.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_contact_info_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_contact_info module.
+    case 'help.page.moody_contact_info':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Moody Contact Info') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_contact_info_theme() {
+  return [
+    'moody_contact_info' => [
+      'variables' => [
+        'headline' => NULL,
+        'subheadline' => NULL,
+        'copy' => NULL,
+        'cta' => NULL,
+      ],
+      'template' => 'moody-contact-info',
+    ],
+  ];
+}

@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.storage.block_content.field_mav_poster
+    - media.type.utexas_image
+id: block_content.ambient_video.field_mav_poster
+field_name: field_mav_poster
+entity_type: block_content
+bundle: ambient_video
+label: Poster
+description: 'The image that displays briefly before video loads or if video is unable to load. This image should always match the first frame of the video.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      utexas_image: utexas_image
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

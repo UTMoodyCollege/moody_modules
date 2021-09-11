@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies: {  }
+id: full_html_editor
+label: 'Full HTML Editor'
+weight: 34
+is_admin: null
+permissions:
+  - 'use text format basic_html'
+  - 'use text format filtered_html'
+  - 'use text format filtered_html_for_blocks'
+  - 'use text format flex_html'
+  - 'use text format full_html'

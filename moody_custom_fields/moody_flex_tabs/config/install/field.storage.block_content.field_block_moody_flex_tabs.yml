@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_flex_tabs
+id: block_content.field_block_moody_flex_tabs
+field_name: field_block_moody_flex_tabs
+entity_type: block_content
+type: moody_flex_tabs
+settings: {  }
+module: moody_flex_tabs
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

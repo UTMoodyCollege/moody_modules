@@ -1,0 +1,35 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.experience_moody_block
+    - field.field.block_content.experience_moody_block.field_experience_block_style
+    - field.field.block_content.experience_moody_block.field_moody_experience_items
+  module:
+    - moody_card
+id: block_content.experience_moody_block.default
+targetEntityType: block_content
+bundle: experience_moody_block
+mode: default
+content:
+  field_experience_block_style:
+    weight: 28
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_moody_experience_items:
+    weight: 27
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_card_widget
+    region: content
+  info:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

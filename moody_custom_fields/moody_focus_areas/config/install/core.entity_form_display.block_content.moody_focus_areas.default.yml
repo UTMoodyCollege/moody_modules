@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_focus_areas
+    - field.field.block_content.moody_focus_areas.field_focus_areas
+  module:
+    - moody_focus_areas
+id: block_content.moody_focus_areas.default
+targetEntityType: block_content
+bundle: moody_focus_areas
+mode: default
+content:
+  field_focus_areas:
+    weight: 27
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_focus_areas_widget
+    region: content
+  info:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_faq
+label: 'Moody FAQ'
+revision: 0
+description: 'Provides compound field for creating themed faq widgets.'

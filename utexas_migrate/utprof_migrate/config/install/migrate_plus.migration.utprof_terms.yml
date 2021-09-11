@@ -1,0 +1,36 @@
+id: utprof_terms
+label: Terms
+audit: true
+migration_group: utprof
+source:
+  plugin: d7_taxonomy_term
+  bundle:
+    - team_member_group
+process:
+  name: name
+  'description/value': description
+  'description/format':
+    plugin: utexas_text_formats
+    source: format
+  weight: weight
+  # Only attempt to stub real (non-zero) parents.
+  parent_id:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: parent
+    -
+      plugin: migration_lookup
+      migration: utprof_terms
+  parent:
+    plugin: default_value
+    default_value: 0
+    source: '@parent_id'
+  changed: timestamp
+destination:
+  plugin: entity:taxonomy_term
+  default_bundle: utprof_groups
+  no_stub: true
+migration_dependencies:
+  required:
+    - utexas_users

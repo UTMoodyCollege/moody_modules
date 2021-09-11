@@ -1,0 +1,23 @@
+name: 'Moody Events'
+type: module
+core: 8.x
+core_version_requirement: ^8 || ^9
+dependencies:
+  - features
+  - field
+  - layout_builder
+  - media
+  - media_library
+  - menu_ui
+  - moody_events
+  - node
+  - options
+  - path
+  - smart_date
+  - smart_date_recur
+  - taxonomy
+  - text
+  - user
+  - utexas_image_styles
+  - utexas_media_types
+  - views

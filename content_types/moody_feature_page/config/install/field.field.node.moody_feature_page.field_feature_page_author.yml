@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_feature_page_author
+    - node.type.moody_feature_page
+  module:
+    - moody_feature_credit
+id: node.moody_feature_page.field_feature_page_author
+field_name: field_feature_page_author
+entity_type: node
+bundle: moody_feature_page
+label: Author
+description: 'Add author(s) with titles.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_feature_credit

@@ -1,0 +1,56 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.moody_media_page.body
+    - field.field.node.moody_media_page.field_east_austin_stories_catego
+    - field.field.node.moody_media_page.field_media_location
+    - field.field.node.moody_media_page.field_media_page_copy
+    - field.field.node.moody_media_page.field_media_page_description
+    - field.field.node.moody_media_page.field_media_page_directors
+    - field.field.node.moody_media_page.field_media_page_directors_text
+    - field.field.node.moody_media_page.field_media_page_featured_audio
+    - field.field.node.moody_media_page.field_media_page_people
+    - field.field.node.moody_media_page.field_media_page_thumbnail_image
+    - field.field.node.moody_media_page.field_media_page_video
+    - field.field.node.moody_media_page.field_moody_url_generator
+    - field.field.node.moody_media_page.field_tags_media_page
+    - node.type.moody_media_page
+  module:
+    - text
+    - user
+id: node.moody_media_page.teaser
+targetEntityType: node
+bundle: moody_media_page
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 101
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  addtoany: true
+  display_breadcrumbs: true
+  display_page_title: true
+  field_east_austin_stories_catego: true
+  field_media_location: true
+  field_media_page_copy: true
+  field_media_page_description: true
+  field_media_page_directors: true
+  field_media_page_directors_text: true
+  field_media_page_featured_audio: true
+  field_media_page_people: true
+  field_media_page_thumbnail_image: true
+  field_media_page_video: true
+  field_moody_url_generator: true
+  field_tags_media_page: true

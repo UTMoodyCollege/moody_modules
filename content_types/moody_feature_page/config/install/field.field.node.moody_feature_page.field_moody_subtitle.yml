@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_moody_subtitle
+    - node.type.moody_feature_page
+id: node.moody_feature_page.field_moody_subtitle
+field_name: field_moody_subtitle
+entity_type: node
+bundle: moody_feature_page
+label: Subtitle
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

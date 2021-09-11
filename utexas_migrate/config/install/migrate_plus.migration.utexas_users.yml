@@ -1,0 +1,71 @@
+id: utexas_users
+label: UTDK user migration
+migration_group: utexas
+source:
+  plugin: d7_user
+process:
+  name: name
+  pass: pass
+  mail: mail
+  created: created
+  access: access
+  login: login
+  status: status
+  timezone: timezone
+  langcode:
+    plugin: user_langcode
+    source: language
+    fallback_to_site_default: false
+  preferred_langcode:
+    plugin: user_langcode
+    source: language
+    fallback_to_site_default: true
+  preferred_admin_langcode:
+    plugin: user_langcode
+    source: language
+    fallback_to_site_default: true
+  roles:
+    plugin: migration_lookup
+    migration: utexas_roles
+    source: roles
+destination:
+  plugin: utexas:user
+migration_dependencies:
+  required:
+    - utexas_roles
+    - utexas_pathauto_patterns
+
+# id: utexas_users
+# label: UTDK user migration
+# migration_group: utexas
+# source:
+#   plugin: d7_user
+# process:
+#   name: name
+#   pass: pass
+#   mail: mail
+#   created: created
+#   access: access
+#   login: login
+#   status: status
+#   timezone: timezone
+#   langcode:
+#     plugin: user_langcode
+#     source: language
+#     fallback_to_site_default: false
+#   preferred_langcode:
+#     plugin: user_langcode
+#     source: language
+#     fallback_to_site_default: true
+#   preferred_admin_langcode:
+#     plugin: user_langcode
+#     source: language
+#     fallback_to_site_default: true
+#   init: init
+# destination:
+#   plugin: utexas:user
+#   no_stub: true
+# migration_dependencies:
+#   required:
+#     - utexas_roles
+#     - utexas_pathauto_patterns

@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: moody_image_style_900w_506h
+label: 900w_x_506h
+effects:
+  f9975d17-dfd5-4ead-a94e-72c60b541a25:
+    uuid: f9975d17-dfd5-4ead-a94e-72c60b541a25
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 900
+      height: 506
+      anchor: center-center
