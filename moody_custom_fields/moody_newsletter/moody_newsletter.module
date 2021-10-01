@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_newsletter.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_newsletter_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_newsletter module.
+    case 'help.page.moody_newsletter':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Styled display for newsletter link.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_newsletter_theme() {
+  return [
+    'moody_newsletter' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'cta' => NULL,
+      ],
+      'template' => 'moody-newsletter',
+    ],
+  ];
+}

@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_newsletter
+id: block_content.field_block_moody_newsletter
+field_name: field_block_moody_newsletter
+entity_type: block_content
+type: moody_newsletter
+settings: {  }
+module: moody_newsletter
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
