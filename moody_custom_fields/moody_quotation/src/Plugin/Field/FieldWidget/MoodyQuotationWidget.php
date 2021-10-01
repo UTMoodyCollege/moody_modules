@@ -34,6 +34,15 @@ class MoodyQuotationWidget extends WidgetBase {
       '#type' => 'textfield',
       '#default_value' => $items[$delta]->author ?? NULL,
     ];
+    $element['media'] = [
+      '#type' => 'media_library',
+      '#allowed_bundles' => ['utexas_image'],
+      '#delta' => $delta,
+      '#cardinality' => 1,
+      '#title' => $this->t('Image'),
+      '#default_value' => !empty($items[$delta]->media) ? $items[$delta]->media : NULL,
+      '#description' => $this->t('Upload an image of 500 x 500 pixels to maintain resolution & avoid cropping.'),
+    ];
     $element['style'] = [
       '#title' => $this->t('Style'),
       '#type' => 'radios',
@@ -44,8 +53,21 @@ class MoodyQuotationWidget extends WidgetBase {
       ],
       '#default_value' => $items[$delta]->style ?? 'default',
     ];
-
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    // This loop is through (potential) field instances.
+    foreach ($values as &$value) {
+      if (empty($value['media'])) {
+        // A null media value should be saved as 0.
+        $value['media'] = 0;
+      }
+    }
+    return $values;
   }
 
 }

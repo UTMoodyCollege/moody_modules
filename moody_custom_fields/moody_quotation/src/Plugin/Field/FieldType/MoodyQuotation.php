@@ -38,6 +38,9 @@ class MoodyQuotation extends FieldItemBase {
     $properties['style'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Style value'))
       ->setRequired(FALSE);
+    $properties['media'] = DataDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Media'))
+      ->setRequired(FALSE);
 
     return $properties;
   }
@@ -62,6 +65,9 @@ class MoodyQuotation extends FieldItemBase {
           'type' => 'varchar',
           'length' => 255,
           'binary' => FALSE,
+        ],
+        'media' => [
+          'type' => 'int',
         ],
       ],
     ];

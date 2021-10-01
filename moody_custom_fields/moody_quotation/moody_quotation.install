@@ -1,0 +1,30 @@
+<?php
+
+use Drupal\Core\Database\Database;
+
+/**
+ * @file
+ * Install file for moody_quotation.
+ */
+
+/**
+ * Add column to moody_quotation block for media.
+ */
+function moody_quotation_update_8101() {
+  $spec = [
+    'type' => 'int',
+  ];
+  $database = Database::getConnection();
+  $query = $database->query(
+    "SELECT value FROM {key_value} WHERE name=:name",
+    [
+      ':name' => "block_content.field_schema_data.field_block_moody_quotation",
+    ]
+  );
+  $result = $query->fetchAssoc();
+  $tables = array_keys(unserialize($result['value']));
+  $schema = $database->schema();
+  foreach ($tables as $table_name) {
+    $schema->addField($table_name, 'field_block_moody_quotation_media', $spec);
+  }
+}

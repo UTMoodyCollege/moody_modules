@@ -45,7 +45,6 @@ class MoodyCardWidget extends WidgetBase {
       '#cardinality' => 1,
       '#title' => $this->t('Image'),
       '#default_value' => isset($item->media) ? $item->media : NULL,
-      '#description' => $this->t('Upload an image of 560 x 315 pixels to maintain resolution & avoid cropping.'),
     ];
     $element['cta'] = [
       '#type' => 'fieldset',

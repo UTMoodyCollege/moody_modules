@@ -89,12 +89,47 @@ class MoodyQuotationFormatter extends FormatterBase implements ContainerFactoryP
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
-    foreach ($items as $delta => $item) {
+    $responsive_image_style_name = 'moody_flex_grid_promo_style';
+    $responsive_image_style = $this->entityTypeManager->getStorage('responsive_image_style')->load($responsive_image_style_name);
+    $image_styles_to_load = [];
+    $cache_tags = [];
+    if ($responsive_image_style) {
+      $cache_tags = Cache::mergeTags($cache_tags, $responsive_image_style->getCacheTags());
+      $image_styles_to_load = $responsive_image_style->getImageStyleIds();
+    }
+    $image_styles = $this->entityTypeManager->getStorage('image_style')->loadMultiple($image_styles_to_load);
+    foreach ($image_styles as $image_style) {
+      $cache_tags = Cache::mergeTags($cache_tags, $image_style->getCacheTags());
+    }
+    foreach ($items as $item) {
+      $image_render_array = [];
+      if ($media = $this->entityTypeManager->getStorage('media')->load($item->media)) {
+        $media_attributes = $media->get('field_utexas_media_image')->getValue();
+        if ($file = $this->entityTypeManager->getStorage('file')->load($media_attributes[0]['target_id'])) {
+          $image = new \stdClass();
+          $image->title = NULL;
+          $image->alt = $media_attributes[0]['alt'];
+          $image->entity = $file;
+          $image->uri = $file->getFileUri();
+          $image->width = NULL;
+          $image->height = NULL;
+          $image_render_array = [
+            '#theme' => 'responsive_image_formatter',
+            '#item' => $image,
+            '#item_attributes' => [],
+            '#responsive_image_style_id' => $responsive_image_style_name,
+            '#cache' => [
+              'tags' => $cache_tags,
+            ],
+          ];
+        }
+      }
       $elements[] = [
         '#theme' => 'moody_quotation',
         '#quote' => $item->quote,
         '#style' => $item->style,
         '#author' => $item->author,
+        '#media' => $image_render_array,
       ];
     }
 

@@ -33,6 +33,7 @@ function moody_quotation_theme() {
         'quote' => NULL,
         'style' => NULL,
         'author' => NULL,
+        'media' => NULL,
       ],
       'template' => 'moody-quotation',
     ],

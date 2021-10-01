@@ -28,7 +28,7 @@ class MoodyCardFormatter2 extends MoodyCardFormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
 
-    $responsive_image_style_name = 'moody_showcase_style_two';
+    $responsive_image_style_name = 'moody_showcase_default_image';
     $responsive_image_style = $this->entityTypeManager->getStorage('responsive_image_style')->load($responsive_image_style_name);
     $image_styles_to_load = [];
     $cache_tags = [];
