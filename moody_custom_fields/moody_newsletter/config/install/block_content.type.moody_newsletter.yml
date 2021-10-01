@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_newsletter
+label: 'Moody Newsletter'
+revision: 0
+description: 'Headline, link and style options fields.'

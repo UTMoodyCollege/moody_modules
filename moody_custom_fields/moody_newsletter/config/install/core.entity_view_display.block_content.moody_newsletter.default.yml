@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_newsletter
+    - field.field.block_content.moody_newsletter.field_block_moody_newsletter
+  module:
+    - moody_newsletter
+id: block_content.moody_newsletter.default
+targetEntityType: block_content
+bundle: moody_newsletter
+mode: default
+content:
+  field_block_moody_newsletter:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_newsletter_formatter
+    region: content
+hidden: {  }

@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_newsletter
+    - field.storage.block_content.field_block_moody_newsletter
+  module:
+    - moody_newsletter
+id: block_content.moody_newsletter.field_block_moody_newsletter
+field_name: field_block_moody_newsletter
+entity_type: block_content
+bundle: moody_newsletter
+label: Newsletter
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_newsletter
