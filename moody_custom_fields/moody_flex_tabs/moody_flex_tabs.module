@@ -60,9 +60,11 @@ function moody_flex_tabs_preprocess_field(&$variables) {
       $content = $item['content']['#tab_content'];
       $contents[$key] = $content;
     }
-
     $variables['set_active'] = $set_active;
     $variables['tab_titles'] = $titles;
     $variables['tab_contents'] = $contents;
   }
+  // Pass a random number to differentiate multiple tab components if placed on the same page.
+  $rand_str = mt_rand();
+  $variables['rand'] = $rand_str;
 }
