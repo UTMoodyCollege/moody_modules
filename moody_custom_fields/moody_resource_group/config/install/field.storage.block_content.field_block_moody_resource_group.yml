@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - moody_resource_group
+id: block_content.field_block_moody_resource_group
+field_name: field_block_moody_resource_group
+entity_type: block_content
+type: resource_group
+settings: {  }
+module: moody_resource_group
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

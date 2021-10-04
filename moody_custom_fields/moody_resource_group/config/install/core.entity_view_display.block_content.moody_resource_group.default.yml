@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_resource_group
+    - field.field.block_content.moody_resource_group.field_block_moody_resource_group
+  module:
+    - moody_resource_group
+id: block_content.moody_resource_group.default
+targetEntityType: block_content
+bundle: moody_resource_group
+mode: default
+content:
+  field_block_moody_resource_group:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: resource_group_formatter
+    region: content
+hidden: {  }

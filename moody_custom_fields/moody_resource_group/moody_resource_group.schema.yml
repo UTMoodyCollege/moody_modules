@@ -1,0 +1,10 @@
+field.widget.settings.resource_group_widget:
+  type: mapping
+  label: 'Resource group widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'

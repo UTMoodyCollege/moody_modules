@@ -1,0 +1,13 @@
+<!-- Add you custom twig html here -->
+<div class="moody-resource-group-wrapper">
+  <h3 class="{{ style }}">{{ headline }}</h3>
+  <div class="resource-group-links">
+    <ul class="link-list">
+      {% for link in links %}
+        <li>
+          {{ link }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

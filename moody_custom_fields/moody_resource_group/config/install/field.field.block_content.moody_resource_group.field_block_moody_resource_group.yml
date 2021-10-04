@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_resource_group
+    - field.storage.block_content.field_block_moody_resource_group
+  module:
+    - moody_resource_group
+id: block_content.moody_resource_group.field_block_moody_resource_group
+field_name: field_block_moody_resource_group
+entity_type: block_content
+bundle: moody_resource_group
+label: 'Moody Resource Group'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: resource_group
