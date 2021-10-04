@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_resource_group
+label: 'Moody Resource Group'
+revision: 0
+description: 'Configurable list of links with stylized headline.'

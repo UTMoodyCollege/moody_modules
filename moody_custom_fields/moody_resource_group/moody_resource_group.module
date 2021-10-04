@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_resource_group.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_resource_group_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_resource_group module.
+    case 'help.page.moody_resource_group':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Configurable list of links with stylized headline.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_resource_group_theme() {
+  return [
+    'moody_resource_group' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'links' => [],
+      ],
+      'template' => 'moody-resource-group',
+    ],
+  ];
+}
