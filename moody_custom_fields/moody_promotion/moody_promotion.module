@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Contains moody_promotion.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_promotion_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the moody_promotion module.
+    case 'help.page.moody_promotion':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Featured promo with image, copy and link fields') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function moody_promotion_theme() {
+  return [
+    'moody_promotion' => [
+      'variables' => [
+        'headline' => NULL,
+        'media' => NULL,
+        'date' => NULL,
+        'copy' => NULL,
+        'cta' => NULL,
+        'style' => NULL,
+      ],
+      'template' => 'moody-promotion',
+    ],
+  ];
+}

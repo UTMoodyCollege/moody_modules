@@ -1,0 +1,24 @@
+<!-- Add you custom twig html here -->
+<div class="moody-promotion-wrapper">
+  <div class="moody-promotion-inner-wrapper">
+    {% if media %}
+      <div class="media-wrapper">
+        {{ media }}
+      </div>
+    {% endif %}
+    <div class="text-wrapper">
+      {% if headline %}
+        <h3 class="headline">{{ headline }}</h3>
+      {% endif %}
+      {% if date %}
+        <div class="date">{{ date }}</div>
+      {% endif %}
+      {% if copy %}
+        <div class="copy">{{ copy }}</div>
+      {% endif %}
+      {% if cta %}
+        <div class="cta-wrapper">{{ cta }}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
