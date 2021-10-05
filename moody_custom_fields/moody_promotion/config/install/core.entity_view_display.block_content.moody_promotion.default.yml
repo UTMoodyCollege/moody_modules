@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_promotion
+    - field.field.block_content.moody_promotion.field_block_moody_promotion
+id: block_content.moody_promotion.default
+targetEntityType: block_content
+bundle: moody_promotion
+mode: default
+content:
+  field_block_moody_promotion:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: moody_promotion_formatter
+    region: content
+hidden: {  }

@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_promotion
+    - field.storage.block_content.field_block_moody_promotion
+  module:
+    - moody_promotion
+id: block_content.moody_promotion.field_block_moody_promotion
+field_name: field_block_moody_promotion
+entity_type: block_content
+bundle: moody_promotion
+label: 'Moody Promotion'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: moody_promotion

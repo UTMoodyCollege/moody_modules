@@ -4,3 +4,7 @@ description: 'Configurable list of links with stylized headline.'
 core: 8.x
 core_version_requirement: ^8 || ^9
 package: 'Moody'
+dependencies:
+  - block_content
+  - field
+  - layout_builder

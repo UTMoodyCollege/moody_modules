@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_promotion
+label: 'Moody Promotion'
+revision: 0
+description: 'Featured promo with image, copy and link fields'

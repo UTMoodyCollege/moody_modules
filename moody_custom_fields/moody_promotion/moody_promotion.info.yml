@@ -1,0 +1,13 @@
+name: 'Moody Promotion'
+type: module
+description: 'Featured promo with image, copy and link fields'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: 'Moody'
+dependencies:
+  - block_content
+  - field
+  - layout_builder
+  - media_library_form_element
+  - responsive_image
+  - utexas_image_styles
