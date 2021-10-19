@@ -32,7 +32,7 @@ class MoodySocialAccountsFormatter extends FormatterBase {
     foreach ($links as $key => $value) {
       $invert = ($key == 'weibo') ? 'invert' : '';
       if (!empty($value)) {
-        $links_output .= '<div class="' . $invert . '"><a class="block__ut-social-link" href="' . $value . '"><svg><use xlink:href="#ut-social-' . $key . '"></use></svg></a></a></div>';
+        $links_output .= '<div class="' . $invert . '"><a class="block__ut-social-link" href="' . $value . '" aria-label="Find us on ' . $key . '"><svg><use xlink:href="#ut-social-' . $key . '"></use></svg></a></a></div>';
       }
     }
     $output = ($links_output) ? '<div class="block__ut-social-links--items">' . $links_output . '</div>' : '';
