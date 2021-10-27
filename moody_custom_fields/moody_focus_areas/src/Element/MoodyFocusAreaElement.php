@@ -42,7 +42,7 @@ class MoodyFocusAreaElement extends FormElement {
       '#name' => 'image',
       '#title' => t('Image'),
       '#default_value' => isset($element['#default_value']['image']) ? $element['#default_value']['image'] : NULL,
-      '#description' => t('Image will be scaled and cropped to a 1:1 ratio. Ideally, upload an image of 170x170 pixels to maintain resolution & avoid cropping.'),
+      '#description' => t('Image will be scaled and cropped to a 1:1 ratio. Ideally, upload an image of 280 x 280 pixels to maintain resolution & avoid cropping.'),
       '#upload_location' => 'public://focus_areas_items/',
     ];
     $element['copy'] = [

@@ -29,6 +29,7 @@ class MoodyShowcaseWidget extends WidgetBase {
       '#allowed_bundles' => ['utexas_image'],
       '#cardinality' => 1,
       '#title' => $this->t('Image'),
+      '#description' => t('Upload an image of 900 x 970 pixels to maintain resolution & avoid cropping. If using the Moody Showcase Marketing Style formatter, opt for an image with dimensions of 1000 x 666 pixels to maintain resolution & avoid cropping.'),
       '#default_value' => isset($items[$delta]->image) ? $items[$delta]->image : NULL,
     ];
     $element['headline'] = [

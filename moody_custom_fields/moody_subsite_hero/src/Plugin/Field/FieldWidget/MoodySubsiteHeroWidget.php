@@ -38,7 +38,7 @@ class MoodySubsiteHeroWidget extends WidgetBase {
       '#cardinality' => 1,
       '#title' => $this->t('Image'),
       '#default_value' => isset($item->media) ? $item->media : NULL,
-      '#description' => $this->t('Image will be scaled and cropped to a 87:47 ratio. Upload an image with a minimum resolution of 2280x1232 pixels to maintain quality and avoid cropping.'),
+      '#description' => $this->t('Image will be scaled and cropped to 1800 x 575 pixels. Upload an image with a resolution of 1800 x 575 pixels to maintain quality and avoid cropping.'),
     ];
     $element['subsite_hero']['disable_image_styles'] = [
       '#type' => 'checkbox',
