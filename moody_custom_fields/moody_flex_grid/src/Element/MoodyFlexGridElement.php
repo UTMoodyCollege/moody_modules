@@ -37,7 +37,7 @@ class MoodyFlexGridElement extends FormElement {
       '#name' => 'image',
       '#title' => t('Image'),
       '#default_value' => isset($element['#default_value']['image']) ? $element['#default_value']['image'] : NULL,
-      '#description' => t('Image will be scaled and cropped to a 1:1 ratio. Ideally, upload an image of 170x170 pixels to maintain resolution & avoid cropping.'),
+      '#description' => t('Image will be scaled and cropped to a 1:1 ratio. Ideally, upload an image of 500 x 500 pixels to maintain resolution & avoid cropping. If using the Flex Grid Rectangular Style, opt for an image with a 3:2 aspect ratio.'),
       '#upload_location' => 'public://moody_flex_grid_items/',
     ];
     $element['headline'] = [
