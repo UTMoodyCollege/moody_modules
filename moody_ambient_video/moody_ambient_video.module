@@ -36,8 +36,7 @@ function moody_ambient_video_preprocess_block(&$variables) {
       // Variables to pass to Twig. //
       //----------------------------//
       // Pass the file URL of the poster image.
-      if (isset($variables['content']['field_mav_poster'])) {
-        $mid = $variables['content']['#block_content']->get('field_mav_poster')->getString(); // Get mid.
+      if ($mid = $variables['content']['#block_content']->get('field_mav_poster')->getString()) {
         $media = Media::load($mid); // Load media.
         $fid = $media->getSource()->getSourceFieldValue($media); // Get fid.
         $file = File::load($fid); // Get file.
@@ -71,8 +70,7 @@ function moody_ambient_video_preprocess_block(&$variables) {
       $variables['#attached']['drupalSettings']['ambientVideo']['ambientVideoUrl'] = $video_url;
 
       // Pass the fallback image URL.
-      if (isset($variables['content']['field_mav_fallback'])) {
-        $mid = $variables['content']['#block_content']->get('field_mav_fallback')->getString(); // Get mid.
+      if ($mid = $variables['content']['#block_content']->get('field_mav_fallback')->getString()) {
         $media = Media::load($mid); // Load media.
         $fid = $media->getSource()->getSourceFieldValue($media); // Get fid.
         $file = File::load($fid); // Get file.
