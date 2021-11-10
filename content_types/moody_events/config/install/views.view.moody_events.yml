@@ -466,23 +466,66 @@ display:
           expose:
             operator_limit_selection: false
             operator_list: {  }
-      sorts:
-        created:
-          id: created
-          table: node_field_data
-          field: created
-          order: DESC
-          entity_type: node
-          entity_field: created
-          plugin_id: date
+        field_moodyevent_datetime_end_value:
+          id: field_moodyevent_datetime_end_value
+          table: node__field_moodyevent_datetime
+          field: field_moodyevent_datetime_end_value
           relationship: none
           group_type: group
           admin_label: ''
+          operator: '>='
+          value:
+            min: ''
+            max: ''
+            value: today
+            type: offset
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+            placeholder: ''
+            min_placeholder: ''
+            max_placeholder: ''
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          plugin_id: date
+      sorts:
+        field_moodyevent_datetime_value:
+          id: field_moodyevent_datetime_value
+          table: node__field_moodyevent_datetime
+          field: field_moodyevent_datetime_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          order: ASC
           exposed: false
           expose:
             label: ''
           granularity: second
-      title: 'Moody Events'
+          plugin_id: date
+      title: 'Moody College Events'
       header: {  }
       footer:
         area_text_custom_1:
@@ -496,7 +539,12 @@ display:
           tokenize: false
           content: "<ul class=\"button-list d-flex\">\r\n<li><a href=\"https://texasmoodymedia.org\" class=\"ut-btn--homepage\">View All Events</a></li>\r\n<li><a href=\"https://texasmoodymedia.org/submit-event\" class=\"ut-btn--homepage\">Submit an Event</a></li>\r\n</ul>"
           plugin_id: text_custom
-      empty: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          plugin_id: text
       relationships: {  }
       arguments: {  }
       display_extenders: {  }
@@ -519,7 +567,8 @@ display:
     display_title: 'Moody Event Slider'
     position: 2
     display_options:
-      display_extenders: {  }
+      display_extenders:
+        metatag_display_extender: {  }
       pager:
         type: some
         options:
@@ -530,6 +579,10 @@ display:
         style: false
         row: false
         css_class: false
+        filters: true
+        filter_groups: true
+        empty: false
+        sorts: false
       display_description: ''
       block_description: 'Moody Event Slider'
       style:
@@ -545,6 +598,34 @@ display:
         type: fields
         options: {  }
       css_class: moody-events-view
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: 'There are no events scheduled at this time'
+            format: flex_html
+          plugin_id: text
+      sorts:
+        field_moodyevent_datetime_value:
+          id: field_moodyevent_datetime_value
+          table: node__field_moodyevent_datetime
+          field: field_moodyevent_datetime_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          order: ASC
+          exposed: false
+          expose:
+            label: ''
+          granularity: hour
+          plugin_id: date
     cache_metadata:
       max-age: -1
       contexts:
@@ -584,7 +665,8 @@ display:
     display_title: Page
     position: 1
     display_options:
-      display_extenders: {  }
+      display_extenders:
+        metatag_display_extender: {  }
       path: moody-events
     cache_metadata:
       max-age: -1

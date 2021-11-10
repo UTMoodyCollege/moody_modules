@@ -68,8 +68,25 @@ function _get_events_from_media_channel() {
     $response = $request->getBody()->getContents();
     $json = Json::decode($response);
     $events = $json['events'];
+    // Create empty array for storing only remote ids.
+    $remote_ids = [];
     foreach ($events as $event) {
       _create_event_nodes_from_media_channel($event);
+      array_push($remote_ids, $event['id']);
+    }
+    // Loop through existing events and delete any that are no longer in json feed.
+    $existing_events = \Drupal::entityQuery('node')
+      ->condition('type', 'moody_event')
+      ->addMetaData('account', User::load(1))
+      ->execute();
+    if ($nodes = Drupal::entityTypeManager()->getStorage('node')->loadMultiple($existing_events)) {
+      foreach ($nodes as $key => $value) {
+        $remote_id = $value->get('field_moodyevent_remote_id')->getString();
+        if (!in_array($remote_id, $remote_ids)) {
+          $node = Node::load($key);
+          $node->delete();
+        }
+      }
     }
   }
   else {
