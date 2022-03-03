@@ -116,6 +116,7 @@ function moody_hero_theme($existing, $type, $theme, $path) {
       'variables' => [
         'media_identifier' => NULL,
         'heading' => NULL,
+        'subheading' => NULL,
         'alt' => NULL,
         'anchor_position' => NULL,
         'text_position' => NULL,

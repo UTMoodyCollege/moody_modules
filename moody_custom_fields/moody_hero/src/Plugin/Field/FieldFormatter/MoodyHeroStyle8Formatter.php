@@ -85,6 +85,7 @@ class MoodyHeroStyle8Formatter extends MoodyHeroFormatterBase {
         '#media_identifier' => $id,
         '#alt' => isset($media_attributes) ? $media_attributes[0]['alt'] : '',
         '#heading' => $item->heading,
+        '#subheading' => $item->subheading ? $item->subheading : NULL,
         '#text_position' => $item->text_position,
         '#text_color' => $item->text_color,
         '#overlay' => $item->overlay,
