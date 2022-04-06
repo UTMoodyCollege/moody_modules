@@ -71,6 +71,10 @@ class MoodyShowcaseWidget extends WidgetBase {
         // A null media value should be saved as 0.
         $value['image'] = 0;
       }
+      // Massage erroneous value.
+      else if (strpos($value['image'], '0,') !== false) {
+        $value['image'] = str_replace('0,', '', $value['image']);
+      }
       $value['copy_value'] = $value['copy']['value'];
       $value['copy_format'] = $value['copy']['format'];
       if (isset($value['cta']['link']['uri'])) {
