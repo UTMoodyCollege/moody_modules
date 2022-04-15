@@ -1,12 +1,19 @@
 <!-- Add you custom twig html here -->
 <div class="moody-showcase">
-  <div class="showcase-image">
-    {{ image }}
-  </div>
-  <div class="showcase-text">
-    <h3 class="showcase-headline">{{ headline }}</h3>
-    <hr>
-    <div class="showcase-copy">{{ copy }}</div>
-    {{ cta }}
-  </div>
+	{% if image %}
+		<div class="showcase-image">
+			{{ image }}
+		</div>
+	{% endif %}
+	{% if video %}
+		<div class="showcase-video">
+			{{ video }}
+		</div>
+	{% endif %}
+	<div class="showcase-text">
+		<h3 class="showcase-headline">{{ headline }}</h3>
+		<hr>
+		<div class="showcase-copy">{{ copy }}</div>
+		{{ cta }}
+	</div>
 </div>
