@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.node.moody_subsite_page.body
+    - field.field.node.moody_subsite_page.field_hide_default_hero
     - field.field.node.moody_subsite_page.field_moody_url_generator
     - field.field.node.moody_subsite_page.field_primary_subsite_hero
     - field.field.node.moody_subsite_page.field_subsite_page_metatags
@@ -34,6 +35,20 @@ content:
   display_page_title:
     type: boolean_checkbox
     weight: 4
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  display_updated:
+    type: boolean_checkbox
+    weight: 10
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_hide_default_hero:
+    type: boolean_checkbox
+    weight: 27
     region: content
     settings:
       display_label: true

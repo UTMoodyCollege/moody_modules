@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_hide_default_hero
+    - node.type.moody_subsite_page
+id: node.moody_subsite_page.field_hide_default_hero
+field_name: field_hide_default_hero
+entity_type: node
+bundle: moody_subsite_page
+label: 'Hide Default Hero'
+description: 'Selecting this option will hide the default subsite hero image.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

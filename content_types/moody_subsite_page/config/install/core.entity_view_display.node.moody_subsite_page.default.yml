@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.node.moody_subsite_page.body
+    - field.field.node.moody_subsite_page.field_hide_default_hero
     - field.field.node.moody_subsite_page.field_moody_url_generator
     - field.field.node.moody_subsite_page.field_primary_subsite_hero
     - field.field.node.moody_subsite_page.field_subsite_page_metatags
@@ -98,6 +99,24 @@ third_party_settings:
                 third_party_settings: {  }
             weight: 4
             additional: {  }
+          db945eef-f4ca-459e-b737-49915645fa6f:
+            uuid: db945eef-f4ca-459e-b737-49915645fa6f
+            region: content
+            configuration:
+              id: 'field_block:node:moody_subsite_page:field_hide_default_hero'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: boolean
+                label: above
+                settings:
+                  format: default
+                  format_custom_false: ''
+                  format_custom_true: ''
+                third_party_settings: {  }
+            weight: 5
+            additional: {  }
         third_party_settings: {  }
   layout_builder_restrictions:
     allowed_block_categories: {  }
@@ -144,6 +163,16 @@ targetEntityType: node
 bundle: moody_subsite_page
 mode: default
 content:
+  field_hide_default_hero:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 105
+    region: content
   field_moody_url_generator:
     type: entity_reference_label
     label: above
@@ -184,4 +213,5 @@ hidden:
   body: true
   display_breadcrumbs: true
   display_page_title: true
+  display_updated: true
   layout_builder__layout: true
