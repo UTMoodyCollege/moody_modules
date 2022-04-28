@@ -137,11 +137,15 @@ function moody_subsite_page_preprocess_page(&$variables) {
       }
 
        // Get the option for hiding default info bars completely.
+       // This will also hide the subtitle
        $hide_default_info_bar = $node->field_hide_default_infobar->value;
        if ($hide_default_info_bar !== "1") {
         // Get info bars.
         $info_bars = $subsite->get('subsite_info_bars')->view();
         $variables['info_bars'] = $info_bars;
+         // Get subtitle from node if present.
+        $subtitle = $node->get('field_subsite_page_subtitle');
+        $variables['page_subtitle'] = isset($subtitle) ? $subtitle->getString() : FALSE;
        }
 
       // Get social accounts formatted string.
@@ -150,9 +154,7 @@ function moody_subsite_page_preprocess_page(&$variables) {
         $variables['subsite_social'] = $subsite->get('subsite_social_links')->view()[0]['#markup'];
       }
 
-      // Get subtitle from node if present.
-      $subtitle = $node->get('field_subsite_page_subtitle');
-      $variables['page_subtitle'] = isset($subtitle) ? $subtitle->getString() : FALSE;
+     
 
       // If the custom homepage option is checked and on the subsite homepage
       // hide the subsite hero, info bars and page title.
