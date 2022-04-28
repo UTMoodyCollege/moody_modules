@@ -5,6 +5,7 @@ dependencies:
     - core.entity_view_mode.node.teaser
     - field.field.node.moody_subsite_page.body
     - field.field.node.moody_subsite_page.field_hide_default_hero
+    - field.field.node.moody_subsite_page.field_hide_default_infobar
     - field.field.node.moody_subsite_page.field_moody_url_generator
     - field.field.node.moody_subsite_page.field_primary_subsite_hero
     - field.field.node.moody_subsite_page.field_subsite_page_metatags
@@ -30,6 +31,7 @@ hidden:
   display_page_title: true
   display_updated: true
   field_hide_default_hero: true
+  field_hide_default_infobar: true
   field_moody_url_generator: true
   field_primary_subsite_hero: true
   field_subsite_page_metatags: true

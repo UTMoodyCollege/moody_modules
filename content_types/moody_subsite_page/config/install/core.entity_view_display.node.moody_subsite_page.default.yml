@@ -4,6 +4,7 @@ dependencies:
   config:
     - field.field.node.moody_subsite_page.body
     - field.field.node.moody_subsite_page.field_hide_default_hero
+    - field.field.node.moody_subsite_page.field_hide_default_infobar
     - field.field.node.moody_subsite_page.field_moody_url_generator
     - field.field.node.moody_subsite_page.field_primary_subsite_hero
     - field.field.node.moody_subsite_page.field_subsite_page_metatags
@@ -117,6 +118,24 @@ third_party_settings:
                 third_party_settings: {  }
             weight: 5
             additional: {  }
+          95c57cc4-c483-4ea6-992d-09bbdf9058b3:
+            uuid: 95c57cc4-c483-4ea6-992d-09bbdf9058b3
+            region: content
+            configuration:
+              id: 'field_block:node:moody_subsite_page:field_hide_default_infobar'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: boolean
+                label: above
+                settings:
+                  format: default
+                  format_custom_false: ''
+                  format_custom_true: ''
+                third_party_settings: {  }
+            weight: 6
+            additional: {  }
         third_party_settings: {  }
   layout_builder_restrictions:
     allowed_block_categories: {  }
@@ -172,6 +191,16 @@ content:
       format_custom_true: ''
     third_party_settings: {  }
     weight: 105
+    region: content
+  field_hide_default_infobar:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 106
     region: content
   field_moody_url_generator:
     type: entity_reference_label

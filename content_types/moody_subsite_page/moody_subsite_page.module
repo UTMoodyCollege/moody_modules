@@ -69,11 +69,17 @@ function moody_subsite_page_preprocess_page(&$variables) {
       $base_url = $subsite->get('base_url')->getString();
       $variables['subsite_base_url'] = $base_url;
 
-      // If present, pass the page level hero, else pass the subsite default hero.
-      $page_level_hero = $node->get('field_primary_subsite_hero')->view();
-      $subsite_default_hero = $subsite->get('hero')->view();
-      $subsite_hero = (isset($page_level_hero[0])) ? $page_level_hero : $subsite_default_hero;
-      $variables['subsite_hero'] = $subsite_hero;
+      // Get the option for hiding default hero completely.
+      $hide_default_hero = $node->field_hide_default_hero->value;
+      if ($hide_default_hero !== "1") {
+          // If present, pass the page level hero, else pass the subsite default hero.
+          $page_level_hero = $node->get('field_primary_subsite_hero')->view();
+          $subsite_default_hero = $subsite->get('hero')->view();
+          $subsite_hero = (isset($page_level_hero[0])) ? $page_level_hero : $subsite_default_hero;
+          $variables['subsite_hero'] = $subsite_hero;
+      }
+
+      
 
       // Get subsite footer text.
       $variables['subsite_footer_text'] = FALSE;
@@ -130,9 +136,13 @@ function moody_subsite_page_preprocess_page(&$variables) {
         $variables['strauss_link'] = ($strauss_link) ? $strauss_link : FALSE;
       }
 
-      // Get info bars.
-      $info_bars = $subsite->get('subsite_info_bars')->view();
-      $variables['info_bars'] = $info_bars;
+       // Get the option for hiding default info bars completely.
+       $hide_default_info_bar = $node->field_hide_default_infobar->value;
+       if ($hide_default_info_bar !== "1") {
+        // Get info bars.
+        $info_bars = $subsite->get('subsite_info_bars')->view();
+        $variables['info_bars'] = $info_bars;
+       }
 
       // Get social accounts formatted string.
       $variables['subsite_social'] = FALSE;
