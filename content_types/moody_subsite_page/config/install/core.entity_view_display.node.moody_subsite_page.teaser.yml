@@ -6,6 +6,7 @@ dependencies:
     - field.field.node.moody_subsite_page.body
     - field.field.node.moody_subsite_page.field_moody_url_generator
     - field.field.node.moody_subsite_page.field_primary_subsite_hero
+    - field.field.node.moody_subsite_page.field_subsite_page_metatags
     - field.field.node.moody_subsite_page.field_subsite_page_subtitle
     - field.field.node.moody_subsite_page.layout_builder__layout
     - node.type.moody_subsite_page
@@ -17,9 +18,9 @@ bundle: moody_subsite_page
 mode: teaser
 content:
   links:
-    weight: 100
     settings: {  }
     third_party_settings: {  }
+    weight: 100
     region: content
 hidden:
   addtoany: true
@@ -28,5 +29,6 @@ hidden:
   display_page_title: true
   field_moody_url_generator: true
   field_primary_subsite_hero: true
+  field_subsite_page_metatags: true
   field_subsite_page_subtitle: true
   layout_builder__layout: true

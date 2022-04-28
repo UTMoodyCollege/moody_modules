@@ -14,6 +14,7 @@ dependencies:
   - 'drupal:text'
   - 'drupal:user'
   - 'layout_builder_restrictions:layout_builder_restrictions'
+  - 'metatag:metatag'
   - 'moody_image_styles:moody_image_styles'
   - 'moody_landing_page:moody_landing_page'
   - 'moody_subsite_hero:moody_subsite_hero'
@@ -21,4 +22,5 @@ dependencies:
   - 'page_title_visibility:page_title_visibility'
   - 'pathauto:pathauto'
   - 'utexas_content_type_flex_page:utexas_content_type_flex_page'
+  - 'xmlsitemap:xmlsitemap'
 core_incompatible: false

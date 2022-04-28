@@ -5,10 +5,12 @@ dependencies:
     - field.field.node.moody_subsite_page.body
     - field.field.node.moody_subsite_page.field_moody_url_generator
     - field.field.node.moody_subsite_page.field_primary_subsite_hero
+    - field.field.node.moody_subsite_page.field_subsite_page_metatags
     - field.field.node.moody_subsite_page.field_subsite_page_subtitle
     - field.field.node.moody_subsite_page.layout_builder__layout
     - node.type.moody_subsite_page
   module:
+    - metatag
     - moody_subsite_hero
     - path
 id: node.moody_subsite_page.default
@@ -37,25 +39,32 @@ content:
       display_label: true
     third_party_settings: {  }
   field_moody_url_generator:
-    weight: 11
-    settings: {  }
-    third_party_settings: {  }
     type: options_select
+    weight: 11
     region: content
-  field_primary_subsite_hero:
-    weight: 12
     settings: {  }
     third_party_settings: {  }
+  field_primary_subsite_hero:
     type: moody_subsite_hero
+    weight: 12
     region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_subsite_page_metatags:
+    type: metatag_firehose
+    weight: 26
+    region: content
+    settings:
+      sidebar: true
+    third_party_settings: {  }
   field_subsite_page_subtitle:
+    type: string_textfield
     weight: 1
+    region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   path:
     type: path
     weight: 8
@@ -64,24 +73,24 @@ content:
     third_party_settings: {  }
   promote:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 6
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 10
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 7
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   title:
     type: string_textfield
@@ -94,12 +103,12 @@ content:
   uid:
     type: entity_reference_autocomplete
     weight: 2
+    region: content
     settings:
       match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
-      match_limit: 10
-    region: content
     third_party_settings: {  }
   url_redirects:
     weight: 9

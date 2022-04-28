@@ -10,12 +10,12 @@ pattern: '[node:field_moody_url_generator:entity:parents:join-path]/[node:field_
 selection_criteria:
   daf00c60-e3b5-49c9-9e13-7c8cdf5f10dc:
     id: node_type
-    bundles:
-      moody_subsite_page: moody_subsite_page
     negate: false
+    uuid: daf00c60-e3b5-49c9-9e13-7c8cdf5f10dc
     context_mapping:
       node: node
-    uuid: daf00c60-e3b5-49c9-9e13-7c8cdf5f10dc
+    bundles:
+      moody_subsite_page: moody_subsite_page
 selection_logic: and
 weight: -5
 relationships: {  }
