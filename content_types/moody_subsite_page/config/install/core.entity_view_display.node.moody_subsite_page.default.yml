@@ -38,22 +38,6 @@ third_party_settings:
                 entity: layout_builder.entity
             weight: 0
             additional: {  }
-          2ece81ae-a2ce-42af-b266-5f80eba627b4:
-            uuid: 2ece81ae-a2ce-42af-b266-5f80eba627b4
-            region: content
-            configuration:
-              id: 'field_block:node:moody_subsite_page:field_moody_url_generator'
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              formatter:
-                type: entity_reference_label
-                label: above
-                settings:
-                  link: true
-                third_party_settings: {  }
-            weight: 1
-            additional: {  }
           76fbb89a-bb43-45b9-b0a8-c9ae9904b10a:
             uuid: 76fbb89a-bb43-45b9-b0a8-c9ae9904b10a
             region: content
@@ -99,42 +83,6 @@ third_party_settings:
                 settings: {  }
                 third_party_settings: {  }
             weight: 4
-            additional: {  }
-          db945eef-f4ca-459e-b737-49915645fa6f:
-            uuid: db945eef-f4ca-459e-b737-49915645fa6f
-            region: content
-            configuration:
-              id: 'field_block:node:moody_subsite_page:field_hide_default_hero'
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              formatter:
-                type: boolean
-                label: above
-                settings:
-                  format: default
-                  format_custom_false: ''
-                  format_custom_true: ''
-                third_party_settings: {  }
-            weight: 5
-            additional: {  }
-          95c57cc4-c483-4ea6-992d-09bbdf9058b3:
-            uuid: 95c57cc4-c483-4ea6-992d-09bbdf9058b3
-            region: content
-            configuration:
-              id: 'field_block:node:moody_subsite_page:field_hide_default_infobar'
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              formatter:
-                type: boolean
-                label: above
-                settings:
-                  format: default
-                  format_custom_false: ''
-                  format_custom_true: ''
-                third_party_settings: {  }
-            weight: 6
             additional: {  }
         third_party_settings: {  }
   layout_builder_restrictions:
