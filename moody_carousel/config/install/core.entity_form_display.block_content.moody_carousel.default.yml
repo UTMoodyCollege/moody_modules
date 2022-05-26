@@ -5,6 +5,7 @@ dependencies:
     - block_content.type.moody_carousel
     - field.field.block_content.moody_carousel.field_moody_carousel
     - field.field.block_content.moody_carousel.field_moody_carousel_autoplay
+    - field.field.block_content.moody_carousel.field_moody_carousel_dots
     - field.field.block_content.moody_carousel.field_moody_carousel_fade
     - field.field.block_content.moody_carousel.field_moody_carousel_speed
   module:
@@ -23,6 +24,13 @@ content:
   field_moody_carousel_autoplay:
     type: boolean_checkbox
     weight: 1
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_moody_carousel_dots:
+    type: boolean_checkbox
+    weight: 26
     region: content
     settings:
       display_label: true

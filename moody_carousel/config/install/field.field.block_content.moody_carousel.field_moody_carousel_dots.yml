@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_carousel
+    - field.storage.block_content.field_moody_carousel_dots
+id: block_content.moody_carousel.field_moody_carousel_dots
+field_name: field_moody_carousel_dots
+entity_type: block_content
+bundle: moody_carousel
+label: 'Show navigational dots'
+description: 'If turned on, will display "dots" on the bottom that can be used for navigation.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

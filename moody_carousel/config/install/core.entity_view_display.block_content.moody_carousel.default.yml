@@ -5,6 +5,7 @@ dependencies:
     - block_content.type.moody_carousel
     - field.field.block_content.moody_carousel.field_moody_carousel
     - field.field.block_content.moody_carousel.field_moody_carousel_autoplay
+    - field.field.block_content.moody_carousel.field_moody_carousel_dots
     - field.field.block_content.moody_carousel.field_moody_carousel_fade
     - field.field.block_content.moody_carousel.field_moody_carousel_speed
   module:
@@ -22,6 +23,16 @@ content:
       moody_carousel:
         style: utexas_hero_3
     weight: 0
+    region: content
+  field_moody_carousel_dots:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 1
     region: content
 hidden:
   field_moody_carousel_autoplay: true

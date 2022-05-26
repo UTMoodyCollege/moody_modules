@@ -8,7 +8,7 @@ id: block_content.moody_carousel.field_moody_carousel_speed
 field_name: field_moody_carousel_speed
 entity_type: block_content
 bundle: moody_carousel
-label: Slide Transition Delay
+label: 'Slide Transition Delay'
 description: 'The length of time, in seconds, before a slide transitions'
 required: true
 translatable: false

@@ -29,6 +29,7 @@ function utexas_moody_carousel_entity_view_alter(array &$build, EntityInterface 
     'field_moody_carousel_fade' => 'fade',
     'field_moody_carousel_autoplay' => 'autoplay',
     'field_moody_carousel_speed' => 'autoplaySpeed',
+    'field_moody_carousel_dots' => 'dots',
   ];
   // Assign values from block fields to drupalSettings.
   foreach ($drupal_settings_field_map as $field_name => $setting_key) {
