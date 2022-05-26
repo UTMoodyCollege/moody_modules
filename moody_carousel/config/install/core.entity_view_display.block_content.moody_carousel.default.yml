@@ -24,18 +24,9 @@ content:
         style: utexas_hero_3
     weight: 0
     region: content
-  field_moody_carousel_dots:
-    type: boolean
-    label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    weight: 1
-    region: content
 hidden:
   field_moody_carousel_autoplay: true
+  field_moody_carousel_dots: true
   field_moody_carousel_fade: true
   field_moody_carousel_speed: true
   search_api_excerpt: true

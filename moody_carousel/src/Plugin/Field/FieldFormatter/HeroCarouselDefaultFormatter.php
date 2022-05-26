@@ -25,7 +25,7 @@ class HeroCarouselDefaultFormatter extends UTexasHeroFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     // Get id of the parent formatter to use.
-    $third_party_settings = $this->getThirdPartySettings('utexas_hero_carousel');
+    $third_party_settings = $this->getThirdPartySettings('moody_carousel');
     $parent_formatter_id = $third_party_settings['style'] ?? 'utexas_hero_3';
 
     // Build configuration array to pass to a new instance of whichever existing
@@ -57,9 +57,9 @@ class HeroCarouselDefaultFormatter extends UTexasHeroFormatterBase {
     ];
 
     $elements['#attributes']['id'] = $js_data_id;
-    $elements['#attributes']['class'][] = 'utexas-hero-carousel';
-    $elements['#attached']['drupalSettings']['utexas_hero_carousel'][$js_data_id] = $drupal_settings;
-    $elements['#attached']['library'][] = 'utexas_hero_carousel/slick-carousel';
+    $elements['#attributes']['class'][] = 'moody-carousel';
+    $elements['#attached']['drupalSettings']['moody_carousel'][$js_data_id] = $drupal_settings;
+    $elements['#attached']['library'][] = 'moody_carousel/slick-carousel';
     return $elements;
   }
 

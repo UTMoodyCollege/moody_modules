@@ -12,7 +12,7 @@ use Drupal\block_content\Entity\BlockContent;
 /**
  * Implements hook_entity_view_alter().
  */
-function utexas_moody_carousel_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+function moody_carousel_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
   // Bail if not our target block bundle.
   if (!$entity instanceof BlockContent || $entity->bundle() !== 'moody_carousel') {
     return;

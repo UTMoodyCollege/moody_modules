@@ -12,31 +12,23 @@
      *
      * @type {Drupal~behavior}
      */
-    Drupal.behaviors.utexasHeroCarousel = {
+    Drupal.behaviors.moodyCarousel = {
       attach: function (context) {
-
-        $('.utexas-hero-carousel', context).each(function(el) {
+        console.log("Moody carousel123");
+        $('.moody-carousel', context).each(function(el) {
           var id = $(this).attr('id');
-          var carouselOptions = drupalSettings['utexas_hero_carousel'][id];
-          // We always set "autoplay" to true so that the play/pause button is
-          // always visible.
-          $(this).slick({
-            autoplay: true,
-            autoplaySpeed: parseFloat(carouselOptions['autoplaySpeed']) * 1000,
+          var carouselOptions = drupalSettings['moody_carousel'][id];
+          var slickOptions = {
             dots: Boolean( parseInt(carouselOptions['dots'])),
             fade: Boolean( parseInt(carouselOptions['fade'])),
             slidesToScroll: parseInt(carouselOptions['slidesToScroll']),
             slidesToShow: parseInt(carouselOptions['slidesToShow']),
-          });
-          // If the carousel does not have autoplay enabled, pause the carousel
-          // and set the button display to "Play".
-          if (carouselOptions['autoplay'] == 0) {
-            $(this).slick('slickSetOption', 'autoplay', true).slick('slickPause');
-            $(this).find('.slick-pause-icon').attr('style', 'display: none');
-            $(this).find('.slick-play-icon').removeAttr('style');
-            $(this).find('.slick-pause-text').attr('style', 'display: none');
-            $(this).find('.slick-play-text').removeAttr('style');
           }
+          if (carouselOptions['autoplay'] != "0") {
+            slickOptions.autoplay = carouselOptions['autoplay'];
+            slickOptions.autoplaySpeed = parseFloat(carouselOptions['autoplaySpeed']) * 1000;
+          }
+          $(this).slick(slickOptions);
         });
 
 
