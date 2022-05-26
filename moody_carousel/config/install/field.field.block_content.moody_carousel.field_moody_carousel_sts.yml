@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_carousel
+    - field.storage.block_content.field_moody_carousel_sts
+  module:
+    - options
+id: block_content.moody_carousel.field_moody_carousel_sts
+field_name: field_moody_carousel_sts
+entity_type: block_content
+bundle: moody_carousel
+label: 'Number of slides to show at once'
+description: 'Select how many slides should be shown at a time as the user navigates.'
+required: false
+translatable: false
+default_value:
+  -
+    value: '1'
+default_value_callback: ''
+settings: {  }
+field_type: list_string

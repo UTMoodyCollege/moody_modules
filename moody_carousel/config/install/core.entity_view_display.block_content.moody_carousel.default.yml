@@ -7,7 +7,9 @@ dependencies:
     - field.field.block_content.moody_carousel.field_moody_carousel_autoplay
     - field.field.block_content.moody_carousel.field_moody_carousel_dots
     - field.field.block_content.moody_carousel.field_moody_carousel_fade
+    - field.field.block_content.moody_carousel.field_moody_carousel_scr
     - field.field.block_content.moody_carousel.field_moody_carousel_speed
+    - field.field.block_content.moody_carousel.field_moody_carousel_sts
   module:
     - moody_carousel
 id: block_content.moody_carousel.default
@@ -28,5 +30,7 @@ hidden:
   field_moody_carousel_autoplay: true
   field_moody_carousel_dots: true
   field_moody_carousel_fade: true
+  field_moody_carousel_scr: true
   field_moody_carousel_speed: true
+  field_moody_carousel_sts: true
   search_api_excerpt: true

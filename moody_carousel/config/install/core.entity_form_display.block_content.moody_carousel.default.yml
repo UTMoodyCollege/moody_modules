@@ -7,7 +7,9 @@ dependencies:
     - field.field.block_content.moody_carousel.field_moody_carousel_autoplay
     - field.field.block_content.moody_carousel.field_moody_carousel_dots
     - field.field.block_content.moody_carousel.field_moody_carousel_fade
+    - field.field.block_content.moody_carousel.field_moody_carousel_scr
     - field.field.block_content.moody_carousel.field_moody_carousel_speed
+    - field.field.block_content.moody_carousel.field_moody_carousel_sts
   module:
     - moody_carousel
 id: block_content.moody_carousel.default
@@ -17,7 +19,7 @@ mode: default
 content:
   field_moody_carousel:
     type: moody_carousel
-    weight: 5
+    weight: 7
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -42,12 +44,24 @@ content:
     settings:
       display_label: true
     third_party_settings: {  }
+  field_moody_carousel_scr:
+    type: options_select
+    weight: 5
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_moody_carousel_speed:
     type: number
     weight: 4
     region: content
     settings:
       placeholder: ''
+    third_party_settings: {  }
+  field_moody_carousel_sts:
+    type: options_select
+    weight: 6
+    region: content
+    settings: {  }
     third_party_settings: {  }
   info:
     type: string_textfield
