@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_carousel
+    - field.field.block_content.moody_carousel.field_moody_carousel
+    - field.field.block_content.moody_carousel.field_moody_carousel_autoplay
+    - field.field.block_content.moody_carousel.field_moody_carousel_fade
+    - field.field.block_content.moody_carousel.field_moody_carousel_speed
+  module:
+    - moody_carousel
+id: block_content.moody_carousel.default
+targetEntityType: block_content
+bundle: moody_carousel
+mode: default
+content:
+  field_moody_carousel:
+    type: moody_carousel
+    label: hidden
+    settings: {  }
+    third_party_settings:
+      moody_carousel:
+        style: utexas_hero_3
+    weight: 0
+    region: content
+hidden:
+  field_moody_carousel_autoplay: true
+  field_moody_carousel_fade: true
+  field_moody_carousel_speed: true
+  search_api_excerpt: true
