@@ -45,6 +45,16 @@ class MoodyFlexGridElement extends FormElement {
       '#title' => t('Item Headline'),
       '#default_value' => isset($element['#default_value']['headline']) ? $element['#default_value']['headline'] : '',
     ];
+    $element['headline_alignment'] = [
+      '#title' => t('Headline text alignment'),
+      '#type' => 'radios',
+      '#options' => [
+        'left' => 'Left',
+        'center' => 'Center',
+        'right' => 'Right',
+      ],
+      '#default_value' => $element['#default_value']['headline_alignment'] ?? 'left',
+    ];
     $element['copy'] = [
       '#title' => 'Copy',
       '#type' => 'textarea',

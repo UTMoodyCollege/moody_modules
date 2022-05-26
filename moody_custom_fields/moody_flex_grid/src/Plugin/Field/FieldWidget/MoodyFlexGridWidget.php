@@ -132,6 +132,7 @@ class MoodyFlexGridWidget extends WidgetBase {
         '#default_value' => [
           'image' => $items[$i]['item']['image'] ?? '',
           'headline' => $items[$i]['item']['headline'] ?? '',
+          'headline_alignment' => $items[$i]['item']['headline_alignment'] ?? '',
           'copy' => $items[$i]['item']['copy'] ?? '',
           'link' => $items[$i]['item']['link'] ?? '',
         ],
@@ -179,6 +180,9 @@ class MoodyFlexGridWidget extends WidgetBase {
           }
           if (!empty($elements['copy'])) {
             $storage[$delta]['flex_grid_items'][$weight]['item']['copy'] = $elements['copy'];
+          }
+          if (!empty($elements['headline_alignment'])) {
+            $storage[$delta]['flex_grid_items'][$weight]['item']['headline_alignment'] = $elements['headline_alignment'];
           }
           if (!empty($elements['link']['uri'])) {
             $storage[$delta]['flex_grid_items'][$weight]['item']['link']['uri'] = $elements['link']['uri'];

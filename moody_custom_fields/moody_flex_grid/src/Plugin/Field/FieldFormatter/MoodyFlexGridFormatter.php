@@ -119,6 +119,9 @@ class MoodyFlexGridFormatter extends FormatterBase implements ContainerFactoryPl
           if (!empty($instance_item['copy'])) {
             $instances[$key]['copy'] = check_markup($instance_item['copy'], 'plain_text');
           }
+          if (!empty($instance_item['headline_alignment'])) {
+            $instances[$key]['headline_alignment'] = $instance_item['headline_alignment'];
+          }
           if (!empty($instance_item['link']['uri'])) {
             // $instances[$key]['link'] = UtexasLinkOptionsHelper::buildLink($instance_item, ['ut-link--darker']);
             $instances[$key]['link'] = Url::fromUri($instance_item['link']['uri']);
