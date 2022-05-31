@@ -12,7 +12,7 @@ use Drupal\utexas_hero\Plugin\Field\FieldFormatter\UTexasHeroFormatterBase;
  *
  * @FieldFormatter(
  *   id = "moody_carousel",
- *   label = @Translation("moody_carousel Carousel: full-width image"),
+ *   label = @Translation("Moody Carousel: full-width image"),
  *   field_types = {
  *     "utexas_hero"
  *   }

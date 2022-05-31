@@ -2,6 +2,6 @@ langcode: en
 status: true
 dependencies: {  }
 id: moody_carousel
-label: 'moody_carousel Carousel'
+label: 'Moody Carousel'
 revision: 1
 description: 'Display a rotating series of images, each with optional headline & call to action.'
