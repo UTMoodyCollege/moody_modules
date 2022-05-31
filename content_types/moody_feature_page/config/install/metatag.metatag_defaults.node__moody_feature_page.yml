@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: node__moody_feature_page
+label: 'Content: Moody Feature Page'
+tags:
+  og_image_width: '[node:field_thumbnail_image_for_summar:entity:field_utexas_media_image:moody_image_style_650w_x_700h:width]'
+  og_image: '[node:field_thumbnail_image_for_summar:entity:field_utexas_media_image:moody_image_style_650w_x_700h:url]'
+  og_image_url: '[node:field_thumbnail_image_for_summar:entity:field_utexas_media_image:moody_image_style_650w_x_700h:url]'
+  og_image_height: '[node:field_thumbnail_image_for_summar:entity:field_utexas_media_image:moody_image_style_650w_x_700h:height]'
+  og_image_secure_url: '[node:field_thumbnail_image_for_summar:entity:field_utexas_media_image:moody_image_style_650w_x_700h:url]'
