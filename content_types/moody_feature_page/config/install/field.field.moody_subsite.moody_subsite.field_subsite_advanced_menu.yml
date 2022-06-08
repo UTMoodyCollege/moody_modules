@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.moody_subsite.field_subsite_advanced_menu
+  module:
+    - moody_subsite
+id: moody_subsite.moody_subsite.field_subsite_advanced_menu
+field_name: field_subsite_advanced_menu
+entity_type: moody_subsite
+bundle: moody_subsite
+label: 'Subsite Advanced Menu'
+description: 'Select a Menu to use instead of the standard subsite menu. This enables nesting links to create menus beyond 1 link of depth.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:menu'
+  handler_settings:
+    target_bundles: null
+    auto_create: false
+field_type: entity_reference
