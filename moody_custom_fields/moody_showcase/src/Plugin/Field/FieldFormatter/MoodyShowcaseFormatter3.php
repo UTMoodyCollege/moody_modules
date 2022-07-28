@@ -45,6 +45,7 @@ class MoodyShowcaseFormatter3 extends MoodyShowcaseFormatter {
       $cache_tags = Cache::mergeTags($cache_tags, $image_style->getCacheTags());
     }
 
+    $elements = [];
     foreach ($items as $delta => $item) {
       $cta_item['link']['uri'] = $item->link_uri;
       $cta_item['link']['title'] = $item->link_title ?? NULL;
@@ -52,39 +53,79 @@ class MoodyShowcaseFormatter3 extends MoodyShowcaseFormatter {
       $cta = UtexasLinkOptionsHelper::buildLink($cta_item, ['ut-btn--homepage']);
       $image_render_array = [];
       if ($media = $this->entityTypeManager->getStorage('media')->load($item->image)) {
-        $media_attributes = $media->get('field_utexas_media_image')->getValue();
-        if ($file = $this->entityTypeManager->getStorage('file')->load($media_attributes[0]['target_id'])) {
-          $image = new \stdClass();
-          $image->title = NULL;
-          $image->alt = $media_attributes[0]['alt'];
-          $image->entity = $file;
-          $image->uri = $file->getFileUri();
-          $image->width = NULL;
-          $image->height = NULL;
-          $image_render_array = [
-            '#theme' => 'responsive_image_formatter',
-            '#item' => $image,
-            '#item_attributes' => [],
-            '#responsive_image_style_id' => $responsive_image_style_name,
-            '#cache' => [
-              'tags' => $cache_tags,
-            ],
-          ];
-        }
-      }
+        // Alter if it's a video.
+        $media_bundle = $media->bundle();
+        switch ($media_bundle) {
+          case 'utexas_video_external':
+            $entity_type = 'media';
+            $entity_id = $media->id();
+            $view_mode = 'default';
 
-      $elements[] = [
+            $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+            $view_builder = \Drupal::entityTypeManager()->getViewBuilder('media');
+            $pre_render = $view_builder->view($entity, $view_mode);
+            $video_render_array = $pre_render;
+            break;
+
+          case 'utexas_image':
+            $media_attributes = $media->get('field_utexas_media_image')->getValue();
+            if ($file = $this->entityTypeManager->getStorage('file')->load($media_attributes[0]['target_id'])) {
+              $image = new \stdClass();
+              $image->title = NULL;
+              $image->alt = $media_attributes[0]['alt'];
+              $image->entity = $file;
+              $image->uri = $file->getFileUri();
+              $image->width = NULL;
+              $image->height = NULL;
+              $image_render_array = [
+                '#theme' => 'responsive_image_formatter',
+                '#item' => $image,
+                '#item_attributes' => [],
+                '#responsive_image_style_id' => $responsive_image_style_name,
+                '#cache' => [
+                  'tags' => $cache_tags,
+                ],
+              ];
+            }
+            break;
+        }
+
+      
+      }
+      $data = [
         '#theme' => 'moody_showcase',
-        '#image' => $image_render_array,
         '#headline' => $item->headline,
         '#copy' => check_markup($item->copy_value, $item->copy_format),
         '#cta' => $cta,
       ];
+
+      switch ($media_bundle) {
+        case 'utexas_image':
+          if (!empty($image_render_array)) {
+            $data['#image'] = $image_render_array;
+
+          }
+          break;
+
+        case 'utexas_video_external':
+          if (!empty($video_render_array)) {
+            $data['#video'] = $video_render_array;
+
+          }
+          break;
+      }
+      $elements[$delta] = $data;
+      $elements['#items'][$delta] = new \stdClass();
+      $elements['#items'][$delta]->_attributes = [
+        'class' => ['moody-showcase-marketing-style'],
+      ];
+
+
+    
     }
-    $elements['#items'][$delta] = new \stdClass();
-    $elements['#items'][$delta]->_attributes = [
-      'class' => ['moody-showcase-marketing-style'],
-    ];
+
+    
+
     return $elements;
   }
 
