@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.moody_subsite_page.field_moody_url_generator
+    - taxonomy.vocabulary.directory_structure
+id: directory_structure
+plural_label: 'Directory Structures'
+label: 'Directory Structure'
+scheme: taxonomy
+scheme_settings:
+  vocabularies:
+    - directory_structure
+  fields:
+    -
+      entity_type: moody_subsite
+      bundle: moody_subsite
+      field: directory_structure
+    -
+      entity_type: node
+      bundle: moody_subsite_page
+      field: field_moody_url_generator

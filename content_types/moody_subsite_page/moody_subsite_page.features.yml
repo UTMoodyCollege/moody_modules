@@ -1,1 +1,11 @@
+excluded:
+  - user.role.moody_subsite_editor
+  - user.role.moody_administrator
+  - taxonomy.vocabulary.association
+  - taxonomy.vocabulary.moody_file_content_usage
+  - taxonomy.vocabulary.team_member_group
+  - editor.editor.basic_html
+  - filter.format.basic_html
+  - filter.format.full_html
+  - filter.format.restricted_html
 required: true

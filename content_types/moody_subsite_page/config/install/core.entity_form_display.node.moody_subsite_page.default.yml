@@ -7,11 +7,15 @@ dependencies:
     - field.field.node.moody_subsite_page.field_hide_default_infobar
     - field.field.node.moody_subsite_page.field_moody_url_generator
     - field.field.node.moody_subsite_page.field_primary_subsite_hero
+    - field.field.node.moody_subsite_page.field_subsite_blog_image
+    - field.field.node.moody_subsite_page.field_subsite_blog_page
+    - field.field.node.moody_subsite_page.field_subsite_blog_summary
     - field.field.node.moody_subsite_page.field_subsite_page_metatags
     - field.field.node.moody_subsite_page.field_subsite_page_subtitle
     - field.field.node.moody_subsite_page.layout_builder__layout
     - node.type.moody_subsite_page
   module:
+    - media_library
     - metatag
     - moody_subsite_hero
     - path
@@ -72,6 +76,28 @@ content:
     weight: 12
     region: content
     settings: {  }
+    third_party_settings: {  }
+  field_subsite_blog_image:
+    type: media_library_widget
+    weight: 30
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+  field_subsite_blog_page:
+    type: boolean_checkbox
+    weight: 29
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_subsite_blog_summary:
+    type: string_textarea
+    weight: 31
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
     third_party_settings: {  }
   field_subsite_page_metatags:
     type: metatag_firehose

@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_subsite_blog_page
+    - node.type.moody_subsite_page
+id: node.moody_subsite_page.field_subsite_blog_page
+field_name: field_subsite_blog_page
+entity_type: node
+bundle: moody_subsite_page
+label: 'Subsite Blog Page'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean
