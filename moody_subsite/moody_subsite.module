@@ -69,5 +69,19 @@ function moody_subsite_form_moody_subsite_edit_form_alter(&$form, FormStateInter
     if (!in_array('moody_administrator', $roles)) {
       $form['directory_structure']['#attributes']['class'][] = 'visually-hidden';
     }
+    
+    
   }
+}
+
+/**
+ * Implements hook_alter for the node form.
+ */
+function moody_subsite_form_node_form_alter(&$form, FormStateInterface &$form_state, $form_id) {
+  // Add a state to be invisible via Drupal form API to the $form['subsite_blog_summary'] if the subsite_page checkbox is not checked
+  $invisible_state_for_blog_checked = [
+    ':input[name="field_subsite_blog_page[value]"]' => ['checked' => FALSE],
+  ];
+  $form['field_subsite_blog_image']['#states']['invisible'] = $invisible_state_for_blog_checked;
+  $form['field_subsite_blog_summary']['#states']['invisible'] = $invisible_state_for_blog_checked;
 }
