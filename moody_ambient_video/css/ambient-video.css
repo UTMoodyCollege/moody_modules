@@ -206,6 +206,7 @@
 @media screen and (min-width: 900px) {
   .moody-ambient-video.natural {
     min-height: auto;
+    height: 900px;
   }
 }
 .moody-ambient-video.natural #hidden-overflow-container {
