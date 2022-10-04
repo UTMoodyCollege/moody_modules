@@ -127,6 +127,13 @@ class MoodySocialAccountsWidget extends WidgetBase {
       '#placeholder' => 'https://www.google.com/',
     ];
 
+    $element['social_accounts']['tiktok'] = [
+      '#type' => 'url',
+      '#title' => $this->t('TikTok'),
+      '#default_value' => isset($links['tiktok']) ? $links['tiktok'] : NULL,
+      '#placeholder' => 'https://www.tiktok.com/',
+    ];
+
     return $element;
   }
 
@@ -149,7 +156,7 @@ class MoodySocialAccountsWidget extends WidgetBase {
       $links['linkedin'] = isset($value['social_accounts']['linkedin']) ? $value['social_accounts']['linkedin'] : NULL;
       $links['weibo'] = isset($value['social_accounts']['weibo']) ? $value['social_accounts']['weibo'] : NULL;
       $links['medium'] = isset($value['social_accounts']['medium']) ? $value['social_accounts']['medium'] : NULL;
-      $links['newsletter'] = isset($value['social_accounts']['newsletter']) ? $value['social_accounts']['newsletter'] : NULL;
+      $links['tiktok'] = isset($value['social_accounts']['tiktok']) ? $value['social_accounts']['tiktok'] : NULL;
     }
     $storage = serialize($links);
     return $storage;
