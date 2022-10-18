@@ -56,22 +56,6 @@ third_party_settings:
                 third_party_settings: {  }
             weight: 2
             additional: {  }
-          971e97c5-077e-4b10-8210-f9cf15e658ca:
-            uuid: 971e97c5-077e-4b10-8210-f9cf15e658ca
-            region: content
-            configuration:
-              id: 'field_block:node:moody_subsite_page:field_subsite_page_subtitle'
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              formatter:
-                type: string
-                label: above
-                settings:
-                  link_to_entity: false
-                third_party_settings: {  }
-            weight: 3
-            additional: {  }
           3505fea3-b6e3-477c-94b8-1bcc39334a43:
             uuid: 3505fea3-b6e3-477c-94b8-1bcc39334a43
             region: content
