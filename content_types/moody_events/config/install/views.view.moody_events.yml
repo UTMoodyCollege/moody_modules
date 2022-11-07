@@ -8,10 +8,12 @@ dependencies:
     - field.storage.node.field_moodyevent_remote_url
     - image.style.utexas_image_style_128w_128h
     - node.type.moody_event
+    - taxonomy.vocabulary.moody_event_tags
   module:
     - media
     - moody_events
     - node
+    - smart_date
     - text
     - user
 id: moody_events
@@ -23,49 +25,12 @@ base_table: node_field_data
 base_field: nid
 display:
   default:
-    display_plugin: default
     id: default
     display_title: Master
+    display_plugin: default
     position: 0
     display_options:
-      access:
-        type: perm
-        options:
-          perm: 'access content'
-      cache:
-        type: tag
-        options: {  }
-      query:
-        type: views_query
-        options:
-          disable_sql_rewrite: false
-          distinct: false
-          replica: false
-          query_comment: ''
-          query_tags: {  }
-      exposed_form:
-        type: basic
-        options:
-          submit_button: Apply
-          reset_button: false
-          reset_button_label: Reset
-          exposed_sorts_label: 'Sort by'
-          expose_sort_order: true
-          sort_asc_label: Asc
-          sort_desc_label: Desc
-      pager:
-        type: some
-        options:
-          items_per_page: 5
-          offset: 0
-      style:
-        type: default
-        options:
-          grouping: {  }
-          row_class: col-sm-12
-          default_row_class: true
-      row:
-        type: fields
+      title: 'Moody Events'
       fields:
         field_moodyevent_remote_url:
           id: field_moodyevent_remote_url
@@ -74,6 +39,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: true
           alter:
@@ -129,7 +95,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         field_moodyevent_image:
           id: field_moodyevent_image
           table: node__field_moodyevent_image
@@ -137,6 +102,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: false
           alter:
@@ -181,8 +147,8 @@ display:
           click_sort_column: target_id
           type: media_thumbnail
           settings:
-            image_style: utexas_image_style_128w_128h
             image_link: ''
+            image_style: utexas_image_style_128w_128h
           group_column: target_id
           group_columns: {  }
           group_rows: true
@@ -193,7 +159,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         title:
           id: title
           table: node_field_data
@@ -201,6 +166,9 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          entity_type: node
+          entity_field: title
+          plugin_id: field
           label: ''
           exclude: false
           alter:
@@ -256,9 +224,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          entity_type: node
-          entity_field: title
-          plugin_id: field
         field_moodyevent_datetime:
           id: field_moodyevent_datetime
           table: node__field_moodyevent_datetime
@@ -266,6 +231,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: false
           alter:
@@ -327,7 +293,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         field_moodyevent_body:
           id: field_moodyevent_body
           table: node__field_moodyevent_body
@@ -335,6 +300,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: false
           alter:
@@ -390,7 +356,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         nothing:
           id: nothing
           table: views
@@ -398,6 +363,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: custom
           label: ''
           exclude: false
           alter:
@@ -439,45 +405,137 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: false
-          plugin_id: custom
+      pager:
+        type: some
+        options:
+          offset: 0
+          items_per_page: 5
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Apply
+          reset_button: false
+          reset_button_label: Reset
+          exposed_sorts_label: 'Sort by'
+          expose_sort_order: true
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+        options: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: true
+          content:
+            value: 'There are no upcoming events scheduled at this time.'
+            format: flex_html
+          tokenize: false
+      sorts:
+        field_moodyevent_datetime_value:
+          id: field_moodyevent_datetime_value
+          table: node__field_moodyevent_datetime
+          field: field_moodyevent_datetime_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: date
+          order: ASC
+          expose:
+            label: ''
+            field_identifier: field_moodyevent_datetime_value
+          exposed: false
+          granularity: hour
+      arguments:
+        field_moodyevent_tags_target_id:
+          id: field_moodyevent_tags_target_id
+          table: node__field_moodyevent_tags
+          field: field_moodyevent_tags_target_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: numeric
+          default_action: ignore
+          exception:
+            value: all
+            title_enable: false
+            title: All
+          title_enable: false
+          title: ''
+          default_argument_type: fixed
+          default_argument_options:
+            argument: ''
+          default_argument_skip_url: false
+          summary_options:
+            base_path: ''
+            count: true
+            override: false
+            items_per_page: 25
+          summary:
+            sort_order: asc
+            number_of_records: 0
+            format: default_summary
+          specify_validation: true
+          validate:
+            type: 'entity:taxonomy_term'
+            fail: 'not found'
+          validate_options:
+            bundles:
+              moody_event_tags: moody_event_tags
+            access: false
+            operation: view
+            multiple: 1
+          break_phrase: false
+          not: false
       filters:
         status:
-          value: '1'
+          id: status
           table: node_field_data
           field: status
-          plugin_id: boolean
           entity_type: node
           entity_field: status
-          id: status
+          plugin_id: boolean
+          value: '1'
+          group: 1
           expose:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
-          group: 1
         type:
           id: type
           table: node_field_data
           field: type
-          value:
-            moody_event: moody_event
           entity_type: node
           entity_field: type
           plugin_id: bundle
+          value:
+            moody_event: moody_event
           expose:
             operator_limit_selection: false
             operator_list: {  }
-        field_moodyevent_datetime_end_value:
-          id: field_moodyevent_datetime_end_value
+        field_moodyevent_datetime_value:
+          id: field_moodyevent_datetime_value
           table: node__field_moodyevent_datetime
-          field: field_moodyevent_datetime_end_value
+          field: field_moodyevent_datetime_value
           relationship: none
           group_type: group
           admin_label: ''
-          operator: '>='
+          plugin_id: date
+          operator: '>'
           value:
             min: ''
             max: ''
-            value: today
+            value: '-1 day'
             type: offset
           group: 1
           exposed: false
@@ -495,9 +553,9 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-            placeholder: ''
             min_placeholder: ''
             max_placeholder: ''
+            placeholder: ''
           is_grouped: false
           group_info:
             label: ''
@@ -510,22 +568,24 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-          plugin_id: date
-      sorts:
-        field_moodyevent_datetime_value:
-          id: field_moodyevent_datetime_value
-          table: node__field_moodyevent_datetime
-          field: field_moodyevent_datetime_value
-          relationship: none
-          group_type: group
-          admin_label: ''
-          order: ASC
-          exposed: false
-          expose:
-            label: ''
-          granularity: second
-          plugin_id: date
-      title: 'Moody College Events'
+      style:
+        type: default
+        options:
+          grouping: {  }
+          row_class: col-sm-12
+          default_row_class: true
+      row:
+        type: fields
+      query:
+        type: views_query
+        options:
+          query_comment: ''
+          disable_sql_rewrite: false
+          distinct: false
+          replica: false
+          query_tags: {  }
+      relationships: {  }
+      css_class: 'moody-events-view row'
       header: {  }
       footer:
         area_text_custom_1:
@@ -535,25 +595,17 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          empty: false
-          tokenize: false
-          content: "<ul class=\"button-list d-flex\">\r\n<li><a href=\"https://texasmoodymedia.org\" class=\"ut-btn--homepage\">View All Events</a></li>\r\n<li><a href=\"https://texasmoodymedia.org/submit-event\" class=\"ut-btn--homepage\">Submit an Event</a></li>\r\n</ul>"
           plugin_id: text_custom
-      empty:
-        area:
-          id: area
-          table: views
-          field: area
-          plugin_id: text
-      relationships: {  }
-      arguments: {  }
+          empty: false
+          content: "<ul class=\"button-list d-flex\">\r\n<li><a href=\"https://texasmoodymedia.org/#post-0\" class=\"ut-btn--homepage\">View All Events</a></li>\r\n<li><a href=\"https://texasmoodymedia.org/submit-event\" class=\"ut-btn--homepage\">Submit an Event</a></li>\r\n</ul>"
+          tokenize: false
       display_extenders: {  }
-      css_class: 'moody-events-view row'
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - 'user.node_grants:view'
         - user.permissions
       tags:
@@ -562,29 +614,16 @@ display:
         - 'config:field.storage.node.field_moodyevent_image'
         - 'config:field.storage.node.field_moodyevent_remote_url'
   block_1:
-    display_plugin: block
     id: block_1
     display_title: 'Moody Event Slider'
+    display_plugin: block
     position: 2
     display_options:
-      display_extenders:
-        metatag_display_extender: {  }
       pager:
         type: some
         options:
-          items_per_page: 5
           offset: 0
-      defaults:
-        pager: false
-        style: false
-        row: false
-        css_class: false
-        filters: true
-        filter_groups: true
-        empty: false
-        sorts: false
-      display_description: ''
-      block_description: 'Moody Event Slider'
+          items_per_page: 5
       style:
         type: html_list
         options:
@@ -597,40 +636,23 @@ display:
       row:
         type: fields
         options: {  }
+      defaults:
+        css_class: false
+        pager: false
+        style: false
+        row: false
+        filters: true
+        filter_groups: true
       css_class: moody-events-view
-      empty:
-        area:
-          id: area
-          table: views
-          field: area
-          relationship: none
-          group_type: group
-          admin_label: ''
-          empty: true
-          tokenize: false
-          content:
-            value: 'There are no events scheduled at this time'
-            format: flex_html
-          plugin_id: text
-      sorts:
-        field_moodyevent_datetime_value:
-          id: field_moodyevent_datetime_value
-          table: node__field_moodyevent_datetime
-          field: field_moodyevent_datetime_value
-          relationship: none
-          group_type: group
-          admin_label: ''
-          order: ASC
-          exposed: false
-          expose:
-            label: ''
-          granularity: hour
-          plugin_id: date
+      display_description: ''
+      display_extenders: {  }
+      block_description: 'Moody Event Slider'
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - 'user.node_grants:view'
         - user.permissions
       tags:
@@ -639,19 +661,20 @@ display:
         - 'config:field.storage.node.field_moodyevent_image'
         - 'config:field.storage.node.field_moodyevent_remote_url'
   block_2:
-    display_plugin: block
     id: block_2
     display_title: 'Filtered Events'
+    display_plugin: block
     position: 3
     display_options:
+      display_description: ''
       display_extenders: {  }
       block_description: 'Filtered Events'
-      display_description: ''
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - 'user.node_grants:view'
         - user.permissions
       tags:
@@ -660,19 +683,19 @@ display:
         - 'config:field.storage.node.field_moodyevent_image'
         - 'config:field.storage.node.field_moodyevent_remote_url'
   page_1:
-    display_plugin: page
     id: page_1
     display_title: Page
+    display_plugin: page
     position: 1
     display_options:
-      display_extenders:
-        metatag_display_extender: {  }
+      display_extenders: {  }
       path: moody-events
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - 'user.node_grants:view'
         - user.permissions
       tags:

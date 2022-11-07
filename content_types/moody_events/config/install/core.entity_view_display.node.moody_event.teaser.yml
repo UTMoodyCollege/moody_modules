@@ -27,8 +27,6 @@ mode: teaser
 content:
   field_moodyevent_datetime:
     type: utevent_smartdate_recurring
-    weight: 0
-    region: content
     label: visually_hidden
     settings:
       format: default
@@ -40,38 +38,40 @@ content:
       upcoming_display: '2'
       show_next: false
     third_party_settings: {  }
+    weight: 0
+    region: content
   field_moodyevent_image:
     type: media_thumbnail
-    weight: 1
-    region: content
     label: hidden
     settings:
-      image_style: utexas_image_style_280w_280h
       image_link: ''
+      image_style: utexas_image_style_280w_280h
     third_party_settings: {  }
+    weight: 1
+    region: content
   field_moodyevent_location:
     type: entity_reference_label
-    weight: 3
-    region: content
     label: visually_hidden
     settings:
       link: false
     third_party_settings: {  }
+    weight: 3
+    region: content
   field_moodyevent_status:
     type: list_default
-    weight: 2
-    region: content
     label: visually_hidden
     settings: {  }
     third_party_settings: {  }
+    weight: 2
+    region: content
   field_moodyevent_tags:
     type: entity_reference_label
-    weight: 4
-    region: content
     label: hidden
     settings:
       link: false
     third_party_settings: {  }
+    weight: 4
+    region: content
 hidden:
   display_breadcrumbs: true
   display_page_title: true

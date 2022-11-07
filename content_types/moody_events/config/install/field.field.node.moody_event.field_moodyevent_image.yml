@@ -5,6 +5,8 @@ dependencies:
     - field.storage.node.field_moodyevent_image
     - media.type.utexas_image
     - node.type.moody_event
+  content:
+    - 'media:utexas_image:13c3ef0c-72c7-4629-b894-7e506345d81f'
 id: node.moody_event.field_moodyevent_image
 field_name: field_moodyevent_image
 entity_type: node
@@ -13,7 +15,10 @@ label: Image
 description: 'This image can be displayed both on the event page and as a thumbnail in lists of events. To accommodate retina screens, use an image with a width of 400x400 pixels or greater. The image will be automatically square-cropped when displayed as a thumbnail.'
 required: false
 translatable: false
-default_value: {  }
+default_value:
+  -
+    target_uuid: 13c3ef0c-72c7-4629-b894-7e506345d81f
+    weight: 0
 default_value_callback: ''
 settings:
   handler: 'default:media'
@@ -22,6 +27,7 @@ settings:
       utexas_image: utexas_image
     sort:
       field: _none
+      direction: ASC
     auto_create: false
     auto_create_bundle: ''
 field_type: entity_reference
