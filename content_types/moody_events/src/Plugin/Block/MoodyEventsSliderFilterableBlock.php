@@ -76,39 +76,36 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
    */
   public function defaultConfiguration() {
     return [
-      'event_filter' => null,
+      'event_exclusions' => null,
     ];
   }
 
   /**
-   * Helper to get all event tags from event_tag taxonomy array with key as tid and name as value.
+   * Helper to list out all nodes of type moody_event with node id as key and title as value
    */
-  private function getEventTags() {
-    $event_tags = [];
-    $event_tags_taxonomy = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree('moody_event_tags');
-    foreach ($event_tags_taxonomy as $event_tag) {
-      $event_tags[$event_tag->tid] = $event_tag->name;
+  private function getEventsNodeList() {
+    $events = [];
+    $events_nodes = $this->entityTypeManager->getStorage('node')->loadByProperties(['type' => 'moody_event']);
+    foreach ($events_nodes as $event_node) {
+      $events[$event_node->id()] = $event_node->getTitle();
     }
-    return $event_tags;
+    return $events;
   }
+
   /**
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
-    // Get the current configured event_filter config.
-    $event_filter = $this->configuration['event_filter'];
-    // Since these are stored as comma separated, explode to array.
-    $event_filter = explode(',', $event_filter);
-    
-    $form['event_filter'] = [
+    $event_exclusions_default_value = $this->configuration['event_exclusions'];
+    $event_exclusions_default_value = explode(',', $event_exclusions_default_value);
+    $form['event_exclusions'] = [
       '#type' => 'select',
       '#multiple' => TRUE,
-      '#title' => $this->t('Event Tag Filter'),
-      '#description' => $this->t('Select event tags to filter by.'),
-      '#default_value' => $event_filter,
-      '#options' => $this->getEventTags(),
+      '#title' => $this->t('Event Tag Exclusion Filter'),
+      '#description' => $this->t('Select events to exclude.'),
+      '#default_value' => $event_exclusions_default_value,
+      '#options' => $this->getEventsNodeList(),
     ];
-
     return $form;
   }
 
@@ -116,11 +113,10 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    // Create a comma separated list of the terms selected.
-    $event_filters_selected = $form_state->getValue('event_filter');
-    $imploded_event_filters = implode(',', $event_filters_selected);
-    $this->configuration['event_filter'] = $imploded_event_filters;
-    
+    // Create a comma separated list of the terms selected for the event_exclusions.
+    $event_exclusions_selected = $form_state->getValue('event_exclusions');
+    $imploded_event_exclusions = implode(',', $event_exclusions_selected);
+    $this->configuration['event_exclusions'] = $imploded_event_exclusions;
   }
 
   /**
@@ -128,12 +124,9 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
    */
   public function build() {
     $view = Views::getView('moody_events');
-    // Load the configured event filter.
-    $event_filter = $this->configuration['event_filter'];
-    
-    $build['moody_events'] = $view->buildRenderable('block_1', [$event_filter]);
+    $event_exclusions = $this->configuration['event_exclusions'];
+    $build['moody_events'] = $view->buildRenderable('block_1', [$event_exclusions]);
     $build['moody_events']['#attributes']['class'][] = 'block-views-blockmoody-events-block-1';
-
     return $build;
   }
 
