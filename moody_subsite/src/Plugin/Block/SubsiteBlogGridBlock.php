@@ -105,7 +105,18 @@ class SubsiteBlogGridBlock extends BlockBase implements ContainerFactoryPluginIn
    * {@inheritdoc}
    */
   public function build() {
+    // Run a query against the config table to see if the views.view.subsite_blogs exists.
+    $query = \Drupal::database()->select('config', 'c');
+    $query->fields('c', ['name']);
+    $query->condition('name', 'views.view.subsite_blogs');
+    $query->range(0, 1);
+    $result = $query->execute()->fetchField();
+    if (!$result) {
+      $build['#markup'] = 'The "subsite_blogs" View entity does not exist. Contact Moody Web Services.';
+      return $build;
+    }
     $build = [];
+  
     $subsite_to_show = $this->configuration['subsite_to_show'];
     $build['content']['view'] = [
       '#type' => 'view',
@@ -115,8 +126,7 @@ class SubsiteBlogGridBlock extends BlockBase implements ContainerFactoryPluginIn
         $subsite_to_show,
       ],
     ];
-
-    return $build;
+    return $build;    
   }
 
 }
