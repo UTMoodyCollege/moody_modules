@@ -10,7 +10,7 @@ use Drupal\filter\FilterProcessResult;
  *   id = "utexas_inner_rail_filter",
  *   title = @Translation("UTexas Inner Rail"),
  *   description = @Translation("Enter inner rail content into WYSIWYG editor."),
- *   type = Drupal\filter\Plugin\FilterInterface::TYPE_MARKUP_LANGUAGE,
+ *   type = Drupal\filter\Plugin\FilterInterface::TYPE_TRANSFORM_IRREVERSIBLE,
  * )
  */
 class UtexasInnerRailFilter extends FilterBase {
