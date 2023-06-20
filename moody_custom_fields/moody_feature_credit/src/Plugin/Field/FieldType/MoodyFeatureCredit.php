@@ -74,9 +74,9 @@ class MoodyFeatureCredit extends FieldItemBase {
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $random = new Random();
-    $values['first_name'] = $random->word(mt_rand(1, $field_definition->getSetting('max_length')));
-    $values['last_name'] = $random->word(mt_rand(1, $field_definition->getSetting('max_length')));
-    $values['title'] = $random->word(mt_rand(1, $field_definition->getSetting('max_length')));
+    $values['first_name'] = $random->word(mt_rand(1, $field_definition->getSetting('max_length') ?? 2));
+    $values['last_name'] = $random->word(mt_rand(1, $field_definition->getSetting('max_length') ?? 2));
+    $values['title'] = $random->word(mt_rand(1, $field_definition->getSetting('max_length') ?? 2));
     return $values;
   }
 
