@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_news_categories
+    - node.type.moody_feature_page
+    - taxonomy.vocabulary.feature_page_categories
+id: node.moody_feature_page.field_news_categories
+field_name: field_news_categories
+entity_type: node
+bundle: moody_feature_page
+label: 'News Categories'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      feature_page_categories: feature_page_categories
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

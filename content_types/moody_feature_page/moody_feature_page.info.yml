@@ -17,6 +17,7 @@ dependencies:
   - 'drupal:node'
   - 'drupal:options'
   - 'drupal:path'
+  - 'drupal:taxonomy'
   - 'drupal:text'
   - 'drupal:user'
   - 'drupal:views'
