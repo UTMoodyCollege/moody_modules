@@ -5,12 +5,94 @@
  * Contains moody_feature_page.module.
  */
 
+use Drupal\file\Entity\File;
+use Drupal\image\Entity\ImageStyle;
+use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
+
+/**
+ * Implenents hook_theme().
+ */
+function moody_feature_page_theme($existing, $type, $theme, $path)
+{
+  return [
+    'moody_feature_page_hero' => [
+      'variables' => [
+        'feature_node' => NULL,
+        'highlighted_image_uri' => NULL,
+        'link_to_content' => NULL,
+        'field_featured_news_teaser' => NULL,
+      ],
+      'template' => 'moody-feature-page-hero',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_block__block_content__moody_feature_page_hero().
+ */
+function moody_feature_page_preprocess_block(&$variables)
+{
+  if ($variables['elements']['#derivative_plugin_id'] == 'feature_page_hero') {
+    // There is a media entity reference to a media image on this custom block type 'field_feature_highlight_image'. Let's get the image and put it into a "large" image style and pass it through for template.
+    $image = $variables['elements']['content']['#block_content']->get('field_feature_highlight_image')->getValue()[0]['target_id'];
+    if (!empty($image)) {
+      $image = Media::load($image);
+      $image_uri = $image->get('field_utexas_media_image')->getValue()[0]['target_id'];
+      $image_uri = File::load($image_uri)->getFileUri();
+      $image_uri = ImageStyle::load('large')->buildUrl($image_uri);
+      $highlighted_image_uri = $image_uri;
+  
+    }
+    else {
+      $highlighted_image_uri = '';
+    }
+
+    // Get a an absolute link to the node referenced to pass as link_to_content in the theme function..
+    $node = $variables['elements']['content']['#block_content']->get('field_highlighted_article')->getValue()[0]['target_id'];
+    $node = Node::load($node);
+    $link_to_content = $node->toUrl()->toString();
+
+    // Get the field_featured_news_teaser and set the $field_featured_news_teaser variable if it exists.
+    if ($variables['elements']['content']['#block_content']->hasField('field_featured_news_teaser')) {
+      $field_featured_news_teaser = $variables['elements']['content']['#block_content']->get('field_featured_news_teaser')->getValue()[0]['value'];
+    }
+    else {
+      $field_featured_news_teaser = '';
+    }
+
+    // There is an entity reference field on this custom block type 'field_highlighted_article'.
+    // This field is a reference to a moody_feature_page node.
+    // This preprocess function loads the referenced node and passes it to the template.
+
+    $node = $variables['elements']['content']['#block_content']->get('field_highlighted_article')->getValue()[0]['target_id'];
+    $node = Node::load($node);
+    // The node has the following fields we want to tease out and get variables for twig:
+    // - field_news_categories - This is a taxonomy reference, it could have multiple values. WE want the first one, get the label for it as well.
+    // - title - The title of the node.
+    // - field_moody_subtitle - The subtitle of the node.
+
+    // Now lets override the output with a custom theme function 'moody_feature_page_hero'.
+    $variables['content'] = [
+      '#theme' => 'moody_feature_page_hero',
+      '#feature_node' => $node,
+      '#highlighted_image_uri' => $highlighted_image_uri,
+      '#link_to_content' => $link_to_content,
+      '#field_featured_news_teaser' => $field_featured_news_teaser,
+    ];
+    // Attach the moody_feature_hero library from this moduile.
+    $variables['#attached']['library'][] = 'moody_feature_page/moody_feature_hero';
+  }
+}
+
+
+
 
 /**
  * Implements hook_preprocess_html().
  */
-function moody_feature_page_preprocess_html(&$variables) {
+function moody_feature_page_preprocess_html(&$variables)
+{
   if ($node = \Drupal::request()->attributes->get('node')) {
     if (is_object($node) && $node->bundle() == 'moody_feature_page') {
       $variables['attributes']['class'][] = 'moody-feature-page';
@@ -28,7 +110,8 @@ function moody_feature_page_preprocess_html(&$variables) {
 /**
  * Implements hook_preprocess_page().
  */
-function moody_feature_page_preprocess_page(&$variables) {
+function moody_feature_page_preprocess_page(&$variables)
+{
   $node_type = FALSE;
   if (isset($variables['node']) && is_object($variables['node'])) {
     $node = $variables['node'];
@@ -54,7 +137,8 @@ function moody_feature_page_preprocess_page(&$variables) {
 /**
  * Helper function to return previous and next nodes.
  */
-function _get_previous_next_nodes($nid) {
+function _get_previous_next_nodes($nid)
+{
   // Set array to return.
   $results = [];
   // Get array of all published moody feature pages.

@@ -1,0 +1,37 @@
+<a href="{{ link_to_content }}" class="featured-news d-block position-relative overflow-hidden">
+	<div class="bg-image position-relative text-white d-flex flex-column justify-content-end align-items-start p-3"
+	     style="background-image: url('{{ highlighted_image_uri }}'); background-position: center; background-repeat: no-repeat; background-size: cover;">
+		{% if feature_node.field_news_categories.0.entity.label is not empty %}
+			<div class="category rounded-pill bg-primary text-white px-3 py-1 position-absolute" style="top: 10px; left: 10px;">
+				{{ feature_node.field_news_categories.0.entity.label }}
+			</div>
+		{% endif %}
+		<div class="title-and-teaser">
+			<h1 class="mb-2">{{ feature_node.title.value }}</h1>
+			{% if field_featured_news_teaser is not empty %}
+				<div class="teaser">{{ field_featured_news_teaser }}</div>
+			{% endif %}
+		</div>
+	</div>
+</a>
+
+<style>
+/* Mobile first (default) */
+.bg-image {
+    min-height: auto; /* adjust as needed */
+}
+
+/* Tablet (768px and up) */
+@media (min-width: 768px) {
+    .bg-image {
+        min-height: 400px; /* adjust as needed */
+    }
+}
+
+/* Desktop (1024px and up) */
+@media (min-width: 1024px) {
+    .bg-image {
+        min-height: 600px; /* adjust as needed */
+    }
+}
+</style>
