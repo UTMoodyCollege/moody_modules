@@ -1,5 +1,8 @@
 .featured-news {
   min-height: 500px; /* Adjust to your preferred minimum height for desktop/tablet */
+  color: #bf5700;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .featured-news .bg-image {
@@ -8,6 +11,7 @@
   background-size: cover;
   padding-left: 15%; /* Adjust to your preferred padding for desktop/tablet */
   padding-right: 15%; /* Adjust to your preferred padding for desktop/tablet */
+  min-height: 600px; /* adjust as needed */
 }
 
 .featured-news .bg-image .category {
@@ -15,13 +19,72 @@
   left: 10px;
 }
 
+.featured-news .bg-image .title {
+  font-size: 1.2em; /* adjust as needed */
+  max-width: fit-content;
+  color: #bf5700;
+  font-weight: 900;
+}
+
+.featured-news .bg-image .teaser {
+  font-size: 1em; /* adjust as needed */
+}
+
 /* For mobile */
 @media (max-width: 768px) {
   .featured-news {
     min-height: 150px; /* Adjust to your preferred minimum height for mobile */
   }
+
   .featured-news .bg-image {
     padding-left: 5%; /* Adjust to your preferred padding for mobile */
     padding-right: 5%; /* Adjust to your preferred padding for mobile */
+    min-height: 250px; /* adjust as needed */
   }
+
+  .featured-news .bg-image .title, .featured-news .bg-image .teaser {
+    font-size: 0.9em; /* adjust as needed */
+  }
+}
+
+/* Tablet (768px and up) */
+@media (min-width: 768px) {
+  .featured-news .bg-image {
+    min-height: 600px; /* adjust as needed */
+  }
+
+  .featured-news .bg-image .title {
+    font-size: 3em; /* adjust as needed */
+    max-width: 70%; /* adjust as needed */
+  }
+
+  .featured-news .bg-image .teaser {
+    font-size: 1.8em; /* adjust as needed */
+  }
+}
+.featured-news .bg-image {
+  position: relative;
+}
+
+.featured-news .bg-image::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(255, 255, 255, 0.1));
+  z-index: 1; /* Gradient on top of the image but below the text */
+}
+
+.featured-news .bg-image .title-and-teaser, .featured-news .bg-image .category {
+  position: relative;
+  z-index: 2; /* Text and category on top of the gradient */
+}
+
+.featured-news .bg-image .category {
+  border: 3px solid white; /* Thick white border */
+  color: white; /* White text */
+  font-weight: bold; /* Bold text */
+  background-color: #bf5700; /* Background color */
 }
