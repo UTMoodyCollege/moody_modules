@@ -1,6 +1,6 @@
 name: 'Faculty Bio Content Type'
 type: module
-core_version_requirement: '^8.9 || ^9'
+core_version_requirement: '^8.9 || ^9 || ^10'
 core_incompatible: false
 package: 'Moody Content Type'
 dependencies:
