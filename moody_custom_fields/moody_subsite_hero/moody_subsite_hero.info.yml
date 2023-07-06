@@ -2,7 +2,7 @@ name: 'Moody Subsite Hero'
 type: module
 description: 'Defines an image field for use on moody subsite pages.'
 core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 package: Moody
 dependencies:
   - field

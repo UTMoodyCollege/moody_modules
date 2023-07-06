@@ -2,7 +2,7 @@ name: 'Moody Resource Group'
 type: module
 description: 'Configurable list of links with stylized headline.'
 core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 package: 'Moody'
 dependencies:
   - block_content

@@ -2,5 +2,5 @@ name: 'Learn Through Experience Block'
 type: module
 description: Provide a static plugin block
 core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 package: Moody

@@ -2,7 +2,7 @@ name: 'Faculty Bio Data Import'
 type: module
 description: 'Feed importer of Faculty Bio CSV data'
 core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 package: 'Moody'
 dependencies:
   - feeds
