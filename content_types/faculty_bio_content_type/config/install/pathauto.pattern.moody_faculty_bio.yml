@@ -9,7 +9,7 @@ type: 'canonical_entities:node'
 pattern: 'faculty/[node:title]'
 selection_criteria:
   a829a75a-cf62-4a94-82d1-eb662f478b33:
-    id: node_type
+    entity_bundle:node
     bundles:
       moody_faculty_bio: moody_faculty_bio
     negate: false
