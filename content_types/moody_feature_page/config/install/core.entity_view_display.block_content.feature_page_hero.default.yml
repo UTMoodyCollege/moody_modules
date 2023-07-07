@@ -1,0 +1,38 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.feature_page_hero
+    - field.field.block_content.feature_page_hero.field_feature_highlight_image
+    - field.field.block_content.feature_page_hero.field_featured_news_teaser
+    - field.field.block_content.feature_page_hero.field_highlighted_article
+id: block_content.feature_page_hero.default
+targetEntityType: block_content
+bundle: feature_page_hero
+mode: default
+content:
+  field_feature_highlight_image:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_featured_news_teaser:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_highlighted_article:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

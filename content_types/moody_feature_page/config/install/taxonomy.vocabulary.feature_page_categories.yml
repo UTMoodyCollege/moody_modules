@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Feature Page Categories'
+vid: feature_page_categories
+description: 'Categories for the Feature (aka "News" or "Stories") pages'
+weight: 0

@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.feature_page_hero
+    - field.storage.block_content.field_highlighted_article
+    - node.type.moody_feature_page
+id: block_content.feature_page_hero.field_highlighted_article
+field_name: field_highlighted_article
+entity_type: block_content
+bundle: feature_page_hero
+label: 'Highlighted Article'
+description: 'Select a Feature Page to use as the highlighted article for this.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      moody_feature_page: moody_feature_page
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
