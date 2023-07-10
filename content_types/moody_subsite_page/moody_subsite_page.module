@@ -17,7 +17,8 @@ use Drupal\Core\Url;
 /**
  * Implements hook_preprocess_html().
  */
-function moody_subsite_page_preprocess_html(&$variables) {
+function moody_subsite_page_preprocess_html(&$variables)
+{
   if ($node = \Drupal::request()->attributes->get('node')) {
     if (is_object($node) && $node->bundle() == 'moody_subsite_page') {
       $variables['attributes']['class'][] = 'moody-subsite-page';
@@ -35,7 +36,8 @@ function moody_subsite_page_preprocess_html(&$variables) {
 /**
  * Implements hook_preprocess_page().
  */
-function moody_subsite_page_preprocess_page(&$variables) {
+function moody_subsite_page_preprocess_page(&$variables)
+{
   $node_type = FALSE;
   if (isset($variables['node']) && is_object($variables['node'])) {
     $node = $variables['node'];
@@ -59,7 +61,7 @@ function moody_subsite_page_preprocess_page(&$variables) {
 
       // Get subsite menu.
       $subsite_nav = $subsite->get('subsite_nav')->view();
-      $variables['subsite_nav'] = $subsite_nav ;
+      $variables['subsite_nav'] = $subsite_nav;
 
       // Get subsite title.
       $subsite_title = $subsite->get('display_name')->getString();
@@ -72,14 +74,14 @@ function moody_subsite_page_preprocess_page(&$variables) {
       // Get the option for hiding default hero completely.
       $hide_default_hero = $node->field_hide_default_hero->value;
       if ($hide_default_hero !== "1") {
-          // If present, pass the page level hero, else pass the subsite default hero.
-          $page_level_hero = $node->get('field_primary_subsite_hero')->view();
-          $subsite_default_hero = $subsite->get('hero')->view();
-          $subsite_hero = (isset($page_level_hero[0])) ? $page_level_hero : $subsite_default_hero;
-          $variables['subsite_hero'] = $subsite_hero;
+        // If present, pass the page level hero, else pass the subsite default hero.
+        $page_level_hero = $node->get('field_primary_subsite_hero')->view();
+        $subsite_default_hero = $subsite->get('hero')->view();
+        $subsite_hero = (isset($page_level_hero[0])) ? $page_level_hero : $subsite_default_hero;
+        $variables['subsite_hero'] = $subsite_hero;
       }
 
-      
+
 
       // Get subsite footer text.
       $variables['subsite_footer_text'] = FALSE;
@@ -136,17 +138,17 @@ function moody_subsite_page_preprocess_page(&$variables) {
         $variables['strauss_link'] = ($strauss_link) ? $strauss_link : FALSE;
       }
 
-       // Get the option for hiding default info bars completely.
-       // This will also hide the subtitle
-       $hide_default_info_bar = $node->field_hide_default_infobar->value;
-       if ($hide_default_info_bar !== "1") {
+      // Get the option for hiding default info bars completely.
+      // This will also hide the subtitle
+      $hide_default_info_bar = $node->field_hide_default_infobar->value;
+      if ($hide_default_info_bar !== "1") {
         // Get info bars.
         $info_bars = $subsite->get('subsite_info_bars')->view();
         $variables['info_bars'] = $info_bars;
-         // Get subtitle from node if present.
+        // Get subtitle from node if present.
         $subtitle = $node->get('field_subsite_page_subtitle');
         $variables['page_subtitle'] = isset($subtitle) ? $subtitle->getString() : FALSE;
-       }
+      }
 
       // Get social accounts formatted string.
       $variables['subsite_social'] = FALSE;
@@ -154,7 +156,7 @@ function moody_subsite_page_preprocess_page(&$variables) {
         $variables['subsite_social'] = $subsite->get('subsite_social_links')->view()[0]['#markup'];
       }
 
-     
+
 
       // If the custom homepage option is checked and on the subsite homepage
       // hide the subsite hero, info bars and page title.
@@ -179,7 +181,8 @@ function moody_subsite_page_preprocess_page(&$variables) {
 /**
  * Implements hook_preprocess_page_title().
  */
-function moody_subsite_preprocess_page_title(&$variables) {
+function moody_subsite_preprocess_page_title(&$variables)
+{
   if ($node = \Drupal::request()->attributes->get('node')) {
     if (is_object($node) && $node->bundle() == 'moody_subsite_page') {
       // Check if there is an associated moody_subsite entity.
@@ -192,7 +195,7 @@ function moody_subsite_preprocess_page_title(&$variables) {
         $subsite = $subsite_entity[0];
         $title_display_option = $subsite->get('title_display_option')->getString();
         switch ($title_display_option) {
-          // Case '1' is page title only so nothing to do here.
+            // Case '1' is page title only so nothing to do here.
           case '2':
             // No page title.
             $variables['title_attributes']['class'][] = 'sr-only';
@@ -204,7 +207,6 @@ function moody_subsite_preprocess_page_title(&$variables) {
             $subsite_title = $subsite->get('display_name')->getString();
             $variables['title'] = $subsite_title . ': ' . $current_title;
             break;
-
         }
         // Hide page title on subsites with custom homepage hero images.
         $custom_homepage = $subsite->get('subsite_home_hero')->getString();
@@ -223,23 +225,27 @@ function moody_subsite_preprocess_page_title(&$variables) {
 /**
  * Implements hook_form_FORM_ID_form_alter().
  */
-function moody_subsite_page_form_node_form_alter(&$form, FormStateInterface $form_state) {
+function moody_subsite_page_form_node_form_alter(&$form, FormStateInterface $form_state)
+{
   $form['#validate'][] = '_moody_subsite_page_node_form_validate';
 }
 
 /**
  * Helper function to validate subsite page node edit form.
  */
-function _moody_subsite_page_node_form_validate($form, FormStateInterface $form_state) {
+function _moody_subsite_page_node_form_validate($form, FormStateInterface $form_state)
+{
   $node = $form_state->getFormObject()->getEntity();
   if ($node->getType() == 'moody_subsite_page') {
     // Get user selected term.
     $url_generator = $form_state->getValue('field_moody_url_generator');
     $tid = $url_generator[0]['target_id'];
-    // Check if this term is associated with an existing subsite.
-    $query = \Drupal::entityQuery('moody_subsite')
+    $query = \Drupal::entityTypeManager()
+      ->getStorage('moody_subsite')
+      ->getQuery()
       ->condition('directory_structure', $tid);
     $results = $query->execute();
+
     // If results is empty throw error.
     if (empty($results)) {
       $form_state->setErrorByName('field_moody_url_generator', t('Error: You have chosen a term for "Moody URL Generator" that is not associated with an existing subsite. Please select a different term.'));
@@ -250,7 +256,8 @@ function _moody_subsite_page_node_form_validate($form, FormStateInterface $form_
 /**
  * Helper function to add link to Strauss subsite pages.
  */
-function _process_strauss_page($tid) {
+function _process_strauss_page($tid)
+{
   // Strauss: 197
   // American Trustees: 261
   // Lessons: 215
@@ -272,5 +279,3 @@ function _process_strauss_page($tid) {
   $output = (in_array($tid, $strauss_tids)) ? $markup : FALSE;
   return $output;
 }
-
-

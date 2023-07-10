@@ -42,9 +42,7 @@ function moody_feature_page_preprocess_block(&$variables)
       $image_uri = File::load($image_uri)->getFileUri();
       $image_uri = ImageStyle::load('large')->buildUrl($image_uri);
       $highlighted_image_uri = $image_uri;
-  
-    }
-    else {
+    } else {
       $highlighted_image_uri = '';
     }
 
@@ -56,8 +54,7 @@ function moody_feature_page_preprocess_block(&$variables)
     // Get the field_featured_news_teaser and set the $field_featured_news_teaser variable if it exists.
     if ($variables['elements']['content']['#block_content']->hasField('field_featured_news_teaser')) {
       $field_featured_news_teaser = $variables['elements']['content']['#block_content']->get('field_featured_news_teaser')->getValue()[0]['value'];
-    }
-    else {
+    } else {
       $field_featured_news_teaser = '';
     }
 
@@ -142,11 +139,14 @@ function _get_previous_next_nodes($nid)
   // Set array to return.
   $results = [];
   // Get array of all published moody feature pages.
-  $nids = \Drupal::entityQuery('node')
+  $nids = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->getQuery()
     ->condition('status', 1)
     ->condition('type', 'moody_feature_page')
     ->sort('created', 'ASC')
     ->execute();
+
   // Reset arrays keys to be sequential integers.
   $keyed_array = array_values($nids);
   // Get key of current node.

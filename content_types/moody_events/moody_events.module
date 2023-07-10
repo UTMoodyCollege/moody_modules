@@ -31,9 +31,10 @@ define('MOODY_EVENTS_MEDIA_CHANNEL_ENDPOINT', 'https://texasmoodymedia.org/wp-js
 /**
  * Implements hook_help().
  */
-function moody_events_help($route_name, RouteMatchInterface $route_match) {
+function moody_events_help($route_name, RouteMatchInterface $route_match)
+{
   switch ($route_name) {
-    // Main module help for the moody_events module.
+      // Main module help for the moody_events module.
     case 'help.page.moody_events':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
@@ -47,7 +48,8 @@ function moody_events_help($route_name, RouteMatchInterface $route_match) {
 /**
  * Implements hook_theme().
  */
-function moody_events_theme() {
+function moody_events_theme()
+{
   return [
     'node__moody_event' => [
       'template' => 'node--moody-event',
@@ -59,7 +61,8 @@ function moody_events_theme() {
 /**
  * Helper function to grab Moody events from endpoint.
  */
-function _get_events_from_media_channel() {
+function _get_events_from_media_channel()
+{
   $client = \Drupal::httpClient();
   $request = $client->get(MOODY_EVENTS_MEDIA_CHANNEL_ENDPOINT);
   $code = $request->getStatusCode();
@@ -75,7 +78,9 @@ function _get_events_from_media_channel() {
       array_push($remote_ids, $event['id']);
     }
     // Loop through existing events and delete any that are no longer in json feed.
-    $existing_events = \Drupal::entityQuery('node')
+    $existing_events = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->getQuery()
       ->condition('type', 'moody_event')
       ->addMetaData('account', User::load(1))
       ->execute();
@@ -88,8 +93,7 @@ function _get_events_from_media_channel() {
         }
       }
     }
-  }
-  else {
+  } else {
     \Drupal::logger('moody_events')->warning("Import of events from Moody Media Channel failed. Please verify JSON feed is working as expected.");
   }
 }
@@ -97,7 +101,8 @@ function _get_events_from_media_channel() {
 /**
  * Helper function to create new Moody events.
  */
-function _create_event_nodes_from_media_channel(&$event_data) {
+function _create_event_nodes_from_media_channel(&$event_data)
+{
   // Get data about remote event.
   $remote_id = isset($event_data['id']) ? $event_data['id'] : FALSE;
   $remote_modified = isset($event_data['modified']) ? strtotime($event_data['modified']) : FALSE;
@@ -135,11 +140,14 @@ function _create_event_nodes_from_media_channel(&$event_data) {
   }
   if ($remote_id && $remote_modified) {
     // Check if we already have that id and last mofified date from remote.
-    $event_exists = \Drupal::entityQuery('node')
+    $event_exists = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->getQuery()
       ->condition('type', 'moody_event')
       ->condition('field_moodyevent_remote_id', $remote_id)
       ->addMetaData('account', User::load(1))
       ->execute();
+
     // No entity exists with this remote_id so create one.
     if (empty($event_exists)) {
       $node = Node::create(['type' => 'moody_event']);
@@ -190,12 +198,15 @@ function _create_event_nodes_from_media_channel(&$event_data) {
     // If we do have an event with this remote_id check to see if the last modified date has changed.
     else {
       // Query for entities with the same value for remote_id and a different value for remote_modified.
-      $event_updated = \Drupal::entityQuery('node')
+      $event_updated = \Drupal::entityTypeManager()
+        ->getStorage('node')
+        ->getQuery()
         ->condition('type', 'moody_event')
         ->condition('field_moodyevent_remote_id', $remote_id, '=')
         ->condition('field_remote_last_updated_date', $remote_modified, '!=')
         ->addMetaData('account', User::load(1))
         ->execute();
+
       // If $event_updated is empty then that event has not been updated and does not need to be reimported.
       if (!empty($event_updated)) {
         $node_to_reimport = $event_updated[key($event_updated)];
@@ -233,7 +244,8 @@ function _create_event_nodes_from_media_channel(&$event_data) {
 /**
  * Helper function to check if term exists and if not create it.
  */
-function _process_term($term_name, $vocab) {
+function _process_term($term_name, $vocab)
+{
   // Check if term already exists and load.
   $term = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
     'name' => $term_name,
@@ -262,14 +274,16 @@ function _process_term($term_name, $vocab) {
 /**
  * Helper function to create new Moody events.
  */
-function moody_events_cron() {
+function moody_events_cron()
+{
   _get_events_from_media_channel();
 }
 
 /**
  * Implements hook_form_FORM_ID_form_alter().
  */
-function moody_events_form_node_moody_event_edit_form_alter(&$form, FormStateInterface &$form_state, $form_id) {
+function moody_events_form_node_moody_event_edit_form_alter(&$form, FormStateInterface &$form_state, $form_id)
+{
   // Get current user's roles.
   $current_user = \Drupal::currentUser();
   $roles = $current_user->getRoles();
@@ -279,13 +293,13 @@ function moody_events_form_node_moody_event_edit_form_alter(&$form, FormStateInt
     $form['field_remote_last_updated_date']['widget'][0]['value']['#attributes']['disabled'] = 'disabled';
     $form['field_moodyevent_remote_url']['widget'][0]['value']['#attributes']['disabled'] = 'disabled';
   }
-
 }
 
 /**
  * Implements hook_preprocess_node().
  */
-function moody_events_preprocess_node(&$variables) {
+function moody_events_preprocess_node(&$variables)
+{
   $node_type = $variables['node']->bundle();
   if ($node_type == 'moody_event') {
     // Pass external link to add button to node pages.
