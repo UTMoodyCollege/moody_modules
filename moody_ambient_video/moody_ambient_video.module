@@ -47,7 +47,7 @@ function moody_ambient_video_preprocess_block(&$variables) {
       // Pass the file entity of the descriptions file.
       if (isset($variables['content']['field_mav_descriptions']['0']['#file'])) {
         $descriptions_uri = $variables['content']['field_mav_descriptions']['0']['#file']->getFileUri();
-        $descriptions_url = file_create_url($descriptions_uri);
+        $descriptions_url = \Drupal\Core\Url::fromUri(file_create_url($descriptions_uri))->toString();
       }
       $variables['descriptions'] = $descriptions_url ?? FALSE;
 
