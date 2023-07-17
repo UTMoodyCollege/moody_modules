@@ -34,7 +34,6 @@ function moody_ambient_video_preprocess_block(&$variables)
 {
   if ($variables['base_plugin_id'] == 'block_content' || $variables['derivative_plugin_id'] == 'ambient_video') {
     if (!empty($variables['elements']['content']['#block_content']->bundle()) && $variables['elements']['content']['#block_content']->bundle() == 'ambient_video') {
-      $entity_manager = \Drupal::entityTypeManager();
       // Variables to pass to Twig. //
       //----------------------------//
       // Pass the file URL of the poster image.
