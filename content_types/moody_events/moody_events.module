@@ -83,6 +83,7 @@ function _get_events_from_media_channel()
       ->getQuery()
       ->condition('type', 'moody_event')
       ->addMetaData('account', User::load(1))
+      ->accessCheck(FALSE)
       ->execute();
     if ($nodes = Drupal::entityTypeManager()->getStorage('node')->loadMultiple($existing_events)) {
       foreach ($nodes as $key => $value) {
@@ -146,6 +147,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
       ->condition('type', 'moody_event')
       ->condition('field_moodyevent_remote_id', $remote_id)
       ->addMetaData('account', User::load(1))
+      ->accessCheck(FALSE)
       ->execute();
 
     // No entity exists with this remote_id so create one.
@@ -205,6 +207,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
         ->condition('field_moodyevent_remote_id', $remote_id, '=')
         ->condition('field_remote_last_updated_date', $remote_modified, '!=')
         ->addMetaData('account', User::load(1))
+        ->accessCheck(FALSE)
         ->execute();
 
       // If $event_updated is empty then that event has not been updated and does not need to be reimported.
