@@ -1,8 +1,8 @@
 <a href="{{ link_to_content }}" class="featured-news d-block position-relative overflow-hidden text-decoration-none text-bold">
-	<div class="bg-image position-relative text-white d-flex flex-column justify-content-end align-items-start p-3"
+	<div class="bg-image position-relative text-white d-flex flex-column justify-content-end align-items-start"
 	     style="background-image: url('{{ highlighted_image_uri }}'); background-position: center; background-repeat: no-repeat; background-size: cover;">
 		{% if feature_node.field_news_categories.0.entity.label is not empty %}
-			<div class="category rounded-pill bg-burntorange text-white px-3 py-1 position-absolute" style="top: 10px; left: 10px;">
+			<div class="category text-burntorange position-absolute">
 				{{ feature_node.field_news_categories.0.entity.label }}
 			</div>
 		{% endif %}
