@@ -21,11 +21,12 @@ content:
     weight: 1
     region: content
   field_featured_news_teaser:
-    type: basic_string
+    type: string
     label: above
-    settings: {  }
+    settings:
+      link_to_entity: false
     third_party_settings: {  }
-    weight: 2
+    weight: 3
     region: content
   field_highlighted_article:
     type: entity_reference_label

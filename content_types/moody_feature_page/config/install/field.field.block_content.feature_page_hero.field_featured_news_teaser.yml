@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.feature_page_hero
+    - field.storage.block_content.field_featured_news_teaser
+id: block_content.feature_page_hero.field_featured_news_teaser
+field_name: field_featured_news_teaser
+entity_type: block_content
+bundle: feature_page_hero
+label: 'Featured News Teaser'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
