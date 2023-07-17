@@ -99,10 +99,12 @@ function moody_subsite_page_preprocess_page(&$variables)
       $subsite_logo_media = $subsite_logo[0]['media'];
       $subsite_logo_size = $subsite_logo[0]['size'];
       // Pass the default logo URL to use on subsites without custom logo.
-      $variables['default_logo_url'] = file_url_transform_relative(file_create_url(theme_get_setting('logo.url')));
+      $default_logo_url = theme_get_setting('logo.url');
+      $variables['default_logo_url'] = $default_logo_url;
       // Pass the custom logo height.
       $variables['subsite_logo_height'] = $subsite_logo_size;
       $variables['custom_logo'] = FALSE;
+
       if ($subsite_logo_media != 0 && $media = \Drupal::service('entity_type.manager')->getStorage('media')->load($subsite_logo_media)) {
         $media_attributes = $media->get('field_utexas_media_image')->getValue();
         if ($file = \Drupal::service('entity_type.manager')->getStorage('file')->load($media_attributes[0]['target_id'])) {
@@ -243,7 +245,8 @@ function _moody_subsite_page_node_form_validate($form, FormStateInterface $form_
     $query = \Drupal::entityTypeManager()
       ->getStorage('moody_subsite')
       ->getQuery()
-      ->condition('directory_structure', $tid);
+      ->condition('directory_structure', $tid)
+      ->accessCheck(FALSE);
     $results = $query->execute();
 
     // If results is empty throw error.
