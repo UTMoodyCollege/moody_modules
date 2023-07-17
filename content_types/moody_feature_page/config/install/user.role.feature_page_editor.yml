@@ -1,22 +1,6 @@
 langcode: en
 status: true
-dependencies:
-  config:
-    - filter.format.basic_html
-    - filter.format.flex_html
-    - filter.format.restricted_html
-    - node.type.moody_feature_page
-    - taxonomy.vocabulary.tags
-  module:
-    - contextual
-    - filter
-    - google_cse
-    - media
-    - node
-    - system
-    - taxonomy
-    - view_unpublished
-    - workbench
+dependencies: {  }
 id: feature_page_editor
 label: 'Feature Page Editor'
 weight: 30
