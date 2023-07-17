@@ -145,6 +145,7 @@ function _get_previous_next_nodes($nid)
     ->condition('status', 1)
     ->condition('type', 'moody_feature_page')
     ->sort('created', 'ASC')
+    ->accessCheck(FALSE)
     ->execute();
 
   // Reset arrays keys to be sequential integers.
