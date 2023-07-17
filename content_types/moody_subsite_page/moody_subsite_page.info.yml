@@ -44,7 +44,6 @@ dependencies:
   - 'layout_builder_styles:layout_builder_styles'
   - 'linkit:linkit'
   - 'metatag:metatag'
-  - 'migrate_tools:migrate_tools'
   - 'moody_events:moody_events'
   - 'moody_feature_page:moody_feature_page'
   - 'moody_image_styles:moody_image_styles'
