@@ -16,7 +16,8 @@ use Drupal\media\Entity\Media;
  * @param array $suggestions
  * @param array $variables
  */
-function faculty_bio_content_type_theme_suggestions_node_alter(array &$suggestions, array $variables) {
+function faculty_bio_content_type_theme_suggestions_node_alter(array &$suggestions, array $variables)
+{
   if (isset($variables['elements']['#node']) && $variables['elements']['#node']->bundle() == 'moody_faculty_bio') {
     $suggestions[] = 'node--faculty-bio';
   }
@@ -25,7 +26,8 @@ function faculty_bio_content_type_theme_suggestions_node_alter(array &$suggestio
 /**
  * Implements hook_theme().
  */
-function faculty_bio_content_type_theme($existing, $type, $theme, $path) {
+function faculty_bio_content_type_theme($existing, $type, $theme, $path)
+{
   $variables = [
     'node--faculty-bio' => [
       'base hook' => 'node',
@@ -42,8 +44,9 @@ function faculty_bio_content_type_theme($existing, $type, $theme, $path) {
 /**
  * Implements template_preprocess_node().
  */
-function faculty_bio_content_type_preprocess_node(&$variables) {
-  if ($variables['node']->getType() == 'moody_faculty_bio') {
+function faculty_bio_content_type_preprocess_node(&$variables)
+{
+  if ($variables['node']->bundle() == 'moody_faculty_bio') {
     $variables['cv_url'] = FALSE;
     $cv = $variables['node']->get('field_cv_pdf_faculty_bio')->getValue();
     if (!empty($cv[0]['target_id'])) {
@@ -52,7 +55,7 @@ function faculty_bio_content_type_preprocess_node(&$variables) {
       $fid = $match[1];
       $file = File::load($fid);
       $uri = $file->getFileUri();
-      $file_url = file_create_url($uri);
+      $file_url = \Drupal::service('file_url_generator')->generateAbsoluteString($uri);
       $variables['cv_url'] = $file_url;
     }
     $variables['directory_link'] = FALSE;
@@ -71,7 +74,8 @@ function faculty_bio_content_type_preprocess_node(&$variables) {
 /**
  * Implements template_preprocess_node().
  */
-function faculty_bio_content_type_preprocess_views_view(&$variables) {
+function faculty_bio_content_type_preprocess_views_view(&$variables)
+{
   $view_name = isset($variables['id']) ? $variables['id'] : NULL;
   if ($view_name == 'faculty_bio_view') {
     $sitename = \Drupal::config('system.site')->get('name');
@@ -109,7 +113,6 @@ function faculty_bio_content_type_preprocess_views_view(&$variables) {
       case 'Speech, Language, and Hearing Science':
         $variables['attributes']['class'][] = 'hide-department-selector';
         break;
-
     }
   }
 }
