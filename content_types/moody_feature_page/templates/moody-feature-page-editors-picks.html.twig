@@ -1,0 +1,15 @@
+<div id="editors-picks-block">
+  <h2 class="editors-picks-title">{{ title }}</h2>
+  <ul class="editors-picks-list">
+    {% for article in articles %}
+      <li class="editors-picks-item">
+        <h3 class="editors-picks-article-title"><a href="{{ article.url }}" class="editors-picks-article-link">{{ article.title }}</a></h3>
+        {% if article.summary %}
+          <p class="editors-picks-article-summary">{{ article.summary }} <a href="{{ article.url }}" class="editors-picks-read-more">Read more</a></p>
+        {% else %}
+          <p class="editors-picks-read-more-only"><a href="{{ article.url }}" class="editors-picks-read-more">Read more</a></p>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>

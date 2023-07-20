@@ -25,6 +25,13 @@ function moody_feature_page_theme($existing, $type, $theme, $path)
       ],
       'template' => 'moody-feature-page-hero',
     ],
+    'moody_feature_page_editors_picks' => [
+      'variables' => [
+        'title' => NULL,
+        'articles' => NULL,
+      ],
+      'template' => 'moody-feature-page-editors-picks',
+    ],
   ];
 }
 

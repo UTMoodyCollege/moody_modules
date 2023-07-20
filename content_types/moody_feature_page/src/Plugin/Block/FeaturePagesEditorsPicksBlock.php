@@ -48,7 +48,7 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
    */
   public function defaultConfiguration(): array {
     return [
-      'example' => $this->t('Hello world!'),
+      'selected_nodes' => [],
     ];
   }
 
@@ -56,29 +56,68 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state): array {
-    $form['example'] = [
-      '#type' => 'textarea',
-      '#title' => $this->t('Example'),
-      '#default_value' => $this->configuration['example'],
+    $options = [];
+  
+    $query = $this->entityTypeManager->getStorage('node')->getQuery();
+    $nids = $query->condition('type', 'moody_feature_page')
+      ->sort('created', 'DESC')
+      ->accessCheck(FALSE)
+      ->range(0, 50)
+      ->execute();
+  
+    $nodes = $this->entityTypeManager->getStorage('node')->loadMultiple($nids);
+  
+    foreach ($nodes as $node) {
+      $options[$node->id()] = $node->getTitle();
+    }
+  
+    $form['selected_nodes'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Select Nodes'),
+      '#options' => $options,
+      '#default_value' => $this->configuration['selected_nodes'],
     ];
     return $form;
   }
+  
+  
 
   /**
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state): void {
-    $this->configuration['example'] = $form_state->getValue('example');
+    $this->configuration['selected_nodes'] = $form_state->getValue('selected_nodes');
   }
 
   /**
    * {@inheritdoc}
    */
   public function build(): array {
-    $build['content'] = [
-      '#markup' => $this->t('It works!'),
+    $articles = [];
+  
+    $nodes = $this->entityTypeManager->getStorage('node')->loadMultiple($this->configuration['selected_nodes']);
+    
+    foreach ($nodes as $node) {
+      $url = $node->toUrl()->toString();
+      $summary = $node->body->summary;
+      $articles[] = [
+        'title' => $node->getTitle(),
+        'summary' => $summary,
+        'url' => $url,
+      ];
+    }
+  
+    $build = [
+      '#theme' => 'moody_feature_page_editors_picks',
+      '#title' => $this->t('Editor\'s Picks'),
+      '#articles' => $articles,
     ];
+
+    // Attach the moody_feature_page/moody_feature_editors_picks library.
+    $build['#attached']['library'][] = 'moody_feature_page/moody_feature_editors_picks';
+  
     return $build;
   }
+  
 
 }

@@ -1,0 +1,25 @@
+#editors-picks-block .editors-picks-title {
+    font-style: italic;
+    padding-bottom: 1em; /* adjust this value as needed */
+  }
+  #editors-picks-block .editors-picks-list {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  #editors-picks-block .editors-picks-item {
+    margin-bottom: 1em;
+  }
+  #editors-picks-block .editors-picks-article-title {
+    font-weight: bold;
+  }
+  #editors-picks-block .editors-picks-article-link {
+    color: #000; /* black color */
+  }
+  #editors-picks-block .editors-picks-read-more {
+    color: #CF5700; /* new color for "Read more" */
+  }
+  #editors-picks-block .editors-picks-article-summary,
+  #editors-picks-block .editors-picks-read-more-only {
+    margin-top: 0.5em;
+  }
+  
