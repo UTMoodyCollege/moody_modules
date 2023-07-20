@@ -140,6 +140,7 @@ function moody_feature_page_preprocess_page(&$variables)
 
 /**
  * Helper function to return previous and next nodes.
+*/
 function _get_previous_next_nodes($nid)
 {
   // Set array to return.
