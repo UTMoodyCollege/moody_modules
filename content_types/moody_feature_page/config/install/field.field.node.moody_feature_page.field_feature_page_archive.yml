@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_feature_page_archive
+    - node.type.moody_feature_page
+id: node.moody_feature_page.field_feature_page_archive
+field_name: field_feature_page_archive
+entity_type: node
+bundle: moody_feature_page
+label: 'Feature Page Archive'
+description: 'If selected, the feature page will be only available in an "archive" filter view. Typically, we''d expect any other Views / displays of Feature pages can respect this option for "legacy" articles if they only need newer ones.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

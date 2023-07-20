@@ -4,6 +4,7 @@ dependencies:
   config:
     - field.field.node.moody_feature_page.body
     - field.field.node.moody_feature_page.field_color_scheme
+    - field.field.node.moody_feature_page.field_feature_page_archive
     - field.field.node.moody_feature_page.field_feature_page_author
     - field.field.node.moody_feature_page.field_moody_subtitle
     - field.field.node.moody_feature_page.field_news_categories
@@ -62,6 +63,13 @@ content:
     weight: 11
     region: content
     settings: {  }
+    third_party_settings: {  }
+  field_feature_page_archive:
+    type: boolean_checkbox
+    weight: 31
+    region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   field_feature_page_author:
     type: moody_feature_credit

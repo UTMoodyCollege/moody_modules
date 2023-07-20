@@ -4,6 +4,7 @@ dependencies:
   config:
     - field.field.node.moody_feature_page.body
     - field.field.node.moody_feature_page.field_color_scheme
+    - field.field.node.moody_feature_page.field_feature_page_archive
     - field.field.node.moody_feature_page.field_feature_page_author
     - field.field.node.moody_feature_page.field_moody_subtitle
     - field.field.node.moody_feature_page.field_news_categories
@@ -224,6 +225,16 @@ content:
     third_party_settings: {  }
     weight: 3
     region: content
+  field_feature_page_archive:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 6
+    region: main
   field_feature_page_author:
     type: moody_feature_credit
     label: hidden

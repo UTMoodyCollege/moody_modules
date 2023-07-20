@@ -5,6 +5,7 @@ dependencies:
     - core.entity_view_mode.node.teaser
     - field.field.node.moody_feature_page.body
     - field.field.node.moody_feature_page.field_color_scheme
+    - field.field.node.moody_feature_page.field_feature_page_archive
     - field.field.node.moody_feature_page.field_feature_page_author
     - field.field.node.moody_feature_page.field_moody_subtitle
     - field.field.node.moody_feature_page.field_news_categories
@@ -38,6 +39,7 @@ hidden:
   display_page_title: true
   display_updated: true
   field_color_scheme: true
+  field_feature_page_archive: true
   field_feature_page_author: true
   field_moody_subtitle: true
   field_news_categories: true
