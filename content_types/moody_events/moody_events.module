@@ -115,7 +115,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
   if ($image_url) {
     $filename = pathinfo($image_url)['basename'];
     $image = file_get_contents($image_url);
-    $file = file_save_data($image, 'public://' . $filename, FileSystemInterface::EXISTS_REPLACE);
+    $file = \Drupal::service('file.repository')->writeData($image, 'public://' . $filename, FileSystemInterface::EXISTS_REPLACE);
     $fid = $file->id();
   }
   $body = isset($event_data['description']) ? $event_data['description'] : '';
