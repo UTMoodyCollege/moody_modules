@@ -2,6 +2,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.moody_event.field_moody_event_department
     - field.field.node.moody_event.field_moodyevent_body
     - field.field.node.moody_event.field_moodyevent_datetime
     - field.field.node.moody_event.field_moodyevent_featured
@@ -42,6 +43,23 @@ content:
     region: content
     settings:
       display_label: true
+    third_party_settings: {  }
+  display_updated:
+    type: boolean_checkbox
+    weight: 10
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_moody_event_department:
+    type: entity_reference_autocomplete
+    weight: 26
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   field_moodyevent_body:
     type: text_textarea_with_summary

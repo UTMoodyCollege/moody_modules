@@ -123,9 +123,19 @@ function _create_event_nodes_from_media_channel(&$event_data)
   $startdate = isset($event_data['start_date']) ? strtotime($event_data['start_date']) : '';
   $enddate = isset($event_data['end_date']) ? strtotime($event_data['end_date']) : '';
   // Merge the two category arrays to create taxonomy terms.
-  $categories = explode('|', $event_data['category']);
-  $extra_tags = explode('|', $event_data['extra_tags']);
-  $tags = array_merge($categories, $extra_tags);
+  $event_tags = $event_data['field_utevent_tags'];
+  $event_categories = $event_data['field_event_categories'];
+  $categories = $event_categories;
+  $extra_tags =  $event_tags;
+  $tags = array_merge($categories ?? [], $extra_tags ?? []);
+  $department = $event_data['field_event_department'] ?? [];
+  $department_tid_refs = [];
+  foreach ($department as $department_name) {
+    if (!empty($department_name)) {
+      $department_tid = _process_term($department_name, 'moody_departments');
+      array_push($department_tid_refs, $department_tid);
+    }
+  }
   // Check if tag terms already exist and construct list of tids.
   $tag_list = [];
   foreach ($tags as $key => $value) {
@@ -195,6 +205,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
       $node->set('field_moodyevent_remote_id', $remote_id);
       $node->set('field_remote_last_updated_date', $remote_modified);
       $node->set('field_moodyevent_remote_url', $url);
+      $node->set('field_moody_event_department', $department_tid_refs);
       $node->save();
     }
     // If we do have an event with this remote_id check to see if the last modified date has changed.
@@ -238,6 +249,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
         $node->set('field_moodyevent_remote_id', $remote_id);
         $node->set('field_remote_last_updated_date', $remote_modified);
         $node->set('field_moodyevent_remote_url', $url);
+        $node->set('field_moody_event_department', $department_tid_refs);
         $node->save();
       }
     }

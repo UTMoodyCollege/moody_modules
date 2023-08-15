@@ -2,6 +2,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.moody_event.field_moody_event_department
     - field.field.node.moody_event.field_moodyevent_body
     - field.field.node.moody_event.field_moodyevent_datetime
     - field.field.node.moody_event.field_moodyevent_featured
@@ -25,6 +26,14 @@ targetEntityType: node
 bundle: moody_event
 mode: default
 content:
+  field_moody_event_department:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 6
+    region: content
   field_moodyevent_body:
     type: text_default
     label: hidden
@@ -80,8 +89,10 @@ content:
     weight: 5
     region: content
 hidden:
+  addtoany: true
   display_breadcrumbs: true
   display_page_title: true
+  display_updated: true
   field_moodyevent_featured: true
   field_moodyevent_remote_id: true
   field_moodyevent_remote_url: true
