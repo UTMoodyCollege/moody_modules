@@ -77,6 +77,7 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
   public function defaultConfiguration() {
     return [
       'event_exclusions' => null,
+      'event_host' => null,
     ];
   }
 
@@ -93,6 +94,18 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
   }
 
   /**
+   * Helper to get all taxonomy terms id and label array for the moody_departments vocab.
+   */
+  private function getDepartmentsTerms() {
+    $departments = [];
+    $departments_terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree('moody_departments');
+    foreach ($departments_terms as $departments_term) {
+      $departments[$departments_term->tid] = $departments_term->name;
+    }
+    return $departments;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
@@ -106,6 +119,14 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
       '#default_value' => $event_exclusions_default_value,
       '#options' => $this->getEventsNodeList(),
     ];
+    $form['event_host'] = [
+      '#type' => 'select',
+      '#multiple' => TRUE,
+      '#title' => $this->t('Event Host Filter'),
+      '#description' => $this->t('Select event hosts to include.'),
+      '#default_value' => $this->configuration['event_host'],
+      '#options' => $this->getDepartmentsTerms(),
+    ];
     return $form;
   }
 
@@ -117,6 +138,10 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
     $event_exclusions_selected = $form_state->getValue('event_exclusions');
     $imploded_event_exclusions = implode(',', $event_exclusions_selected);
     $this->configuration['event_exclusions'] = $imploded_event_exclusions;
+    // Create a comma separated list of the terms selected for the event_host.
+    $event_host_selected = $form_state->getValue('event_host');
+    $imploded_event_host = implode(',', $event_host_selected);
+    $this->configuration['event_host'] = $imploded_event_host;
   }
 
   /**
@@ -125,7 +150,8 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
   public function build() {
     $view = Views::getView('moody_events');
     $event_exclusions = $this->configuration['event_exclusions'];
-    $build['moody_events'] = $view->buildRenderable('block_1', [$event_exclusions]);
+    $event_host = $this->configuration['event_host'];
+    $build['moody_events'] = $view->buildRenderable('block_1', [$event_exclusions, $event_host]);
     $build['moody_events']['#attributes']['class'][] = 'block-views-blockmoody-events-block-1';
     return $build;
   }
