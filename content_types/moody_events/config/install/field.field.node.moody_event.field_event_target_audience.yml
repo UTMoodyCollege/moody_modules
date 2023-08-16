@@ -2,14 +2,14 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.field_moody_event_department
+    - field.storage.node.field_event_target_audience
     - node.type.moody_event
-    - taxonomy.vocabulary.moody_departments
-id: node.moody_event.field_moody_event_department
-field_name: field_moody_event_department
+    - taxonomy.vocabulary.moody_event_target_audience
+id: node.moody_event.field_event_target_audience
+field_name: field_event_target_audience
 entity_type: node
 bundle: moody_event
-label: 'Moody Event Host'
+label: 'Event Target Audience'
 description: ''
 required: false
 translatable: false
@@ -19,7 +19,7 @@ settings:
   handler: 'default:taxonomy_term'
   handler_settings:
     target_bundles:
-      moody_departments: moody_departments
+      moody_event_target_audience: moody_event_target_audience
     sort:
       field: name
       direction: asc

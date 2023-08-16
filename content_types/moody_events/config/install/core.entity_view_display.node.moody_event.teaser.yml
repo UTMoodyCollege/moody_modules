@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
+    - field.field.node.moody_event.field_event_target_audience
     - field.field.node.moody_event.field_moody_event_department
     - field.field.node.moody_event.field_moodyevent_body
     - field.field.node.moody_event.field_moodyevent_datetime
@@ -78,6 +79,7 @@ hidden:
   display_breadcrumbs: true
   display_page_title: true
   display_updated: true
+  field_event_target_audience: true
   field_moody_event_department: true
   field_moodyevent_body: true
   field_moodyevent_featured: true

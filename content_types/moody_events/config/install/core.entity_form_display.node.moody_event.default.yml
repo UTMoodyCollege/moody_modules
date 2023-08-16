@@ -2,6 +2,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.moody_event.field_event_target_audience
     - field.field.node.moody_event.field_moody_event_department
     - field.field.node.moody_event.field_moodyevent_body
     - field.field.node.moody_event.field_moodyevent_datetime
@@ -50,6 +51,16 @@ content:
     region: content
     settings:
       display_label: true
+    third_party_settings: {  }
+  field_event_target_audience:
+    type: entity_reference_autocomplete
+    weight: 27
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   field_moody_event_department:
     type: entity_reference_autocomplete

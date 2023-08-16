@@ -128,7 +128,14 @@ function _create_event_nodes_from_media_channel(&$event_data)
   $categories = $event_categories;
   $extra_tags =  $event_tags;
   $tags = array_merge($categories ?? [], $extra_tags ?? []);
-  
+  $target_audience = $event_data['field_event_target_audience'] ?? [];
+  $target_audience_tid_refs = [];
+  foreach ($target_audience as $target_audience_name) {
+    if (!empty($target_audience_name)) {
+      $target_audience_tid = _process_term($target_audience_name, 'moody_event_target_audience');
+      array_push($target_audience_tid_refs, $target_audience_tid);
+    }
+  }
   // Check if tag terms already exist and construct list of tids.
   $tag_list = [];
   foreach ($tags as $key => $value) {

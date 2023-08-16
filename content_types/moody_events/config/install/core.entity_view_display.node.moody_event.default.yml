@@ -2,6 +2,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.moody_event.field_event_target_audience
     - field.field.node.moody_event.field_moody_event_department
     - field.field.node.moody_event.field_moodyevent_body
     - field.field.node.moody_event.field_moodyevent_datetime
@@ -26,6 +27,14 @@ targetEntityType: node
 bundle: moody_event
 mode: default
 content:
+  field_event_target_audience:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 7
+    region: content
   field_moody_event_department:
     type: entity_reference_label
     label: above
