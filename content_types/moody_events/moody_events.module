@@ -21,7 +21,7 @@ use Drupal\Core\File\FileSystemInterface;
 /**
  * Default URL for MMC events.
  */
-define('MOODY_EVENTS_MEDIA_CHANNEL_ENDPOINT', 'https://texasmoodymedia.org/wp-json/tribe/events/v1/events/?per_page=100&status=publish');
+define('MOODY_EVENTS_MEDIA_CHANNEL_ENDPOINT', 'http://moody-events.docksal.site/wp-json/tribe/events/v1/events/?per_page=100&status=publish');
 
 /**
  * Default URL for Localist events.
@@ -128,14 +128,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
   $categories = $event_categories;
   $extra_tags =  $event_tags;
   $tags = array_merge($categories ?? [], $extra_tags ?? []);
-  $department = $event_data['field_event_department'] ?? [];
-  $department_tid_refs = [];
-  foreach ($department as $department_name) {
-    if (!empty($department_name)) {
-      $department_tid = _process_term($department_name, 'moody_departments');
-      array_push($department_tid_refs, $department_tid);
-    }
-  }
+  
   // Check if tag terms already exist and construct list of tids.
   $tag_list = [];
   foreach ($tags as $key => $value) {
@@ -144,6 +137,16 @@ function _create_event_nodes_from_media_channel(&$event_data)
       array_push($tag_list, $tid);
     }
   }
+  // Setup departments to reference
+  $department = $event_data['field_event_department'] ?? [];
+  $department_tid_refs = [];
+  foreach ($department as $department_name) {
+    if (!empty($department_name)) {
+      $department_tid = _process_term($department_name, 'moody_departments');
+      array_push($department_tid_refs, $department_tid);
+    }
+  }
+
   // Check if venue term exists and if not create it.
   $venue = $event_data['venue']['venue'];
   if (!empty($venue)) {
