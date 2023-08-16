@@ -216,6 +216,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
       $node->set('field_remote_last_updated_date', $remote_modified);
       $node->set('field_moodyevent_remote_url', $url);
       $node->set('field_moody_event_department', $department_tid_refs);
+      $node->set('field_moody_event_target_audience', $target_audience_tid_refs);
       $node->save();
     }
     // If we do have an event with this remote_id check to see if the last modified date has changed.
@@ -260,6 +261,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
         $node->set('field_remote_last_updated_date', $remote_modified);
         $node->set('field_moodyevent_remote_url', $url);
         $node->set('field_moody_event_department', $department_tid_refs);
+        $node->set('field_moody_event_target_audience', $target_audience_tid_refs);
         $node->save();
       }
     }
