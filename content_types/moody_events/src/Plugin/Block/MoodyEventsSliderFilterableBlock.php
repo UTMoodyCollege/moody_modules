@@ -150,8 +150,19 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
   public function build() {
     $view = Views::getView('moody_events');
     $event_exclusions = $this->configuration['event_exclusions'];
-    $event_host = $this->configuration['event_host'];
-    $build['moody_events'] = $view->buildRenderable('block_1', [$event_exclusions, $event_host]);
+    if (empty($event_exclusions)) {
+      // Set it to "0"
+      $event_exclusions = '0';
+    }
+    $event_host = $this->configuration['event_host'] ?? NULL;
+    //Build an args array
+    $view_args = [
+      'event_exclusions' => $event_exclusions,
+    ];
+    if (!empty($event_host)) {
+      $view_args['event_host'] = $event_host;
+    }
+    $build['moody_events'] = $view->buildRenderable('block_1', $view_args);
     $build['moody_events']['#attributes']['class'][] = 'block-views-blockmoody-events-block-1';
     return $build;
   }
