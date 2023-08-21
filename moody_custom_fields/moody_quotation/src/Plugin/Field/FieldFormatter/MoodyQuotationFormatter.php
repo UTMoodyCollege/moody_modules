@@ -103,7 +103,7 @@ class MoodyQuotationFormatter extends FormatterBase implements ContainerFactoryP
     }
     foreach ($items as $item) {
       $image_render_array = [];
-      if ($media = $this->entityTypeManager->getStorage('media')->load($item->media)) {
+      if (!empty($item->media) && $media = $this->entityTypeManager->getStorage('media')->load($item->media)) {
         $media_attributes = $media->get('field_utexas_media_image')->getValue();
         if ($file = $this->entityTypeManager->getStorage('file')->load($media_attributes[0]['target_id'])) {
           $image = new \stdClass();
