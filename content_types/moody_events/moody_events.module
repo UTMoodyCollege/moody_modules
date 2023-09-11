@@ -110,7 +110,16 @@ function _create_event_nodes_from_media_channel(&$event_data)
   $title = isset($event_data['title']) ? Html::decodeEntities($event_data['title']) : '';
 
   // Import image and create media entity.
-  $image_url = $event_data['image']['sizes']['medium']['url'];
+  if (
+    isset($event_data['image']) &&
+    isset($event_data['image']['sizes']) &&
+    isset($event_data['image']['sizes']['medium']) &&
+    isset($event_data['image']['sizes']['medium']['url'])
+  ) {
+    $image_url = $event_data['image']['sizes']['medium']['url'];
+  } else {
+    $image_url = null; // Or a default value
+  }
   $fid = FALSE;
   if ($image_url) {
     $filename = pathinfo($image_url)['basename'];
