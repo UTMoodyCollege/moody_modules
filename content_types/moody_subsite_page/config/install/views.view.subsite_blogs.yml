@@ -489,6 +489,8 @@ display:
           settings:
             image_link: ''
             image_style: moody_image_style_363w_x_190h
+            image_loading:
+              attribute: lazy
           group_column: ''
           group_columns: {  }
           group_rows: true
