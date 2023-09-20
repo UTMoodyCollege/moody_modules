@@ -1,1 +1,13 @@
+excluded:
+  - taxonomy.vocabulary.association
+  - taxonomy.vocabulary.moody_file_content_usage
+  - taxonomy.vocabulary.team_member_group
+  - filter.format.basic_html
+  - filter.format.full_html
+  - filter.format.restricted_html
+  - user.role.moody_subsite_editor
+  - user.role.standard_content_editor
+  - user.role.standard_content_manager
+  - user.role.moody_administrator
+  - user.role.woolfolk_center_subsite_editor
 required: true
