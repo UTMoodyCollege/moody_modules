@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: feature_page_hero
+label: 'Feature Page Hero'
+revision: 0
+description: 'A component intended to showcase Feature Pages.'
