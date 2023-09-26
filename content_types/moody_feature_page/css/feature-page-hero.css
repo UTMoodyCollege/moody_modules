@@ -52,7 +52,7 @@
   }
 
   .featured-news .bg-image .title, .featured-news .bg-image .teaser {
-    font-size: 0.9em; /* adjust as needed */
+    font-size: 1.4em; /* adjust as needed */
   }
 }
 
@@ -63,12 +63,12 @@
   }
 
   .featured-news .bg-image .title {
-    font-size: 3em; /* adjust as needed */
+    font-size: 2em; /* adjust as needed */
     max-width: 70%; /* adjust as needed */
   }
 
   .featured-news .bg-image .teaser {
-    font-size: 1.8em; /* adjust as needed */
+    font-size: 1.7em; /* adjust as needed */
   }
 }
 
