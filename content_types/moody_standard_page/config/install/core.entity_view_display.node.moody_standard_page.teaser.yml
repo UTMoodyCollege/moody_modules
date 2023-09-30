@@ -25,6 +25,7 @@ hidden:
   body: true
   display_breadcrumbs: true
   display_page_title: true
+  display_updated: true
   field_moody_url_generator: true
   field_standard_page_metatags: true
   layout_builder__layout: true
