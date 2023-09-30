@@ -34,22 +34,6 @@ third_party_settings:
                 entity: layout_builder.entity
             weight: 0
             additional: {  }
-          5c71bb62-33b0-4ad3-ac4a-066b24d77215:
-            uuid: 5c71bb62-33b0-4ad3-ac4a-066b24d77215
-            region: content
-            configuration:
-              id: 'field_block:node:moody_landing_page:field_moody_url_generator'
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              formatter:
-                type: entity_reference_label
-                label: above
-                settings:
-                  link: true
-                third_party_settings: {  }
-            weight: 1
-            additional: {  }
           44d80a19-6bec-41b8-bac7-a5fabd5c9f82:
             uuid: 44d80a19-6bec-41b8-bac7-a5fabd5c9f82
             region: content
