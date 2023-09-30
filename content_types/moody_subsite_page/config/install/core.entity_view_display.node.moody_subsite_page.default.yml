@@ -80,7 +80,6 @@ third_party_settings:
         - layout_utexas_twocol
         - layout_utexas_threecol
         - layout_utexas_fourcol
-      restricted_categories: {  }
       blacklisted_blocks:
         'Custom block types':
           - utexas_hero
@@ -112,6 +111,7 @@ third_party_settings:
         User: {  }
         'Workbench Access': {  }
         core: {  }
+      restricted_categories: {  }
 id: node.moody_subsite_page.default
 targetEntityType: node
 bundle: moody_subsite_page

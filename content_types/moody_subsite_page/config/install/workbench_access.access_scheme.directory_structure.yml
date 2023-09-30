@@ -5,8 +5,8 @@ dependencies:
     - field.field.node.moody_subsite_page.field_moody_url_generator
     - taxonomy.vocabulary.directory_structure
 id: directory_structure
-plural_label: 'Directory Structures'
 label: 'Directory Structure'
+plural_label: 'Directory Structures'
 scheme: taxonomy
 scheme_settings:
   vocabularies:
