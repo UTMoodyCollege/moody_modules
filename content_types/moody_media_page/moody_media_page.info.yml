@@ -1,6 +1,6 @@
 name: 'Moody Media Page'
 type: module
-core_version_requirement: '^8.9 || ^9 || ^10'
+core_version_requirement: '^9.4 || ^10'
 package: 'Moody Content Type'
 dependencies:
   - 'breadcrumbs_visibility:breadcrumbs_visibility'
@@ -27,4 +27,5 @@ dependencies:
   - 'utexas_content_type_flex_page:utexas_content_type_flex_page'
   - 'utexas_image_styles:utexas_image_styles'
   - 'utexas_media_types:utexas_media_types'
+  - 'xmlsitemap:xmlsitemap'
 core_incompatible: false

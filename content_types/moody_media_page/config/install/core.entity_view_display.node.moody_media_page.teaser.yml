@@ -26,22 +26,23 @@ bundle: moody_media_page
 mode: teaser
 content:
   body:
-    label: hidden
     type: text_summary_or_trimmed
-    weight: 101
+    label: hidden
     settings:
       trim_length: 600
     third_party_settings: {  }
+    weight: 101
     region: content
   links:
-    weight: 100
     settings: {  }
     third_party_settings: {  }
+    weight: 100
     region: content
 hidden:
   addtoany: true
   display_breadcrumbs: true
   display_page_title: true
+  display_updated: true
   field_east_austin_stories_catego: true
   field_media_location: true
   field_media_page_copy: true
