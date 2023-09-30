@@ -26,10 +26,10 @@ third_party_settings:
         layout_id: layout_utexas_onecol
         layout_settings:
           label: ''
-          context_mapping: {  }
           blur: false
           background-color: none
           section_width: readable
+          context_mapping: {  }
           layout_builder_styles_style: {  }
           background-accent: 0
         components:
@@ -181,6 +181,15 @@ third_party_settings:
                   date_format: custom
                   custom_date_format: 'F j, Y'
                   timezone: ''
+                  tooltip:
+                    date_format: ''
+                    custom_date_format: ''
+                  time_diff:
+                    enabled: false
+                    future_format: '@interval hence'
+                    past_format: '@interval ago'
+                    granularity: 2
+                    refresh: 60
                 third_party_settings: {  }
             weight: 2
             additional:
