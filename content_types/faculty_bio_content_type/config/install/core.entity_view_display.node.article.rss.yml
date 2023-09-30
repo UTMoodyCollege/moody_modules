@@ -18,9 +18,11 @@ content:
     weight: 100
     region: content
 hidden:
+  addtoany: true
   body: true
   comment: true
   display_breadcrumbs: true
   display_page_title: true
+  display_updated: true
   field_image: true
   field_tags: true

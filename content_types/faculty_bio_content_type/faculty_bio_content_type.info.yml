@@ -1,6 +1,6 @@
 name: 'Faculty Bio Content Type'
 type: module
-core_version_requirement: '^8.9 || ^9 || ^10'
+core_version_requirement: '^9.4 || ^10'
 core_incompatible: false
 package: 'Moody Content Type'
 dependencies:
@@ -19,6 +19,7 @@ dependencies:
   - 'drupal:user'
   - 'drupal:views'
   - 'faculty_bio_content_type:faculty_bio_content_type'
+  - 'feeds:feeds'
   - 'moody_social_accounts:moody_social_accounts'
   - 'pathauto:pathauto'
   - 'utexas_image_styles:utexas_image_styles'

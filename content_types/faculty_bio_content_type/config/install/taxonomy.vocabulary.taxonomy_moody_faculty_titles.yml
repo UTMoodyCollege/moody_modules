@@ -1,7 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-name: 'Moody Faculty Titles'
-vid: taxonomy_moody_faculty_titles
-description: ''
-weight: 0

@@ -4,11 +4,13 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.moody_faculty_bio.body
+    - field.field.node.moody_faculty_bio.feeds_item
     - field.field.node.moody_faculty_bio.field_affiliations_faculty_bio
     - field.field.node.moody_faculty_bio.field_biography_faculty_bio
     - field.field.node.moody_faculty_bio.field_courses_faculty_bio
     - field.field.node.moody_faculty_bio.field_custom_tab_content_faculty
     - field.field.node.moody_faculty_bio.field_custom_tab_title_faculty
+    - field.field.node.moody_faculty_bio.field_cv_faculty_bio
     - field.field.node.moody_faculty_bio.field_cv_pdf_faculty_bio
     - field.field.node.moody_faculty_bio.field_degrees_faculty_bio
     - field.field.node.moody_faculty_bio.field_department_association_fac
@@ -16,6 +18,7 @@ dependencies:
     - field.field.node.moody_faculty_bio.field_email_address_faculty_bio
     - field.field.node.moody_faculty_bio.field_email_faculty_bio
     - field.field.node.moody_faculty_bio.field_expertise_faculty_bio
+    - field.field.node.moody_faculty_bio.field_faculty_image
     - field.field.node.moody_faculty_bio.field_first_name_faculty_bio
     - field.field.node.moody_faculty_bio.field_headshot_faculty_bio
     - field.field.node.moody_faculty_bio.field_last_name_faculty_bio
@@ -35,19 +38,23 @@ bundle: moody_faculty_bio
 mode: teaser
 content:
   links:
-    weight: 100
     settings: {  }
     third_party_settings: {  }
+    weight: 100
     region: content
 hidden:
+  addtoany: true
   body: true
   display_breadcrumbs: true
   display_page_title: true
+  display_updated: true
+  feeds_item: true
   field_affiliations_faculty_bio: true
   field_biography_faculty_bio: true
   field_courses_faculty_bio: true
   field_custom_tab_content_faculty: true
   field_custom_tab_title_faculty: true
+  field_cv_faculty_bio: true
   field_cv_pdf_faculty_bio: true
   field_degrees_faculty_bio: true
   field_department_association_fac: true
@@ -55,6 +62,7 @@ hidden:
   field_email_address_faculty_bio: true
   field_email_faculty_bio: true
   field_expertise_faculty_bio: true
+  field_faculty_image: true
   field_first_name_faculty_bio: true
   field_headshot_faculty_bio: true
   field_last_name_faculty_bio: true

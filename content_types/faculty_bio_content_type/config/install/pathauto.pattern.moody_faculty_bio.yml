@@ -8,14 +8,14 @@ label: 'Moody Faculty Bio'
 type: 'canonical_entities:node'
 pattern: 'faculty/[node:title]'
 selection_criteria:
-  a829a75a-cf62-4a94-82d1-eb662f478b33:
-    entity_bundle: node
-    bundles:
-      moody_faculty_bio: moody_faculty_bio
+  f4d7913e-42be-47da-8b40-090bf52df2e8:
+    id: 'entity_bundle:node'
     negate: false
+    uuid: f4d7913e-42be-47da-8b40-090bf52df2e8
     context_mapping:
       node: node
-    uuid: a829a75a-cf62-4a94-82d1-eb662f478b33
+    bundles:
+      moody_faculty_bio: moody_faculty_bio
 selection_logic: and
 weight: -5
 relationships: {  }

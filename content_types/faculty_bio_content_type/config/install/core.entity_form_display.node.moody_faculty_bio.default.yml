@@ -3,11 +3,13 @@ status: true
 dependencies:
   config:
     - field.field.node.moody_faculty_bio.body
+    - field.field.node.moody_faculty_bio.feeds_item
     - field.field.node.moody_faculty_bio.field_affiliations_faculty_bio
     - field.field.node.moody_faculty_bio.field_biography_faculty_bio
     - field.field.node.moody_faculty_bio.field_courses_faculty_bio
     - field.field.node.moody_faculty_bio.field_custom_tab_content_faculty
     - field.field.node.moody_faculty_bio.field_custom_tab_title_faculty
+    - field.field.node.moody_faculty_bio.field_cv_faculty_bio
     - field.field.node.moody_faculty_bio.field_cv_pdf_faculty_bio
     - field.field.node.moody_faculty_bio.field_degrees_faculty_bio
     - field.field.node.moody_faculty_bio.field_department_association_fac
@@ -15,6 +17,7 @@ dependencies:
     - field.field.node.moody_faculty_bio.field_email_address_faculty_bio
     - field.field.node.moody_faculty_bio.field_email_faculty_bio
     - field.field.node.moody_faculty_bio.field_expertise_faculty_bio
+    - field.field.node.moody_faculty_bio.field_faculty_image
     - field.field.node.moody_faculty_bio.field_first_name_faculty_bio
     - field.field.node.moody_faculty_bio.field_headshot_faculty_bio
     - field.field.node.moody_faculty_bio.field_last_name_faculty_bio
@@ -61,166 +64,166 @@ content:
       display_label: true
     third_party_settings: {  }
   field_affiliations_faculty_bio:
+    type: text_textarea
     weight: 27
+    region: content
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
-    type: text_textarea
-    region: content
   field_biography_faculty_bio:
+    type: text_textarea
     weight: 24
+    region: content
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
-    type: text_textarea
-    region: content
   field_courses_faculty_bio:
+    type: text_textarea
     weight: 26
+    region: content
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
-    type: text_textarea
-    region: content
   field_custom_tab_content_faculty:
+    type: text_textarea
     weight: 29
+    region: content
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
-    type: text_textarea
-    region: content
   field_custom_tab_title_faculty:
+    type: string_textfield
     weight: 28
+    region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_cv_pdf_faculty_bio:
+    type: file_generic
     weight: 32
+    region: content
     settings:
       progress_indicator: throbber
     third_party_settings: {  }
-    type: file_generic
-    region: content
   field_degrees_faculty_bio:
+    type: text_textarea
     weight: 25
+    region: content
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
-    type: text_textarea
-    region: content
   field_department_association_fac:
+    type: options_buttons
     weight: 16
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: options_buttons
-    region: content
   field_eid_faculty_bio:
-    weight: 20
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
     type: string_textfield
+    weight: 20
     region: content
-  field_email_address_faculty_bio:
-    weight: 17
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  field_email_address_faculty_bio:
     type: email_default
+    weight: 17
     region: content
+    settings:
+      placeholder: ''
+      size: 60
+    third_party_settings: {  }
   field_expertise_faculty_bio:
+    type: entity_reference_autocomplete_tags
     weight: 22
+    region: content
     settings:
       match_operator: CONTAINS
       match_limit: 10
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: entity_reference_autocomplete_tags
-    region: content
   field_first_name_faculty_bio:
+    type: string_textfield
     weight: 12
+    region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_headshot_faculty_bio:
+    type: image_image
     weight: 11
+    region: content
     settings:
       progress_indicator: throbber
       preview_image_style: thumbnail
     third_party_settings: {  }
-    type: image_image
-    region: content
   field_last_name_faculty_bio:
+    type: string_textfield
     weight: 14
+    region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_middle_name_facutly_bio:
+    type: string_textfield
     weight: 13
+    region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_office_number_faculty_bio:
+    type: string_textfield
     weight: 19
+    region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_personal_link_faculty_bio:
+    type: link_default
     weight: 23
+    region: content
     settings:
       placeholder_url: ''
       placeholder_title: ''
     third_party_settings: {  }
-    type: link_default
-    region: content
   field_position_faculty_bio:
+    type: options_buttons
     weight: 15
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: options_buttons
-    region: content
   field_show_eid_faculty_bio:
+    type: boolean_checkbox
     weight: 21
+    region: content
     settings:
       display_label: true
     third_party_settings: {  }
-    type: boolean_checkbox
-    region: content
   field_social_faculty_bio:
+    type: moody_social_accounts_widget
     weight: 30
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: moody_social_accounts_widget
-    region: content
   field_telephone_faculty_bio:
+    type: telephone_default
     weight: 18
+    region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
-    type: telephone_default
-    region: content
   path:
     type: path
     weight: 7
@@ -229,24 +232,24 @@ content:
     third_party_settings: {  }
   promote:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 5
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 9
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 6
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   title:
     type: string_textfield
@@ -259,12 +262,12 @@ content:
   uid:
     type: entity_reference_autocomplete
     weight: 1
+    region: content
     settings:
       match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
-      match_limit: 10
-    region: content
     third_party_settings: {  }
   url_redirects:
     weight: 8
@@ -273,4 +276,7 @@ content:
     third_party_settings: {  }
 hidden:
   body: true
+  feeds_item: true
+  field_cv_faculty_bio: true
   field_email_faculty_bio: true
+  field_faculty_image: true

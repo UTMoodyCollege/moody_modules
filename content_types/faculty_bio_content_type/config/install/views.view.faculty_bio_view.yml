@@ -14,6 +14,19 @@ dependencies:
     - taxonomy.vocabulary.moody_departments
     - taxonomy.vocabulary.moody_faculty_titles
     - taxonomy.vocabulary.tags
+  content:
+    - 'taxonomy_term:directory_structure:73056f73-72de-4e00-ab85-87e2eaf29fd3'
+    - 'taxonomy_term:directory_structure:f19c2b60-b3e6-4a12-b042-f1c4362f600b'
+    - 'taxonomy_term:moody_departments:2d8340e9-ef58-43d4-9d4e-d00dd2f4a476'
+    - 'taxonomy_term:moody_departments:61718162-7f58-45ee-acb0-925bb16523f5'
+    - 'taxonomy_term:moody_departments:87b0b4ad-111e-44b8-85bc-18dbb5b1e253'
+    - 'taxonomy_term:moody_departments:ea9cb071-7391-4522-b68d-8fab3a553a38'
+    - 'taxonomy_term:moody_departments:f07ccc8c-7c11-4d98-82b3-8f268683c407'
+    - 'taxonomy_term:moody_faculty_titles:edf48c41-400c-4e0b-bd21-8c55d8117a3f'
+    - 'taxonomy_term:moody_faculty_titles:f706d751-4b4c-48a1-bd04-c65f181aef74'
+    - 'taxonomy_term:tags:7e2e557d-d1d0-4095-8747-a1af6f38e1ca'
+    - 'taxonomy_term:tags:a326a374-272d-4004-8742-a424e7fa0381'
+    - 'taxonomy_term:tags:db44cb11-5ca0-4433-bcda-a98972be7245'
   module:
     - image
     - node
@@ -29,48 +42,12 @@ base_table: node_field_data
 base_field: nid
 display:
   default:
-    display_plugin: default
     id: default
     display_title: Master
+    display_plugin: default
     position: 0
     display_options:
-      access:
-        type: perm
-        options:
-          perm: 'access content'
-      cache:
-        type: tag
-        options: {  }
-      query:
-        type: views_query
-        options:
-          disable_sql_rewrite: false
-          distinct: false
-          replica: false
-          query_comment: ''
-          query_tags: {  }
-      exposed_form:
-        type: basic
-        options:
-          submit_button: Apply
-          reset_button: false
-          reset_button_label: Reset
-          exposed_sorts_label: 'Sort by'
-          expose_sort_order: true
-          sort_asc_label: Asc
-          sort_desc_label: Desc
-      pager:
-        type: none
-        options:
-          offset: 0
-      style:
-        type: default
-        options:
-          grouping: {  }
-          row_class: 'col-12 col-sm-6 col-md-4 col-lg-3'
-          default_row_class: true
-      row:
-        type: fields
+      title: Faculty
       fields:
         field_headshot_faculty_bio:
           id: field_headshot_faculty_bio
@@ -79,6 +56,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: false
           alter:
@@ -123,8 +101,10 @@ display:
           click_sort_column: target_id
           type: image
           settings:
-            image_style: faculty_bio_image
             image_link: content
+            image_style: faculty_bio_image
+            image_loading:
+              attribute: lazy
           group_column: ''
           group_columns: {  }
           group_rows: true
@@ -135,7 +115,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         field_first_name_faculty_bio:
           id: field_first_name_faculty_bio
           table: node__field_first_name_faculty_bio
@@ -143,6 +122,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: true
           alter:
@@ -198,7 +178,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         field_middle_name_facutly_bio:
           id: field_middle_name_facutly_bio
           table: node__field_middle_name_facutly_bio
@@ -206,6 +185,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: true
           alter:
@@ -261,7 +241,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         field_last_name_faculty_bio:
           id: field_last_name_faculty_bio
           table: node__field_last_name_faculty_bio
@@ -269,6 +248,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: true
           alter:
@@ -324,7 +304,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         nothing:
           id: nothing
           table: views
@@ -332,6 +311,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: custom
           label: ''
           exclude: false
           alter:
@@ -373,7 +353,6 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: false
-          plugin_id: custom
         field_position_faculty_bio:
           id: field_position_faculty_bio
           table: node__field_position_faculty_bio
@@ -381,6 +360,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: false
           alter:
@@ -436,7 +416,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         field_department_association_fac:
           id: field_department_association_fac
           table: node__field_department_association_fac
@@ -444,6 +423,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: false
           alter:
@@ -499,7 +479,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
         field_biography_faculty_bio:
           id: field_biography_faculty_bio
           table: node__field_biography_faculty_bio
@@ -507,6 +486,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: field
           label: ''
           exclude: true
           alter:
@@ -561,30 +541,66 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          plugin_id: field
+      pager:
+        type: none
+        options:
+          offset: 0
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Apply
+          reset_button: false
+          reset_button_label: Reset
+          exposed_sorts_label: 'Sort by'
+          expose_sort_order: true
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+        options: {  }
+      empty: {  }
+      sorts:
+        field_last_name_faculty_bio_value:
+          id: field_last_name_faculty_bio_value
+          table: node__field_last_name_faculty_bio
+          field: field_last_name_faculty_bio_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: standard
+          order: ASC
+          expose:
+            label: ''
+            field_identifier: field_last_name_faculty_bio_value
+          exposed: false
+      arguments: {  }
       filters:
         status:
-          value: '1'
+          id: status
           table: node_field_data
           field: status
-          plugin_id: boolean
           entity_type: node
           entity_field: status
-          id: status
+          plugin_id: boolean
+          value: '1'
+          group: 1
           expose:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
-          group: 1
         type:
           id: type
           table: node_field_data
           field: type
-          value:
-            moody_faculty_bio: moody_faculty_bio
           entity_type: node
           entity_field: type
           plugin_id: bundle
+          value:
+            moody_faculty_bio: moody_faculty_bio
           expose:
             operator_limit_selection: false
             operator_list: {  }
@@ -595,6 +611,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: combine
           operator: word
           value: ''
           group: 1
@@ -658,7 +675,6 @@ display:
             field_middle_name_facutly_bio: field_middle_name_facutly_bio
             field_last_name_faculty_bio: field_last_name_faculty_bio
             field_biography_faculty_bio: field_biography_faculty_bio
-          plugin_id: combine
         field_department_association_fac_target_id:
           id: field_department_association_fac_target_id
           table: node__field_department_association_fac
@@ -666,8 +682,14 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: taxonomy_index_tid
           operator: or
-          value: {  }
+          value:
+            124: 124
+            125: 125
+            126: 126
+            127: 127
+            128: 128
           group: 1
           exposed: true
           expose:
@@ -685,25 +707,41 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
-              utexas_content_editor: '0'
-              utexas_site_manager: '0'
               administrator: '0'
-              moody_site_builder: '0'
-              moody_site_manager: '0'
-              advertising_aaf_stickell_internships_editor: '0'
-              moody_standard_user: '0'
-              advertising_push_editor: '0'
-              advertising_center_for_brand_research_editor: '0'
-              moody_content_coordinator: '0'
-              advertising_participant_pool_editor: '0'
-              moody_standard_content_editor: '0'
-              moody_subsite_content_editor: '0'
-              moody_faculty_bio_editor: '0'
-              advertising_internships_editor: '0'
-              feature_temp_role: '0'
+              moody_strauss_editor: '0'
+              moody_behavioral_science_lab_editor: '0'
+              moody_center_for_health_comm_editor: '0'
+              moody_denius_sams_gaming_academy_editor: '0'
+              moody_subsite_editor: '0'
+              moody_ie_editor: '0'
+              moody_conferences_editor: '0'
+              moody_lang_stuttering_institute_editor: '0'
+              moody_senior_fellows_editor: '0'
+              moody_tipi_editor: '0'
+              moody_utla_editor: '0'
+              moody_writing_support_program_editor: '0'
+              moody_tpsm_editor: '0'
+              moody_career_services_editor: '0'
+              moody_gcc_editor: '0'
               moody_feature_page_editor: '0'
-              home_video_editor: '0'
-            reduce: false
+              faculty_bio_editor: '0'
+              feature_page_editor: '0'
+              moody_institute_for_media_innovation_editor: '0'
+              cemi_editor: '0'
+              standard_content_editor: '0'
+              blank_center_editor: '0'
+              standard_content_manager: '0'
+              cate_editor: '0'
+              file_manager: '0'
+              full_html_editor: '0'
+              moody_administrator: '0'
+              basic_page_editor: '0'
+              room_editor: '0'
+              moody_eastin_research_editor: '0'
+              strong_editor: '0'
+              latino_media_editor: '0'
+              woolfolk_center_subsite_editor: '0'
+            reduce: true
           is_grouped: false
           group_info:
             label: ''
@@ -717,33 +755,32 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          type: select
-          limit: true
           vid: moody_departments
+          type: select
           hierarchy: false
+          limit: true
           error_message: true
-          plugin_id: taxonomy_index_tid
-      sorts:
-        field_last_name_faculty_bio_value:
-          id: field_last_name_faculty_bio_value
-          table: node__field_last_name_faculty_bio
-          field: field_last_name_faculty_bio_value
-          relationship: none
-          group_type: group
-          admin_label: ''
-          order: ASC
-          exposed: false
-          expose:
-            label: ''
-          plugin_id: standard
-      title: Faculty
+      style:
+        type: default
+        options:
+          grouping: {  }
+          row_class: 'col-12 col-sm-6 col-md-4 col-lg-3'
+          default_row_class: true
+      row:
+        type: fields
+      query:
+        type: views_query
+        options:
+          query_comment: ''
+          disable_sql_rewrite: false
+          distinct: false
+          replica: false
+          query_tags: {  }
+      relationships: {  }
+      css_class: 'faculty-bio-view row'
       header: {  }
       footer: {  }
-      empty: {  }
-      relationships: {  }
-      arguments: {  }
       display_extenders: {  }
-      css_class: 'faculty-bio-view row'
     cache_metadata:
       max-age: -1
       contexts:
@@ -762,15 +799,15 @@ display:
         - 'config:field.storage.node.field_middle_name_facutly_bio'
         - 'config:field.storage.node.field_position_faculty_bio'
   block_1:
-    display_plugin: block
     id: block_1
     display_title: Block
+    display_plugin: block
     position: 2
     display_options:
-      display_extenders: {  }
       title: 'Faculty Biographies'
       defaults:
         title: false
+      display_extenders: {  }
     cache_metadata:
       max-age: -1
       contexts:
@@ -789,42 +826,35 @@ display:
         - 'config:field.storage.node.field_middle_name_facutly_bio'
         - 'config:field.storage.node.field_position_faculty_bio'
   block_2:
-    display_plugin: block
     id: block_2
     display_title: 'RTF: Media Studies'
+    display_plugin: block
     position: 2
     display_options:
-      display_extenders: {  }
       title: 'Faculty Biographies'
-      defaults:
-        title: false
-        filters: false
-        filter_groups: false
-      display_description: 'RTF Media Studies'
-      block_description: 'RTF: Media Studies'
       filters:
         status:
-          value: '1'
+          id: status
           table: node_field_data
           field: status
-          plugin_id: boolean
           entity_type: node
           entity_field: status
-          id: status
+          plugin_id: boolean
+          value: '1'
+          group: 1
           expose:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
-          group: 1
         type:
           id: type
           table: node_field_data
           field: type
-          value:
-            moody_faculty_bio: moody_faculty_bio
           entity_type: node
           entity_field: type
           plugin_id: bundle
+          value:
+            moody_faculty_bio: moody_faculty_bio
           expose:
             operator_limit_selection: false
             operator_list: {  }
@@ -835,6 +865,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: combine
           operator: word
           value: ''
           group: 1
@@ -898,7 +929,6 @@ display:
             field_middle_name_facutly_bio: field_middle_name_facutly_bio
             field_last_name_faculty_bio: field_last_name_faculty_bio
             field_biography_faculty_bio: field_biography_faculty_bio
-          plugin_id: combine
         field_department_association_fac_target_id:
           id: field_department_association_fac_target_id
           table: node__field_department_association_fac
@@ -906,6 +936,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: taxonomy_index_tid
           operator: or
           value: {  }
           group: 1
@@ -957,12 +988,11 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          type: select
-          limit: true
           vid: moody_departments
+          type: select
           hierarchy: false
+          limit: true
           error_message: true
-          plugin_id: taxonomy_index_tid
         field_expertise_faculty_bio_target_id:
           id: field_expertise_faculty_bio_target_id
           table: node__field_expertise_faculty_bio
@@ -970,6 +1000,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: taxonomy_index_tid
           operator: or
           value:
             - 82
@@ -1003,12 +1034,11 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          type: textfield
-          limit: true
           vid: tags
+          type: textfield
           hierarchy: false
+          limit: true
           error_message: true
-          plugin_id: taxonomy_index_tid
         field_expertise_faculty_bio_target_id_1:
           id: field_expertise_faculty_bio_target_id_1
           table: node__field_expertise_faculty_bio
@@ -1016,6 +1046,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: taxonomy_index_tid
           operator: not
           value:
             - 258
@@ -1050,16 +1081,22 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          type: textfield
-          limit: true
           vid: tags
+          type: textfield
           hierarchy: false
+          limit: true
           error_message: true
-          plugin_id: taxonomy_index_tid
       filter_groups:
         operator: AND
         groups:
           1: AND
+      defaults:
+        title: false
+        filters: false
+        filter_groups: false
+      display_description: 'RTF Media Studies'
+      display_extenders: {  }
+      block_description: 'RTF: Media Studies'
     cache_metadata:
       max-age: -1
       contexts:
@@ -1078,42 +1115,35 @@ display:
         - 'config:field.storage.node.field_middle_name_facutly_bio'
         - 'config:field.storage.node.field_position_faculty_bio'
   block_3:
-    display_plugin: block
     id: block_3
     display_title: 'RTF: Production and Screenwriting'
+    display_plugin: block
     position: 2
     display_options:
-      display_extenders: {  }
       title: 'Faculty Biographies'
-      defaults:
-        title: false
-        filters: false
-        filter_groups: false
-      display_description: 'RTF: Production and Screenwriting'
-      block_description: 'RTF: Production and Screenwriting'
       filters:
         status:
-          value: '1'
+          id: status
           table: node_field_data
           field: status
-          plugin_id: boolean
           entity_type: node
           entity_field: status
-          id: status
+          plugin_id: boolean
+          value: '1'
+          group: 1
           expose:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
-          group: 1
         type:
           id: type
           table: node_field_data
           field: type
-          value:
-            moody_faculty_bio: moody_faculty_bio
           entity_type: node
           entity_field: type
           plugin_id: bundle
+          value:
+            moody_faculty_bio: moody_faculty_bio
           expose:
             operator_limit_selection: false
             operator_list: {  }
@@ -1124,6 +1154,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: combine
           operator: word
           value: ''
           group: 1
@@ -1187,7 +1218,6 @@ display:
             field_middle_name_facutly_bio: field_middle_name_facutly_bio
             field_last_name_faculty_bio: field_last_name_faculty_bio
             field_biography_faculty_bio: field_biography_faculty_bio
-          plugin_id: combine
         field_department_association_fac_target_id:
           id: field_department_association_fac_target_id
           table: node__field_department_association_fac
@@ -1195,6 +1225,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: taxonomy_index_tid
           operator: or
           value: {  }
           group: 1
@@ -1246,12 +1277,11 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          type: select
-          limit: true
           vid: moody_departments
+          type: select
           hierarchy: false
+          limit: true
           error_message: true
-          plugin_id: taxonomy_index_tid
         field_expertise_faculty_bio_target_id:
           id: field_expertise_faculty_bio_target_id
           table: node__field_expertise_faculty_bio
@@ -1259,6 +1289,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: taxonomy_index_tid
           operator: or
           value:
             - 258
@@ -1293,16 +1324,22 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: true
-          type: textfield
-          limit: true
           vid: tags
+          type: textfield
           hierarchy: false
+          limit: true
           error_message: true
-          plugin_id: taxonomy_index_tid
       filter_groups:
         operator: AND
         groups:
           1: AND
+      defaults:
+        title: false
+        filters: false
+        filter_groups: false
+      display_description: 'RTF: Production and Screenwriting'
+      display_extenders: {  }
+      block_description: 'RTF: Production and Screenwriting'
     cache_metadata:
       max-age: -1
       contexts:
@@ -1321,42 +1358,35 @@ display:
         - 'config:field.storage.node.field_middle_name_facutly_bio'
         - 'config:field.storage.node.field_position_faculty_bio'
   block_4:
-    display_plugin: block
     id: block_4
     display_title: 'Faculty Emeritus'
+    display_plugin: block
     position: 2
     display_options:
-      display_extenders: {  }
       title: 'Faculty Biographies'
-      defaults:
-        title: false
-        filters: false
-        filter_groups: false
-      display_description: 'Faculty Emeritus'
-      block_description: 'Faculty Emeritus'
       filters:
         status:
-          value: '1'
+          id: status
           table: node_field_data
           field: status
-          plugin_id: boolean
           entity_type: node
           entity_field: status
-          id: status
+          plugin_id: boolean
+          value: '1'
+          group: 1
           expose:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
-          group: 1
         type:
           id: type
           table: node_field_data
           field: type
-          value:
-            moody_faculty_bio: moody_faculty_bio
           entity_type: node
           entity_field: type
           plugin_id: bundle
+          value:
+            moody_faculty_bio: moody_faculty_bio
           expose:
             operator_limit_selection: false
             operator_list: {  }
@@ -1367,6 +1397,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: combine
           operator: word
           value: ''
           group: 1
@@ -1430,7 +1461,6 @@ display:
             field_middle_name_facutly_bio: field_middle_name_facutly_bio
             field_last_name_faculty_bio: field_last_name_faculty_bio
             field_biography_faculty_bio: field_biography_faculty_bio
-          plugin_id: combine
         field_department_association_fac_target_id:
           id: field_department_association_fac_target_id
           table: node__field_department_association_fac
@@ -1438,6 +1468,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: taxonomy_index_tid
           operator: or
           value: {  }
           group: 1
@@ -1489,12 +1520,11 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          type: select
-          limit: true
           vid: moody_departments
+          type: select
           hierarchy: false
+          limit: true
           error_message: true
-          plugin_id: taxonomy_index_tid
         field_position_faculty_bio_target_id:
           id: field_position_faculty_bio_target_id
           table: node__field_position_faculty_bio
@@ -1502,6 +1532,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: taxonomy_index_tid
           operator: or
           value:
             - 440
@@ -1538,16 +1569,22 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          type: textfield
-          limit: true
           vid: moody_faculty_titles
+          type: textfield
           hierarchy: false
+          limit: true
           error_message: true
-          plugin_id: taxonomy_index_tid
       filter_groups:
         operator: AND
         groups:
           1: AND
+      defaults:
+        title: false
+        filters: false
+        filter_groups: false
+      display_description: 'Faculty Emeritus'
+      display_extenders: {  }
+      block_description: 'Faculty Emeritus'
     cache_metadata:
       max-age: -1
       contexts:
@@ -1566,9 +1603,9 @@ display:
         - 'config:field.storage.node.field_middle_name_facutly_bio'
         - 'config:field.storage.node.field_position_faculty_bio'
   page_1:
-    display_plugin: page
     id: page_1
     display_title: Page
+    display_plugin: page
     position: 1
     display_options:
       display_extenders: {  }
