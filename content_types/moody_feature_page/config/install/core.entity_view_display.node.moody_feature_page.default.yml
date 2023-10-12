@@ -12,6 +12,7 @@ dependencies:
     - field.field.node.moody_feature_page.layout_builder__layout
     - node.type.moody_feature_page
   module:
+    - addtoany
     - layout_builder
     - layout_builder_restrictions
     - text
@@ -26,10 +27,10 @@ third_party_settings:
         layout_id: layout_utexas_onecol
         layout_settings:
           label: ''
+          context_mapping: {  }
           blur: false
           background-color: none
           section_width: readable
-          context_mapping: {  }
           layout_builder_styles_style: {  }
           background-accent: 0
         components:
@@ -62,16 +63,6 @@ third_party_settings:
                 settings: {  }
                 third_party_settings: {  }
             weight: 5
-            additional: {  }
-          3e56a1fb-5878-4286-a7da-eb34161f3896:
-            uuid: 3e56a1fb-5878-4286-a7da-eb34161f3896
-            region: main
-            configuration:
-              id: 'extra_field_block:node:moody_feature_page:addtoany'
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-            weight: 4
             additional: {  }
           eac7ee61-97c3-47dc-a68b-bc7bb8e8cd4f:
             uuid: eac7ee61-97c3-47dc-a68b-bc7bb8e8cd4f
@@ -192,6 +183,33 @@ third_party_settings:
                     refresh: 60
                 third_party_settings: {  }
             weight: 2
+            additional:
+              layout_builder_styles_style:
+                utexas_border_without_background: 0
+                utexas_border_with_background: 0
+                utexas_readable: 0
+                utexas_block_top_margin_remove: 0
+                utexas_block_bottom_margin_remove: 0
+                utexas_block_top_margin_increase: 0
+                utexas_block_bottom_margin_increase: 0
+                moody_add_bottom_margin: 0
+                moody_add_top_margin: 0
+                moody_remove_bottom_margin: 0
+                moody_remove_top_margin: 0
+          9df0f410-bb60-4e66-a490-330775b2d06e:
+            uuid: 9df0f410-bb60-4e66-a490-330775b2d06e
+            region: main
+            configuration:
+              id: addtoany_block
+              label: 'AddToAny share buttons'
+              label_display: '0'
+              provider: addtoany
+              context_mapping: {  }
+              link_url: ''
+              link_title: ''
+              buttons_size: ''
+              addtoany_html: ''
+            weight: 7
             additional:
               layout_builder_styles_style:
                 utexas_border_without_background: 0
