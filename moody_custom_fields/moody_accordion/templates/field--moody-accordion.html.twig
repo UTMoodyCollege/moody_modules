@@ -50,8 +50,8 @@
 	{% for item in items %}
     <div class="accordion-title" id="accordion-{{ item.content['#item_delta'] }}">
       <button class="accordion-btn collapsed" type="button" data-toggle="collapse" data-target="#collapse-{{ item.content['#item_delta'] }}" aria-expanded="true" aria-controls="collapse-{{ item.content['#item_delta'] }}">
-        <span class="accordion-caret"></span>
         {{ item.content['#panel_title'] }}
+        <span class="accordion-caret"></span>
       </button>
     </div>
     <div id="collapse-{{ item.content['#item_delta'] }}" class="collapse accordion-content" aria-labelledby="{{ item.content['#item_delta'] }}" data-parent="#moodyAccordion-{{ rand }}">
