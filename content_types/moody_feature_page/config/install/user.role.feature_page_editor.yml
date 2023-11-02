@@ -1,7 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: feature_page_editor
-label: 'Feature Page Editor'
-weight: 30
-is_admin: null
