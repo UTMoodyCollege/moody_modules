@@ -6,4 +6,5 @@ excluded:
   - filter.format.full_html
   - filter.format.restricted_html
   - user.role.moody_administrator
+  - user.role.moody_feature_page_editor
 required: true

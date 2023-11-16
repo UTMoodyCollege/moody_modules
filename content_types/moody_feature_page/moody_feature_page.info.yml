@@ -10,6 +10,7 @@ dependencies:
   - 'drupal:block'
   - 'drupal:block_content'
   - 'drupal:config'
+  - 'drupal:content_moderation'
   - 'drupal:contextual'
   - 'drupal:editor'
   - 'drupal:field'
