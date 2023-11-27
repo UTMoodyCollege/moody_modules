@@ -100,10 +100,18 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
     foreach ($nodes as $node) {
       $url = $node->toUrl()->toString();
       $summary = $node->body->summary;
+      // Get the category
+      $category = $node->get('field_news_categories')->referencedEntities();
+      $author = 'BY ' . strtoupper($node->get('field_feature_page_author')->getValue()[0]['first_name'] . ' ' . $node->get('field_feature_page_author')->getValue()[0]['last_name']);
+      $article_date = $node->created->value;
+
       $articles[] = [
         'title' => $node->getTitle(),
         'summary' => $summary,
         'url' => $url,
+        'category' => $category[0] ? $category[0]->getName() : '',
+        'author' => $author,
+        'article_date' => $article_date,
       ];
     }
   

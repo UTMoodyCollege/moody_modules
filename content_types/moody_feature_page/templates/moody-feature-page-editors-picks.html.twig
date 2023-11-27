@@ -1,15 +1,21 @@
 <div id="editors-picks-block">
-  <h2 class="editors-picks-title">{{ title }}</h2>
-  <ul class="editors-picks-list">
-    {% for article in articles %}
-      <li class="editors-picks-item">
-        <h3 class="editors-picks-article-title"><a href="{{ article.url }}" class="editors-picks-article-link">{{ article.title }}</a></h3>
-        {% if article.summary %}
-          <p class="editors-picks-article-summary">{{ article.summary }} <a href="{{ article.url }}" class="editors-picks-read-more">Read more</a></p>
-        {% else %}
-          <p class="editors-picks-read-more-only"><a href="{{ article.url }}" class="editors-picks-read-more">Read more</a></p>
-        {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
+	<ul class="editors-picks-list">
+		{% for article in articles %}
+			<li class="editors-picks-item">
+				<a href="{{ article.url }}" class="editors-picks-read-more">
+					{# Add an "article.category" div in orange all caps smaller than title #}
+					<div class="editors-picks-article-category">{{ article.category|upper }}</div>
+					<h3 class="editors-picks-article-title">
+						<div class="editors-picks-article-link">{{ article.title }}</div>
+					</h3>
+					{% if article.summary %}
+						<p class="editors-picks-article-summary">{{ article.summary }}</p>
+						{% else %}
+					{% endif %}
+          <p class="editors-picks-article-date">{{ article.article_date|date("F j, Y")|upper }} | {{ article.author }}</p>
+					<hr/>
+				</a>
+			</li>
+		{% endfor %}
+	</ul>
 </div>

@@ -144,8 +144,8 @@ function moody_feature_page_preprocess_page(&$variables)
     // Get node titles and links for previous/next links.
     $nid = $node->id();
     $previous_next = _get_previous_next_nodes($nid);
-    $variables['prev_node'] = ($previous_next['prev'] != FALSE) ? $previous_next['prev'] : FALSE;
-    $variables['next_node'] = ($previous_next['next'] != FALSE) ? $previous_next['next'] : FALSE;
+    $variables['prev_node'] = !empty($previous_next['prev']) ? $previous_next['prev'] : FALSE;
+    $variables['next_node'] = !empty($previous_next['next']) ? $previous_next['next'] : FALSE;
   }
 }
 
@@ -180,8 +180,8 @@ function _get_previous_next_nodes($nid)
     $key_next = NULL;
   }
 
-  $previous_node = isset($keyed_array[$key_previous]) ? Node::load($keyed_array[$key_previous]) : NULL;
-  $next_node = isset($keyed_array[$key_next]) ? Node::load($keyed_array[$key_next]) : NULL;
+  $previous_node = !empty($keyed_array[$key_previous]) ? Node::load($keyed_array[$key_previous]) : NULL;
+  $next_node = !empty($keyed_array[$key_next]) ? Node::load($keyed_array[$key_next]) : NULL;
 
   $results['prev'] = FALSE;
   $results['next'] = FALSE;

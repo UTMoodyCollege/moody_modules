@@ -1,25 +1,45 @@
+#editors-picks-block {
+  /* No underline links */
+  text-decoration: none;
+}
+/* We want a links to have no underline on hover or anyhting inside the block */
+#editors-picks-block a {
+  text-decoration: none;
+}
+/* We want a links to have no underline on hover or anyhting inside the block */
+#editors-picks-block a:hover {
+  text-decoration: none;
+}
 #editors-picks-block .editors-picks-title {
-    font-style: italic;
-    padding-bottom: 1em; /* adjust this value as needed */
-  }
-  #editors-picks-block .editors-picks-list {
-    list-style-type: none;
-    padding-left: 0;
-  }
-  #editors-picks-block .editors-picks-item {
-    margin-bottom: 1em;
-  }
-  #editors-picks-block .editors-picks-article-title {
-    font-weight: bold;
-  }
-  #editors-picks-block .editors-picks-article-link {
-    color: #000; /* black color */
-  }
-  #editors-picks-block .editors-picks-read-more {
-    color: #CF5700; /* new color for "Read more" */
-  }
-  #editors-picks-block .editors-picks-article-summary,
-  #editors-picks-block .editors-picks-read-more-only {
-    margin-top: 0.5em;
-  }
-  
+  font-style: italic;
+  padding-bottom: 1em; /* adjust this value as needed */
+}
+#editors-picks-block .editors-picks-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+#editors-picks-block .editors-picks-item {
+  margin-bottom: 1em;
+}
+#editors-picks-block .editors-picks-article-title {
+  font-weight: 900;
+  font-size: 1.3em;
+}
+#editors-picks-block .editors-picks-article-link {
+  color: #000; /* black color */
+}
+#editors-picks-block .editors-picks-read-more {
+  color: #cf5700; /* new color for "Read more" */
+}
+#editors-picks-block .editors-picks-article-summary,
+#editors-picks-block .editors-picks-read-more-only {
+  margin-top: 0.5em;
+}
+.editors-picks-article-category {
+  font-size: 0.75em;
+  font-weight: bold;
+}
+.editors-picks-article-date {
+  font-size: 0.75em;
+  color: #5e686e; /* gray color */
+}
