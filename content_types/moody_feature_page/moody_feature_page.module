@@ -22,6 +22,8 @@ function moody_feature_page_theme($existing, $type, $theme, $path)
         'highlighted_image_uri' => NULL,
         'link_to_content' => NULL,
         'field_featured_news_teaser' => NULL,
+        'author' => NULL,
+        'article_date' => NULL,
       ],
       'template' => 'moody-feature-page-hero',
     ],
@@ -71,6 +73,13 @@ function moody_feature_page_preprocess_block(&$variables)
 
     $node = $variables['elements']['content']['#block_content']->get('field_highlighted_article')->getValue()[0]['target_id'];
     $node = Node::load($node);
+    // Lets get the author from values of $node->values["field_feature_page_author"]. It has a 'first_name' and 'last_name' we want to concatenate and tease out. For mulitp[le values, we want to get the first one only.
+    $author = 'BY ' . strtoupper($node->get('field_feature_page_author')->getValue()[0]['first_name'] . ' ' . $node->get('field_feature_page_author')->getValue()[0]['last_name']);
+
+    $article_date = // Get the authored on date for the node.
+    $article_date = $node->created->value;
+
+
     // The node has the following fields we want to tease out and get variables for twig:
     // - field_news_categories - This is a taxonomy reference, it could have multiple values. WE want the first one, get the label for it as well.
     // - title - The title of the node.
@@ -83,6 +92,8 @@ function moody_feature_page_preprocess_block(&$variables)
       '#highlighted_image_uri' => $highlighted_image_uri,
       '#link_to_content' => $link_to_content,
       '#field_featured_news_teaser' => $field_featured_news_teaser,
+      '#author' => $author,
+      '#article_date' => $article_date,
     ];
     // Attach the moody_feature_hero library from this moduile.
     $variables['#attached']['library'][] = 'moody_feature_page/moody_feature_hero';

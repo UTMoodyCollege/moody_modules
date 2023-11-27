@@ -1,44 +1,51 @@
 .featured-news {
-  min-height: 500px; /* Adjust to your preferred minimum height for desktop/tablet */
   text-decoration: none;
   font-weight: bold;
 }
 
-.featured-news .bg-image {
+/* the .date under featured news */
+.featured-news .date {
+  font-size: 1em;
+}
+
+/* New Image Section */
+.featured-news .image-section {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  /* padding-left: 15%; /* Adjust to your preferred padding for desktop/tablet */
-  /*padding-right: 15%; /* Adjust to your preferred padding for desktop/tablet */
-  min-height: 600px; /* adjust as needed */
+  min-height: 600px; /* Adjust as needed */
+  position: relative; /* For absolute positioning of the category */
 }
 
-.featured-news .bg-image .category {
+/* New Text Section */
+.featured-news .text-section {
+  padding: 2.5rem; /* Adjust as needed */
+  background-color: #F5F6F8;
+  color: #333; /* Adjust text color as needed */
+}
+
+/* Styles for the category label */
+.featured-news .category {
   top: 2.5rem;
   left: 2.5rem;
-  padding: 0;
-  border: none;
-  border-radius: 0;
+  color: #bf5700; /* Burnt orange */
+  font-weight: bold; /* Bold text */
+  text-transform: uppercase;
+  font-size: 1rem;
+  padding-bottom: 0.5em;
 }
 
-.featured-news .bg-image .title-and-teaser {
-  padding-left: 2.5rem;
-  padding-bottom: 2rem;
-  color: white;
-
-}
-
-.featured-news .bg-image .title {
-  font-size: 1.2em; /* adjust as needed */
-  max-width: fit-content;
+/* Styles for title and teaser inside the text section */
+.featured-news .text-section .title {
+  font-size: 1.5em; /* Adjust as needed */
   font-weight: 900;
-  color: white;
+  color: #333; /* Adjust title color as needed */
 }
 
-.featured-news .bg-image .teaser {
-  font-size: 1em; /* adjust as needed */
+.featured-news .text-section .teaser {
+  font-size: 1em; /* Adjust as needed */
+  color: #666; /* Adjust teaser text color as needed */
 }
-
 /* For mobile */
 @media (max-width: 768px) {
   .featured-news {

@@ -1,16 +1,23 @@
-<a href="{{ link_to_content }}" class="featured-news d-block position-relative overflow-hidden text-decoration-none text-bold">
-	<div class="bg-image position-relative text-white d-flex flex-column justify-content-end align-items-start"
-	     style="background-image: url('{{ highlighted_image_uri }}'); background-position: center; background-repeat: no-repeat; background-size: cover;">
+<a
+	href="{{ link_to_content }}" class="featured-news d-block position-relative overflow-hidden text-decoration-none text-bold">
+	<!-- Image Section -->
+	<div class="image-section" style="background-image: url('{{ highlighted_image_uri }}'); background-position: center; background-repeat: no-repeat; background-size: cover;"></div>
+
+	<!-- Text Section -->
+	<div class="text-section px-4 py-3 bg-">
 		{% if feature_node.field_news_categories.0.entity.label is not empty %}
-			<div class="category text-burntorange position-absolute">
+			<div class="category text-burntorange">
 				{{ feature_node.field_news_categories.0.entity.label }}
 			</div>
 		{% endif %}
-		<div class="title-and-teaser">
-			<h1 class="mb-2 title">{{ feature_node.title.value }}</h1>
-			{% if field_featured_news_teaser is not empty %}
-				<div class="teaser">{{ field_featured_news_teaser }}</div>
-			{% endif %}
-		</div>
+		<h1 class="pt-2 title">{{ feature_node.title.value }}</h1>
+		<div class="date text-burntorange pt-2">
+			{{ article_date|date("F j, Y")|upper }}<span>
+				|
+			</span>
+			{{ author }}</div>
+		{% if field_featured_news_teaser is not empty %}
+			<div class="teaser pt-2">{{ field_featured_news_teaser }}</div>
+		{% endif %}
 	</div>
 </a>
