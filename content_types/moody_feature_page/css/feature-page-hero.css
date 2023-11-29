@@ -21,7 +21,6 @@
 /* New Text Section */
 .featured-news .text-section {
   padding: 2.5rem; /* Adjust as needed */
-  color: #333f48; /* Adjust text color as needed */
 }
 
 /* Styles for the category label */
@@ -39,7 +38,6 @@
 .featured-news .text-section .title {
   font-size: 1.5em; /* Adjust as needed */
   font-weight: 700;
-  color: #333; /* Adjust title color as needed */
 }
 
 .featured-news .text-section .teaser {
