@@ -6,6 +6,7 @@
 /* the .date under featured news */
 .featured-news .date {
   font-size: 1em;
+  font-weight: 500;
 }
 
 /* New Image Section */
@@ -20,7 +21,7 @@
 /* New Text Section */
 .featured-news .text-section {
   padding: 2.5rem; /* Adjust as needed */
-  color: #333; /* Adjust text color as needed */
+  color: #333f48; /* Adjust text color as needed */
 }
 
 /* Styles for the category label */
@@ -37,13 +38,13 @@
 /* Styles for title and teaser inside the text section */
 .featured-news .text-section .title {
   font-size: 1.5em; /* Adjust as needed */
-  font-weight: 900;
+  font-weight: 700;
   color: #333; /* Adjust title color as needed */
 }
 
 .featured-news .text-section .teaser {
   font-size: 1em; /* Adjust as needed */
-  color: #666; /* Adjust teaser text color as needed */
+  font-weight: 400;
 }
 /* For mobile */
 @media (max-width: 768px) {
@@ -100,7 +101,7 @@
 
 .featured-news .bg-image .category {
   color: #bf5700; /* White text */
-  font-weight: bold; /* Bold text */
+  font-weight: 400; /* Bold text */
   text-transform: uppercase;
   font-size: 1.5rem;
 }

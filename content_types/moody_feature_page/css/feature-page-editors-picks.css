@@ -13,6 +13,7 @@
 #editors-picks-block .editors-picks-title {
   font-style: italic;
   padding-bottom: 1em; /* adjust this value as needed */
+  font-weight: 700;
 }
 #editors-picks-block .editors-picks-list {
   list-style-type: none;
@@ -22,7 +23,7 @@
   margin-bottom: 1em;
 }
 #editors-picks-block .editors-picks-article-title {
-  font-weight: 900;
+  font-weight: 700;
   font-size: 1.3em;
 }
 #editors-picks-block .editors-picks-article-link {
