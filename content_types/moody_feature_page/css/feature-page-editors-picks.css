@@ -27,7 +27,7 @@
   font-size: 1.3em;
 }
 #editors-picks-block .editors-picks-article-link {
-  color: #000; /* black color */
+  color: /* charcoal benton sans */ #5e686e;
 }
 #editors-picks-block .editors-picks-read-more {
   color: #cf5700; /* new color for "Read more" */
