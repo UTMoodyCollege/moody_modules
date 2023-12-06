@@ -64,7 +64,7 @@
 /* Tablet (768px and up) */
 @media (min-width: 768px) {
   .featured-news .bg-image {
-    min-height: 600px; /* adjust as needed */
+    min-height: 400px; /* adjust as needed */
   }
 
   .featured-news .bg-image .title {
