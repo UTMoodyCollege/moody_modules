@@ -42,7 +42,7 @@
 
 .featured-news .text-section .teaser {
   font-size: 1em; /* Adjust as needed */
-  font-weight: 400;
+  font-weight: normal;
 }
 /* For mobile */
 @media (max-width: 768px) {
