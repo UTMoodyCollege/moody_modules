@@ -13,7 +13,7 @@
 #editors-picks-block .editors-picks-title {
   font-style: italic;
   padding-bottom: 1em; /* adjust this value as needed */
-  font-weight: 700;
+  font-weight: 600;
 }
 #editors-picks-block .editors-picks-list {
   list-style-type: none;
@@ -30,7 +30,7 @@
   color: /* charcoal benton sans */ #5e686e;
 }
 #editors-picks-block .editors-picks-read-more {
-  color: #cf5700; /* new color for "Read more" */
+  color: #5e686e;
 }
 #editors-picks-block .editors-picks-article-summary,
 #editors-picks-block .editors-picks-read-more-only {
@@ -38,7 +38,7 @@
 }
 .editors-picks-article-category {
   font-size: 0.75em;
-  font-weight: bold;
+  font-weight: 600;
 }
 .editors-picks-article-date {
   font-size: 0.75em;

@@ -1,12 +1,12 @@
 .featured-news {
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 /* the .date under featured news */
 .featured-news .date {
   font-size: 1em;
-  font-weight: 500;
+  font-weight: normal;
 }
 
 /* New Image Section */
@@ -21,6 +21,7 @@
 /* New Text Section */
 .featured-news .text-section {
   padding: 2.5rem; /* Adjust as needed */
+  color: #5e686e;
 }
 
 /* Styles for the category label */
@@ -28,7 +29,7 @@
   top: 2.5rem;
   left: 2.5rem;
   color: #bf5700; /* Burnt orange */
-  font-weight: bold; /* Bold text */
+  font-weight: 600; /* Bold text */
   text-transform: uppercase;
   font-size: 1rem;
   padding-bottom: 0.5em;
@@ -38,6 +39,7 @@
 .featured-news .text-section .title {
   font-size: 1.5em; /* Adjust as needed */
   font-weight: 600;
+  color: #5e686e;
 }
 
 .featured-news .text-section .teaser {
@@ -92,14 +94,3 @@
   z-index: 1; /* Gradient on top of the image but below the text */
 }
 
-.featured-news .bg-image .title-and-teaser, .featured-news .bg-image .category {
-  position: relative;
-  z-index: 2; /* Text and category on top of the gradient */
-}
-
-.featured-news .bg-image .category {
-  color: #bf5700; /* White text */
-  font-weight: 400; /* Bold text */
-  text-transform: uppercase;
-  font-size: 1.5rem;
-}
