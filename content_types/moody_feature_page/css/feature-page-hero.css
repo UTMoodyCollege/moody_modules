@@ -37,7 +37,7 @@
 /* Styles for title and teaser inside the text section */
 .featured-news .text-section .title {
   font-size: 1.5em; /* Adjust as needed */
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .featured-news .text-section .teaser {
