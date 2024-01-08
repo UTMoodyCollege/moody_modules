@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "subsite_custom_logo",
  *   label = @Translation("Subsite custom logo"),
  *   description = @Translation("Moody subsite custom logo for centers and institutes"),
- *   category = "Moody",
  *   default_widget = "subsite_custom_logo_widget",
  *   default_formatter = "subsite_custom_logo_formatter"
  * )

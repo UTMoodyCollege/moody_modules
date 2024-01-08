@@ -16,7 +16,6 @@ use Drupal\Core\TypedData\DataDefinition;
  * @FieldType(
  *   id = "moody_social_accounts",
  *   label = @Translation("Moody Social Accounts"),
- *   category = "Moody",
  *   description = @Translation("Moody subsite social accounts"),
  *   default_widget = "moody_social_accounts_widget",
  *   default_formatter = "moody_social_accounts_formatter"

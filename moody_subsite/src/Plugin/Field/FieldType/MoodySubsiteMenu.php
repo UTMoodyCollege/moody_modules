@@ -16,7 +16,6 @@ use Drupal\Core\TypedData\DataDefinition;
  * @FieldType(
  *   id = "moody_subsite_menu",
  *   label = @Translation("Moody Subsite Menu"),
- *   category = "Moody",
  *   description = @Translation("Configurable navigation for Moody subsites"),
  *   default_widget = "moody_subsite_menu_widget",
  *   default_formatter = "moody_subsite_menu_formatter"

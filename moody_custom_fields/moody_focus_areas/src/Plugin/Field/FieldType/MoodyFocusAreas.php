@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\MapDataDefinition;
  * @FieldType(
  *   id = "moody_focus_areas",
  *   label = @Translation("Moody Focus Areas"),
- *   category = @Translation("Moody"),
  *   description = @Translation("Themed configurable focus areas"),
  *   default_widget = "moody_focus_areas_widget",
  *   default_formatter = "moody_focus_areas_formatter"

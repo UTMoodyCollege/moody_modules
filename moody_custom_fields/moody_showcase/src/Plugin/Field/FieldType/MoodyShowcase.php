@@ -18,7 +18,6 @@ use Drupal\Core\TypedData\MapDataDefinition;
  *   id = "moody_showcase",
  *   label = @Translation("Moody Showcase"),
  *   description = @Translation("Moody Showcase"),
- *   category = @Translation("Moody"),
  *   default_widget = "moody_showcase_widget",
  *   default_formatter = "moody_showcase_formatter"
  * )

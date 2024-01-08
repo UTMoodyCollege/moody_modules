@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "resource_group",
  *   label = @Translation("Resource group"),
  *   description = @Translation("List of links with stylized headline"),
- *   category = @Translation("Moody"),
  *   default_widget = "resource_group_widget",
  *   default_formatter = "resource_group_formatter"
  * )

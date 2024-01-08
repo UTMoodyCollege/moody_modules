@@ -19,7 +19,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   description = @Translation("Configurable horizontal tabs"),
  *   default_widget = "moody_flex_tabs_widget",
  *   default_formatter = "moody_flex_tabs_formatter",
- *   category = "Moody"
  * )
  */
 class MoodyFlexTabs extends FieldItemBase {

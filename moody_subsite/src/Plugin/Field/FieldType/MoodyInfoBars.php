@@ -16,7 +16,6 @@ use Drupal\Core\TypedData\DataDefinition;
  * @FieldType(
  *   id = "moody_info_bars",
  *   label = @Translation("Moody Info Bars"),
- *   category = "Moody",
  *   description = @Translation("Repeatable list of links with optional URLs"),
  *   default_widget = "moody_info_bars_widget",
  *   default_formatter = "moody_info_bars_formatter"

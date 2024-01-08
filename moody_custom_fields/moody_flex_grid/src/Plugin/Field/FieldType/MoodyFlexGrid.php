@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\MapDataDefinition;
  * @FieldType(
  *   id = "moody_flex_grid",
  *   label = @Translation("Moody Flex Grid"),
- *   category = @Translation("Moody"),
  *   description = @Translation("Themed and accessible grid creator"),
  *   default_widget = "moody_flex_grid_widget",
  *   default_formatter = "moody_flex_grid_formatter"

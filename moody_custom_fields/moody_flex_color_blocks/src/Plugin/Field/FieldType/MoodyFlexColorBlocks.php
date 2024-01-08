@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "moody_flex_color_blocks",
  *   label = @Translation("Moody Flex Color Blocks"),
  *   description = @Translation("Styled multiple calls to action"),
- *   category = @Translation("Moody"),
  *   default_widget = "moody_flex_color_blocks_widget",
  *   default_formatter = "moody_flex_color_blocks_formatter"
  * )

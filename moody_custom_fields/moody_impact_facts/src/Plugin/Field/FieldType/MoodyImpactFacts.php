@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "moody_impact_facts",
  *   label = @Translation("Moody Impact Facts"),
  *   description = @Translation("Themed configurable display of data"),
- *   category = @Translation("Moody"),
  *   default_widget = "moody_impact_facts_widget",
  *   default_formatter = "moody_impact_facts_default_formatter"
  * )

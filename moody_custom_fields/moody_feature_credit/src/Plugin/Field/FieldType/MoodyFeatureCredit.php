@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "moody_feature_credit",
  *   label = @Translation("Moody Feature Credit"),
  *   description = @Translation("Moody Feature Credit"),
- *   category = @Translation("Moody"),
  *   default_widget = "moody_feature_credit",
  *   default_formatter = "moody_feature_credit"
  * )

@@ -16,7 +16,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "moody_directors",
  *   label = @Translation("Moody Directors"),
  *   description = @Translation("Moody multimedia directors"),
- *   category = @Translation("Moody"),
  *   default_widget = "moody_directors_widget",
  *   default_formatter = "moody_directors_formatter"
  * )

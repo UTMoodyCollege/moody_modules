@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "moody_quotation",
  *   label = @Translation("Moody quotation"),
  *   description = @Translation("A configurable quotation with author and style options"),
- *   category = @Translation("Moody"),
  *   default_widget = "moody_quotation_widget",
  *   default_formatter = "moody_quotation_formatter"
  * )

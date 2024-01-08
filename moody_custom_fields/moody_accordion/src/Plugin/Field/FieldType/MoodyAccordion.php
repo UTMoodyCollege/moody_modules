@@ -16,7 +16,6 @@ use Drupal\Core\TypedData\DataDefinition;
  * @FieldType(
  *   id = "moody_accordion",
  *   label = @Translation("Moody Accordion"),
- *   category = "Moody",
  *   description = @Translation("Bootstrap powered accordion"),
  *   default_widget = "moody_accordion_widget",
  *   default_formatter = "moody_accordion_formatter"

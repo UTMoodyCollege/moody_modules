@@ -16,7 +16,6 @@ use Drupal\Core\TypedData\DataDefinition;
  * @FieldType(
  *   id = "moody_faq",
  *   label = @Translation("Moody FAQ"),
- *   category = "Moody",
  *   description = @Translation("Bootstrap powered faq"),
  *   default_widget = "moody_faq_widget",
  *   default_formatter = "moody_faq_formatter"

@@ -18,7 +18,6 @@ use Drupal\Core\TypedData\MapDataDefinition;
  *   id = "moody_contact_info",
  *   label = @Translation("Moody Contact Info"),
  *   description = @Translation("Configurable contact info block"),
- *   category = "Moody",
  *   default_widget = "moody_contact_info_widget",
  *   default_formatter = "moody_contact_info_formatter"
  * )

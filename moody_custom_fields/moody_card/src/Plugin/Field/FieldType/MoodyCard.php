@@ -22,7 +22,6 @@ use Drupal\Core\Language\Language;
  *   id = "moody_card",
  *   label = @Translation("Moody Card"),
  *   description = @Translation("Generic card"),
- *   category = @Translation("Moody"),
  *   default_widget = "moody_card_widget",
  *   default_formatter = "moody_card_formatter"
  * )

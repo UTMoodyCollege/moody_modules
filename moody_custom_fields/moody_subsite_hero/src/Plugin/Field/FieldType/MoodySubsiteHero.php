@@ -21,7 +21,6 @@ use Drupal\media\Entity\Media;
  *   id = "moody_subsite_hero",
  *   label = @Translation("Moody Subsite Hero"),
  *   description = @Translation("Large-display media field, with heading/subheading/link"),
- *   category = "Moody",
  *   default_widget = "moody_subsite_hero",
  *   default_formatter = "moody_subsite_hero"
  * )

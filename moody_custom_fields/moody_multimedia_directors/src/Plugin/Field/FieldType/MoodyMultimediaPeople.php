@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "moody_multimedia_people",
  *   label = @Translation("Moody Multimedia People"),
  *   description = @Translation("Repeatable field with ifrst name, last name and body fields"),
- *   category = @Translation("Moody"),
  *   default_widget = "moody_multimedia_people_widget",
  *   default_formatter = "moody_multimedia_people_formatter"
  * )
