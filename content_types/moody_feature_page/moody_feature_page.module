@@ -49,7 +49,7 @@ function moody_feature_page_preprocess_block(&$variables)
       $image = Media::load($image);
       $image_uri = $image->get('field_utexas_media_image')->getValue()[0]['target_id'];
       $image_uri = File::load($image_uri)->getFileUri();
-      $image_uri = ImageStyle::load('moody_image_style_800w_1140h')->buildUrl($image_uri);
+      $image_uri = ImageStyle::load('utexas_image_style_1000w_600h')->buildUrl($image_uri);
       $highlighted_image_uri = $image_uri;
     } else {
       $highlighted_image_uri = '';
