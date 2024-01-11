@@ -104,12 +104,16 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
       $category = $node->get('field_news_categories')->referencedEntities();
       $author = 'BY ' . strtoupper($node->get('field_feature_page_author')->getValue()[0]['first_name'] . ' ' . $node->get('field_feature_page_author')->getValue()[0]['last_name']);
       $article_date = $node->created->value;
+      $category = NULL;
+      if (!empty($category[0])) {
+        $category = $category[0]->getName();
+      }
 
       $articles[] = [
         'title' => $node->getTitle(),
         'summary' => $summary,
         'url' => $url,
-        'category' => $category[0] ? $category[0]->getName() : '',
+        'category' => $category,
         'author' => $author,
         'article_date' => $article_date,
       ];

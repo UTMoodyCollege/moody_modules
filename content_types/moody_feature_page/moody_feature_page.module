@@ -62,7 +62,12 @@ function moody_feature_page_preprocess_block(&$variables)
 
     // Get the field_featured_news_teaser and set the $field_featured_news_teaser variable if it exists.
     if ($variables['elements']['content']['#block_content']->hasField('field_featured_news_teaser')) {
-      $field_featured_news_teaser = $variables['elements']['content']['#block_content']->get('field_featured_news_teaser')->getValue()[0]['value'];
+      $block_teaser_val = $variables['elements']['content']['#block_content']->get('field_featured_news_teaser')->getValue();
+      if (!empty($block_teaser_val[0]['value'])) {
+        $field_featured_news_teaser = $block_teaser_val[0]['value'];
+      } else {
+        $field_featured_news_teaser = '';
+      }
     } else {
       $field_featured_news_teaser = '';
     }
