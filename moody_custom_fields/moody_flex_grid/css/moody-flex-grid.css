@@ -14,3 +14,10 @@
   font-style: italic;
   margin-bottom: 3px;
 } */
+
+/* We want any a links inside .moody-flex-grid-wrapper to not have any efect on hover or link effect */
+.moody-flex-grid-wrapper a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
