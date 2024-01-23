@@ -2,73 +2,125 @@
   display: flex;
   flex-flow: row wrap;
 }
-
-.moody-interactive-featurette .image-container {
+.image-container {
+  flex: 50%;
   display: flex;
-  flex-flow: column wrap;
-  flex: 50%;
+  flex-flow: row wrap;
   padding: 2em;
-  padding-left: 1em;
   justify-content: center;
+  align-items: flex-start; /* Align items to the start of the cross axis */
 }
 
-.image-container .first-half {
-  flex: 50%;
+.first-half,
+.second-half {
+  flex: 1 1 50%; /* Assigning flex-grow, flex-shrink and flex-basis */
+  padding: 1em;
 }
 
-/* Image max width inside the first half to  */
-.image-container .first-half img {
+.first-half .featurette-image,
+.second-half .featurette-image {
+  display: flex;
+  align-items: center;
+}
+
+/* Set a max-width to the images to prevent them from becoming too large */
+.first-half .featurette-image img,
+.second-half .featurette-image img {
   max-width: 100%;
+  height: auto;
 }
 
-.image-container .second-half {
-  flex: 50%;
-  padding-left: 2em;
-  padding-top: 3em;
+.moody-featurette-color {
+  height: 150px; /* Set a fixed height for the color block */
+  width: 100%; /* Full width of the parent container */
 }
 
-.moody-interactive-featurette .featurette-image {
-  flex: 50%;
+/* .feature-2 to have padding-top: 2.5em */
+.second-half .feature-2 {
+
 }
 
-.moody-interactive-featurette .featurette-content {
+/* Clear any padding that might affect the layout */
+.second-half .featurette-image.feature-3 {
+  padding: 0;
+}
+
+.featurette-content {
   flex: 50%;
   padding: 2em;
-  justify-content: center;
   display: flex;
   flex-flow: column wrap;
+  justify-content: center;
+  align-items: flex-start;
+
 }
 
-.featurette-content h2 {
+.featurette-heading {
   color: black;
+  font-weight: 800;
 }
 
-.moody-interactive-featurette .moody-featurette-color {
-  min-height: 150px;
-  min-width: 150px;
+.feature-3 {
+  max-width: 325px;
 }
 
-/* featurette-image feature-2 */
-.moody-interactive-featurette .featurette-image .feature-1 {
-  padding-bottom: 2em;
-}
-.featurette-image.feature-2 {
-  padding-bottom: 2em;
+/* Style the link with the "featurette-link" class */
+.featurette-link {
+  display: inline-flex; /* Make the link and line display inline */
+  align-items: center; /* Vertically center the text and line */
+  text-decoration: none; /* Remove the default underline if needed */
+  color: #bf5700; /* Change the link text color to your preferred color */
+  padding-right: 10px; /* Add padding to the right of the line */
 }
 
-.image-container .first-half img {
-    max-width: 100%;
-  }
+.featurette-link-container {
 
-/* On bootstrap large up */
+}
+
+/* Style the line with the "featurette-line" class */
+.featurette-link-line {
+  flex: 1; /* Take up the remaining space */
+  height: 1px; /* Set the height of the line */
+  background-color: #bf5700; /* Set the color of the line */
+  margin-right: 10px; /* Add some left padding */
+}
+
+
+
+
+
+/* Responsive Design */
 @media (min-width: 992px) {
-  .moody-interactive-featurette .image-container {
-    flex: 50%;
-    padding: 2em;
-    padding-left: 5em;
+  .moody-interactive-featurette {
+    padding: 0 5em 0 5em;
+  }
+  .first-half,
+  .second-half {
+    flex: 0 1 50%; /* Do not allow the flex items to grow but they can shrink */
   }
 
-  .image-container .first-half img {
-    max-width: 300px;
+  /* Set a max-width for the first image on larger screens */
+  .first-half .featurette-image img {
+
+  }
+
+  .second-half .featurette-image img {
+
+  }
+
+  .second-half {
+    display: flex;
+    flex-flow: column wrap;
+    align-content: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .second-half .featurette-image.feature-2 .featurette-image-2 {
+    max-width: 75%;
+    padding-bottom: 2em;
+  }
+  .second-half .featurette-image.feature-2 .featurette-image-3 {
+    
   }
 }

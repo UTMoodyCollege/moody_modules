@@ -16,7 +16,7 @@
 	</div>
 	<div class="featurette-content">
 		{% if data.heading %}
-			<h2>{{ data.heading }}</h2>
+			<h2 class="featurette-heading">{{ data.heading }}</h2>
 		{% endif %}
 
 		{% if data.text %}
@@ -24,7 +24,12 @@
 		{% endif %}
 
 		{% if data.link and data.link_text %}
-			<a href="{{ data.link }}" class="featurette-link">{{ data.link_text }}</a>
+			<div class="featurette-link-container">
+				<div class="featurette-link-line"></div>
+				<div class="featurette-link-container">
+					<a href="{{ data.link }}" class="featurette-link">{{ data.link_text }}</a>
+				</div>
+			</div>
 		{% endif %}
 	</div>
 </div>

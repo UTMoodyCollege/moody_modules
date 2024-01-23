@@ -100,7 +100,7 @@ final class MoodyInteractiveFeaturetteBlock extends BlockBase implements Contain
 
     // Text
     $form['text'] = [
-      '#type' => 'textfield',
+      '#type' => 'textarea',
       '#title' => $this->t('Text'),
       '#description' => $this->t('Enter the text for the featurette.'),
       '#default_value' => $this->configuration['text'] ?? NULL,
@@ -174,7 +174,7 @@ final class MoodyInteractiveFeaturetteBlock extends BlockBase implements Contain
               $image_style = 'utexas_image_style_280w_280h';
               break;
             case 3:
-              $image_style = 'moody_image_style_500w_712h';
+              $image_style = 'utexas_image_style_250w_150h';
               break;
           }
           $image_render_arrays[] = [
