@@ -1,0 +1,30 @@
+<div class="moody-interactive-featurette">
+	<div class="image-container">
+		<div class="first-half">
+			<div class="featurette-image feature-1">
+				{{ data.image_1 }}
+			</div>
+		</div>
+		<div class="second-half">
+			<div class="featurette-image feature-2">
+				{{ data.image_2 }}
+			</div>
+			<div class="featurette-image feature-3">
+				{{ data.image_3 }}
+			</div>
+		</div>
+	</div>
+	<div class="featurette-content">
+		{% if data.heading %}
+			<h2>{{ data.heading }}</h2>
+		{% endif %}
+
+		{% if data.text %}
+			<p>{{ data.text }}</p>
+		{% endif %}
+
+		{% if data.link and data.link_text %}
+			<a href="{{ data.link }}" class="featurette-link">{{ data.link_text }}</a>
+		{% endif %}
+	</div>
+</div>

@@ -1,0 +1,7 @@
+block.settings.moody_interactive_featurette_moody_interactive_featurette:
+  type: block_settings
+  label: 'Moody Interactive Featurette block'
+  mapping:
+    example:
+      type: string
+      label: Example

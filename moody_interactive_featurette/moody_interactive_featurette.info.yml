@@ -1,0 +1,5 @@
+name: 'moody_interactive_featurette'
+type: module
+description: 'Provides a moody interactive featurette block and implementation'
+package: Custom
+core_version_requirement: ^10

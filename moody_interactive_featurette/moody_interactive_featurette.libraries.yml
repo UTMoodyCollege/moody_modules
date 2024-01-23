@@ -1,0 +1,6 @@
+# Lets define a interactive_featurette lib with a css link to the same
+# css file we defined in the theme.
+interactive_featurette:
+  css:
+    theme:
+      css/interactive_featurette.css: {}

@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for moody_interactive_featurette module.
+ */
+/**
+ * Implements hook_theme().
+ */
+function moody_interactive_featurette_theme($existing, $type, $theme, $path) {
+    return [
+      'moody_interactive_featurette' => [
+        'variables' => [
+          'data' => [],
+        ],
+      ],
+      'moody_interactive_featurette_color' => [
+        'variables' => [
+          'color' => NULL,
+        ],
+      ],
+    ];
+  }
+  
