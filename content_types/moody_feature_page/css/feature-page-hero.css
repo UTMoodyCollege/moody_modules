@@ -14,7 +14,7 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  min-height: 600px; /* Adjust as needed */
+  min-height: 320px; /* Adjust as needed */
   position: relative; /* For absolute positioning of the category */
 }
 
