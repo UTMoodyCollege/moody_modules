@@ -54,7 +54,6 @@ dependencies:
   - 'moody_media_page:moody_media_page'
   - 'moody_standard_page:moody_standard_page'
   - 'moody_subsite:moody_subsite'
-  - 'moody_subsite_page:moody_subsite_page'
   - 'page_title_visibility:page_title_visibility'
   - 'pathauto:pathauto'
   - 'pathologic:pathologic'
