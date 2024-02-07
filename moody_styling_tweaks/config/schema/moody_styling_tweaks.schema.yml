@@ -1,0 +1,8 @@
+field.formatter.settings.moody_styling_tweaks_h1_text_styling:
+  type: mapping
+  label: H1 Text Styling formatter settings
+  mapping:
+    extra_classes:
+      type: string
+      label: Extra classes
+      description: 'Add extra classes to the H1 tag.'
