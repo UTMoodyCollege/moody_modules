@@ -100,6 +100,21 @@ function moody_hero_theme($existing, $type, $theme, $path) {
       ],
       'template' => 'moody-hero-6',
     ],
+    'moody_hero_6_short' => [
+      'variables' => [
+        'media_identifier' => NULL,
+        'heading' => NULL,
+        'subheading' => NULL,
+        'caption' => NULL,
+        'credit' => NULL,
+        'cta' => NULL,
+        'alt' => NULL,
+        'anchor_position' => NULL,
+        'text_color' => NULL,
+        'overlay' => NULL,
+      ],
+      'template' => 'moody-hero-6-short',
+    ],
     'moody_hero_7' => [
       'variables' => [
         'media_identifier' => NULL,
