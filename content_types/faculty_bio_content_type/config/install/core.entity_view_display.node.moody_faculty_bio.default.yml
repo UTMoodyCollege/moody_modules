@@ -209,7 +209,7 @@ content:
     region: content
   field_subordinates:
     type: faculty_bio_subordinate_default
-    label: above
+    label: hidden
     settings: {  }
     third_party_settings: {  }
     weight: 26

@@ -1,5 +1,10 @@
 <div class="faculty-bio-subordinate">
-  <div class="name">{{ name }}</div>
+  <div class="name">
+    {% if email %}
+      <a href="mailto:{{ email }}">{{ name }}</a>
+    {% else %}
+      {{ name }}
+    {% endif %}
+  </div>
   <div class="title">{{ title }}</div>
-  <div class="email">{{ email }}</div>
 </div>
