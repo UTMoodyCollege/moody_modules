@@ -32,75 +32,117 @@ third_party_settings:
       d81f01f8-0034-47d9-98fd-d3889b9f463b:
         separator: '|'
         limit: null
+        uuid: d81f01f8-0034-47d9-98fd-d3889b9f463b
         plugin: explode
         source: field_department_association_fac
         weight: -9
         label: Explode
-        uuid: d81f01f8-0034-47d9-98fd-d3889b9f463b
       2ca0f158-03e3-41b0-97bd-84fd2e0a9991:
         separator: '|'
         limit: null
+        uuid: 2ca0f158-03e3-41b0-97bd-84fd2e0a9991
         plugin: explode
         source: field_expertise_faculty_bio
         weight: -9
         label: Explode
-        uuid: 2ca0f158-03e3-41b0-97bd-84fd2e0a9991
       7dfdfde5-b0a0-4b66-9a89-a78c7dbf997e:
         separator: '|'
         limit: null
+        uuid: 7dfdfde5-b0a0-4b66-9a89-a78c7dbf997e
         plugin: explode
         source: field_position_faculty_bio
         weight: -9
         label: Explode
-        uuid: 7dfdfde5-b0a0-4b66-9a89-a78c7dbf997e
       1e5d480c-0743-4ef5-b92a-1bf6d2baa510:
         character: ''
         side: trim
+        uuid: 1e5d480c-0743-4ef5-b92a-1bf6d2baa510
         plugin: trim
         source: field_department_association_fac
         weight: -10
         label: 'Characters to trim'
-        uuid: 1e5d480c-0743-4ef5-b92a-1bf6d2baa510
       e27756f2-d1e3-4961-9c21-61cfb3bf59f5:
         character: ''
         side: trim
+        uuid: e27756f2-d1e3-4961-9c21-61cfb3bf59f5
         plugin: trim
         source: field_department_association_fac
-        weight: -8
+        weight: -7
         label: 'Characters to trim'
-        uuid: e27756f2-d1e3-4961-9c21-61cfb3bf59f5
       a05c3e77-cc4a-436f-ad17-c4d356bd9220:
         character: ''
         side: trim
+        uuid: a05c3e77-cc4a-436f-ad17-c4d356bd9220
         plugin: trim
         source: field_expertise_faculty_bio
         weight: -10
         label: 'Characters to trim'
-        uuid: a05c3e77-cc4a-436f-ad17-c4d356bd9220
       67ff5d16-0235-4987-9d93-0c5cf9a3df42:
         character: ''
         side: trim
+        uuid: 67ff5d16-0235-4987-9d93-0c5cf9a3df42
         plugin: trim
         source: field_expertise_faculty_bio
-        weight: -8
+        weight: -7
         label: 'Characters to trim'
-        uuid: 67ff5d16-0235-4987-9d93-0c5cf9a3df42
       752efb67-47dc-4e9a-b0ad-95c0858dcae0:
         character: ''
         side: trim
+        uuid: 752efb67-47dc-4e9a-b0ad-95c0858dcae0
         plugin: trim
         source: field_position_faculty_bio
         weight: -10
         label: 'Characters to trim'
-        uuid: 752efb67-47dc-4e9a-b0ad-95c0858dcae0
       03363e68-798d-40bd-b929-b5672ada42e2:
         character: ''
         side: trim
+        uuid: 03363e68-798d-40bd-b929-b5672ada42e2
         plugin: trim
         source: field_position_faculty_bio
-        weight: -8
+        weight: -7
         label: 'Characters to trim'
-        uuid: 03363e68-798d-40bd-b929-b5672ada42e2
+      b4966912-3634-4cba-95e2-6481ba9ad272:
+        uuid: b4966912-3634-4cba-95e2-6481ba9ad272
+        plugin: html_entity_decode
+        source: title
+        weight: 0
+        label: 'HTML entity decode'
+      02a7ba0a-6ffb-4ccb-8631-1cb0fe0a065a:
+        uuid: 02a7ba0a-6ffb-4ccb-8631-1cb0fe0a065a
+        plugin: html_entity_decode
+        source: field_first_name_faculty_bio
+        weight: 0
+        label: 'HTML entity decode'
+      f1554e41-9086-4625-be34-c918da2f74b4:
+        uuid: f1554e41-9086-4625-be34-c918da2f74b4
+        plugin: html_entity_decode
+        source: field_middle_name_facutly_bio
+        weight: 0
+        label: 'HTML entity decode'
+      90bc0f4f-62dd-47fc-8a4b-4db69309b6b7:
+        uuid: 90bc0f4f-62dd-47fc-8a4b-4db69309b6b7
+        plugin: html_entity_decode
+        source: field_last_name_faculty_bio
+        weight: 0
+        label: 'HTML entity decode'
+      8949c8cd-d2d3-438e-aa7e-1f0ef520803b:
+        uuid: 8949c8cd-d2d3-438e-aa7e-1f0ef520803b
+        plugin: html_entity_decode
+        source: field_department_association_fac
+        weight: -8
+        label: 'HTML entity decode'
+      6fcca42e-ecca-4823-962d-afb4f7faa637:
+        uuid: 6fcca42e-ecca-4823-962d-afb4f7faa637
+        plugin: html_entity_decode
+        source: field_expertise_faculty_bio
+        weight: -8
+        label: 'HTML entity decode'
+      815fe10d-a13f-48de-a431-db0310741a3a:
+        uuid: 815fe10d-a13f-48de-a431-db0310741a3a
+        plugin: html_entity_decode
+        source: field_position_faculty_bio
+        weight: -8
+        label: 'HTML entity decode'
 id: faculty_bio_importer
 label: 'Faculty Bio Importer'
 description: 'Import Faculty Bio CSV exports from Moody department sites'
@@ -120,138 +162,163 @@ parser_configuration:
   line_limit: 100
 processor: 'entity:node'
 processor_configuration:
+  values:
+    type: moody_faculty_bio
   langcode: en
   update_existing: 2
   update_non_existent: _delete
+  skip_hash_check: false
+  authorize: true
   expire: -1
   owner_feed_author: false
   owner_id: 0
-  authorize: true
-  skip_hash_check: false
-  values:
-    type: moody_faculty_bio
+  insert_new: 1
 custom_sources:
   title:
-    label: title
     value: title
+    label: title
     machine_name: title
+    type: csv
   field_first_name_faculty_bio:
-    label: field_first_name_faculty_bio
     value: field_first_name_faculty_bio
+    label: field_first_name_faculty_bio
     machine_name: field_first_name_faculty_bio
+    type: csv
   field_middle_name_facutly_bio:
-    label: field_middle_name_facutly_bio
     value: field_middle_name_facutly_bio
+    label: field_middle_name_facutly_bio
     machine_name: field_middle_name_facutly_bio
+    type: csv
   field_last_name_faculty_bio:
-    label: field_last_name_faculty_bio
     value: field_last_name_faculty_bio
+    label: field_last_name_faculty_bio
     machine_name: field_last_name_faculty_bio
+    type: csv
   field_affiliations_faculty_bio:
-    label: field_affiliations_faculty_bio
     value: field_affiliations_faculty_bio
+    label: field_affiliations_faculty_bio
     machine_name: field_affiliations_faculty_bio
+    type: csv
   field_biography_faculty_bio:
-    label: field_biography_faculty_bio
     value: field_biography_faculty_bio
+    label: field_biography_faculty_bio
     machine_name: field_biography_faculty_bio
+    type: csv
   field_courses_faculty_bio:
-    label: field_courses_faculty_bio
     value: field_courses_faculty_bio
+    label: field_courses_faculty_bio
     machine_name: field_courses_faculty_bio
+    type: csv
   field_custom_tab_content_faculty:
-    label: field_custom_tab_content_faculty
     value: field_custom_tab_content_faculty
+    label: field_custom_tab_content_faculty
     machine_name: field_custom_tab_content_faculty
+    type: csv
   field_custom_tab_title_faculty:
-    label: field_custom_tab_title_faculty
     value: field_custom_tab_title_faculty
+    label: field_custom_tab_title_faculty
     machine_name: field_custom_tab_title_faculty
+    type: csv
   field_degrees_faculty_bio:
-    label: field_degrees_faculty_bio
     value: field_degrees_faculty_bio
+    label: field_degrees_faculty_bio
     machine_name: field_degrees_faculty_bio
+    type: csv
   field_department_association_fac:
-    label: field_department_association_fac
     value: field_department_association_fac
+    label: field_department_association_fac
     machine_name: field_department_association_fac
+    type: csv
   field_eid_faculty_bio:
-    label: field_eid_faculty_bio
     value: field_eid_faculty_bio
+    label: field_eid_faculty_bio
     machine_name: field_eid_faculty_bio
+    type: csv
   field_email_faculty_bio:
-    label: field_email_faculty_bio
     value: field_email_faculty_bio
+    label: field_email_faculty_bio
     machine_name: field_email_faculty_bio
+    type: csv
   field_email_address_faculty_bio:
-    label: field_email_address_faculty_bio
     value: field_email_address_faculty_bio
+    label: field_email_address_faculty_bio
     machine_name: field_email_address_faculty_bio
+    type: csv
   field_expertise_faculty_bio:
-    label: field_expertise_faculty_bio
     value: field_expertise_faculty_bio
+    label: field_expertise_faculty_bio
     machine_name: field_expertise_faculty_bio
+    type: csv
   field_office_number_faculty_bio:
-    label: field_office_number_faculty_bio
     value: field_office_number_faculty_bio
+    label: field_office_number_faculty_bio
     machine_name: field_office_number_faculty_bio
+    type: csv
   field_personal_link_faculty_bio:
-    label: field_personal_link_faculty_bio
     value: field_personal_link_faculty_bio
+    label: field_personal_link_faculty_bio
     machine_name: field_personal_link_faculty_bio
+    type: csv
   field_position_faculty_bio:
-    label: field_position_faculty_bio
     value: field_position_faculty_bio
+    label: field_position_faculty_bio
     machine_name: field_position_faculty_bio
+    type: csv
   field_show_eid_faculty_bio:
-    label: field_show_eid_faculty_bio
     value: field_show_eid_faculty_bio
+    label: field_show_eid_faculty_bio
     machine_name: field_show_eid_faculty_bio
+    type: csv
   field_telephone_faculty_bio:
-    label: field_telephone_faculty_bio
     value: field_telephone_faculty_bio
+    label: field_telephone_faculty_bio
     machine_name: field_telephone_faculty_bio
+    type: csv
   uri_1:
-    label: uri_1
     value: uri_1
+    label: uri_1
     machine_name: uri_1
+    type: csv
   uri:
-    label: uri
     value: uri
+    label: uri
     machine_name: uri
+    type: csv
   field_headshot_faculty_bio_1:
-    label: field_headshot_faculty_bio_1
     value: field_headshot_faculty_bio_1
+    label: field_headshot_faculty_bio_1
     machine_name: field_headshot_faculty_bio_1
+    type: csv
 mappings:
   -
     target: title
     map:
       value: title
-    unique: {  }
     settings:
       language: null
+    unique:
+      value: '1'
   -
     target: field_first_name_faculty_bio
     map:
       value: field_first_name_faculty_bio
-    unique: {  }
     settings:
       language: null
+    unique: {  }
   -
     target: field_middle_name_facutly_bio
     map:
       value: field_middle_name_facutly_bio
-    unique: {  }
     settings:
       language: null
+    unique: {  }
   -
     target: field_last_name_faculty_bio
     map:
       value: field_last_name_faculty_bio
-    unique: {  }
     settings:
       language: null
+    unique: {  }
   -
     target: field_affiliations_faculty_bio
     map:
@@ -284,9 +351,9 @@ mappings:
     target: field_custom_tab_title_faculty
     map:
       value: field_custom_tab_title_faculty
-    unique: {  }
     settings:
       language: null
+    unique: {  }
   -
     target: field_degrees_faculty_bio
     map:
@@ -306,24 +373,24 @@ mappings:
     target: field_eid_faculty_bio
     map:
       value: field_eid_faculty_bio
-    unique: {  }
     settings:
       language: null
+    unique: {  }
   -
     target: field_email_faculty_bio
     map:
       value: field_email_faculty_bio
-    unique: {  }
     settings:
       language: null
+    unique: {  }
   -
     target: field_email_address_faculty_bio
     map:
       value: field_email_address_faculty_bio
-    unique: {  }
     settings:
       language: null
       defuse: false
+    unique: {  }
   -
     target: field_expertise_faculty_bio
     map:
@@ -336,9 +403,9 @@ mappings:
     target: field_office_number_faculty_bio
     map:
       value: field_office_number_faculty_bio
-    unique: {  }
     settings:
       language: null
+    unique: {  }
   -
     target: field_position_faculty_bio
     map:
