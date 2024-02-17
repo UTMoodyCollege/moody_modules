@@ -137,6 +137,10 @@
       {% if content.field_social_faculty_bio %}
         {{ content.field_social_faculty_bio }}
       {% endif %}
+      {% if content.field_subordinates %}
+        <div class="faculty-bio-label">Subordinates:</div>
+        {{ content.field_subordinates }}
+      {% endif %}
     </div>
 
     <div class="col-sm-12 col-md-8 second-column">

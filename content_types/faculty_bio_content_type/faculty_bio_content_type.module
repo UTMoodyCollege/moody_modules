@@ -11,6 +11,7 @@ use Drupal\media\Entity\Media;
  * Contains faculty_bio_content_type.module.
  */
 
+
 /**
  * Implements hook_theme_suggestions_HOOK_alter().
  * @param array $suggestions
@@ -36,6 +37,14 @@ function faculty_bio_content_type_theme($existing, $type, $theme, $path)
     'views_view__faculty_bio_view' => [
       'base hook' => 'views',
       'template' => 'views-view--faculty-bio-view',
+    ],
+    'faculty_bio_content_type_subordinate_info' => [
+      'variables' => [
+        'name' => NULL,
+        'title' => NULL,
+        'email' => NULL,
+      ],
+      'template' => 'faculty-bio-content-type-subordinate-info',
     ],
   ];
   return $variables;
