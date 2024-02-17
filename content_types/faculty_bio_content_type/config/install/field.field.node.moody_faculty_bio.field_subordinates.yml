@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_subordinates
+    - node.type.moody_faculty_bio
+  module:
+    - faculty_bio_content_type
+id: node.moody_faculty_bio.field_subordinates
+field_name: field_subordinates
+entity_type: node
+bundle: moody_faculty_bio
+label: Subordinates
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: faculty_bio_subordinate

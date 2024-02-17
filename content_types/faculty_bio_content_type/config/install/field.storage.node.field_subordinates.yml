@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - faculty_bio_content_type
+    - node
+id: node.field_subordinates
+field_name: field_subordinates
+entity_type: node
+type: faculty_bio_subordinate
+settings: {  }
+module: faculty_bio_content_type
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -27,10 +27,12 @@ dependencies:
     - field.field.node.moody_faculty_bio.field_position_faculty_bio
     - field.field.node.moody_faculty_bio.field_show_eid_faculty_bio
     - field.field.node.moody_faculty_bio.field_social_faculty_bio
+    - field.field.node.moody_faculty_bio.field_subordinates
     - field.field.node.moody_faculty_bio.field_telephone_faculty_bio
     - image.style.faculty_bio_image
     - node.type.moody_faculty_bio
   module:
+    - faculty_bio_content_type
     - file
     - image
     - link
@@ -204,6 +206,13 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 21
+    region: content
+  field_subordinates:
+    type: faculty_bio_subordinate_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 26
     region: content
   field_telephone_faculty_bio:
     type: telephone_link
