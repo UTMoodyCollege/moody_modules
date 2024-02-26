@@ -25,9 +25,7 @@ class FacultyBioSubordinateTarget extends FieldTargetBase
   protected static function prepareTarget(FieldDefinitionInterface $field_definition)
   {
     return FieldTargetDefinition::createFromFieldDefinition($field_definition)
-      ->addProperty('name')
-      ->addProperty('title')
-      ->addProperty('email');
+      ->addProperty('data');
   }
   /**
    * {@inheritdoc}
