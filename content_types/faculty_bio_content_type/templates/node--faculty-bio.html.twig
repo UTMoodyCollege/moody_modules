@@ -137,7 +137,7 @@
       {% if content.field_social_faculty_bio %}
         {{ content.field_social_faculty_bio }}
       {% endif %}
-      {% if content.field_subordinates %}
+      {% if content.field_subordinates['#items'] %}
         <div class="faculty-bio-label">Assistants:</div>
         {{ content.field_subordinates }}
       {% endif %}
