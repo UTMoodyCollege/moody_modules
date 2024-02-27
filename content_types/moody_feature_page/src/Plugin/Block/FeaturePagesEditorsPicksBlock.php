@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Drupal\moody_feature_page\Plugin\Block;
 
@@ -17,7 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   category = @Translation("Custom"),
  * )
  */
-final class FeaturePagesEditorsPicksBlock extends BlockBase implements ContainerFactoryPluginInterface {
+final class FeaturePagesEditorsPicksBlock extends BlockBase implements ContainerFactoryPluginInterface
+{
 
   /**
    * Constructs the plugin instance.
@@ -34,7 +37,8 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self
+  {
     return new self(
       $configuration,
       $plugin_id,
@@ -46,7 +50,8 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration(): array {
+  public function defaultConfiguration(): array
+  {
     return [
       'selected_nodes' => [],
     ];
@@ -55,22 +60,23 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
   /**
    * {@inheritdoc}
    */
-  public function blockForm($form, FormStateInterface $form_state): array {
+  public function blockForm($form, FormStateInterface $form_state): array
+  {
     $options = [];
-  
+
     $query = $this->entityTypeManager->getStorage('node')->getQuery();
     $nids = $query->condition('type', 'moody_feature_page')
       ->sort('created', 'DESC')
       ->accessCheck(FALSE)
       ->range(0, 50)
       ->execute();
-  
+
     $nodes = $this->entityTypeManager->getStorage('node')->loadMultiple($nids);
-  
+
     foreach ($nodes as $node) {
       $options[$node->id()] = $node->getTitle();
     }
-  
+
     $form['selected_nodes'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Select Nodes'),
@@ -79,57 +85,35 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
     ];
     return $form;
   }
-  
-  
+
+
 
   /**
    * {@inheritdoc}
    */
-  public function blockSubmit($form, FormStateInterface $form_state): void {
+  public function blockSubmit($form, FormStateInterface $form_state): void
+  {
     $this->configuration['selected_nodes'] = $form_state->getValue('selected_nodes');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function build(): array {
-    $articles = [];
-  
-    $nodes = $this->entityTypeManager->getStorage('node')->loadMultiple($this->configuration['selected_nodes']);
-    
-    foreach ($nodes as $node) {
-      $url = $node->toUrl()->toString();
-      $summary = $node->body->summary;
-      // Get the category
-      $category = $node->get('field_news_categories')->referencedEntities();
-      $author = 'BY ' . strtoupper($node->get('field_feature_page_author')->getValue()[0]['first_name'] . ' ' . $node->get('field_feature_page_author')->getValue()[0]['last_name']);
-      $article_date = $node->created->value;
-      $category = NULL;
-      if (!empty($category[0])) {
-        $category = $category[0]->getName();
-      }
-
-      $articles[] = [
-        'title' => $node->getTitle(),
-        'summary' => $summary,
-        'url' => $url,
-        'category' => $category,
-        'author' => $author,
-        'article_date' => $article_date,
-      ];
-    }
-  
-    $build = [
-      '#theme' => 'moody_feature_page_editors_picks',
-      '#title' => $this->t('Editor\'s Picks'),
-      '#articles' => $articles,
+  public function build(): array
+  {
+    // Transform the $this->configuration['selected_nodes'] into a comma separated list of nids
+    $nids = implode(',', $this->configuration['selected_nodes']);
+    // We get a value like "6641,6640,6610,6603,6602,6594,6580,6542,6532,6518,6502,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
+    // Remove any values that are just "0"
+    $nids = preg_replace('/,0/', '', $nids);
+    $build['content'] = [
+      '#type' => 'view',
+      '#name' => 'news_filtered',
+      '#display_id' => 'block_filtered',
+      // We need to add selected_nids as a query parm programmaticallyt
+      '#arguments' => [$nids],
     ];
 
-    // Attach the moody_feature_page/moody_feature_editors_picks library.
-    $build['#attached']['library'][] = 'moody_feature_page/moody_feature_editors_picks';
-  
     return $build;
   }
-  
-
 }
