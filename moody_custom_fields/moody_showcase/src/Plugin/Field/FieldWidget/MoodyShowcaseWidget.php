@@ -44,7 +44,7 @@ class MoodyShowcaseWidget extends WidgetBase {
       '#title' => 'Copy',
       '#type' => 'text_format',
       '#default_value' => isset($items[$delta]->copy_value) ? $items[$delta]->copy_value : NULL,
-      '#format' => isset($items[$delta]->copy_format) ? $items[$delta]->copy_format : 'restricted_html',
+      '#format' => isset($items[$delta]->copy_format) ? $items[$delta]->copy_format : 'flex_html',
       // Set allowed formats to basic and restricted_html.
       '#allowed_formats' => ['flex_html'],
     ];
