@@ -106,7 +106,7 @@ class MoodyShowcaseFormatter extends FormatterBase implements ContainerFactoryPl
       $cta_item['link']['uri'] = $item->link_uri;
       $cta_item['link']['title'] = $item->link_title ?? NULL;
       $cta_item['link']['options'] = $item->link_options ?? [];
-      $cta = UtexasLinkOptionsHelper::buildLink($cta_item, ['ut-btn--homepage']);
+      $cta = UtexasLinkOptionsHelper::buildLink($cta_item, ['ut-btn--homepage', 'mt-4']);
       $image_render_array = [];
 
       if ($media = $this->entityTypeManager->getStorage('media')->load($item->image)) {
