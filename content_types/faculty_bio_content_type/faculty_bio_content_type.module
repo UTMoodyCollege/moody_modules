@@ -114,7 +114,7 @@ function faculty_bio_content_type_preprocess_views_view(&$variables)
           <a class="ut-btn" href="/faculty">All Faculty</a>
           <a class="ut-btn ml-2" href="/faculty/media-studies">Media Studies</a>
           <a class="ut-btn ml-2" href="/faculty/production-screenwriting">Production and Screenwriting</a>
-          <a class="ut-btn ml-2" href="/faculty/joint-appointed">Joint Appointed</a>
+          <a class="ut-btn ml-2" href="/faculty/affiliated">Affiliated</a>
         </div>', 'flex_html');
         $variables['attributes']['class'][] = 'hide-department-selector';
         break;
