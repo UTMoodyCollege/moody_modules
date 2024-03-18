@@ -12,23 +12,6 @@
         trigger: "hover",
       });
 
-      // Adjust the height of the flip containers
-      $(".flip-container").each(function () {
-        var frontHeight = $(this).find(".front").outerHeight();
-        var backHeight = $(this).find(".back").outerHeight();
-        var maxHeight = Math.max(frontHeight, backHeight);
-
-        $(this).css('min-height', maxHeight + 'px'); // Use min-height to enforce the minimum
-      });
-
-      // Optionally, adjust height on flip if needed
-      $('.flip-container').on('flip:done', function() {
-          var frontHeight = $(this).find('.front').outerHeight();
-          var backHeight = $(this).find('.back').outerHeight();
-          var maxHeight = Math.max(frontHeight, backHeight);
-      
-          $(this).css('min-height', maxHeight + 'px'); // Use min-height to enforce the minimum
-        });
     },
   };
 })(jQuery, Drupal, drupalSettings);
