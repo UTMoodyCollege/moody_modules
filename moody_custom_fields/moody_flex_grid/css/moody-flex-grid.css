@@ -21,3 +21,6 @@
   text-decoration: none;
 }
 
+.moody-flex-grid-wrapper .flip-container {
+  min-height: 250px;
+}

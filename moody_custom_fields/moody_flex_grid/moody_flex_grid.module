@@ -68,5 +68,14 @@ function moody_flex_grid_theme() {
       ],
       'template' => 'moody-flex-grid-rectangular',
     ],
+    // Define a 'flip' variant that has the same as the others.
+    'moody_flex_grid_flip' => [
+      'variables' => [
+        'headline' => NULL,
+        'style' => NULL,
+        'flex_grid_items' => NULL,
+      ],
+      'template' => 'moody-flex-grid-flip',
+    ],
   ];
 }

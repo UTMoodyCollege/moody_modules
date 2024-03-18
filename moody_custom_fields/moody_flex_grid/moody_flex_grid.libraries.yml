@@ -3,3 +3,8 @@ moody-flex-grid:
   css:
     theme:
       css/moody-flex-grid.css: {}
+# moody-flex-grid-flip-card, which adds js/jquery.flip.min.js
+moody-flex-grid-flip-card:
+  js:
+    js/jquery.flip.min.js: {}
+    js/flex-grid.flip.js: {}
