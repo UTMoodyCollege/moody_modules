@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Moody Grad Profile Group'
+vid: moody_grad_profile_group
+description: 'Provides groups to put grad profiles into, e.g. "MFA in Film and Media Production"'
+weight: 0

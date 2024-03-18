@@ -1,0 +1,36 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.moody_grad_profile.field_class_year
+    - field.field.node.moody_grad_profile.field_first_name
+    - field.field.node.moody_grad_profile.field_grad_bio
+    - field.field.node.moody_grad_profile.field_grad_group
+    - field.field.node.moody_grad_profile.field_grad_photo
+    - field.field.node.moody_grad_profile.field_grad_title
+    - field.field.node.moody_grad_profile.field_last_name
+    - node.type.moody_grad_profile
+  module:
+    - user
+id: node.moody_grad_profile.teaser
+targetEntityType: node
+bundle: moody_grad_profile
+mode: teaser
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  display_breadcrumbs: true
+  display_page_title: true
+  display_updated: true
+  field_class_year: true
+  field_first_name: true
+  field_grad_bio: true
+  field_grad_group: true
+  field_grad_photo: true
+  field_grad_title: true
+  field_last_name: true

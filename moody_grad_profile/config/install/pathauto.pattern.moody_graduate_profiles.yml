@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: moody_graduate_profiles
+label: 'Moody Graduate Profiles'
+type: 'canonical_entities:node'
+pattern: '/graduate-profiles/[node:title]'
+selection_criteria:
+  a1ad7b09-f4a7-43f4-a8bb-8544e5ba0d9e:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: a1ad7b09-f4a7-43f4-a8bb-8544e5ba0d9e
+    context_mapping:
+      node: node
+    bundles:
+      moody_grad_profile: moody_grad_profile
+selection_logic: and
+weight: -5
+relationships: {  }

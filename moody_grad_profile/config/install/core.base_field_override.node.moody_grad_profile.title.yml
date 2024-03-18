@@ -1,0 +1,17 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.moody_grad_profile
+id: node.moody_grad_profile.title
+field_name: title
+entity_type: node
+bundle: moody_grad_profile
+label: 'Full Display Name'
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,85 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.moody_grad_profile.field_class_year
+    - field.field.node.moody_grad_profile.field_first_name
+    - field.field.node.moody_grad_profile.field_grad_bio
+    - field.field.node.moody_grad_profile.field_grad_group
+    - field.field.node.moody_grad_profile.field_grad_photo
+    - field.field.node.moody_grad_profile.field_grad_title
+    - field.field.node.moody_grad_profile.field_last_name
+    - node.type.moody_grad_profile
+  module:
+    - text
+    - user
+id: node.moody_grad_profile.default
+targetEntityType: node
+bundle: moody_grad_profile
+mode: default
+content:
+  field_class_year:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 107
+    region: content
+  field_first_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 105
+    region: content
+  field_grad_bio:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 104
+    region: content
+  field_grad_group:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  field_grad_photo:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 102
+    region: content
+  field_grad_title:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 103
+    region: content
+  field_last_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 106
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  display_breadcrumbs: true
+  display_page_title: true
+  display_updated: true
