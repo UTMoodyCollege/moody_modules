@@ -17,49 +17,51 @@
  */
 #}
 <div class="flex-grid-wrapper rectangular-display">
-    {% if headline %}
-        <div class="row">
-            <div class="col-12">
-                <div class="ut-h3 headline block-headline-h2">{{ headline }}</div>
-            </div>
-        </div>
-    {% endif %}
-    {% if flex_grid_items %}
-        <div class="flex-grid-items {{ style }}-columns">
-            {% for item in flex_grid_items %}
-                <div class="flex-grid-item">
-                    <div class="flip-container">
-                        <div class="flipper">
-                            {% if item.link %}
-                                <a href="{{ item.link }}" class="linked-flex-grid-item">
-                                    <span class="sr-only">{{ item.headline }}</span>
-                            {% endif %}
-                            <div class="front">
-                                {% if item.image %}
-                                    <div class="mfg--image">
-                                        {{ item.image }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="back">
-                                <div class="content">
-                                    {% if item.headline %}
-                                        <h3 class="mfg--headline text-{{ item.headline_alignment }}">{{ item.headline }}</h3>
-                                    {% endif %}
-                                    {% if item.copy %}
-                                        <div class="mfg--copy ut-copy">
-                                            {{ item.copy }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            {% if item.link %}
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+	{% if headline %}
+		<div class="row">
+			<div class="col-12">
+				<div class="ut-h3 headline block-headline-h2">{{ headline }}</div>
+			</div>
+		</div>
+	{% endif %}
+	{% if flex_grid_items %}
+		<div class="flex-grid-items {{ style }}-columns">
+			{% for item in flex_grid_items %}
+				<div class="flex-grid-item">
+					<div class="flip-container">
+						<div class="flipper">
+							<div class="front relative">
+								{% if item.image %}
+									<div class="mfg--image">
+										{{ item.image }}
+									</div>
+								{% endif %}
+								<div class="absolute">{{ item.headline }}</div>
+							</div>
+							<div class="back">
+								<div class="content">
+									{% if item.headline %}
+										<h3 class="mfg--headline text-{{ item.headline_alignment }}">{{ item.headline }}</h3>
+									{% endif %}
+									{% if item.copy %}
+										{% if item.link %}
+											<a href="{{ item.link }}" class="linked-flex-grid-item">
+											{% endif %}
+
+											<div class="mfg--copy ut-copy">
+												{{ item.copy }}
+											</div>
+										{% endif %}
+										{% if item.link %}
+										</a>
+									{% endif %}
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	{% endif %}
 </div>
