@@ -22,5 +22,75 @@
 }
 
 .moody-flex-grid-wrapper .flip-container {
-  min-height: 250px;
+  min-height: 227px;
+  max-height: 227px;
+}
+
+/* front should min-height */
+.moody-flex-grid-wrapper .flip-container .front {
+  min-height: 227px;
+  max-height: 227px;
+
+}
+
+.moody-flex-grid-wrapper .flip-container .mfg--image {
+  position: relative;
+  min-height: 227px;
+  max-height: 227px;
+}
+
+.moody-flex-grid-wrapper .flip-container .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(191, 87, 1, 0.7); /* Light orange overlay */
+}
+
+.moody-flex-grid-wrapper .flip-container .headline-container {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+}
+
+.moody-flex-grid-wrapper .flip-container .mfg--headline {
+  color: #fff; /* White text color */
+  margin: 0;
+  padding: 10px;
+}
+
+.moody-flex-grid-wrapper .flip-container .back {
+  background-color: #bf5700; /* Burnt orange background color */
+  color: #fff; /* White text color */
+  /* ALign text center */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* We want it to grow vertically to fill parent */
+  flex-grow: 1;
+  min-height: 227px;
+  max-height: 227px;
+
+}
+
+.moody-flex-grid-wrapper .flip-container .back a {
+  color: #fff; /* White text color */
+}
+
+.moody-flex-grid-wrapper .flip-container .back a:hover {
+  color: #fff; /* White text color */
+  /* text-decoration: underline; */
+  /* Gently zoom just a bit */
+  transform: scale(1.1);
+  /* nicely tranisition */
+  transition: transform 0.3s;
+}
+
+/* Same whitge color for back p tag */
+.moody-flex-grid-wrapper .flip-container .back p {
+  color: #fff; /* White text color */
 }

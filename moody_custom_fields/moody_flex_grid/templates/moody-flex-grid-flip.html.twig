@@ -8,15 +8,15 @@
  * - style: The color of the lined background design.
  * - cta: The Moody Mission Statement overall CTA button.
  * - flex_grid_items: An array containing the Moody Mission Statement individual item contents.
- *   - image: The Mission Statement image.
- *   - headline: The Mission Statement headline.
- *   - copy: The Mission Statement copy field.
- *   - link: The Mission Statement link field.
+ * - image: The Mission Statement image.
+ * - headline: The Mission Statement headline.
+ * - copy: The Mission Statement copy field.
+ * - link: The Mission Statement link field.
  *
  * @ingroup themeable
  */
 #}
-<div class="flex-grid-wrapper rectangular-display">
+<div class="flex-grid-wrapper square-display">
 	{% if headline %}
 		<div class="row">
 			<div class="col-12">
@@ -24,6 +24,7 @@
 			</div>
 		</div>
 	{% endif %}
+
 	{% if flex_grid_items %}
 		<div class="flex-grid-items {{ style }}-columns">
 			{% for item in flex_grid_items %}
@@ -34,21 +35,21 @@
 								{% if item.image %}
 									<div class="mfg--image">
 										{{ item.image }}
+										<div class="overlay"></div>
+										<div class="headline-container">
+											<h3 class="mfg--headline text-center">{{ item.headline }}</h3>
+										</div>
 									</div>
 								{% endif %}
-								<div class="absolute">{{ item.headline }}</div>
 							</div>
 							<div class="back">
 								<div class="content">
-									{% if item.headline %}
-										<h3 class="mfg--headline text-{{ item.headline_alignment }}">{{ item.headline }}</h3>
-									{% endif %}
 									{% if item.copy %}
 										{% if item.link %}
 											<a href="{{ item.link }}" class="linked-flex-grid-item">
 											{% endif %}
-
 											<div class="mfg--copy ut-copy">
+												<h3 class="text-center">{{ item.headline }}</h3>
 												{{ item.copy }}
 											</div>
 										{% endif %}
@@ -57,7 +58,6 @@
 									{% endif %}
 								</div>
 							</div>
-
 						</div>
 					</div>
 				</div>
