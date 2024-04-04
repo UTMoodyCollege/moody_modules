@@ -94,3 +94,13 @@
 .moody-flex-grid-wrapper .flip-container .back p {
   color: #fff; /* White text color */
 }
+
+/** The back of the card, copy area */
+.moody-flex-grid-wrapper .flip-container .back .mfg--copy {
+  padding: 2.4em;
+}
+
+/* The back of the card, headline */
+.moody-flex-grid-wrapper .flip-container .back h3 {
+  color: white;
+}
