@@ -1,0 +1,18 @@
+name: 'Moody HTML'
+description: 'Provides managed text format and editor configuration for Moody sites.'
+type: module
+core_version_requirement: '^9.4 || ^10'
+dependencies:
+  - ckeditor5
+  - editor
+  - filter
+  - iframe_title_filter
+  - linkit
+  - media
+  - metatag
+  - pathologic
+  - responsive_tables_filter
+  - url_embed
+  - utexas_inner_rail_filter
+  - utexas_media_types
+  - utexas_qualtrics_filter
