@@ -90,7 +90,7 @@ class MoodyFlexGridFormatter5 extends FormatterBase implements ContainerFactoryP
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
-    $responsive_image_style_name = 'utexas_responsive_image_fca';
+    $responsive_image_style_name = 'moody_flex_grid_promo_style';
     $responsive_image_style = $this->entityTypeManager->getStorage('responsive_image_style')->load($responsive_image_style_name);
     $image_styles_to_load = [];
     $cache_tags = [];
