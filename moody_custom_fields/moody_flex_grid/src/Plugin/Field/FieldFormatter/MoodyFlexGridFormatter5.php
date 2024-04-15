@@ -111,7 +111,16 @@ class MoodyFlexGridFormatter5 extends FormatterBase implements ContainerFactoryP
           $instance_item = $instance['item'];
           if (!empty($instance_item['image'])) {
             $image = isset($instance_item['image']) ? $instance_item['image'] : FALSE;
-            $instances[$key]['image'] = $this->generateImageRenderArray($image, $responsive_image_style_name, $cache_tags);
+            // If $image, then lets get an absolute URL to it, then pass that as the variable
+            // instead of
+            // $instances[$key]['image'] = $this->generateImageRenderArray($image, $responsive_image_style_name, $cache_tags);
+            $media = $this->entityTypeManager->getStorage('media')->load($image);
+            $media_attributes = $media->get('field_utexas_media_image')->getValue();
+            $file = $this->entityTypeManager->getStorage('file')->load($media_attributes[0]['target_id']);
+            $image_uri = $file->getFileUri();
+            $file_url_generator = \Drupal::service('file_url_generator');
+            $image_url = $file_url_generator->generateAbsoluteString($image_uri);
+            $instances[$key]['image'] = $image_url;
           }
           if (!empty($instance_item['headline'])) {
             $instances[$key]['headline'] = $instance_item['headline'];

@@ -30,25 +30,19 @@
 			{% for item in flex_grid_items %}
 				<div class="flex-grid-item flip-container">
 					<div class="front">
-						<div class="mfg--image--promo">
-							{{ item.image }}
+					{# We can add a background image with the {{ item.image }} which is a URL with inline css #}
+						<div class="mfg--image--promo" style="background-image: url('{{ item.image }}');">
+							
 						</div>
-						{% if item.link %}
-							<a href="{{ item.link }}" class="linked-flex-grid-item">
-							{% endif %}
-							<div class="mfg--text--promo">
-								<h3 class="ut--headline text-{{ item.headline_alignment }}">{{ item.headline }}</h3>
-							</div>
-							{% if item.link %}
-							</a>
-						{% endif %}
-					</div>
-					<div class="back">
 						<div class="mfg--text--promo">
 							<h3 class="ut--headline text-{{ item.headline_alignment }}">{{ item.headline }}</h3>
-							<p>{{ item.copy }}</p>
-							<a href="{{ item.link }}" class="btn btn-primary">Learn More</a>
 						</div>
+					</div>
+					<div class="back">
+						<a class="mfg--text--promo" href="{{ item.link }}">
+							<h3 class="ut--headline text-{{ item.headline_alignment }}">{{ item.headline }}</h3>
+							<p>{{ item.copy }}</p>
+						</a>
 					</div>
 				</div>
 
@@ -56,4 +50,3 @@
 		</div>
 	{% endif %}
 </div>
-
