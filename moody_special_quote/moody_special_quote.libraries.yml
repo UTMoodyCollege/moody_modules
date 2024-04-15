@@ -1,0 +1,10 @@
+# Define a moody_image_grid lib that can attach the css/moody-image-grid.css
+moody_special_quote:
+  version: 1.x
+  css:
+    theme:
+      css/moody-special-quote.css: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once

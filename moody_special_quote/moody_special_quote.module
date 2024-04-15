@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for moody special quote block.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function moody_special_quote_theme($existing, $type, $theme, $path)
+{
+    return [
+        'moody_special_quote' => [
+            'variables' => [
+                'headline' => '',
+                'quote' => '',
+                'image_url' => '',
+            ],
+        ],
+    ];
+}
