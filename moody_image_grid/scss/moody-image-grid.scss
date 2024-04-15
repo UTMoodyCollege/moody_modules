@@ -1,0 +1,75 @@
+.moody-image-grid-container {
+  background-image: repeating-linear-gradient(
+    -22deg,
+    #b65625,
+    // color of the stripe
+    #b65625 5px,
+    // beginning of the stripe
+    #b65625 10px,
+    // end of the stripe
+    #be5a27 20px // end of the gap between stripes
+  );
+
+  padding-left: 3em;
+  padding-right: 3em;
+  padding-bottom: 2em;
+
+  .row {
+    .headline {
+      color: white;
+      font-size: 2em;
+      font-weight: 800;
+      margin: 0;
+      padding: 1em;
+      text-align: center;
+    }
+    .col-md-4 {
+      padding-left: 0;
+      padding-right: 0;
+
+      .image-card-wrapper {
+        margin: 10px; // adjust as needed
+        overflow: hidden; // ensures nothing protrudes
+        border: 2px solid white;
+        padding: 0.5em;
+
+        .card {
+          display: block;
+          position: relative;
+          overflow: hidden;
+          text-decoration: none;
+          color: white;
+          background-size: cover;
+          background-position: center;
+          width: 100%;
+          height: 0;
+          padding-bottom: 66.66%; // maintain 3:2 ratio
+
+          .card-body {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 1em;
+
+            .card-title {
+              font-size: 1.5em;
+              font-weight: 800;
+              margin: 0;
+              padding: 0.5em;
+              color: white;
+              display: inline-block;
+            }
+          }
+        }
+      }
+    }
+  }
+}

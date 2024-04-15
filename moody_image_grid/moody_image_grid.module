@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Moody Image Grid module.
+ */
+
+// We get some number of items from our form like:
+//     for ($i = 0; $i < $item_instances; $i++) {
+//         $form['items'][$i] = [
+//           '#type' => 'fieldset',
+//           '#title' => $this->t('Item @i', ['@i' => $i + 1]),
+//         ];
+//         $form['items'][$i]['image'] = [
+//           '#type' => 'media_library',
+//           '#allowed_bundles' => ['image'],
+//           '#title' => $this->t('Image'),
+//         ];
+//         $form['items'][$i]['headline'] = [
+//           '#type' => 'textfield',
+//           '#title' => $this->t('Headline'),
+//         ];
+//         $form['items'][$i]['link_text'] = [
+//           '#type' => 'textfield',
+//           '#title' => $this->t('Link text'),
+//         ];
+//       }
+
+//       So we want a theme funciton that will take in these items then we'll render them out in a nice grid in the template
+
+/**
+ * Implements hook_theme().
+ */
+function moody_image_grid_theme($existing, $type, $theme, $path)
+{
+    return [
+        'moody_image_grid' => [
+            'variables' => [
+                'items' => [],
+                'headline' => '',
+            ],
+        ],
+    ];
+}

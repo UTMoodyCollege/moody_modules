@@ -1,0 +1,8 @@
+name: 'Moody Image Grid'
+type: module
+description: 'Provides a specially styled image grid component.'
+package: Moody
+core_version_requirement: ^10 || ^11
+# dependency on paragraphs
+dependencies:
+  - paragraphs:paragraphs
