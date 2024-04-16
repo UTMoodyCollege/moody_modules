@@ -1,7 +1,4 @@
 .moody-special-quote-container {
-  max-width: 800px; // Maximum width of the entire component.
-  margin-left: auto;
-  margin-right: auto;
 
   .headline-container {
     position: relative;
@@ -51,9 +48,17 @@
 
   .quote {
     font-size: 1em;
-    margin-right: 120px; // Make room for the image to float right.
+    // margin-right: 120px; // Make room for the image to float right.
     color: #bf5700;
     font-weight: 600;
+  }
+
+  .quote2 {
+    font-size: 1em;
+    // margin-right: 120px; // Make room for the image to float right.
+    color: #bf5700;
+    font-weight: 600;
+    max-width: 80%;
   }
 
   .image-overlay {
@@ -68,7 +73,7 @@
 
 @media (min-width: 768px) {
   .moody-special-quote-container .quote {
-    margin-right: 150px; // Increased space for larger screens.
+    // margin-right: 150px; // Increased space for larger screens.
   }
 
   .moody-special-quote-container .image-overlay {

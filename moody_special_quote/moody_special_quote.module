@@ -15,6 +15,7 @@ function moody_special_quote_theme($existing, $type, $theme, $path)
             'variables' => [
                 'headline' => '',
                 'quote' => '',
+                'quote2' => '',
                 'image_url' => '',
             ],
         ],

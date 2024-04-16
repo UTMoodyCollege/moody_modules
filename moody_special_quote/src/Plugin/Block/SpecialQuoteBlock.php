@@ -83,14 +83,17 @@ final class SpecialQuoteBlock extends BlockBase implements ContainerFactoryPlugi
       '#title' => $this->t('Quote'),
       '#default_value' => $config['quote'] ?? '',
     ];
+    $form['quote2'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Quote 2'),
+      '#default_value' => $config['quote2'] ?? '',
+    ];
     $form['image'] = [
       '#type' => 'media_library',
       '#allowed_bundles' => ['utexas_image'],
       '#title' => $this->t('Image'),
       '#default_value' => $config['image'] ?? '',
     ];
-
-
 
     return $form;
   }
@@ -102,6 +105,7 @@ final class SpecialQuoteBlock extends BlockBase implements ContainerFactoryPlugi
   {
     $this->configuration['headline'] = $form_state->getValue('headline');
     $this->configuration['quote'] = $form_state->getValue('quote');
+    $this->configuration['quote2'] = $form_state->getValue('quote2');
     $this->configuration['image'] = $form_state->getValue('image');
   }
 
@@ -124,6 +128,7 @@ final class SpecialQuoteBlock extends BlockBase implements ContainerFactoryPlugi
       '#theme' => 'moody_special_quote',
       '#headline' => $config['headline'] ?? '',
       '#quote' => $config['quote'] ?? '',
+      '#quote2' => $config['quote2'] ?? '',
       '#image_url' => $image_url,
       '#attached' => [
         'library' => [
