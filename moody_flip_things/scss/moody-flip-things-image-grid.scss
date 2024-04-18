@@ -1,6 +1,6 @@
-$height: 250px; // Set the default height for the circle
-$medium_height: 350px; // Set the height for medium screens
-$large_height: 350px; // Set the height for large screens
+$height: 300px; // Set the default height for the circle
+$medium_height: 300px; // Set the height for medium screens
+$large_height: 300px; // Set the height for large screens
 .moody-flip-things-image-grid-container {
   .headline {
     text-align: center;
@@ -10,21 +10,20 @@ $large_height: 350px; // Set the height for large screens
   }
   .img {
     width: 100%; // Make the image responsive
-    max-height: 100%; // Make the image responsive
-    height: auto; // Make the image responsive
+
   }
   .content {
     position: relative; // For positioning arrows and text relative to the content
     text-align: center; // Center the text below the image
-    min-height: $height; // Set the minimum height for the content
-    // REsponsive breakpoint for medium screens
-    @media (min-width: 768px) {
-      min-height: $medium_height; // Set the height for medium screens
-    }
-    // Responsive breakpoint for large screens
-    @media (min-width: 1024px) {
-      min-height: $large_height; // Set the height for large screens
-    }
+    // min-height: $height; // Set the minimum height for the content
+    // // REsponsive breakpoint for medium screens
+    // @media (min-width: 768px) {
+    //   min-height: $medium_height; // Set the height for medium screens
+    // }
+    // // Responsive breakpoint for large screens
+    // @media (min-width: 1024px) {
+    //   min-height: $large_height; // Set the height for large screens
+    // }
   }
 
   .front {
@@ -63,39 +62,8 @@ $large_height: 350px; // Set the height for large screens
   }
 
   .back {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background-color: #bf5700; // Set the background color
-    color: #fff; // Set the text color to white
-    font-weight: bold; // Make the text bold
-    border-radius: 50%; // Match the border radius of .front
-    overflow: hidden;
 
-    // Match the height and width with .front
-    width: $height;
-    height: $height;
 
-    @media (min-width: 768px) {
-      width: $medium_height;
-      height: $medium_height;
-    }
-
-    @media (min-width: 1024px) {
-      width: $large_height;
-      height: $large_height;
-    }
-
-    min-height: $height; // Set the minimum height for the content
-    // REsponsive breakpoint for medium screens
-    @media (min-width: 768px) {
-      min-height: $medium_height; // Set the height for medium screens
-    }
-    // Responsive breakpoint for large screens
-    @media (min-width: 1024px) {
-      min-height: $large_height; // Set the height for large screens
-    }
 
     .circle-border {
       width: $height; // Set a fixed width for the outer circle
@@ -109,6 +77,34 @@ $large_height: 350px; // Set the height for large screens
       overflow: hidden;
       margin: 0 auto;
       padding: 5px; // This creates the transparent space
+
+      .circle {
+        justify-content: center;
+        text-align: center;
+        background-color: #bf5700; // Set the background color
+        color: #fff; // Set the text color to white
+        font-weight: bold; // Make the text bold
+        font-size: 14px;
+        border-radius: 50%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        flex-flow: column wrap;
+        padding-top: 1em;
+        padding-left: 1.55em;
+        padding-right: 1.55em;
+      }
+
+      // Responsive heights for different breakpoints
+      @media (min-width: 768px) {
+        width: $medium_height;
+        height: $medium_height;
+      }
+      @media (min-width: 1024px) {
+        width: $large_height;
+        height: $large_height;
+      }
     }
   }
 
