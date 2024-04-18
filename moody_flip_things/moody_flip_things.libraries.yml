@@ -1,0 +1,13 @@
+# Define a moody_image_grid lib that can attach the css/moody-image-grid.css
+moody_flip_image_grid:
+  version: 1.x
+  css:
+    theme:
+      css/moody-flip-things-image-grid.css: {}
+  js:
+    js/moody-flip-things-image-grid.js: {}
+    js/jquery.flip.min.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once
