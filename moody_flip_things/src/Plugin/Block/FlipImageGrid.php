@@ -99,8 +99,8 @@ final class FlipImageGrid extends BlockBase implements ContainerFactoryPluginInt
       $form['items'][$i]['body'] = [
         '#type' => 'text_format',
         '#title' => $this->t('Body'),
-        '#default_value' => $this->configuration['items'][$i]['body'] ?? '',
-        '#format' => $this->configuration['items'][$i]['body_format'] ?? 'full_html',
+        '#default_value' => $this->configuration['items'][$i]['body']['value'] ?? '',
+        '#format' => $this->configuration['items'][$i]['body']['format'] ?? 'flex_html',
       ];
       // Link url text
       $form['items'][$i]['link_url'] = [
