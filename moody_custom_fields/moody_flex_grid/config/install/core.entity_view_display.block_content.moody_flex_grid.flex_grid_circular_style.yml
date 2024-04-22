@@ -9,18 +9,18 @@ dependencies:
     - layout_builder
 third_party_settings:
   layout_builder:
-    allow_custom: false
     enabled: false
+    allow_custom: false
 id: block_content.moody_flex_grid.flex_grid_circular_style
 targetEntityType: block_content
 bundle: moody_flex_grid
 mode: flex_grid_circular_style
 content:
   field_block_moody_flex_grid:
-    weight: 1
+    type: moody_flex_grid_formatter2
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    type: moody_flex_grid_formatter2
+    weight: 1
     region: content
 hidden: {  }

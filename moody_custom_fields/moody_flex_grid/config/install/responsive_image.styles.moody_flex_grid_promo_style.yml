@@ -10,34 +10,34 @@ id: moody_flex_grid_promo_style
 label: 'Moody Flex Grid promo Style'
 image_style_mappings:
   -
+    image_mapping_type: image_style
+    image_mapping: utexas_image_style_500w_500h
     breakpoint_id: utexas_image_styles.wide
     multiplier: 1x
+  -
     image_mapping_type: image_style
     image_mapping: utexas_image_style_500w_500h
-  -
     breakpoint_id: utexas_image_styles.wide
     multiplier: 2x
+  -
     image_mapping_type: image_style
     image_mapping: utexas_image_style_500w_500h
-  -
     breakpoint_id: utexas_image_styles.narrow
     multiplier: 1x
+  -
     image_mapping_type: image_style
     image_mapping: utexas_image_style_500w_500h
-  -
     breakpoint_id: utexas_image_styles.narrow
     multiplier: 2x
-    image_mapping_type: image_style
-    image_mapping: utexas_image_style_500w_500h
   -
-    breakpoint_id: utexas_image_styles.mobile
-    multiplier: 1x
     image_mapping_type: image_style
     image_mapping: utexas_image_style_280w_280h
-  -
     breakpoint_id: utexas_image_styles.mobile
-    multiplier: 2x
+    multiplier: 1x
+  -
     image_mapping_type: image_style
     image_mapping: utexas_image_style_500w_500h
+    breakpoint_id: utexas_image_styles.mobile
+    multiplier: 2x
 breakpoint_group: utexas_image_styles
 fallback_image_style: utexas_image_style_500w_500h

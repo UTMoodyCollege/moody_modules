@@ -10,10 +10,10 @@ bundle: moody_flex_grid
 mode: default
 content:
   field_block_moody_flex_grid:
-    weight: 1
+    type: moody_flex_grid_formatter
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    type: moody_flex_grid_formatter
+    weight: 1
     region: content
 hidden: {  }
