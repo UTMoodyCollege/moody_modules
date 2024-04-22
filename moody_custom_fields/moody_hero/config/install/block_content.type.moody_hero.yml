@@ -2,6 +2,6 @@ langcode: en
 status: true
 dependencies: {  }
 id: moody_hero
-label: Moody Hero
+label: 'Moody Hero'
 revision: 1
 description: 'Provides a compound field with media, heading, subheading, link, caption and credit.'

@@ -11,8 +11,6 @@ third_party_settings:
   layout_builder:
     enabled: false
     allow_custom: false
-_core:
-  default_config_hash: jp67luoRUrd18QgtDzydnr4NBVXL7-JWzh39SxddIWM
 id: block_content.moody_hero.moody_hero_6_short
 targetEntityType: block_content
 bundle: moody_hero

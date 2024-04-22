@@ -15,10 +15,10 @@ bundle: moody_hero
 mode: default
 content:
   field_block_moody_hero:
-    weight: 0
+    type: moody_hero
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    type: moody_hero
+    weight: 0
     region: content
 hidden: {  }

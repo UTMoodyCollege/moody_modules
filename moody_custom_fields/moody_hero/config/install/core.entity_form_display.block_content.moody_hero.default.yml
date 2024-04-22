@@ -12,11 +12,11 @@ bundle: moody_hero
 mode: default
 content:
   field_block_moody_hero:
+    type: moody_hero
     weight: 26
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: moody_hero
-    region: content
   info:
     type: string_textfield
     weight: -5
