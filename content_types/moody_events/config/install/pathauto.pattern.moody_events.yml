@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: moody_events
+label: 'Moody Events'
+type: 'canonical_entities:node'
+pattern: '/event/[node:title]'
+selection_criteria:
+  cb2500f5-3caa-490e-98a1-0d0ccc2e0a84:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: cb2500f5-3caa-490e-98a1-0d0ccc2e0a84
+    context_mapping:
+      node: node
+    bundles:
+      moody_event: moody_event
+selection_logic: and
+weight: -5
+relationships: {  }

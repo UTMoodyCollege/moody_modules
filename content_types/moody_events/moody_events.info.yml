@@ -17,6 +17,7 @@ dependencies:
   - 'faculty_bio_content_type:faculty_bio_content_type'
   - 'features:features'
   - 'moody_events:moody_events'
+  - 'pathauto:pathauto'
   - 'smart_date:smart_date'
   - 'smart_date:smart_date_recur'
   - 'utexas_image_styles:utexas_image_styles'
