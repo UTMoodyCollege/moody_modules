@@ -466,7 +466,7 @@ display:
         - 'config:field.storage.node.field_thumbnail_image_for_summar'
   block_1:
     id: block_1
-    display_title: Block
+    display_title: 'latest news stories block'
     display_plugin: block
     position: 2
     display_options:
@@ -861,7 +861,11 @@ display:
         row: false
         fields: false
       css_class: 'news-view row latest-news-block'
-      display_extenders: {  }
+      display_description: ''
+      display_extenders:
+        metatag_display_extender:
+          metatags: {  }
+          tokenize: false
       block_description: 'Latest News Stories'
     cache_metadata:
       max-age: -1
@@ -875,7 +879,7 @@ display:
         - 'config:field.storage.node.field_thumbnail_image_for_summar'
   page_1:
     id: page_1
-    display_title: Page
+    display_title: /news-all
     display_plugin: page
     position: 1
     display_options:
@@ -1004,6 +1008,7 @@ display:
         filters: false
         filter_groups: false
         footer: false
+      display_description: ''
       footer:
         area:
           id: area
@@ -1018,8 +1023,11 @@ display:
             value: "<div class=\"news-view-footer col-12\">\r\n<hr>\r\n<strong><p>See our archive of older news articles at</p>\r\n<p><a href=\"/news-archive\" class=\"ut-btn\">The News Archives</a></p></strong>\r\n</div>"
             format: flex_html
           tokenize: false
-      display_extenders: {  }
-      path: news
+      display_extenders:
+        metatag_display_extender:
+          metatags: {  }
+          tokenize: false
+      path: news-all
     cache_metadata:
       max-age: -1
       contexts:
@@ -1285,6 +1293,167 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - 'user.node_grants:view'
+        - user.permissions
+      tags:
+        - 'config:field.storage.node.field_moody_subtitle'
+        - 'config:field.storage.node.field_thumbnail_image_for_summar'
+  page_3:
+    id: page_3
+    display_title: /news
+    display_plugin: page
+    position: 1
+    display_options:
+      filters:
+        status:
+          id: status
+          table: node_field_data
+          field: status
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
+          value: '1'
+          group: 1
+          expose:
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+        type:
+          id: type
+          table: node_field_data
+          field: type
+          entity_type: node
+          entity_field: type
+          plugin_id: bundle
+          value:
+            moody_feature_page: moody_feature_page
+          expose:
+            operator_limit_selection: false
+            operator_list: {  }
+        field_thumbnail_image_for_summar_target_id:
+          id: field_thumbnail_image_for_summar_target_id
+          table: node__field_thumbnail_image_for_summar
+          field: field_thumbnail_image_for_summar_target_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: numeric
+          operator: 'not empty'
+          value:
+            min: ''
+            max: ''
+            value: ''
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+            min_placeholder: ''
+            max_placeholder: ''
+            placeholder: ''
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+        created:
+          id: created
+          table: node_field_data
+          field: created
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: created
+          plugin_id: date
+          operator: '>'
+          value:
+            min: ''
+            max: ''
+            value: '-2 years'
+            type: offset
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+            min_placeholder: ''
+            max_placeholder: ''
+            placeholder: ''
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+      filter_groups:
+        operator: AND
+        groups:
+          1: AND
+      defaults:
+        filters: false
+        filter_groups: false
+        footer: false
+      display_description: ''
+      footer:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: false
+          content:
+            value: "<div class=\"news-view-footer col-12\">\r\n<hr>\r\n<strong><p>See our archive of older news articles at</p>\r\n<p><a href=\"/news-archive\" class=\"ut-btn\">The News Archives</a></p></strong>\r\n</div>"
+            format: flex_html
+          tokenize: false
+      display_extenders:
+        metatag_display_extender:
+          metatags: {  }
+          tokenize: false
+      path: news
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
         - 'user.node_grants:view'
         - user.permissions
       tags:
