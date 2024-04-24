@@ -1,38 +1,41 @@
+uuid: 563ba8a8-a830-493f-9e37-dd18e1cbb8a4
 langcode: en
 status: true
 dependencies: {  }
+_core:
+  default_config_hash: QVqxy5OvBoAEXE41mFtYwjRzzT1b6jyPE0MTNWHnwAQ
 id: moody_responsive_image_hi
 label: 'Hero Image'
 image_style_mappings:
   -
-    breakpoint_id: moody_image_styles.wide
+    breakpoint_id: utexas_image_styles.wide
     multiplier: 1x
     image_mapping_type: image_style
-    image_mapping: moody_image_style_1140w_616h
+    image_mapping: utexas_image_style_1140w_616h
   -
-    breakpoint_id: moody_image_styles.wide
+    breakpoint_id: utexas_image_styles.wide
     multiplier: 2x
     image_mapping_type: image_style
-    image_mapping: moody_image_style_2280w_1232h
+    image_mapping: utexas_image_style_2280w_1232h
   -
-    breakpoint_id: moody_image_styles.narrow
+    breakpoint_id: utexas_image_styles.narrow
     multiplier: 1x
     image_mapping_type: image_style
-    image_mapping: moody_image_style_960w_519h
+    image_mapping: utexas_image_style_960w_519h
   -
-    breakpoint_id: moody_image_styles.narrow
+    breakpoint_id: utexas_image_styles.narrow
     multiplier: 2x
     image_mapping_type: image_style
-    image_mapping: moody_image_style_1920w_1038h
+    image_mapping: utexas_image_style_1920w_1038h
   -
-    breakpoint_id: moody_image_styles.mobile
+    breakpoint_id: utexas_image_styles.mobile
     multiplier: 1x
     image_mapping_type: image_style
-    image_mapping: moody_image_style_720w_389h
+    image_mapping: utexas_image_style_720w_389h
   -
-    breakpoint_id: moody_image_styles.mobile
+    breakpoint_id: utexas_image_styles.mobile
     multiplier: 2x
     image_mapping_type: image_style
-    image_mapping: moody_image_style_1440w_778h
-breakpoint_group: moody_image_styles
-fallback_image_style: moody_image_style_720w_389h
+    image_mapping: utexas_image_style_1440w_778h
+breakpoint_group: utexas_image_styles
+fallback_image_style: utexas_image_style_720w_389h
