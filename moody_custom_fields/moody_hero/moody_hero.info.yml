@@ -11,3 +11,4 @@ dependencies:
   - 'drupal:responsive_image'
   - 'media_library_form_element:media_library_form_element'
   - 'moody_hero:moody_hero'
+  - 'utexas_image_styles:utexas_image_styles'
