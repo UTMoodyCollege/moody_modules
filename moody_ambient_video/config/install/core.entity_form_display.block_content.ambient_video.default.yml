@@ -14,6 +14,7 @@ dependencies:
     - field.field.block_content.ambient_video.field_mav_poster
     - field.field.block_content.ambient_video.field_mav_text_position
     - field.field.block_content.ambient_video.field_mav_url
+    - field.field.block_content.ambient_video.field_short_mode
   module:
     - file
     - link
@@ -24,83 +25,90 @@ bundle: ambient_video
 mode: default
 content:
   field_mav_cta:
+    type: link_default
     weight: 8
+    region: content
     settings:
       placeholder_url: ''
       placeholder_title: ''
     third_party_settings: {  }
-    type: link_default
-    region: content
   field_mav_descriptions:
+    type: file_generic
     weight: 4
+    region: content
     settings:
       progress_indicator: throbber
     third_party_settings: {  }
-    type: file_generic
-    region: content
   field_mav_fallback:
     type: media_library_widget
     weight: 3
+    region: content
     settings:
       media_types: {  }
     third_party_settings: {  }
-    region: content
   field_mav_headline:
+    type: string_textfield
     weight: 6
+    region: content
     settings:
       size: 120
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_mav_headline_line_two:
+    type: string_textfield
     weight: 7
+    region: content
     settings:
       size: 120
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_mav_height:
+    type: options_buttons
     weight: 5
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: options_buttons
-    region: content
   field_mav_mask:
+    type: options_buttons
     weight: 10
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: options_buttons
-    region: content
   field_mav_opacity:
+    type: number
     weight: 11
+    region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
-    type: number
-    region: content
   field_mav_poster:
     type: media_library_widget
     weight: 2
+    region: content
     settings:
       media_types: {  }
     third_party_settings: {  }
-    region: content
   field_mav_text_position:
+    type: options_select
     weight: 9
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: options_select
-    region: content
   field_mav_url:
+    type: link_default
     weight: 1
+    region: content
     settings:
       placeholder_url: ''
       placeholder_title: ''
     third_party_settings: {  }
-    type: link_default
+  field_short_mode:
+    type: boolean_checkbox
+    weight: 26
     region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
   info:
     type: string_textfield
     weight: 0

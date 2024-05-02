@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.storage.block_content.field_short_mode
+id: block_content.ambient_video.field_short_mode
+field_name: field_short_mode
+entity_type: block_content
+bundle: ambient_video
+label: 'Short Mode'
+description: 'Enables a "short mode" display where, the video is a 16:9 wide style and centers on the video.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

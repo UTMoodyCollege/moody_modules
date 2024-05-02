@@ -52,6 +52,23 @@ function moody_ambient_video_preprocess_block(&$variables)
       }
       $variables['descriptions'] = $descriptions_url ?? FALSE;
 
+      $short_mode_class = 'moody-ambient-video-short';
+      // Retrieve the first value of the "field_short_mode" if it exists.
+$short_mode = FALSE; // Default to FALSE if not set or any other issue arises.
+if (isset($variables["content"]["field_short_mode"]["#items"][0])) {
+    // The field value is accessed directly from the FieldItemList object.
+    $short_mode_value = $variables["content"]["field_short_mode"]["#items"][0]->value;
+    $short_mode = ($short_mode_value === '1'); // Check if the value is '1' (TRUE).
+}
+
+// Define the class to be added if short mode is true.
+if ($short_mode) {
+    $short_mode_class = 'moody-ambient-video-short';
+    // Add the class to the block's attributes if short mode is TRUE.
+    $variables["attributes"]["class"][] = $short_mode_class;
+}
+    
+
       // Pass the overlay mask color.
       $mask = isset($variables['content']['field_mav_mask']['#items']) ? ('#' . $variables['content']['field_mav_mask']['#items']->getString()) : 'transparent';
       $variables['mask'] = $mask;
