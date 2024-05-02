@@ -27,7 +27,7 @@ third_party_settings:
         layout_settings:
           label: ''
           context_mapping: {  }
-          column_widths: 50-50
+          column_widths: 25-75
           layout_builder_styles_style:
             utexas_no_padding: 0
             moody_container_constraint: 0
@@ -111,7 +111,7 @@ third_party_settings:
                   thousand_separator: ''
                   prefix_suffix: true
                 third_party_settings: {  }
-            weight: 6
+            weight: 5
             additional: {  }
           828a5e5a-188b-4e57-845e-c0b74a9fc66a:
             uuid: 828a5e5a-188b-4e57-845e-c0b74a9fc66a
@@ -129,38 +129,7 @@ third_party_settings:
                 label: hidden
                 settings: {  }
                 third_party_settings: {  }
-            weight: 2
-            additional:
-              layout_builder_styles_style:
-                utexas_border_without_background: 0
-                utexas_border_with_background: 0
-                utexas_readable: 0
-                utexas_block_top_margin_remove: 0
-                utexas_block_bottom_margin_remove: 0
-                utexas_block_top_margin_increase: 0
-                utexas_block_bottom_margin_increase: 0
-                moody_add_bottom_margin: 0
-                moody_add_top_margin: 0
-                moody_remove_bottom_margin: 0
-                moody_remove_top_margin: 0
-          ad8ebb99-4305-4627-9235-024e40370866:
-            uuid: ad8ebb99-4305-4627-9235-024e40370866
-            region: first
-            configuration:
-              id: 'field_block:node:moody_grad_profile:title'
-              label: 'Full Display Name'
-              label_display: '0'
-              provider: layout_builder
-              context_mapping:
-                entity: layout_builder.entity
-                view_mode: view_mode
-              formatter:
-                type: string
-                label: hidden
-                settings:
-                  link_to_entity: false
-                third_party_settings: {  }
-            weight: 1
+            weight: 3
             additional:
               layout_builder_styles_style:
                 utexas_border_without_background: 0
@@ -189,9 +158,40 @@ third_party_settings:
                 type: entity_reference_label
                 label: hidden
                 settings:
-                  link: true
+                  link: false
                 third_party_settings: {  }
-            weight: 5
+            weight: 4
+            additional:
+              layout_builder_styles_style:
+                utexas_border_without_background: 0
+                utexas_border_with_background: 0
+                utexas_readable: 0
+                utexas_block_top_margin_remove: 0
+                utexas_block_bottom_margin_remove: 0
+                utexas_block_top_margin_increase: 0
+                utexas_block_bottom_margin_increase: 0
+                moody_add_bottom_margin: 0
+                moody_add_top_margin: 0
+                moody_remove_bottom_margin: 0
+                moody_remove_top_margin: 0
+          d28a6928-1181-40ec-ab48-94553622dbda:
+            uuid: d28a6928-1181-40ec-ab48-94553622dbda
+            region: first
+            configuration:
+              id: 'field_block:node:moody_grad_profile:title'
+              label: 'Full Display Name'
+              label_display: '0'
+              provider: layout_builder
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+              formatter:
+                type: string
+                label: hidden
+                settings:
+                  link_to_entity: false
+                third_party_settings: {  }
+            weight: 2
             additional:
               layout_builder_styles_style:
                 utexas_border_without_background: 0
