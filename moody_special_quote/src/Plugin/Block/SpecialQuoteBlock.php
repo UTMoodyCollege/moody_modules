@@ -114,28 +114,34 @@ final class SpecialQuoteBlock extends BlockBase implements ContainerFactoryPlugi
    */
   public function build(): array
   {
-    // Unpack and build out 'moody_special_quote' => [
-      //   'variables' => [
-    //     'headline' => '',
-    //     'quote' => '',
-    //     'image_url' => '',
-    // ],
-    // Lets unpack our items and then pass that all into the theme function moody_image_grid 
-    $config = $this->getConfiguration();
-    $image = $this->entityTypeManager->getStorage('media')->load($config['image']);
-    $image_url = $this->fileUrlGenerator->generate($image->get('field_utexas_media_image')->entity->getFileUri());
-    return [
-      '#theme' => 'moody_special_quote',
-      '#headline' => $config['headline'] ?? '',
-      '#quote' => $config['quote'] ?? '',
-      '#quote2' => $config['quote2'] ?? '',
-      '#image_url' => $image_url,
-      '#attached' => [
-        'library' => [
-          'moody_special_quote/moody_special_quote',
-        ],
-      ],
-    ];
+      $config = $this->getConfiguration();
 
+      // Initialize the image_url as an empty string.
+      $image_url = '';
+
+      // Check if 'image' is set in the configuration and a media entity exists.
+      if (!empty($config['image'])) {
+          $media = $this->entityTypeManager->getStorage('media')->load($config['image']);
+          if ($media && !$media->get('field_utexas_media_image')->isEmpty()) {
+              $file_entity = $media->get('field_utexas_media_image')->entity;
+              if ($file_entity) {
+                  $image_url = $this->fileUrlGenerator->generate($file_entity->getFileUri());
+              }
+          }
+      }
+
+      return [
+          '#theme' => 'moody_special_quote',
+          '#headline' => $config['headline'] ?? '',
+          '#quote' => $config['quote'] ?? '',
+          '#quote2' => $config['quote2'] ?? '',
+          '#image_url' => $image_url,
+          '#attached' => [
+              'library' => [
+                  'moody_special_quote/moody_special_quote',
+              ],
+          ],
+      ];
   }
+
 }
