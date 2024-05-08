@@ -2,8 +2,8 @@
 
   .headline-container {
     position: relative;
-    background-color: #da7e07; // Yellow background color.
-    padding: 1rem 2rem; // Decent padding around the content.
+    background-color: #f8971f; // Yellow background color.
+    padding: 1.75rem 2rem; // Decent padding around the content.
     display: inline-block; // Makes the container only as wide as its content plus padding.
     min-width: 60%;
 
@@ -14,7 +14,7 @@
       bottom: -20px; // Size of the triangle, should match border-top.
       border-left: 20px solid transparent; // Adjust for triangle size.
       border-right: 0px solid transparent; // Adjust for triangle size.
-      border-top: 20px solid #da7e07; // The color of the headline container.
+      border-top: 20px solid #f8971f; // The color of the headline container.
       z-index: 999;
 
     }
@@ -22,17 +22,19 @@
 
   .headline {
     font-size: 2rem;
-    font-weight: 800; 
+    font-weight: bold;
     font-style: italic;
+    color: #333f48;
+    font-family: 'LibreFrankBlack';
     
   }
 
   .quote-container {
     position: relative;
-    background-color: #d6d2c4; // Gray background color.
-    padding: 1rem;
-    padding-top: 1.5rem;
+    background-color: #F7F6F3; // Gray background color.
+    padding: 1.25rem;
     margin-left: 30px; // Offset the quote container to the right.
+    font-size: 1.25rem; 
     
     &:before {
       content: '';
@@ -41,7 +43,7 @@
       left: 0; // Position at the left edge.
       border-left: 0px solid transparent; // Adjust for triangle size.
       border-right: 20px solid transparent; // Adjust for triangle size.
-      border-bottom: 20px solid #D3D3D3; // The color of the quote container.
+      border-bottom: 20px solid #F7F6F3; // The color of the quote container.
       z-index: inherit;
     }
   }
