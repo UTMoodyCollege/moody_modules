@@ -1,13 +1,10 @@
 .moody-image-grid-container {
-  background-image: repeating-linear-gradient(
-    -22deg,
-    #b65625,
-    // color of the stripe
-    #b65625 5px,
-    // beginning of the stripe
-    #b65625 10px,
-    // end of the stripe
-    #be5a27 20px // end of the gap between stripes
+  background: repeating-linear-gradient(
+    -25deg, // Angle of the lines
+    #bf5700, // A very light grey for the primary color
+    #bf5700 20px, // Color stop at 10 pixels, keeps the line thin
+    #AF5224 20px, // A slightly darker grey for the line starts at 10 pixels
+    #AF5224 22px // The line stops at 12 pixels, creating a 2-pixel thick line
   );
 
   padding-left: 3em;
