@@ -2,6 +2,17 @@ $height: 300px; // Set the default height for the circle
 $medium_height: 300px; // Set the height for medium screens
 $large_height: 300px; // Set the height for large screens
 .moody-flip-things-image-grid-container {
+  background: repeating-linear-gradient(
+    -25deg, // Angle of the lines
+    white, // A very light grey for the primary color
+    white 10px, // Color stop at 10 pixels, keeps the line thin
+    #f7f7f7 10px, // A slightly darker grey for the line starts at 10 pixels
+    #f7f7f7 12px // The line stops at 12 pixels, creating a 2-pixel thick line
+  );
+  .contents-row-max-w {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
   .headline {
     text-align: center;
     font-size: 28px;
