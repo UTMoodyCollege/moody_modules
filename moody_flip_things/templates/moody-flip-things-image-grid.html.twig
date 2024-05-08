@@ -38,20 +38,22 @@
                             
 
 							<!-- Back with circle border and body text -->
-							<div class="back">
-								<div class="circle-border">
-									<div class="circle">
-										<p>{{ item.body|raw }}</p>
-                                        <div
-                                            class="arrow left">{{ chevron_left | raw }}<!-- Include your left arrow icon or text here -->
-                                        </div>
+                            {% if item.link_url %}
+                                <a href="{{ item.link_url }}">
+                            {% endif %}
+                            <div class="back">
+                                <div class="circle-border">
+                                    <div class="circle">
+                                        <p>{{ item.body|raw }}</p>
+                                        <div class="arrow left">{{ chevron_left | raw }}</div>
                                         <!-- Right arrow -->
-                                        <div
-                                            class="arrow right">{{ chevron_right | raw }}<!-- Include your right arrow icon or text here -->
-                                        </div>
-									</div>
-								</div>
-							</div>
+                                        <div class="arrow right">{{ chevron_right | raw }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if item.link_url %}
+                                </a>
+                            {% endif %}
 
 							
 						</div>
