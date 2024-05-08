@@ -1,22 +1,24 @@
 <div class="moody-image-grid-container">
-    {% if headline %}
-        <div class="row">
-            <div class="col-12">
-                <div class="ut-h3 headline block-headline-h2">{{ headline }}</div>
-            </div>
-        </div>
-    {% endif %}
-    <div class="row">
-        {% for item in items %}
-            <div class="col-md-4">
-                <div class="image-card-wrapper">
-                    <a href="{{ item.link_url }}" class="card" style="background-image: url('{{ item.image_url }}');">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ item.headline }}</h5>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
+	<div class="container">
+		{% if headline %}
+			<div class="row">
+				<div class="col-12">
+					<div class="ut-h3 headline block-headline-h2">{{ headline }}</div>
+				</div>
+			</div>
+		{% endif %}
+		<div class="row">
+			{% for item in items %}
+				<div class="col-md-4">
+					<div class="image-card-wrapper">
+						<a href="{{ item.link_url }}" class="card" style="background-image: url('{{ item.image_url }}');">
+							<div class="card-body">
+								<h5 class="card-title">{{ item.headline }}</h5>
+							</div>
+						</a>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
 </div>

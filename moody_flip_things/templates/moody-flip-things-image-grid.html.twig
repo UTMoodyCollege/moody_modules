@@ -1,49 +1,52 @@
 <div class="moody-flip-things-image-grid-container">
-    {% if headline %}
-        <div class="row">
-            <div class="col-12">
-                <div class="ut-h3 headline block-headline-h2">{{ headline }}</div>
-            </div>
-        </div>
-    {% endif %}
-    <div class="row contents-row-max-w">
-        {% for item in items %}
-            <div class="col">
-                <div class="moody-flip-things-image-grid">
-                    <div class="content">
-                        <!-- Left arrow -->
-                        <div class="arrow left">
-                            <!-- Include your left arrow icon or text here -->
-                        </div>
+	<div class="container">
+		{% if headline %}
+			<div class="row">
+				<div class="col-12">
+					<div class="ut-h3 headline block-headline-h2">{{ headline }}</div>
+				</div>
+			</div>
+		{% endif %}
+		<div class="row contents-row-max-w">
+			{% for item in items %}
+				<div class="col">
+					<div class="moody-flip-things-image-grid">
+						<div
+							class="content">
+							<!-- Left arrow -->
+							<div
+								class="arrow left"><!-- Include your left arrow icon or text here -->
+							</div>
 
-                        <!-- Front with circle border and image -->
-                        <div class="front">
-                            <div class="circle-border">
-                                <div class="circle" style="background-image: url('{{ item.image_url }}');">
-                                    <!-- Image is set as background -->
-                                </div>
-                            </div>
-                        </div>
+							<!-- Front with circle border and image -->
+							<div class="front">
+								<div class="circle-border">
+									<div
+										class="circle" style="background-image: url('{{ item.image_url }}');"><!-- Image is set as background -->
+									</div>
+								</div>
+							</div>
 
-                        <!-- Back with circle border and body text -->
-                        <div class="back">
-                            <div class="circle-border">
-                                <div class="circle">
-                                    <p>{{ item.body|raw }}</p>
-                                </div>
-                            </div>
-                        </div>
+							<!-- Back with circle border and body text -->
+							<div class="back">
+								<div class="circle-border">
+									<div class="circle">
+										<p>{{ item.body|raw }}</p>
+									</div>
+								</div>
+							</div>
 
-                        <!-- Right arrow -->
-                        <div class="arrow right">
-                            <!-- Include your right arrow icon or text here -->
-                        </div>
-                    </div>
-                    <div class="below-content">
-                        {{ item.headline }}
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
+							<!-- Right arrow -->
+							<div
+								class="arrow right"><!-- Include your right arrow icon or text here -->
+							</div>
+						</div>
+						<div class="below-content">
+							{{ item.headline }}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
 </div>
