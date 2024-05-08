@@ -13,33 +13,47 @@
 					<div class="moody-flip-things-image-grid">
 						<div
 							class="content">
-							<!-- Left arrow -->
-							<div
-								class="arrow left"><!-- Include your left arrow icon or text here -->
-							</div>
+							
 
 							<!-- Front with circle border and image -->
 							<div class="front">
 								<div class="circle-border">
+                                   
+                                    <!-- Content in the circle -->
 									<div
 										class="circle" style="background-image: url('{{ item.image_url }}');"><!-- Image is set as background -->
+                                        <!-- Left arrow -->
+                                        <div
+                                            class="arrow left">{{ chevron_left | raw }}<!-- Include your left arrow icon or text here -->
+                                        </div>
+                                        <!-- Right arrow -->
+                                        <div
+                                            class="arrow right">{{ chevron_right | raw }}<!-- Include your right arrow icon or text here -->
+                                        </div>
 									</div>
+                                    
 								</div>
+                                
 							</div>
+                            
 
 							<!-- Back with circle border and body text -->
 							<div class="back">
 								<div class="circle-border">
 									<div class="circle">
 										<p>{{ item.body|raw }}</p>
+                                        <div
+                                            class="arrow left">{{ chevron_left | raw }}<!-- Include your left arrow icon or text here -->
+                                        </div>
+                                        <!-- Right arrow -->
+                                        <div
+                                            class="arrow right">{{ chevron_right | raw }}<!-- Include your right arrow icon or text here -->
+                                        </div>
 									</div>
 								</div>
 							</div>
 
-							<!-- Right arrow -->
-							<div
-								class="arrow right"><!-- Include your right arrow icon or text here -->
-							</div>
+							
 						</div>
 						<div class="below-content">
 							{{ item.headline }}

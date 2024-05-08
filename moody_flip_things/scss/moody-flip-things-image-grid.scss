@@ -52,6 +52,8 @@ $large_height: 300px; // Set the height for large screens
       padding: 5px; // This creates the transparent space
 
       .circle {
+        position: relative;
+
         width: 100%; // Fill the parent
         height: 100%; // Fill the parent
         border-radius: 50%; // Ensures the inner div is also circular
@@ -80,7 +82,7 @@ $large_height: 300px; // Set the height for large screens
       width: $height; // Set a fixed width for the outer circle
       height: $height; // Set a fixed height for the outer circle
       border-radius: 50%;
-      border: 4px solid #bf5700;
+      border: 2px solid #bf5700;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       display: flex;
       align-items: center;
@@ -90,6 +92,8 @@ $large_height: 300px; // Set the height for large screens
       padding: 5px; // This creates the transparent space
 
       .circle {
+        position: relative;
+
         justify-content: center;
         text-align: center;
         background-color: #bf5700; // Set the background color
@@ -132,13 +136,14 @@ $large_height: 300px; // Set the height for large screens
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+    width: 20px;
     // Add specific styles for left and right arrows
     // Adjust the size, color, etc., as needed
     &.left {
-      left: 10px;
+      left: 0;
     }
     &.right {
-      right: 10px;
+      right: 0;
     }
   }
 }

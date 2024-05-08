@@ -153,10 +153,29 @@ final class FlipImageGrid extends BlockBase implements ContainerFactoryPluginInt
       ];
 
     }
+
+    // Lets get $chevron_left and $chevron_right by using Drupal 10 comaptible path to module moody_flip_things + /images/white-chevron-left.svg + white-chevron-right.svg respectively, so we'll pass that to the theme for redner
+    $module_path = \Drupal::service('extension.list.module')->getPath('moody_flip_things');
+
+    $chevron_left_path = $module_path . '/images/white-chevron-left.svg';
+    if (file_exists($chevron_left_path)) {
+      $chevron_left = file_get_contents($chevron_left_path);
+    } else {
+      $chevron_left = '';
+    }
+
+    $chevron_right_path = $module_path . '/images/white-chevron-right.svg';
+    if (file_exists($chevron_right_path)) {
+      $chevron_right = file_get_contents($chevron_right_path);
+    } else {
+      $chevron_right = '';
+    }
     return [
       '#theme' => 'moody_flip_things_image_grid',
       '#headline' => $this->configuration['headline'] ?? '',
       '#items' => $items,
+      '#chevron_left' => $chevron_left,
+      '#chevron_right' => $chevron_right,
       '#attached' => [
         'library' => [
           'moody_flip_things/moody_flip_image_grid',
