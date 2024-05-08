@@ -24,6 +24,7 @@ $large_height: 300px; // Set the height for large screens
 
   }
   .content {
+
     position: relative; // For positioning arrows and text relative to the content
     text-align: center; // Center the text below the image
     // min-height: $height; // Set the minimum height for the content
@@ -99,7 +100,7 @@ $large_height: 300px; // Set the height for large screens
         background-color: #bf5700; // Set the background color
         color: #fff; // Set the text color to white
         font-weight: bold; // Make the text bold
-        font-size: 14px;
+        font-size: 1em;
         border-radius: 50%;
         height: 100%;
         display: flex;
@@ -107,8 +108,8 @@ $large_height: 300px; // Set the height for large screens
         overflow: hidden;
         flex-flow: column wrap;
         padding-top: 1em;
-        padding-left: 1.55em;
-        padding-right: 1.55em;
+        padding-left: 2em;
+        padding-right: 2em;
       }
 
       // Responsive heights for different breakpoints
@@ -136,14 +137,14 @@ $large_height: 300px; // Set the height for large screens
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
+    width: 14px;
     // Add specific styles for left and right arrows
     // Adjust the size, color, etc., as needed
     &.left {
-      left: 0;
+      left: 10px;
     }
     &.right {
-      right: 0;
+      right: 10px;
     }
   }
 }
