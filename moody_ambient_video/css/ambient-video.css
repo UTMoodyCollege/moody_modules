@@ -228,3 +228,7 @@
   overflow: hidden;
   max-height: 400px;
 }
+.moody-ambient-video-short .textual-content {
+  bottom: 0;
+  left: 2em;
+}
