@@ -1,9 +1,9 @@
-<div class="moody-image-grid-container">
+<div class="moody-image-grid-container ut-pt-8">
 	<div class="container">
 		{% if headline %}
 			<div class="row">
 				<div class="col-12">
-					<div class="ut-h3 headline block-headline-h2">{{ headline }}</div>
+					<div class="ut-text-2xl text-ut-white ut-font-weight-black text-center ut-pb-8">{{ headline }}</div>
 				</div>
 			</div>
 		{% endif %}
@@ -13,7 +13,7 @@
 					<div class="image-card-wrapper">
 						<a href="{{ item.link_url }}" class="card" style="background-image: url('{{ item.image_url }}');">
 							<div class="card-body">
-								<h5 class="card-title">{{ item.headline }}</h5>
+								<h5 class="ut-text-xl text-ut-white ut-font-weight-black text-center ut-p-2">{{ item.headline }}</h5>
 							</div>
 						</a>
 					</div>
