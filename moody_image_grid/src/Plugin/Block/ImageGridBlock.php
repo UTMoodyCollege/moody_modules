@@ -103,6 +103,20 @@ final class ImageGridBlock extends BlockBase implements ContainerFactoryPluginIn
       ];
     }
 
+    // Lets add an image style selection that alows choosing
+    // from the available image styles
+    $all_image_styles = \Drupal::entityTypeManager()->getStorage('image_style')->loadMultiple();
+    $image_style_options = [];
+    foreach ($all_image_styles as $image_style) {
+      $image_style_options[$image_style->id()] = $image_style->label();
+    }
+    $form['image_style'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Image Style'),
+      '#options' => $image_style_options,
+      '#default_value' => $this->configuration['image_style'] ?? 'moody_image_style_560w_x_315h',
+    ];
+
     return $form;
   }
 
@@ -114,6 +128,7 @@ final class ImageGridBlock extends BlockBase implements ContainerFactoryPluginIn
     // Lets serialize up the data and then render it out in the build method.
     $this->configuration['items'] = $form_state->getValue('items');
     $this->configuration['headline'] = $form_state->getValue('headline');
+    $this->configuration['image_style'] = $form_state->getValue('image_style');
   }
 
   /**
@@ -121,9 +136,10 @@ final class ImageGridBlock extends BlockBase implements ContainerFactoryPluginIn
    */
   public function build(): array
   {
-    // Lets unpack our items and then pass that all into the theme function moody_image_grid 
+    $image_style = $this->configuration['image_style'] ?? 'moody_image_style_560w_x_315h';
+    // Unpack our items and then pass them all into the theme function moody_image_grid
     $items = $this->configuration['items'] ?? [];
-    // Lets revise each one so that the $items['image_url'] contains absolute url to the media image referenced
+    // Revise each one so that $items['image_url'] contains the absolute URL to the media image referenced
     foreach ($items as $key => $item) {
       $image = $item['image'] ?? FALSE;
       if ($image) {
@@ -131,8 +147,16 @@ final class ImageGridBlock extends BlockBase implements ContainerFactoryPluginIn
         $media_attributes = $media->get('field_utexas_media_image')->getValue();
         $file = $this->entityTypeManager->getStorage('file')->load($media_attributes[0]['target_id']);
         $image_uri = $file->getFileUri();
-        $image_url = $this->fileUrlGenerator->generateAbsoluteString($image_uri);
-        $items[$key]['image_url'] = $image_url;
+
+        // Get the image style from the image style storage and create the URL
+        $image_style = \Drupal::entityTypeManager()->getStorage('image_style')->load('moody_image_style_560w_x_315h');
+        if ($image_style) {
+          $styled_image_url = $image_style->buildUrl($image_uri);
+          $items[$key]['image_url'] = $styled_image_url;
+        } else {
+          // Fallback to original image URL if the style is not found
+          $items[$key]['image_url'] = file_create_url($image_uri);
+        }
       }
     }
     return [
