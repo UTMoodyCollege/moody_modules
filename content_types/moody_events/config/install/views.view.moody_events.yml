@@ -6,7 +6,6 @@ dependencies:
     - field.storage.node.field_moodyevent_datetime
     - field.storage.node.field_moodyevent_image
     - field.storage.node.field_moodyevent_remote_url
-    - image.style.utexas_image_style_128w_128h
     - node.type.moody_event
     - taxonomy.vocabulary.moody_departments
   module:
@@ -148,7 +147,9 @@ display:
           type: media_thumbnail
           settings:
             image_link: ''
-            image_style: utexas_image_style_128w_128h
+            image_style: ''
+            image_loading:
+              attribute: lazy
           group_column: target_id
           group_columns: {  }
           group_rows: true
@@ -477,7 +478,6 @@ display:
           default_argument_type: fixed
           default_argument_options:
             argument: ''
-          default_argument_skip_url: false
           summary_options:
             base_path: ''
             count: true
@@ -517,7 +517,6 @@ display:
           default_argument_type: fixed
           default_argument_options:
             argument: ''
-          default_argument_skip_url: false
           summary_options:
             base_path: ''
             count: true
