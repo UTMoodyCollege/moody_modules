@@ -5,6 +5,7 @@ core_version_requirement: '^9.4 || ^10'
 package: 'Moody Content Type'
 dependencies:
   - 'breadcrumbs_visibility:breadcrumbs_visibility'
+  - 'drupal:content_moderation'
   - 'drupal:field'
   - 'drupal:layout_builder'
   - 'drupal:layout_discovery'
