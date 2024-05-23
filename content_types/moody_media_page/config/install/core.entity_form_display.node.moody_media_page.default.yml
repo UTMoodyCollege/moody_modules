@@ -17,6 +17,7 @@ dependencies:
     - field.field.node.moody_media_page.field_tags_media_page
     - node.type.moody_media_page
   module:
+    - content_moderation
     - media_library
     - moody_multimedia_directors
     - path
@@ -52,6 +53,13 @@ content:
   display_page_title:
     type: boolean_checkbox
     weight: 3
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  display_updated:
+    type: boolean_checkbox
+    weight: 10
     region: content
     settings:
       display_label: true
@@ -143,6 +151,12 @@ content:
       match_limit: 10
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  moderation_state:
+    type: moderation_state_default
+    weight: 100
+    region: content
+    settings: {  }
     third_party_settings: {  }
   path:
     type: path
