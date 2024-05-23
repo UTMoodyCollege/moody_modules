@@ -2,46 +2,46 @@ langcode: en
 status: true
 dependencies:
   config:
-    - image.style.moody_image_style_1800w_575h
-    - image.style.moody_image_style_1600w_510h
-    - image.style.moody_image_style_1165w_372h
     - image.style.moody_image_style_1000w_320h
-    - image.style.moody_image_style_800w_255h
+    - image.style.moody_image_style_1165w_372h
+    - image.style.moody_image_style_1600w_510h
+    - image.style.moody_image_style_1800w_575h
     - image.style.moody_image_style_500w_160h
+    - image.style.moody_image_style_800w_255h
   module:
-    - moody_image_styles
+    - utexas_image_styles
 id: moody_responsive_image_subsite_hero
 label: 'Moody Subsite Hero'
 image_style_mappings:
   -
-    breakpoint_id: utexas_image_styles.wide
-    multiplier: 1x
     image_mapping_type: image_style
     image_mapping: moody_image_style_1165w_372h
-  -
     breakpoint_id: utexas_image_styles.wide
-    multiplier: 2x
+    multiplier: 1x
+  -
     image_mapping_type: image_style
     image_mapping: moody_image_style_1800w_575h
+    breakpoint_id: utexas_image_styles.wide
+    multiplier: 2x
   -
-    breakpoint_id: utexas_image_styles.narrow
-    multiplier: 1x
     image_mapping_type: image_style
     image_mapping: moody_image_style_800w_255h
-  -
     breakpoint_id: utexas_image_styles.narrow
-    multiplier: 2x
+    multiplier: 1x
+  -
     image_mapping_type: image_style
     image_mapping: moody_image_style_1600w_510h
+    breakpoint_id: utexas_image_styles.narrow
+    multiplier: 2x
   -
-    breakpoint_id: utexas_image_styles.mobile
-    multiplier: 1x
     image_mapping_type: image_style
     image_mapping: moody_image_style_500w_160h
-  -
     breakpoint_id: utexas_image_styles.mobile
-    multiplier: 2x
+    multiplier: 1x
+  -
     image_mapping_type: image_style
     image_mapping: moody_image_style_1000w_320h
+    breakpoint_id: utexas_image_styles.mobile
+    multiplier: 2x
 breakpoint_group: utexas_image_styles
 fallback_image_style: moody_image_style_500w_160h
