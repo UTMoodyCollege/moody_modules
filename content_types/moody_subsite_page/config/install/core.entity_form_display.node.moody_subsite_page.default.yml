@@ -15,6 +15,7 @@ dependencies:
     - field.field.node.moody_subsite_page.layout_builder__layout
     - node.type.moody_subsite_page
   module:
+    - content_moderation
     - media_library
     - metatag
     - moody_subsite_hero
@@ -113,6 +114,12 @@ content:
     settings:
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  moderation_state:
+    type: moderation_state_default
+    weight: 100
+    region: content
+    settings: {  }
     third_party_settings: {  }
   path:
     type: path

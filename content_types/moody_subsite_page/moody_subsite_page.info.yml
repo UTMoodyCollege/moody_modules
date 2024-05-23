@@ -11,6 +11,7 @@ dependencies:
   - 'drupal:block_content'
   - 'drupal:ckeditor5'
   - 'drupal:config'
+  - 'drupal:content_moderation'
   - 'drupal:contextual'
   - 'drupal:editor'
   - 'drupal:field'
