@@ -173,6 +173,7 @@ processor_configuration:
   owner_feed_author: false
   owner_id: 0
   insert_new: 1
+  revision: false
 custom_sources:
   title:
     value: title
