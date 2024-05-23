@@ -205,10 +205,10 @@ third_party_settings:
               label_display: '0'
               provider: addtoany
               context_mapping: {  }
+              buttons_size: null
+              addtoany_html: ''
               link_url: ''
               link_title: ''
-              buttons_size: ''
-              addtoany_html: ''
             weight: 7
             additional:
               layout_builder_styles_style:
