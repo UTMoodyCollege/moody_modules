@@ -113,7 +113,12 @@ function _create_event_nodes_from_media_channel(&$event_data)
   $image_url = $event_data['image']['sizes']['medium']['url'];
   $fid = FALSE;
   if ($image_url) {
+    // Value will be like: "https://events.moody.utexas.edu/sites/default/files/styles/medium/public/2023-08/copy-of-mic-2023-slides3-300x169.png?itok=YeGRKBsE"
+
     $filename = pathinfo($image_url)['basename'];
+    // Strip off any params like ?token=xyz
+    $filename = explode('?', $filename)[0];
+    // Get the image data.
     $image = file_get_contents($image_url);
     $file = \Drupal::service('file.repository')->writeData($image, 'public://' . $filename, FileSystemInterface::EXISTS_REPLACE);
     $fid = $file->id();
