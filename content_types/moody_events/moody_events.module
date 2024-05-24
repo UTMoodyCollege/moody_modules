@@ -110,7 +110,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
   $title = isset($event_data['title']) ? Html::decodeEntities($event_data['title']) : '';
 
   // Import image and create media entity.
-  $image_url = $event_data['image']['sizes']['medium']['url'];
+  $image_url = $event_data['image']['sizes']['medium']['url'] ?? FALSE;
   $fid = FALSE;
   if ($image_url) {
     // Value will be like: "https://events.moody.utexas.edu/sites/default/files/styles/medium/public/2023-08/copy-of-mic-2023-slides3-300x169.png?itok=YeGRKBsE"
