@@ -1,0 +1,5 @@
+services:
+  drush.commands.moody_events:
+    class: Drupal\moody_events\Commands\MoodyEventsCommands
+    tags:
+      - { name: drush.command }
