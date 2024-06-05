@@ -161,7 +161,7 @@ class MoodyCard extends FieldItemBase {
     $image_media->save();
     $values['media'] = $image_media->id();
     // Attributes for sample image.
-    static $images = [];
+    $images = [];
     $min_resolution = '2280x1232';
     $max_resolution = '2280x1232';
     $extensions = ['png', 'gif', 'jpg', 'jpeg'];
