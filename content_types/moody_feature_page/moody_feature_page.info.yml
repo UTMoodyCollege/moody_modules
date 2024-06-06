@@ -63,7 +63,6 @@ dependencies:
   - 'role_delegation:role_delegation'
   - 'smart_date:smart_date'
   - 'smart_date:smart_date_recur'
-  - 'twitter_profile_widget:twitter_profile_widget'
   - 'url_embed:url_embed'
   - 'utexas:utexas'
   - 'utexas_block_library_access:utexas_block_library_access'
