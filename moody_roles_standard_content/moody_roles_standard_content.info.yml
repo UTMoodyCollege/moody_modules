@@ -1,0 +1,6 @@
+# the moody_roles_standard_page_editor basic drupal 10 module def
+name: Moody Roles Standard Content
+type: module
+description: 'Defines roles for standard content editors and managers.'
+core_version_requirement: ^8 || ^9 || ^10 || ^11
+package: Moody
