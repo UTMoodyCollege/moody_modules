@@ -38,7 +38,7 @@ display:
           admin_label: ''
           plugin_id: field
           label: ''
-          exclude: false
+          exclude: true
           alter:
             alter_text: false
             text: ''
@@ -106,21 +106,39 @@ display:
           entity_field: title
           plugin_id: field
           label: ''
-          exclude: false
+          exclude: true
           alter:
             alter_text: false
+            text: ''
             make_link: false
+            path: ''
             absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
             word_boundary: false
             ellipsis: false
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
             strip_tags: false
             trim: false
+            preserve_tags: ''
             html: false
           element_type: ''
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: true
+          element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -153,8 +171,8 @@ display:
           label: ''
           exclude: false
           alter:
-            alter_text: false
-            text: ''
+            alter_text: true
+            text: "<div class=\"grad-profile-view-item\">\r\n<div class=\"photo\">{{ field_grad_photo }}</div>\r\n<div class=\"text-ut-bluebonnet ut-text-3xl\">{{ title }}</div>\r\n<div class=\"ut-text-2xl text-ut-burntorange\">{{ field_grad_title }}</div>\r\n</div>"
             make_link: false
             path: ''
             absolute: false
@@ -481,7 +499,7 @@ display:
               field: field_grad_group
               rendered: true
               rendered_strip: false
-          row_class: ''
+          row_class: grad-profile-row
           default_row_class: true
       row:
         type: fields
