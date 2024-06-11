@@ -15,6 +15,7 @@ dependencies:
     - layout_builder
     - layout_builder_restrictions
     - layout_discovery
+    - options
     - text
     - user
 third_party_settings:
@@ -218,14 +219,12 @@ bundle: moody_grad_profile
 mode: default
 content:
   field_class_year:
-    type: number_integer
+    type: list_default
     label: above
-    settings:
-      thousand_separator: ''
-      prefix_suffix: true
+    settings: {  }
     third_party_settings: {  }
     weight: 107
-    region: content
+    region: first
   field_first_name:
     type: string
     label: above

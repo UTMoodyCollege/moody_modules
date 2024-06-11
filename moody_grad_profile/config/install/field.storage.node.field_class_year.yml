@@ -3,14 +3,30 @@ status: true
 dependencies:
   module:
     - node
+    - options
 id: node.field_class_year
 field_name: field_class_year
 entity_type: node
-type: integer
+type: list_string
 settings:
-  unsigned: false
-  size: normal
-module: core
+  allowed_values:
+    -
+      value: year_1
+      label: 'Year 1'
+    -
+      value: year_2
+      label: 'Year 2'
+    -
+      value: year_3
+      label: 'Year 3'
+    -
+      value: year_4
+      label: 'Year 4'
+    -
+      value: year_5_and_beyond
+      label: 'Year 5 and beyond'
+  allowed_values_function: ''
+module: options
 locked: false
 cardinality: 1
 translatable: true
