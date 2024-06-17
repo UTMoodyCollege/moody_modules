@@ -84,7 +84,7 @@ if ($short_mode) {
       // Variables to pass to drupalSettings. //
       //----------------------------//
       // Pass video URL.
-      $video_url = $variables['content']['field_mav_url']['0']['#url']->getUri();
+      $video_url = !empty($variables['content']['field_mav_url']['0']['#url']) ? $variables['content']['field_mav_url']['0']['#url']->getUri() : FALSE;
       $variables['#attached']['drupalSettings']['ambientVideo']['ambientVideoUrl'] = $video_url;
 
       // Pass the fallback image URL.
