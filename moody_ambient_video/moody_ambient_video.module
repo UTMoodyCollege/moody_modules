@@ -39,9 +39,9 @@ function moody_ambient_video_preprocess_block(&$variables)
       // Pass the file URL of the poster image.
       if ($mid = $variables['content']['#block_content']->get('field_mav_poster')->getString()) {
         $media = Media::load($mid); // Load media.
-        $fid = $media->getSource()->getSourceFieldValue($media); // Get fid.
+        $fid = $media ? $media->getSource()->getSourceFieldValue($media) : FALSE; // Get fid.
         $file = File::load($fid); // Get file.
-        $poster_url = ImageStyle::load('moody_image_style_960w_x_540h')->buildUrl($file->getFileUri()); // Create URL.
+        $poster_url = $file ? ImageStyle::load('moody_image_style_960w_x_540h')->buildUrl($file->getFileUri()) : FALSE; // Create URL.
       }
       $variables['poster'] = $poster_url ?? FALSE;
 
@@ -90,7 +90,7 @@ if ($short_mode) {
       // Pass the fallback image URL.
       if ($mid = $variables['content']['#block_content']->get('field_mav_fallback')->getString()) {
         $media = Media::load($mid); // Load media.
-        $fid = $media->getSource()->getSourceFieldValue($media); // Get fid.
+        $fid = $media ? $media->getSource()->getSourceFieldValue($media) : FALSE; // Get fid.
         $file = File::load($fid); // Get file.
         $fallback_url = ImageStyle::load('moody_image_style_650w_x_700h')->buildUrl($file->getFileUri()); // Create URL.
       }
