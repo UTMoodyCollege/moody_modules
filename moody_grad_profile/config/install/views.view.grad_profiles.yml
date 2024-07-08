@@ -11,6 +11,7 @@ dependencies:
     - media
     - moody_grad_profile
     - node
+    - options
     - taxonomy
     - user
 id: grad_profiles
@@ -419,11 +420,8 @@ display:
           group_type: group
           admin_label: ''
           plugin_id: numeric
-          operator: '='
-          value:
-            min: ''
-            max: ''
-            value: ''
+          operator: or
+          value: {  }
           group: 1
           exposed: true
           expose:
@@ -445,17 +443,9 @@ display:
               moody_strauss_editor: '0'
               moody_behavioral_science_lab_editor: '0'
               moody_center_for_health_comm_editor: '0'
-              moody_denius_sams_gaming_academy_editor: '0'
               moody_subsite_editor: '0'
-              moody_ie_editor: '0'
               moody_conferences_editor: '0'
-              moody_lang_stuttering_institute_editor: '0'
-              moody_senior_fellows_editor: '0'
-              moody_tipi_editor: '0'
-              moody_utla_editor: '0'
               moody_writing_support_program_editor: '0'
-              moody_tpsm_editor: '0'
-              moody_career_services_editor: '0'
               moody_gcc_editor: '0'
               moody_feature_page_editor: '0'
               faculty_bio_editor: '0'
@@ -472,13 +462,13 @@ display:
               basic_page_editor: '0'
               room_editor: '0'
               moody_eastin_research_editor: '0'
-              strong_editor: '0'
               latino_media_editor: '0'
               woolfolk_center_subsite_editor: '0'
               profile_editor: '0'
             min_placeholder: ''
             max_placeholder: ''
             placeholder: ''
+            reduce: 0
           is_grouped: false
           group_info:
             label: ''
@@ -491,6 +481,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          reduce_duplicates: 0
       style:
         type: default
         options:

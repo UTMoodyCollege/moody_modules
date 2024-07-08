@@ -63,10 +63,11 @@ third_party_settings:
                 utexas_block_bottom_margin_remove: 0
                 utexas_block_top_margin_increase: 0
                 utexas_block_bottom_margin_increase: 0
-                moody_add_bottom_margin: 0
+                align_content_to_top: align_content_to_top
                 moody_add_top_margin: 0
                 moody_remove_bottom_margin: 0
                 moody_remove_top_margin: 0
+                moody_add_bottom_margin: 0
           914a3df6-f377-4093-bab9-ff13f225f119:
             uuid: 914a3df6-f377-4093-bab9-ff13f225f119
             region: second
@@ -189,6 +190,21 @@ third_party_settings:
                 moody_add_top_margin: 0
                 moody_remove_bottom_margin: 0
                 moody_remove_top_margin: 0
+          78bec652-fa12-4f2f-9d14-00fd5eab32eb:
+            uuid: 78bec652-fa12-4f2f-9d14-00fd5eab32eb
+            region: first
+            configuration:
+              id: 'field_block:node:moody_grad_profile:field_class_year'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: list_default
+                label: above
+                settings: {  }
+                third_party_settings: {  }
+            weight: 5
+            additional: {  }
         third_party_settings: {  }
       -
         layout_id: layout_onecol
