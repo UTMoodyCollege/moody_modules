@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * We want to hook_preprocess_form and if we are on the 'views-exposed-form-grad-profiles-page-1' we want to add some classes to nicely wrap the exposed filters.
+ * We can elverage on bootstrap responsive classes for this.
+ */
+function moody_grad_profile_preprocess_form(&$variables) {
+  // Check if we are on the views-exposed-form-grad-profiles-page-1
+  if ($variables['element']['#id'] == 'views-exposed-form-grad-profiles-page-1') {
+    // Add the classes to the form
+    $variables['attributes']['class'][] = 'row';
+    $variables['attributes']['class'][] = 'justify-content-left';
+    $variables['attributes']['class'][] = 'mb-3';
+    // We also want it to have align-items: flex-end;
+    $variables['attributes']['style'] = 'align-items: flex-end;';
+    
+    
+  }
+}
+
+// We want to preprocess the input__submit and if its edit-submit-grad-profiles then we can remove the margin bottom
+function moody_grad_profile_preprocess_input(&$variables) {
+  // Check if we are on the edit-submit-grad-profiles
+  if ($variables['element']['#id'] == 'edit-submit-grad-profiles') {
+    // Remove the margin bottom
+    $variables['attributes']['class'][] = 'mb-1';
+  }
+}
