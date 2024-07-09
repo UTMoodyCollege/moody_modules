@@ -18,7 +18,7 @@ class GradProfileHeader extends AreaPluginBase
   public function render($empty = FALSE)
   {
     $vocabulary = 'moody_grad_profile_group';
-    $output = '<div class="custom-term-links-container row">';
+    $output = '<div class="custom-term-links-container row p-3">';
 
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vocabulary);
 
