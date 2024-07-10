@@ -24,4 +24,5 @@ dependencies:
   - 'moody_grad_profile:moody_grad_profile'
   - 'page_title_visibility:page_title_visibility'
   - 'pathauto:pathauto'
+  - 'utexas_image_styles:utexas_image_styles'
   - 'utexas_media_types:utexas_media_types'

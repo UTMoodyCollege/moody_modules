@@ -16,6 +16,10 @@ function moody_grad_profile_preprocess_form(&$variables) {
     // We also want it to have align-items: flex-end;
     $variables['attributes']['style'] = 'align-items: flex-end;';
     
+    // Let now add some padding-right on some of the elements
+    $variables["element"]["combine"]["#attributes"]["class"][] = "pr-3";
+    // And the year
+    $variables["element"]["field_class_year_value"]["#attributes"]["class"][] = "pr-3";
     
   }
 }
