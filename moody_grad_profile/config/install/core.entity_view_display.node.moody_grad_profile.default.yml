@@ -195,16 +195,32 @@ third_party_settings:
             region: first
             configuration:
               id: 'field_block:node:moody_grad_profile:field_class_year'
+              label: 'Class Year'
               label_display: '0'
+              provider: layout_builder
               context_mapping:
                 entity: layout_builder.entity
+                view_mode: view_mode
               formatter:
                 type: list_default
-                label: above
+                label: hidden
                 settings: {  }
                 third_party_settings: {  }
             weight: 5
-            additional: {  }
+            additional:
+              layout_builder_styles_style:
+                utexas_border_without_background: 0
+                utexas_border_with_background: 0
+                utexas_readable: 0
+                utexas_block_top_margin_remove: 0
+                utexas_block_bottom_margin_remove: 0
+                utexas_block_top_margin_increase: 0
+                utexas_block_bottom_margin_increase: 0
+                align_content_to_top: 0
+                moody_add_top_margin: 0
+                moody_remove_bottom_margin: 0
+                moody_remove_top_margin: 0
+                moody_add_bottom_margin: 0
         third_party_settings: {  }
       -
         layout_id: layout_onecol
