@@ -4,3 +4,33 @@
  * @file
  * Install, update and uninstall functions for the Moody Grad Profile module.
  */
+
+/**
+ * WHen we install, lets add a "grad_profile_editor" role that has:
+ * - permission for CRUD for the "moody_grad_profile" node content type
+ * - permission for CRUD fo rhte taxonomy.vocabulary.moody_grad_profile_group
+ */
+function moody_grad_profile_install()
+{
+    // Create the role.
+    $role = new stdClass();
+    $role->name = 'grad_profile_editor';
+    $role->weight = 4;
+    user_role_save($role);
+
+    // Grant permissions to the role.
+    $permissions = array(
+        'create moody_grad_profile content',
+        'edit any moody_grad_profile content',
+        'edit own moody_grad_profile content',
+        'delete any moody_grad_profile content',
+        'delete own moody_grad_profile content',
+        'access content',
+        'view published content',
+        'administer taxonomy',
+        'create moody_grad_profile_group terms',
+        'edit moody_grad_profile_group terms',
+        'delete moody_grad_profile_group terms',
+    );
+    user_role_grant_permissions($role->rid, $permissions);
+}
