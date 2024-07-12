@@ -19,6 +19,9 @@ class GradProfileHeader extends AreaPluginBase
   {
     $vocabulary = 'moody_grad_profile_group';
     $output = '<div class="custom-term-links-container row p-3">';
+    // Lets add an "All" link
+    $url = "/graduate-profiles";
+    $output .= '<a class="ut-btn" href="' . $url . '">All</a><br>';
 
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vocabulary);
 
@@ -28,7 +31,7 @@ class GradProfileHeader extends AreaPluginBase
         $term = Term::load($term_info->tid);
         if ($term) {
           $url = "/graduate-profiles/" . $term->id();
-          $linkClass = $first ? 'ut-btn' : 'ut-btn ml-2'; // Add 'mr-2' class if not the first term
+          $linkClass = 'ut-btn ml-2';
           $output .= '<a class="' . $linkClass . '" href="' . $url . '">' . $term->label() . '</a><br>';
           $first = FALSE; // Set first to FALSE after the first term is processed
         }
