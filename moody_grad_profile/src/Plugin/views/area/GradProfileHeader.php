@@ -27,7 +27,7 @@ class GradProfileHeader extends AreaPluginBase
       foreach ($terms as $term_info) {
         $term = Term::load($term_info->tid);
         if ($term) {
-          $url = "/grad-profiles/" . $term->id();
+          $url = "/graduate-profiles/" . $term->id();
           $linkClass = $first ? 'ut-btn' : 'ut-btn ml-2'; // Add 'mr-2' class if not the first term
           $output .= '<a class="' . $linkClass . '" href="' . $url . '">' . $term->label() . '</a><br>';
           $first = FALSE; // Set first to FALSE after the first term is processed

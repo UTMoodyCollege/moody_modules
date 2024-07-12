@@ -6,7 +6,7 @@
  */
 function moody_grad_profile_preprocess_form(&$variables) {
   // Check if we are on the views-exposed-form-grad-profiles-page-1
-  if ($variables['element']['#id'] == 'views-exposed-form-grad-profiles-page-1') {
+  if ($variables['element']['#id'] == 'views-exposed-form-grad-profiles-page-1' || $variables['element']['#id'] == 'views-exposed-form-grad-profiles-page-2') {
     // Add the classes to the form
     $variables['attributes']['class'][] = 'row';
     $variables['attributes']['class'][] = 'justify-content-left';
