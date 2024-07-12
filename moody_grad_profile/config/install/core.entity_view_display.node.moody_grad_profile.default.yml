@@ -27,8 +27,8 @@ third_party_settings:
         layout_id: layout_twocol_section
         layout_settings:
           label: ''
-          context_mapping: {  }
           column_widths: 25-75
+          context_mapping: {  }
           layout_builder_styles_style:
             utexas_no_padding: 0
             moody_container_constraint: 0
