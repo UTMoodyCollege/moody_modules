@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Moody Grad Profile module.
+ */
+
+use Drupal\user\Entity\Role;
+
+/**
+ * Implements hook_install().
+ */
+function moody_grad_profile_role_install() {
+    // Create the role.
+    $role = Role::create([
+        'id' => 'grad_profile_editor',
+        'label' => 'Grad Profile Editor',
+    ]);
+    $role->save();
+
+    // Grant permissions to the role.
+    $permissions = [
+        'create moody_grad_profile content',
+        'edit any moody_grad_profile content',
+        'edit own moody_grad_profile content',
+        'delete any moody_grad_profile content',
+        'delete own moody_grad_profile content',
+        'access content',
+        'administer taxonomy',
+        'create terms in moody_grad_profile_group',
+        'edit terms in moody_grad_profile_group',
+        'delete terms in moody_grad_profile_group',
+    ];
+    
+    foreach ($permissions as $permission) {
+        $role->grantPermission($permission);
+    }
+
+    $role->save();
+}
+/**
+ * Implements hook_uninstall().
+ */
+function moody_grad_profile_role_uninstall() {
+    if ($role = Role::load('grad_profile_editor')) {
+        $role->delete();
+    }
+}

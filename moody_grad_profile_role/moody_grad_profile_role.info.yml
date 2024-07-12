@@ -1,0 +1,7 @@
+name: 'Graduate Profile Role'
+type: module
+description: 'Provides Graduate Profile content type and related configuration. Provides a grad student profile.'
+package: Custom
+core_version_requirement: '^9.4 || ^10'
+dependencies:
+  - moody_grad_profile
