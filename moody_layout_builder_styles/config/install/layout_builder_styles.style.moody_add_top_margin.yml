@@ -5,6 +5,7 @@ id: moody_add_top_margin
 label: 'Add Top Margin'
 classes: moody-add-mt
 type: component
-weight: 0
+group: default
 block_restrictions: {  }
 layout_restrictions: {  }
+weight: 0

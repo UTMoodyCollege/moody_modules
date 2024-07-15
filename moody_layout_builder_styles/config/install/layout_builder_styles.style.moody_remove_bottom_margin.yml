@@ -5,6 +5,7 @@ id: moody_remove_bottom_margin
 label: 'Remove Bottom Margin'
 classes: moody-remove-mb
 type: component
-weight: 0
+group: default
 block_restrictions: {  }
 layout_restrictions: {  }
+weight: 0

@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: disable_background_accent_filtering
+label: 'Disable Background Accent Filtering'
+classes: disabled-background-accent-filtering
+type: section
+group: default
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 0

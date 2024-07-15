@@ -5,6 +5,7 @@ id: moody_remove_top_margin
 label: 'Remove Top Margin'
 classes: moody-remove-mt
 type: component
-weight: 0
+group: default
 block_restrictions: {  }
 layout_restrictions: {  }
+weight: 0
