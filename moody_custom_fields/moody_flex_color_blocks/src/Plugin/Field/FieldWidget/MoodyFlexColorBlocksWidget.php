@@ -60,7 +60,7 @@ class MoodyFlexColorBlocksWidget extends WidgetBase {
         'green' => $this->t('Green'),
         'orange' => $this->t('Orange'),
       ],
-      '#default_value' => isset($items[$delta]->color_scheme) ? $items[$delta]->color_scheme : NULL,
+      '#default_value' => isset($items[$delta]->color_scheme) ? $items[$delta]->color_scheme : 'blue',
     ];
 
     return $element;
