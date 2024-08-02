@@ -155,8 +155,10 @@ final class ImageGridBlock extends BlockBase implements ContainerFactoryPluginIn
           $items[$key]['image_url'] = $styled_image_url;
         } else {
           // Fallback to original image URL if the style is not found
-          $items[$key]['image_url'] = file_create_url($image_uri);
+          $file_url_generator = \Drupal::service('file_url_generator');
+          $items[$key]['image_url'] = $file_url_generator->generateAbsoluteString($image_uri);
         }
+
       }
     }
     return [
