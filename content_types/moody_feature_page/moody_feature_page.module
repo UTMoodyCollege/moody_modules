@@ -191,19 +191,20 @@ function _get_previous_next_nodes($nid)
   $results['prev'] = FALSE;
   $results['next'] = FALSE;
 
-  if ($previous_node != NULL) {
+  if (!empty($previous_node)) {
     $prev_title = $previous_node->getTitle();
     $prev_link = $previous_node->toUrl()->toString();
     $results['prev']['title'] = $prev_title;
     $results['prev']['url'] = $prev_link;
   }
 
-  if ($next_node != NULL) {
+  if (!empty($next_node)) {
     $next_title = $next_node->getTitle();
     $next_link = $next_node->toUrl()->toString();
     $results['next']['title'] = $next_title;
     $results['next']['url'] = $next_link;
   }
+
 
   return $results;
 }
