@@ -693,7 +693,7 @@ display:
               field: field_grad_group
               rendered: true
               rendered_strip: false
-          row_class: 'grad-profile-row pb-4 hr-bottom'
+          row_class: 'grad-profile-row pb-4 hr-bottom col-md-4 col-lg-3 col-sm-12'
           default_row_class: true
       row:
         type: fields
