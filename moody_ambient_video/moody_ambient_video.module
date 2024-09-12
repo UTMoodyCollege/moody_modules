@@ -92,7 +92,7 @@ if ($short_mode) {
         $media = Media::load($mid); // Load media.
         $fid = $media ? $media->getSource()->getSourceFieldValue($media) : FALSE; // Get fid.
         $file = File::load($fid); // Get file.
-        $fallback_url = ImageStyle::load('moody_image_style_650w_x_700h')->buildUrl($file->getFileUri()); // Create URL.
+        $fallback_url = $file ? ImageStyle::load('moody_image_style_650w_x_700h')->buildUrl($file->getFileUri()) : FALSE; // Create URL.
       }
       $variables['#attached']['drupalSettings']['ambientVideo']['ambientVideoFallback'] = isset($fallback_url) ? $fallback_url : '';
 
