@@ -27,8 +27,8 @@ class MoodyHeroStyle2Formatter extends MoodyHeroFormatterBase {
     $cache_tags = [];
     $elements = [];
     $large_image_style_name = 'utexas_image_style_2250w_900h';
-    $medium_image_style_name = 'utexas_image_style_900w';
-    $small_image_style_name = 'utexas_image_style_600w';
+    $medium_image_style_name = 'utexas_image_style_1200w';
+    $small_image_style_name = 'utexas_image_style_1200w';
 
     // First load image styles & store their style in the cache for this page.
     $large_image_style = $this->entityTypeManager->getStorage('image_style')->load($large_image_style_name);
