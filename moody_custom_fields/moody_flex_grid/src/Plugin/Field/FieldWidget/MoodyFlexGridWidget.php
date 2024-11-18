@@ -194,6 +194,10 @@ class MoodyFlexGridWidget extends WidgetBase {
           if (empty($storage[$delta]['flex_grid_items'][$weight]['item'])) {
             unset($storage[$delta]['flex_grid_items'][$weight]);
           }
+          // If we *only* have the "headline_alignment" and EVERYTHING ELSE is empty, its a removal... so in othe words, if at this point we have an empty image, headline, copy, and link[uri], we should remove the item.
+          if (empty($elements['image']) && empty($elements['headline']) && empty($elements['copy']) && empty($elements['link']['uri'])) {
+            unset($storage[$delta]['flex_grid_items'][$weight]);
+          }
         }
       }
       // If no Moody Flex Grid items have been added, remove the empty array.
