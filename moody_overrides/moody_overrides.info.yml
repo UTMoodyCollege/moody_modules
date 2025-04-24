@@ -3,5 +3,3 @@ type: module
 description: 'Provides overrides for Moody College website functionality'
 package: Moody
 core_version_requirement: ^9 || ^10
-dependencies:
-  - utexas_promo_unit:utexas_promo_unit
