@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * @file
+ * Install functions for Moody Overrides module.
+ */
+
+/**
+ * Implements hook_update_N().
+ * Reverts moody_overrides feature.
+ */
+function moody_overrides_update_9001() {
+  \Drupal::service('features.manager')->import(['moody_overrides'], TRUE);
+}
