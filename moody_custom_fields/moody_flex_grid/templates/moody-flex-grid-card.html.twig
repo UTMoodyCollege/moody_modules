@@ -1,0 +1,63 @@
+{#
+/**
+ * @file
+ * Custom theme implementation for the Moody Flex Grid Card display.
+ *
+ * Available variables:
+ * - headline: The overall grid headline field.
+ * - style: The grid style/column count.
+ * - flex_grid_items: An array containing grid items.
+ *   - image: The person's image.
+ *   - headline: The person's name.
+ *   - title: The person's title/role.
+ *   - link: Link to bio page.
+ *
+ * @ingroup themeable
+ */
+#}
+
+<div class="flex-grid-wrapper card-display">
+  {% if headline %}
+    <div class="row">
+      <div class="col-12">
+        <div class="ut-h3 headline block-headline-h2">{{ headline }}</div>
+      </div>
+    </div>
+  {% endif %}
+  {% if flex_grid_items %}
+    <div class="flex-grid-items {{ style }}-columns">
+      {% for item in flex_grid_items %}
+        <article class="flex-grid-item person-card">
+          <div class="bg-ut-burntorange" style="height: 10px;"></div>
+          {% if item.link %}
+            <a href="{{ item.link }}" class="person-card__link">
+          {% endif %}
+          <div class="mfg--image">
+            {{ item.image }}
+          </div>
+          <div class="mfg--content">
+            <h3 class="ut--headline mt-3 mb-2 ut-font-weight-black">{{ item.headline }}</h3>
+            {% if item.title %}
+              <div class="mfg--title">{{ item.title }}</div>
+            {% endif %}
+            {# copy if present #}
+            {% if item.copy %}
+                <div class="mfg--copy text-black mb-2">
+                  {{ item.copy }}
+                </div>
+            {% endif %}
+
+            {% if item.link %}
+              <div class="mfg--link">
+                <a href="{{ item.link }}" class="text-ut-burntorange text-decoration-none ut-font-weight-bold">View<span aria-hidden="true">→</span></a>
+              </div>
+            {% endif %}
+          </div>
+          {% if item.link %}
+            </a>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
