@@ -123,7 +123,13 @@ class MoodyFlexGridFormatter6 extends FormatterBase implements ContainerFactoryP
           }
           // copy
             if (!empty($instance_item['copy'])) {
-                $instances[$key]['copy'] = $instance_item['copy'];
+              // Render as Markkup with the flex_html text format
+              $instances[$key]['copy'] = [
+                '#type' => 'processed_text',
+                '#text' => $instance_item['copy'],
+                '#format' => 'flex_html',
+              ];
+              
             }
         }
       }
