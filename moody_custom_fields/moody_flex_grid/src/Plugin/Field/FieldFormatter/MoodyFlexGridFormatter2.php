@@ -117,7 +117,7 @@ class MoodyFlexGridFormatter2 extends FormatterBase implements ContainerFactoryP
             $instances[$key]['headline'] = $instance_item['headline'];
           }
           if (!empty($instance_item['copy'])) {
-            $instances[$key]['copy'] = check_markup($instance_item['copy'], 'plain_text');
+            $instances[$key]['copy'] = check_markup($instance_item['copy'], 'flex_html');
           }
           if (!empty($instance_item['headline_alignment'])) {
             $instances[$key]['headline_alignment'] = $instance_item['headline_alignment'];
