@@ -46,3 +46,35 @@
   font-size: 0.75em;
   color: #333f48; /* gray color */
 }
+
+/* Stylish category tags for news-categories links */
+.latest-news-block .news-categories {
+  margin-top: 0.5em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  width: 100%; /* Ensures tags wrap to new lines if needed */
+}
+
+.latest-news-block .news-categories a {
+  background-color: #bf5700; /* UT Burnt Orange */
+  color: #fff !important;
+  font-size: 0.85em;
+  font-weight: 600;
+  padding: 0.2em 0.7em;
+  border-radius: 1em;
+  display: inline-block;
+  letter-spacing: 0.03em;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.latest-news-block .news-categories a:hover,
+.latest-news-block .news-categories a:focus {
+  background-color: #a94400;
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
+}

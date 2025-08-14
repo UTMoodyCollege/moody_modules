@@ -114,6 +114,9 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
       '#arguments' => [$nids],
     ];
 
+    // Attach the moody_feature_editors_picks lib
+    $build['#attached']['library'][] = 'moody_feature_page/moody_feature_editors_picks';
+
     return $build;
   }
 }

@@ -12,6 +12,7 @@ dependencies:
     - field.field.node.moody_feature_page.layout_builder__layout
     - node.type.moody_feature_page
   module:
+    - content_moderation
     - media_library
     - moody_feature_credit
     - path

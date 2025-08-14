@@ -11,7 +11,7 @@ third_party_settings:
 name: 'Moody Feature Page'
 type: moody_feature_page
 description: 'News articles automatically displayed in grid at /news.'
-help: ''
+help: null
 new_revision: true
 preview_mode: 0
 display_submitted: false

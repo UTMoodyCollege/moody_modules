@@ -5,7 +5,7 @@ moody_feature_hero:
     theme:
       css/feature-page-hero.css: {}
 moody_feature_editors_picks:
-  version: 1.x
+  version: 2.x
   css:
     theme:
       css/feature-page-editors-picks.css: {}
