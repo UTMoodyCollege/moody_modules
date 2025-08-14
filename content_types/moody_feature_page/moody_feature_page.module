@@ -9,6 +9,7 @@ use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Term;
 
 /**
  * Implenents hook_theme().
@@ -151,6 +152,51 @@ function moody_feature_page_preprocess_page(&$variables)
     $previous_next = _get_previous_next_nodes($nid);
     $variables['prev_node'] = !empty($previous_next['prev']) ? $previous_next['prev'] : FALSE;
     $variables['next_node'] = !empty($previous_next['next']) ? $previous_next['next'] : FALSE;
+  }
+
+  // Check if we're on a feature_page_categories term page.
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if ($route_name === 'entity.taxonomy_term.canonical') {
+    $term = \Drupal::routeMatch()->getParameter('taxonomy_term');
+    if ($term instanceof Term && $term->bundle() === 'feature_page_categories') {
+      // Load all moody_feature_page nodes tagged with this term.
+      $query = \Drupal::entityTypeManager()->getStorage('node')->getQuery();
+      $nids = $query
+        ->condition('type', 'moody_feature_page')
+        ->condition('field_news_categories', $term->id())
+        ->accessCheck(FALSE)
+        ->sort('created', 'DESC')
+        ->execute();
+
+      // Remove empty values.
+      $nids = array_filter($nids);
+
+      // Build the title markup.
+      $category_title = $term->getName();
+      $title_markup = [
+        '#type' => 'html_tag',
+        '#tag' => 'h2',
+        '#value' => 'News - ' . $category_title,
+        '#attributes' => ['class' => ['news-category-title']],
+      ];
+
+      // Pass NIDs to the view.
+      $view = [
+        '#type' => 'view',
+        '#name' => 'news_filtered',
+        '#display_id' => 'block_filtered',
+        '#arguments' => [implode(',', $nids)],
+      ];
+
+      // Attach your library if needed.
+      $view['#attached']['library'][] = 'moody_feature_page/moody_feature_editors_picks';
+
+      // Override the main content with title and view.
+      $variables['page']['content'] = [
+        'news_category_title' => $title_markup,
+        'news_category_view' => $view,
+      ];
+    }
   }
 }
 
