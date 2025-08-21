@@ -68,56 +68,48 @@
     align-items: center;
   }
 
-  // Positioning classes for content zones
-  .position-top-left {
+  // Positioning using data-position attribute for content zones
+  .shape[data-position="top-left"] {
     align-items: flex-start;
     justify-content: flex-start;
     text-align: left;
   }
-
-  .position-top-center {
+  .shape[data-position="top-center"] {
     align-items: flex-start;
     justify-content: center;
     text-align: center;
   }
-
-  .position-top-right {
+  .shape[data-position="top-right"] {
     align-items: flex-start;
     justify-content: flex-end;
     text-align: right;
   }
-
-  .position-center-left {
+  .shape[data-position="center-left"] {
     align-items: center;
     justify-content: flex-start;
     text-align: left;
   }
-
-  .position-center {
+  .shape[data-position="center"] {
     align-items: center;
     justify-content: center;
     text-align: center;
   }
-
-  .position-center-right {
+  .shape[data-position="center-right"] {
     align-items: center;
     justify-content: flex-end;
     text-align: right;
   }
-
-  .position-bottom-left {
+  .shape[data-position="bottom-left"] {
     align-items: flex-end;
     justify-content: flex-start;
     text-align: left;
   }
-
-  .position-bottom-center {
+  .shape[data-position="bottom-center"] {
     align-items: flex-end;
     justify-content: center;
     text-align: center;
   }
-
-  .position-bottom-right {
+  .shape[data-position="bottom-right"] {
     align-items: flex-end;
     justify-content: flex-end;
     text-align: right;

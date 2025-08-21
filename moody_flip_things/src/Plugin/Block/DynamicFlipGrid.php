@@ -426,6 +426,17 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
       $chevron_right = file_get_contents($chevron_right_path);
     }
 
+    $position_options = [
+      'top-left' => $this->t('Top Left'),
+      'top-center' => $this->t('Top Center'),
+      'top-right' => $this->t('Top Right'),
+      'center-left' => $this->t('Center Left'),
+      'center' => $this->t('Center'),
+      'center-right' => $this->t('Center Right'),
+      'bottom-left' => $this->t('Bottom Left'),
+      'bottom-center' => $this->t('Bottom Center'),
+      'bottom-right' => $this->t('Bottom Right'),
+    ];
     return [
       '#theme' => 'moody_dynamic_flip_grid',
       '#headline' => $this->configuration['headline'] ?? '',
@@ -434,6 +445,7 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
       '#items' => $processed_items,
       '#chevron_left' => $chevron_left,
       '#chevron_right' => $chevron_right,
+      '#position_options' => $position_options,
       '#attached' => [
         'library' => [
           'moody_flip_things/moody_dynamic_flip_grid',

@@ -20,7 +20,7 @@
 							<!-- Front Side -->
 							<div class="front">
 								<div class="shape-border">
-									<div class="shape position-{{ item.front.position|default('center') }}">
+									<div class="shape position-{{ item.front.position|default('center') }}" data-position="{{ item.front.position|default('center') }}">
 										{% if item.front.media_url %}
 											<div class="media-content" style="background-image: url('{{ item.front.media_url }}');">
 												{% if item.front.media_alt %}
@@ -28,19 +28,15 @@
 												{% endif %}
 											</div>
 										{% endif %}
-										
 										{% if item.front.headline %}
 											<div class="headline-content">{{ item.front.headline }}</div>
 										{% endif %}
-										
 										{% if item.front.body_rendered %}
 											<div class="body-content">{{ item.front.body_rendered }}</div>
 										{% endif %}
-										
 										{% if item.front.cta_render %}
 											<div class="cta-content">{{ item.front.cta_render }}</div>
 										{% endif %}
-										
 										<!-- Navigation arrows -->
 										<div class="arrow left">{{ chevron_left | raw }}</div>
 										<div class="arrow right">{{ chevron_right | raw }}</div>
@@ -51,7 +47,7 @@
 							<!-- Back Side -->
 							<div class="back">
 								<div class="shape-border">
-									<div class="shape position-{{ item.back.position|default('center') }}">
+									<div class="shape position-{{ item.back.position|default('center') }}" data-position="{{ item.back.position|default('center') }}">
 										{% if item.back.media_url %}
 											<div class="media-content" style="background-image: url('{{ item.back.media_url }}');">
 												{% if item.back.media_alt %}
@@ -59,19 +55,15 @@
 												{% endif %}
 											</div>
 										{% endif %}
-										
 										{% if item.back.headline %}
 											<div class="headline-content">{{ item.back.headline }}</div>
 										{% endif %}
-										
 										{% if item.back.body_rendered %}
 											<div class="body-content">{{ item.back.body_rendered }}</div>
 										{% endif %}
-										
 										{% if item.back.cta_render %}
 											<div class="cta-content">{{ item.back.cta_render }}</div>
 										{% endif %}
-										
 										<!-- Navigation arrows -->
 										<div class="arrow left">{{ chevron_left | raw }}</div>
 										<div class="arrow right">{{ chevron_right | raw }}</div>
