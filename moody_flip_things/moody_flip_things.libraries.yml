@@ -10,7 +10,7 @@ moody_flip_image_grid:
   dependencies:
     - core/drupal
     - core/jquery
-    - core/jquery.once
+    - core/once
 
 moody_dynamic_flip_grid:
   version: 1.x
