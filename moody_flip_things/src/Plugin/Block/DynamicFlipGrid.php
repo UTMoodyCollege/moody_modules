@@ -59,6 +59,8 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
   {
     return [
       'headline' => '',
+      'style' => 'round',
+      'items_per_row' => '3',
       'items' => [],
     ];
   }
@@ -73,6 +75,33 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
       '#type' => 'textfield',
       '#title' => $this->t('Headline'),
       '#default_value' => $this->configuration['headline'] ?? '',
+    ];
+
+    // Style selection
+    $form['style'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Style'),
+      '#options' => [
+        'round' => $this->t('Round'),
+        'square' => $this->t('Square'),
+        'rectangle' => $this->t('Rectangle'),
+      ],
+      '#default_value' => $this->configuration['style'] ?? 'round',
+      '#description' => $this->t('Choose the shape style for the flip cards.'),
+    ];
+
+    // Items per row
+    $form['items_per_row'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Items per row'),
+      '#options' => [
+        '1' => $this->t('1 item per row'),
+        '2' => $this->t('2 items per row'),
+        '3' => $this->t('3 items per row'),
+        '4' => $this->t('4 items per row'),
+      ],
+      '#default_value' => $this->configuration['items_per_row'] ?? '3',
+      '#description' => $this->t('Number of items to display per row (responsive).'),
     ];
 
     // Position options for content zones
@@ -261,6 +290,8 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
   public function blockSubmit($form, FormStateInterface $form_state): void
   {
     $this->configuration['headline'] = $form_state->getValue('headline');
+    $this->configuration['style'] = $form_state->getValue('style');
+    $this->configuration['items_per_row'] = $form_state->getValue('items_per_row');
     $items = $form_state->getValue('items');
     
     // Remove the actions element from items
@@ -398,6 +429,8 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
     return [
       '#theme' => 'moody_dynamic_flip_grid',
       '#headline' => $this->configuration['headline'] ?? '',
+      '#style' => $this->configuration['style'] ?? 'round',
+      '#items_per_row' => $this->configuration['items_per_row'] ?? '3',
       '#items' => $processed_items,
       '#chevron_left' => $chevron_left,
       '#chevron_right' => $chevron_right,

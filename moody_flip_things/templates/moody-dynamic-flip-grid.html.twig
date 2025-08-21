@@ -1,4 +1,4 @@
-<div class="moody-dynamic-flip-grid-container ut-pt-8 ut-pb-8">
+<div class="moody-dynamic-flip-grid-container ut-pt-8 ut-pb-8 style-{{ style|default('round') }} items-per-row-{{ items_per_row|default('3') }}">
 	<div class="container">
 		{% if headline %}
 			<div class="row">
@@ -8,14 +8,19 @@
 			</div>
 		{% endif %}
 		<div class="row contents-row-max-w">
+			{% 
+				set col_class = items_per_row == '1' ? 'col-12' : 
+				               (items_per_row == '2' ? 'col-12 col-md-6' : 
+				               (items_per_row == '3' ? 'col-12 col-md-6 col-lg-4' : 'col-12 col-sm-6 col-md-4 col-lg-3'))
+			%}
 			{% for item in items %}
-				<div class="col">
+				<div class="{{ col_class }} ut-mb-4">
 					<div class="moody-dynamic-flip-grid-item">
 						<div class="content">
 							<!-- Front Side -->
 							<div class="front">
-								<div class="circle-border">
-									<div class="circle position-{{ item.front.position|default('center') }}">
+								<div class="shape-border">
+									<div class="shape position-{{ item.front.position|default('center') }}">
 										{% if item.front.media_url %}
 											<div class="media-content" style="background-image: url('{{ item.front.media_url }}');">
 												{% if item.front.media_alt %}
@@ -45,8 +50,8 @@
 
 							<!-- Back Side -->
 							<div class="back">
-								<div class="circle-border">
-									<div class="circle position-{{ item.back.position|default('center') }}">
+								<div class="shape-border">
+									<div class="shape position-{{ item.back.position|default('center') }}">
 										{% if item.back.media_url %}
 											<div class="media-content" style="background-image: url('{{ item.back.media_url }}');">
 												{% if item.back.media_alt %}

@@ -19,10 +19,9 @@
     text-align: center;
   }
 
-  .circle-border {
+  .shape-border {
     width: 300px;
     height: 300px;
-    border-radius: 50%;
     border: 2px solid #bf5700;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -33,11 +32,10 @@
     padding: 5px;
   }
 
-  .circle {
+  .shape {
     position: relative;
     width: 100%;
     height: 100%;
-    border-radius: 50%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -45,14 +43,14 @@
   }
 
   // Front side styling
-  .front .circle {
+  .front .shape {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
   }
 
   // Back side styling
-  .back .circle {
+  .back .shape {
     background-color: #bf5700;
     color: #fff;
     font-weight: bold;
@@ -125,7 +123,6 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    border-radius: 50%;
   }
 
   .headline-content {
@@ -189,14 +186,14 @@
 
   // Responsive adjustments
   @media (min-width: 768px) {
-    .circle-border {
+    .shape-border {
       width: 300px;
       height: 300px;
     }
   }
 
   @media (min-width: 1024px) {
-    .circle-border {
+    .shape-border {
       width: 300px;
       height: 300px;
     }
@@ -218,6 +215,101 @@
         background-color: #f0f0f0;
         color: #bf5700;
       }
+    }
+  }
+}
+
+// Style-specific variations
+.moody-dynamic-flip-grid-container.style-round {
+  .shape-border {
+    border-radius: 50%;
+  }
+
+  .shape {
+    border-radius: 50%;
+  }
+
+  .media-content {
+    border-radius: 50%;
+  }
+}
+
+.moody-dynamic-flip-grid-container.style-square {
+  .shape-border {
+    border-radius: 8px;
+  }
+
+  .shape {
+    border-radius: 4px;
+  }
+
+  .media-content {
+    border-radius: 4px;
+  }
+}
+
+.moody-dynamic-flip-grid-container.style-rectangle {
+  .shape-border {
+    width: 400px;
+    height: 225px; // 16:9 aspect ratio
+    border-radius: 8px;
+  }
+
+  .shape {
+    border-radius: 4px;
+  }
+
+  .media-content {
+    border-radius: 4px;
+  }
+}
+
+// Responsive adjustments for rectangular cards
+.moody-dynamic-flip-grid-container.style-rectangle {
+  .shape-border {
+    @media (max-width: 767px) {
+      width: 100%;
+      max-width: 350px;
+      height: 197px; // Maintain 16:9 ratio
+    }
+  }
+}
+
+// Items per row responsive adjustments
+.moody-dynamic-flip-grid-container {
+  // For 1 item per row - make shapes larger
+  &.items-per-row-1 .shape-border {
+    width: 400px;
+    height: 400px;
+
+    @media (max-width: 767px) {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  &.items-per-row-1.style-rectangle .shape-border {
+    width: 500px;
+    height: 281px; // Maintain 16:9 ratio
+
+    @media (max-width: 767px) {
+      width: 350px;
+      height: 197px;
+    }
+  }
+
+  // For 4 items per row - make shapes smaller on larger screens
+  &.items-per-row-4 .shape-border {
+    @media (min-width: 1200px) {
+      width: 250px;
+      height: 250px;
+    }
+  }
+
+  &.items-per-row-4.style-rectangle .shape-border {
+    @media (min-width: 1200px) {
+      width: 300px;
+      height: 169px;
     }
   }
 }
