@@ -1,0 +1,82 @@
+<div class="moody-dynamic-flip-grid-container ut-pt-8 ut-pb-8">
+	<div class="container">
+		{% if headline %}
+			<div class="row">
+				<div class="col-12">
+					<div class="ut-text-3xl text-ut-charcoal ut-font-weight-black text-center ut-pb-8">{{ headline }}</div>
+				</div>
+			</div>
+		{% endif %}
+		<div class="row contents-row-max-w">
+			{% for item in items %}
+				<div class="col">
+					<div class="moody-dynamic-flip-grid-item">
+						<div class="content">
+							<!-- Front Side -->
+							<div class="front">
+								<div class="circle-border">
+									<div class="circle position-{{ item.front.position|default('center') }}">
+										{% if item.front.media_url %}
+											<div class="media-content" style="background-image: url('{{ item.front.media_url }}');">
+												{% if item.front.media_alt %}
+													<span class="sr-only">{{ item.front.media_alt }}</span>
+												{% endif %}
+											</div>
+										{% endif %}
+										
+										{% if item.front.headline %}
+											<div class="headline-content">{{ item.front.headline }}</div>
+										{% endif %}
+										
+										{% if item.front.body_rendered %}
+											<div class="body-content">{{ item.front.body_rendered }}</div>
+										{% endif %}
+										
+										{% if item.front.cta_render %}
+											<div class="cta-content">{{ item.front.cta_render }}</div>
+										{% endif %}
+										
+										<!-- Navigation arrows -->
+										<div class="arrow left">{{ chevron_left | raw }}</div>
+										<div class="arrow right">{{ chevron_right | raw }}</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Back Side -->
+							<div class="back">
+								<div class="circle-border">
+									<div class="circle position-{{ item.back.position|default('center') }}">
+										{% if item.back.media_url %}
+											<div class="media-content" style="background-image: url('{{ item.back.media_url }}');">
+												{% if item.back.media_alt %}
+													<span class="sr-only">{{ item.back.media_alt }}</span>
+												{% endif %}
+											</div>
+										{% endif %}
+										
+										{% if item.back.headline %}
+											<div class="headline-content">{{ item.back.headline }}</div>
+										{% endif %}
+										
+										{% if item.back.body_rendered %}
+											<div class="body-content">{{ item.back.body_rendered }}</div>
+										{% endif %}
+										
+										{% if item.back.cta_render %}
+											<div class="cta-content">{{ item.back.cta_render }}</div>
+										{% endif %}
+										
+										<!-- Navigation arrows -->
+										<div class="arrow left">{{ chevron_left | raw }}</div>
+										<div class="arrow right">{{ chevron_right | raw }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
