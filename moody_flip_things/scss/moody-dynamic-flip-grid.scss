@@ -13,7 +13,17 @@
   }
 }
 
+// Add horizontal margin and box-sizing to prevent overlap
 .moody-dynamic-flip-grid-item {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+  // Add horizontal spacing between items
+  @media (min-width: 768px) {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
   .content {
     position: relative;
     text-align: center;
@@ -30,6 +40,7 @@
     overflow: hidden;
     margin: 0 auto;
     padding: 5px;
+    box-sizing: border-box;
   }
 
   .shape {
@@ -220,96 +231,77 @@
 }
 
 // Style-specific variations
-.moody-dynamic-flip-grid-container.style-round {
-  .shape-border {
-    border-radius: 50%;
-  }
 
-  .shape {
-    border-radius: 50%;
-  }
-
-  .media-content {
-    border-radius: 50%;
-  }
+// Style-specific variations with increased specificity
+.moody-dynamic-flip-grid-container.style-round .moody-dynamic-flip-grid-item .shape-border {
+  border-radius: 50%;
+}
+.moody-dynamic-flip-grid-container.style-round .moody-dynamic-flip-grid-item .shape {
+  border-radius: 50%;
+}
+.moody-dynamic-flip-grid-container.style-round .moody-dynamic-flip-grid-item .media-content {
+  border-radius: 50%;
 }
 
-.moody-dynamic-flip-grid-container.style-square {
-  .shape-border {
-    border-radius: 8px;
-  }
-
-  .shape {
-    border-radius: 4px;
-  }
-
-  .media-content {
-    border-radius: 4px;
-  }
+.moody-dynamic-flip-grid-container.style-square .moody-dynamic-flip-grid-item .shape-border {
+  border-radius: 8px;
+}
+.moody-dynamic-flip-grid-container.style-square .moody-dynamic-flip-grid-item .shape {
+  border-radius: 4px;
+}
+.moody-dynamic-flip-grid-container.style-square .moody-dynamic-flip-grid-item .media-content {
+  border-radius: 4px;
 }
 
-.moody-dynamic-flip-grid-container.style-rectangle {
-  .shape-border {
-    width: 400px;
-    height: 225px; // 16:9 aspect ratio
-    border-radius: 8px;
-  }
-
-  .shape {
-    border-radius: 4px;
-  }
-
-  .media-content {
-    border-radius: 4px;
-  }
+.moody-dynamic-flip-grid-container.style-rectangle .moody-dynamic-flip-grid-item .shape-border {
+  width: 400px;
+  height: 225px; // 16:9 aspect ratio
+  border-radius: 8px;
+}
+.moody-dynamic-flip-grid-container.style-rectangle .moody-dynamic-flip-grid-item .shape {
+  border-radius: 4px;
+}
+.moody-dynamic-flip-grid-container.style-rectangle .moody-dynamic-flip-grid-item .media-content {
+  border-radius: 4px;
 }
 
 // Responsive adjustments for rectangular cards
-.moody-dynamic-flip-grid-container.style-rectangle {
-  .shape-border {
-    @media (max-width: 767px) {
-      width: 100%;
-      max-width: 350px;
-      height: 197px; // Maintain 16:9 ratio
-    }
+.moody-dynamic-flip-grid-container.style-rectangle .moody-dynamic-flip-grid-item .shape-border {
+  @media (max-width: 1023px) {
+    width: 100%;
+    max-width: 350px;
+    height: 197px; // Maintain 16:9 ratio
   }
 }
 
 // Items per row responsive adjustments
-.moody-dynamic-flip-grid-container {
-  // For 1 item per row - make shapes larger
-  &.items-per-row-1 .shape-border {
-    width: 400px;
-    height: 400px;
 
-    @media (max-width: 767px) {
-      width: 300px;
-      height: 300px;
-    }
+// Items per row responsive adjustments with increased specificity
+.moody-dynamic-flip-grid-container.items-per-row-1 .moody-dynamic-flip-grid-item .shape-border {
+  width: 400px;
+  height: 400px;
+  @media (max-width: 767px) {
+    width: 300px;
+    height: 300px;
   }
-
-  &.items-per-row-1.style-rectangle .shape-border {
-    width: 500px;
-    height: 281px; // Maintain 16:9 ratio
-
-    @media (max-width: 767px) {
-      width: 350px;
-      height: 197px;
-    }
+}
+.moody-dynamic-flip-grid-container.items-per-row-1.style-rectangle .moody-dynamic-flip-grid-item .shape-border {
+  width: 500px;
+  height: 281px; // Maintain 16:9 ratio
+  @media (max-width: 1023px) {
+    width: 350px;
+    height: 197px;
   }
-
-  // For 4 items per row - make shapes smaller on larger screens
-  &.items-per-row-4 .shape-border {
-    @media (min-width: 1200px) {
-      width: 250px;
-      height: 250px;
-    }
+}
+.moody-dynamic-flip-grid-container.items-per-row-4 .moody-dynamic-flip-grid-item .shape-border {
+  @media (min-width: 1200px) {
+    width: 250px;
+    height: 250px;
   }
-
-  &.items-per-row-4.style-rectangle .shape-border {
-    @media (min-width: 1200px) {
-      width: 300px;
-      height: 169px;
-    }
+}
+.moody-dynamic-flip-grid-container.items-per-row-4.style-rectangle .moody-dynamic-flip-grid-item .shape-border {
+  @media (min-width: 1200px) {
+    width: 300px;
+    height: 169px;
   }
 }
