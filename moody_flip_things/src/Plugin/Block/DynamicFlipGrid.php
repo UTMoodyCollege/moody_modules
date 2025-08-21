@@ -119,9 +119,9 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
           '#type' => 'submit',
           '#value' => $this->t('Remove this item'),
           '#name' => 'remove_item_' . $i,
-          '#submit' => ['::removeItemSubmit'],
+          '#submit' => [[ $this, 'removeItemSubmit' ]],
           '#ajax' => [
-            'callback' => '::itemsAjaxCallback',
+            'callback' => [ $this, 'itemsAjaxCallback' ],
             'wrapper' => $wrapper_id,
           ],
           '#limit_validation_errors' => [],
@@ -244,9 +244,9 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
     $form['items']['actions']['add_item'] = [
       '#type' => 'submit',
       '#value' => $this->t('Add another item'),
-      '#submit' => ['::addItemSubmit'],
+      '#submit' => [[ $this, 'addItemSubmit' ]],
       '#ajax' => [
-        'callback' => '::itemsAjaxCallback',
+        'callback' => [ $this, 'itemsAjaxCallback' ],
         'wrapper' => $wrapper_id,
       ],
       '#limit_validation_errors' => [],
