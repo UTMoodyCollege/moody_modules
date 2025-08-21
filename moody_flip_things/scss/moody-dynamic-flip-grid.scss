@@ -133,9 +133,28 @@
     margin-bottom: 0.5em;
     z-index: 2;
     position: relative;
-    background: rgba(255, 255, 255, 0.9);
     padding: 0.25em 0.5em;
     border-radius: 4px;
+    
+    // Background styling options
+    &.bg-style-none {
+      // No background styling applied
+    }
+    
+    &.bg-style-semitransparent {
+      background: rgba(0, 0, 0, 0.1);
+      color: white;
+    }
+    
+    &.bg-style-white {
+      background: rgba(255, 255, 255, 0.9);
+      color: inherit;
+    }
+    
+    &.bg-style-burnt_orange {
+      background: rgba(191, 87, 0, 0.9);
+      color: white;
+    }
   }
 
   .body-content {
@@ -143,10 +162,29 @@
     line-height: 1.4;
     z-index: 2;
     position: relative;
-    background: rgba(255, 255, 255, 0.9);
     padding: 0.5em;
     border-radius: 4px;
     margin-bottom: 0.5em;
+    
+    // Background styling options
+    &.bg-style-none {
+      // No background styling applied
+    }
+    
+    &.bg-style-semitransparent {
+      background: rgba(0, 0, 0, 0.1);
+      color: white;
+    }
+    
+    &.bg-style-white {
+      background: rgba(255, 255, 255, 0.9);
+      color: inherit;
+    }
+    
+    &.bg-style-burnt_orange {
+      background: rgba(191, 87, 0, 0.9);
+      color: white;
+    }
   }
 
   .cta-content {
@@ -201,14 +239,8 @@
     }
   }
 
-  // Back side specific adjustments for better readability
+  // Back side specific adjustments for CTA button styling
   .back {
-    .headline-content,
-    .body-content {
-      background: rgba(0, 0, 0, 0.1);
-      color: white;
-    }
-
     .cta-content .btn {
       background-color: white;
       color: #bf5700;

@@ -29,10 +29,10 @@
 											</div>
 										{% endif %}
 										{% if item.front.headline %}
-											<div class="headline-content">{{ item.front.headline }}</div>
+											<div class="headline-content bg-style-{{ item.front.headline_bg_style|default('white') }}">{{ item.front.headline }}</div>
 										{% endif %}
 										{% if item.front.body_rendered %}
-											<div class="body-content">{{ item.front.body_rendered }}</div>
+											<div class="body-content bg-style-{{ item.front.body_bg_style|default('white') }}">{{ item.front.body_rendered }}</div>
 										{% endif %}
 										{% if item.front.cta_render %}
 											<div class="cta-content">{{ item.front.cta_render }}</div>
@@ -56,10 +56,10 @@
 											</div>
 										{% endif %}
 										{% if item.back.headline %}
-											<div class="headline-content">{{ item.back.headline }}</div>
+											<div class="headline-content bg-style-{{ item.back.headline_bg_style|default('semitransparent') }}">{{ item.back.headline }}</div>
 										{% endif %}
 										{% if item.back.body_rendered %}
-											<div class="body-content">{{ item.back.body_rendered }}</div>
+											<div class="body-content bg-style-{{ item.back.body_bg_style|default('semitransparent') }}">{{ item.back.body_rendered }}</div>
 										{% endif %}
 										{% if item.back.cta_render %}
 											<div class="cta-content">{{ item.back.cta_render }}</div>

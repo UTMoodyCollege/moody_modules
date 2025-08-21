@@ -182,11 +182,37 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
         '#default_value' => $this->configuration['items'][$i]['front']['headline'] ?? '',
       ];
 
+      $form['items'][$i]['front']['headline_bg_style'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Headline Background Styling'),
+        '#options' => [
+          'none' => $this->t('No style'),
+          'semitransparent' => $this->t('SemiTransparent Background'),
+          'white' => $this->t('White Background'),
+          'burnt_orange' => $this->t('Burnt Orange Background'),
+        ],
+        '#default_value' => $this->configuration['items'][$i]['front']['headline_bg_style'] ?? 'white',
+        '#description' => $this->t('Choose background styling for the headline text.'),
+      ];
+
       $form['items'][$i]['front']['body'] = [
         '#type' => 'text_format',
         '#title' => $this->t('Body'),
         '#default_value' => $this->configuration['items'][$i]['front']['body']['value'] ?? '',
         '#format' => $this->configuration['items'][$i]['front']['body']['format'] ?? 'flex_html',
+      ];
+
+      $form['items'][$i]['front']['body_bg_style'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Body Background Styling'),
+        '#options' => [
+          'none' => $this->t('No style'),
+          'semitransparent' => $this->t('SemiTransparent Background'),
+          'white' => $this->t('White Background'),
+          'burnt_orange' => $this->t('Burnt Orange Background'),
+        ],
+        '#default_value' => $this->configuration['items'][$i]['front']['body_bg_style'] ?? 'white',
+        '#description' => $this->t('Choose background styling for the body text.'),
       ];
 
       $form['items'][$i]['front']['cta'] = [
@@ -233,11 +259,37 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
         '#default_value' => $this->configuration['items'][$i]['back']['headline'] ?? '',
       ];
 
+      $form['items'][$i]['back']['headline_bg_style'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Headline Background Styling'),
+        '#options' => [
+          'none' => $this->t('No style'),
+          'semitransparent' => $this->t('SemiTransparent Background'),
+          'white' => $this->t('White Background'),
+          'burnt_orange' => $this->t('Burnt Orange Background'),
+        ],
+        '#default_value' => $this->configuration['items'][$i]['back']['headline_bg_style'] ?? 'semitransparent',
+        '#description' => $this->t('Choose background styling for the headline text.'),
+      ];
+
       $form['items'][$i]['back']['body'] = [
         '#type' => 'text_format',
         '#title' => $this->t('Body'),
         '#default_value' => $this->configuration['items'][$i]['back']['body']['value'] ?? '',
         '#format' => $this->configuration['items'][$i]['back']['body']['format'] ?? 'flex_html',
+      ];
+
+      $form['items'][$i]['back']['body_bg_style'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Body Background Styling'),
+        '#options' => [
+          'none' => $this->t('No style'),
+          'semitransparent' => $this->t('SemiTransparent Background'),
+          'white' => $this->t('White Background'),
+          'burnt_orange' => $this->t('Burnt Orange Background'),
+        ],
+        '#default_value' => $this->configuration['items'][$i]['back']['body_bg_style'] ?? 'semitransparent',
+        '#description' => $this->t('Choose background styling for the body text.'),
       ];
 
       $form['items'][$i]['back']['cta'] = [
@@ -375,6 +427,9 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
       }
     }
 
+    // Process headline styling
+    $processed['headline_bg_style'] = $side_data['headline_bg_style'] ?? 'none';
+
     // Process body content
     if (!empty($side_data['body']['value'])) {
       $processed['body_rendered'] = [
@@ -383,6 +438,9 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
         '#format' => $side_data['body']['format'] ?? 'flex_html',
       ];
     }
+
+    // Process body styling
+    $processed['body_bg_style'] = $side_data['body_bg_style'] ?? 'none';
 
     // Process CTA
     if (!empty($side_data['cta']['link']['uri'])) {
