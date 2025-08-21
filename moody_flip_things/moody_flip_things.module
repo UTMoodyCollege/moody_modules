@@ -46,6 +46,8 @@ function moody_flip_things_theme($existing, $type, $theme, $path)
             'variables' => [
                 'items' => [],
                 'headline' => '',
+                'style' => '',
+                'items_per_row' => '',
                 'chevron_left' => '',
                 'chevron_right' => '',
             ],
