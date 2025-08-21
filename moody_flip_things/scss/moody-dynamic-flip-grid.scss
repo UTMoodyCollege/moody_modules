@@ -1,0 +1,223 @@
+.moody-dynamic-flip-grid-container {
+  background: repeating-linear-gradient(-25deg, white, white 20px, #f7f7f7 20px, #f7f7f7 22px);
+
+  .contents-row-max-w {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .headline {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+  }
+}
+
+.moody-dynamic-flip-grid-item {
+  .content {
+    position: relative;
+    text-align: center;
+  }
+
+  .circle-border {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    border: 2px solid #bf5700;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto;
+    padding: 5px;
+  }
+
+  .circle {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1em;
+  }
+
+  // Front side styling
+  .front .circle {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  // Back side styling
+  .back .circle {
+    background-color: #bf5700;
+    color: #fff;
+    font-weight: bold;
+    justify-content: center;
+    align-items: center;
+  }
+
+  // Positioning classes for content zones
+  .position-top-left {
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .position-top-center {
+    align-items: flex-start;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .position-top-right {
+    align-items: flex-start;
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .position-center-left {
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .position-center {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .position-center-right {
+    align-items: center;
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .position-bottom-left {
+    align-items: flex-end;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .position-bottom-center {
+    align-items: flex-end;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .position-bottom-right {
+    align-items: flex-end;
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  // Content styling within positioned zones
+  .media-content {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+  }
+
+  .headline-content {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    z-index: 2;
+    position: relative;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.25em 0.5em;
+    border-radius: 4px;
+  }
+
+  .body-content {
+    font-size: 0.9em;
+    line-height: 1.4;
+    z-index: 2;
+    position: relative;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5em;
+    border-radius: 4px;
+    margin-bottom: 0.5em;
+  }
+
+  .cta-content {
+    z-index: 2;
+    position: relative;
+
+    .btn {
+      font-size: 0.8em;
+      padding: 0.5em 1em;
+      border-radius: 20px;
+      text-decoration: none;
+      background-color: #bf5700;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: #a04600;
+        color: white;
+      }
+    }
+  }
+
+  // Arrow styling
+  .arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    z-index: 3;
+
+    &.left {
+      left: 10px;
+    }
+
+    &.right {
+      right: 10px;
+    }
+  }
+
+  // Responsive adjustments
+  @media (min-width: 768px) {
+    .circle-border {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .circle-border {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  // Back side specific adjustments for better readability
+  .back {
+    .headline-content,
+    .body-content {
+      background: rgba(0, 0, 0, 0.1);
+      color: white;
+    }
+
+    .cta-content .btn {
+      background-color: white;
+      color: #bf5700;
+
+      &:hover {
+        background-color: #f0f0f0;
+        color: #bf5700;
+      }
+    }
+  }
+}
