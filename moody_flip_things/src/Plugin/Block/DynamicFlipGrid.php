@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\moody_flip_things\Plugin\Block;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
@@ -87,24 +88,55 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
       'bottom-right' => $this->t('Bottom Right'),
     ];
 
-    $item_instances = 3;
+    // Get the number of items from form state or default to existing items
+    $items_count = $form_state->get('items_count');
+    if ($items_count === NULL) {
+      $existing_items = $this->configuration['items'] ?? [];
+      $items_count = !empty($existing_items) ? count($existing_items) : 1;
+      $form_state->set('items_count', $items_count);
+    }
+
+    // Create a wrapper for AJAX updates
+    $wrapper_id = Html::getUniqueId('dynamic-flip-grid-items-wrapper');
+    
     $form['items'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Items'),
+      '#prefix' => '<div id="' . $wrapper_id . '">',
+      '#suffix' => '</div>',
     ];
 
-    for ($i = 0; $i < $item_instances; $i++) {
+    for ($i = 0; $i < $items_count; $i++) {
       $form['items'][$i] = [
-        '#type' => 'fieldset',
+        '#type' => 'details',
         '#title' => $this->t('Item @i', ['@i' => $i + 1]),
+        '#open' => FALSE,
       ];
+
+      // Add a remove button for each item (except if there's only one item)
+      if ($items_count > 1) {
+        $form['items'][$i]['remove_item'] = [
+          '#type' => 'submit',
+          '#value' => $this->t('Remove this item'),
+          '#name' => 'remove_item_' . $i,
+          '#submit' => ['::removeItemSubmit'],
+          '#ajax' => [
+            'callback' => '::itemsAjaxCallback',
+            'wrapper' => $wrapper_id,
+          ],
+          '#limit_validation_errors' => [],
+          '#attributes' => [
+            'class' => ['button--danger'],
+          ],
+          '#item_index' => $i,
+        ];
+      }
 
       // Front side configuration
       $form['items'][$i]['front'] = [
-        '#type' => 'fieldset',
+        '#type' => 'details',
         '#title' => $this->t('Front Side'),
-        '#collapsible' => TRUE,
-        '#collapsed' => FALSE,
+        '#open' => FALSE,
       ];
 
       $form['items'][$i]['front']['media'] = [
@@ -129,8 +161,9 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
       ];
 
       $form['items'][$i]['front']['cta'] = [
-        '#type' => 'fieldset',
+        '#type' => 'details',
         '#title' => $this->t('Call to Action'),
+        '#open' => FALSE,
       ];
 
       $form['items'][$i]['front']['cta']['link'] = [
@@ -152,10 +185,9 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
 
       // Back side configuration
       $form['items'][$i]['back'] = [
-        '#type' => 'fieldset',
+        '#type' => 'details',
         '#title' => $this->t('Back Side'),
-        '#collapsible' => TRUE,
-        '#collapsed' => FALSE,
+        '#open' => FALSE,
       ];
 
       $form['items'][$i]['back']['media'] = [
@@ -180,8 +212,9 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
       ];
 
       $form['items'][$i]['back']['cta'] = [
-        '#type' => 'fieldset',
+        '#type' => 'details',
         '#title' => $this->t('Call to Action'),
+        '#open' => FALSE,
       ];
 
       $form['items'][$i]['back']['cta']['link'] = [
@@ -202,6 +235,23 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
       ];
     }
 
+    // Add more item button
+    $form['items']['actions'] = [
+      '#type' => 'actions',
+      '#weight' => 100,
+    ];
+
+    $form['items']['actions']['add_item'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Add another item'),
+      '#submit' => ['::addItemSubmit'],
+      '#ajax' => [
+        'callback' => '::itemsAjaxCallback',
+        'wrapper' => $wrapper_id,
+      ],
+      '#limit_validation_errors' => [],
+    ];
+
     return $form;
   }
 
@@ -211,7 +261,65 @@ final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginI
   public function blockSubmit($form, FormStateInterface $form_state): void
   {
     $this->configuration['headline'] = $form_state->getValue('headline');
-    $this->configuration['items'] = $form_state->getValue('items');
+    $items = $form_state->getValue('items');
+    
+    // Remove the actions element from items
+    unset($items['actions']);
+    
+    // Clean up any items that might have remove buttons
+    foreach ($items as $key => $item) {
+      if (isset($item['remove_item'])) {
+        unset($items[$key]['remove_item']);
+      }
+    }
+    
+    $this->configuration['items'] = $items;
+  }
+
+  /**
+   * Submit handler for the "Add another item" button.
+   */
+  public function addItemSubmit(array &$form, FormStateInterface $form_state): void
+  {
+    $items_count = $form_state->get('items_count');
+    $items_count++;
+    $form_state->set('items_count', $items_count);
+    $form_state->setRebuild();
+  }
+
+  /**
+   * Submit handler for the "Remove item" buttons.
+   */
+  public function removeItemSubmit(array &$form, FormStateInterface $form_state): void
+  {
+    $triggering_element = $form_state->getTriggeringElement();
+    $item_index = $triggering_element['#item_index'];
+    
+    $items_count = $form_state->get('items_count');
+    
+    // Don't allow removing the last item
+    if ($items_count > 1) {
+      $items_count--;
+      $form_state->set('items_count', $items_count);
+      
+      // Remove the item from configuration
+      $items = $this->configuration['items'] ?? [];
+      unset($items[$item_index]);
+      
+      // Re-index the array to avoid gaps
+      $items = array_values($items);
+      $this->configuration['items'] = $items;
+    }
+    
+    $form_state->setRebuild();
+  }
+
+  /**
+   * AJAX callback for add/remove item operations.
+   */
+  public function itemsAjaxCallback(array &$form, FormStateInterface $form_state): array
+  {
+    return $form['settings']['items'];
   }
 
   /**
