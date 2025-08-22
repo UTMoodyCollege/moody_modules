@@ -1,0 +1,70 @@
+{#
+/**
+ * @file
+ * Template for moody media mentions block.
+ *
+ * Available variables:
+ * - items: Array of media mention items, each containing:
+ *   - media_source: The media source name
+ *   - headline: The headline text
+ *   - link: The URL link
+ *   - date: The date string
+ */
+#}
+
+<div class="moody-media-mentions bg-ut-limestone ut-py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h2 class="text-ut-charcoal ut-font-weight-black ut-text-3xl text-center ut-mb-5">Media Mentions</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="media-mentions-list">
+          {% for item in items %}
+            <div class="media-mention-item bg-white ut-p-4 ut-mb-4 ut-border-radius-sm ut-shadow-sm">
+              <div class="row align-items-center">
+                <div class="col-lg-3">
+                  {% if item.media_source %}
+                    <div class="media-source text-ut-bluebonnet ut-font-weight-bold ut-text-lg">
+                      {{ item.media_source }}
+                    </div>
+                  {% endif %}
+                  {% if item.date %}
+                    <div class="mention-date text-ut-charcoal ut-text-sm ut-mt-1">
+                      {{ item.date|date('F j, Y') }}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="col-lg-6">
+                  {% if item.headline %}
+                    <div class="mention-headline">
+                      {% if item.link %}
+                        <a href="{{ item.link }}" class="text-ut-charcoal ut-text-decoration-none hover:text-ut-burntorange ut-font-weight-semibold" target="_blank" rel="noopener">
+                          {{ item.headline }}
+                        </a>
+                      {% else %}
+                        <span class="text-ut-charcoal ut-font-weight-semibold">
+                          {{ item.headline }}
+                        </span>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="col-lg-3 text-lg-end">
+                  {% if item.link %}
+                    <a href="{{ item.link }}" class="btn bg-ut-burntorange text-white ut-text-sm ut-px-4 ut-py-2 ut-border-radius-sm hover:bg-ut-burntorange-dark text-decoration-none" target="_blank" rel="noopener">
+                      Read More
+                      <i class="fas fa-external-link-alt ut-ml-2" aria-hidden="true"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
