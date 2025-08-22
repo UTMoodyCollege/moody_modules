@@ -9,3 +9,8 @@ moody_feature_editors_picks:
   css:
     theme:
       css/feature-page-editors-picks.css: {}
+moody_media_mentions:
+  version: 1.x
+  css:
+    theme:
+      css/moody-media-mentions.css: {}
