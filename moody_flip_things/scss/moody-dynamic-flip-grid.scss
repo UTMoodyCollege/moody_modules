@@ -1,0 +1,330 @@
+.moody-dynamic-flip-grid-container {
+
+  .contents-row-max-w {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .headline {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+  }
+}
+
+// Add horizontal margin and box-sizing to prevent overlap
+.moody-dynamic-flip-grid-item {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+  // Add horizontal spacing between items
+  @media (min-width: 768px) {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
+  .content {
+    position: relative;
+    text-align: center;
+  }
+
+  .shape-border {
+    width: 300px;
+    height: 300px;
+    border: 2px solid #bf5700;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+
+  .shape {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1em;
+  }
+
+  // Front side styling
+  .front .shape {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  // Back side styling
+  .back .shape {
+    background-color: #bf5700;
+    color: #fff;
+    font-weight: bold;
+    justify-content: center;
+    align-items: center;
+  }
+
+  // Positioning using data-position attribute for content zones
+  .shape[data-position="top-left"] {
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .shape[data-position="top-center"] {
+    align-items: flex-start;
+    justify-content: center;
+    text-align: center;
+  }
+  .shape[data-position="top-right"] {
+    align-items: flex-start;
+    justify-content: flex-end;
+    text-align: right;
+  }
+  .shape[data-position="center-left"] {
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .shape[data-position="center"] {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .shape[data-position="center-right"] {
+    align-items: center;
+    justify-content: flex-end;
+    text-align: right;
+  }
+  .shape[data-position="bottom-left"] {
+    align-items: flex-end;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .shape[data-position="bottom-center"] {
+    align-items: flex-end;
+    justify-content: center;
+    text-align: center;
+  }
+  .shape[data-position="bottom-right"] {
+    align-items: flex-end;
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  // Content styling within positioned zones
+  .media-content {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .headline-content {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    z-index: 2;
+    position: relative;
+    padding: 0.25em 0.5em;
+    border-radius: 4px;
+    
+    // Background styling options
+    &.bg-style-none {
+      // No background styling applied
+    }
+    
+    &.bg-style-semitransparent {
+      background: rgba(0, 0, 0, 0.1);
+      color: white;
+    }
+    
+    &.bg-style-white {
+      background: rgba(255, 255, 255, 0.9);
+      color: inherit;
+    }
+    
+    &.bg-style-burnt_orange {
+      background: rgba(191, 87, 0, 0.9);
+      color: white;
+    }
+  }
+
+  .body-content {
+    font-size: 0.9em;
+    line-height: 1.4;
+    z-index: 2;
+    position: relative;
+    padding: 0.5em;
+    border-radius: 4px;
+    margin-bottom: 0.5em;
+    
+    // Background styling options
+    &.bg-style-none {
+      // No background styling applied
+    }
+    
+    &.bg-style-semitransparent {
+      background: rgba(0, 0, 0, 0.1);
+      color: white;
+    }
+    
+    &.bg-style-white {
+      background: rgba(255, 255, 255, 0.9);
+      color: inherit;
+    }
+    
+    &.bg-style-burnt_orange {
+      background: rgba(191, 87, 0, 0.9);
+      color: white;
+    }
+  }
+
+  .cta-content {
+    z-index: 2;
+    position: relative;
+
+    .btn {
+      font-size: 0.8em;
+      padding: 0.5em 1em;
+      border-radius: 20px;
+      text-decoration: none;
+      background-color: #bf5700;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: #a04600;
+        color: white;
+      }
+    }
+  }
+
+  // Arrow styling
+  .arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    z-index: 3;
+
+    &.left {
+      left: 10px;
+    }
+
+    &.right {
+      right: 10px;
+    }
+  }
+
+  // Responsive adjustments
+  @media (min-width: 768px) {
+    .shape-border {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .shape-border {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  // Back side specific adjustments for CTA button styling
+  .back {
+    .cta-content .btn {
+      background-color: white;
+      color: #bf5700;
+
+      &:hover {
+        background-color: #f0f0f0;
+        color: #bf5700;
+      }
+    }
+  }
+}
+
+// Style-specific variations
+
+// Style-specific variations with increased specificity
+.moody-dynamic-flip-grid-container.style-round .moody-dynamic-flip-grid-item .shape-border {
+  border-radius: 50%;
+}
+.moody-dynamic-flip-grid-container.style-round .moody-dynamic-flip-grid-item .shape {
+  border-radius: 50%;
+}
+.moody-dynamic-flip-grid-container.style-round .moody-dynamic-flip-grid-item .media-content {
+  border-radius: 50%;
+}
+
+.moody-dynamic-flip-grid-container.style-square .moody-dynamic-flip-grid-item .shape-border {
+  border-radius: 8px;
+}
+.moody-dynamic-flip-grid-container.style-square .moody-dynamic-flip-grid-item .shape {
+  border-radius: 4px;
+}
+.moody-dynamic-flip-grid-container.style-square .moody-dynamic-flip-grid-item .media-content {
+  border-radius: 4px;
+}
+
+.moody-dynamic-flip-grid-container.style-rectangle .moody-dynamic-flip-grid-item .shape-border {
+  width: 400px;
+  height: 225px; // 16:9 aspect ratio
+  border-radius: 8px;
+}
+.moody-dynamic-flip-grid-container.style-rectangle .moody-dynamic-flip-grid-item .shape {
+  border-radius: 4px;
+}
+.moody-dynamic-flip-grid-container.style-rectangle .moody-dynamic-flip-grid-item .media-content {
+  border-radius: 4px;
+}
+
+// Responsive adjustments for rectangular cards
+.moody-dynamic-flip-grid-container.style-rectangle .moody-dynamic-flip-grid-item .shape-border {
+  @media (max-width: 1023px) {
+    width: 100%;
+    max-width: 350px;
+    height: 197px; // Maintain 16:9 ratio
+  }
+}
+
+// Items per row responsive adjustments
+
+// Items per row responsive adjustments with increased specificity
+.moody-dynamic-flip-grid-container.items-per-row-1 .moody-dynamic-flip-grid-item .shape-border {
+  width: 400px;
+  height: 400px;
+  @media (max-width: 767px) {
+    width: 300px;
+    height: 300px;
+  }
+}
+.moody-dynamic-flip-grid-container.items-per-row-1.style-rectangle .moody-dynamic-flip-grid-item .shape-border {
+  width: 500px;
+  height: 281px; // Maintain 16:9 ratio
+  @media (max-width: 1023px) {
+    width: 350px;
+    height: 197px;
+  }
+}
+.moody-dynamic-flip-grid-container.items-per-row-4 .moody-dynamic-flip-grid-item .shape-border {
+  @media (min-width: 1200px) {
+    width: 250px;
+    height: 250px;
+  }
+}
+.moody-dynamic-flip-grid-container.items-per-row-4.style-rectangle .moody-dynamic-flip-grid-item .shape-border {
+  @media (min-width: 1200px) {
+    width: 300px;
+    height: 169px;
+  }
+}

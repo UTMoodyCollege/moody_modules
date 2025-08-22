@@ -1,0 +1,514 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\moody_flip_things\Plugin\Block;
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\utexas_form_elements\UtexasLinkOptionsHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+/**
+ * Provides a dynamic flip grid block.
+ *
+ * @Block(
+ *   id = "moody_flip_things_dynamic_flip_grid",
+ *   admin_label = @Translation("Moody Dynamic Flip Grid"),
+ *   category = @Translation("Moody"),
+ * )
+ */
+final class DynamicFlipGrid extends BlockBase implements ContainerFactoryPluginInterface
+{
+
+  /**
+   * Constructs the plugin instance.
+   */
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    private readonly FileUrlGeneratorInterface $fileUrlGenerator,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self
+  {
+    return new self(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('file_url_generator'),
+      $container->get('entity_type.manager'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration(): array
+  {
+    return [
+      'headline' => '',
+      'style' => 'round',
+      'items_per_row' => '3',
+      'items' => [],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function blockForm($form, FormStateInterface $form_state): array
+  {
+    // Overall headline for the grid
+    $form['headline'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Headline'),
+      '#default_value' => $this->configuration['headline'] ?? '',
+    ];
+
+    // Style selection
+    $form['style'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Style'),
+      '#options' => [
+        'round' => $this->t('Round'),
+        'square' => $this->t('Square'),
+        'rectangle' => $this->t('Rectangle'),
+      ],
+      '#default_value' => $this->configuration['style'] ?? 'round',
+      '#description' => $this->t('Choose the shape style for the flip cards.'),
+    ];
+
+    // Items per row
+    $form['items_per_row'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Items per row'),
+      '#options' => [
+        '1' => $this->t('1 item per row'),
+        '2' => $this->t('2 items per row'),
+        '3' => $this->t('3 items per row'),
+        '4' => $this->t('4 items per row'),
+      ],
+      '#default_value' => $this->configuration['items_per_row'] ?? '3',
+      '#description' => $this->t('Number of items to display per row (responsive).'),
+    ];
+
+    // Position options for content zones
+    $position_options = [
+      'top-left' => $this->t('Top Left'),
+      'top-center' => $this->t('Top Center'),
+      'top-right' => $this->t('Top Right'),
+      'center-left' => $this->t('Center Left'),
+      'center' => $this->t('Center'),
+      'center-right' => $this->t('Center Right'),
+      'bottom-left' => $this->t('Bottom Left'),
+      'bottom-center' => $this->t('Bottom Center'),
+      'bottom-right' => $this->t('Bottom Right'),
+    ];
+
+    // Get the number of items from form state or default to existing items
+    $items_count = $form_state->get('items_count');
+    if ($items_count === NULL) {
+      $existing_items = $this->configuration['items'] ?? [];
+      $items_count = !empty($existing_items) ? count($existing_items) : 1;
+      $form_state->set('items_count', $items_count);
+    }
+
+    // Create a wrapper for AJAX updates
+    $wrapper_id = Html::getUniqueId('dynamic-flip-grid-items-wrapper');
+    
+    $form['items'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Items'),
+      '#prefix' => '<div id="' . $wrapper_id . '">',
+      '#suffix' => '</div>',
+    ];
+
+    for ($i = 0; $i < $items_count; $i++) {
+      $form['items'][$i] = [
+        '#type' => 'details',
+        '#title' => $this->t('Item @i', ['@i' => $i + 1]),
+        '#open' => FALSE,
+      ];
+
+      // Add a remove button for each item (except if there's only one item)
+      if ($items_count > 1) {
+        $form['items'][$i]['remove_item'] = [
+          '#type' => 'submit',
+          '#value' => $this->t('Remove this item'),
+          '#name' => 'remove_item_' . $i,
+          '#submit' => [[ $this, 'removeItemSubmit' ]],
+          '#ajax' => [
+            'callback' => [ $this, 'itemsAjaxCallback' ],
+            'wrapper' => $wrapper_id,
+          ],
+          '#limit_validation_errors' => [],
+          '#attributes' => [
+            'class' => ['button--danger'],
+          ],
+          '#item_index' => $i,
+        ];
+      }
+
+      // Front side configuration
+      $form['items'][$i]['front'] = [
+        '#type' => 'details',
+        '#title' => $this->t('Front Side'),
+        '#open' => FALSE,
+      ];
+
+      $form['items'][$i]['front']['media'] = [
+        '#type' => 'media_library',
+        '#allowed_bundles' => ['utexas_image'],
+        '#title' => $this->t('Media'),
+        '#default_value' => $this->configuration['items'][$i]['front']['media'] ?? '',
+        '#cardinality' => 1,
+      ];
+
+      $form['items'][$i]['front']['headline'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Headline'),
+        '#default_value' => $this->configuration['items'][$i]['front']['headline'] ?? '',
+      ];
+
+      $form['items'][$i]['front']['headline_bg_style'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Headline Background Styling'),
+        '#options' => [
+          'none' => $this->t('No style'),
+          'semitransparent' => $this->t('SemiTransparent Background'),
+          'white' => $this->t('White Background'),
+          'burnt_orange' => $this->t('Burnt Orange Background'),
+        ],
+        '#default_value' => $this->configuration['items'][$i]['front']['headline_bg_style'] ?? 'white',
+        '#description' => $this->t('Choose background styling for the headline text.'),
+      ];
+
+      $form['items'][$i]['front']['body'] = [
+        '#type' => 'text_format',
+        '#title' => $this->t('Body'),
+        '#default_value' => $this->configuration['items'][$i]['front']['body']['value'] ?? '',
+        '#format' => $this->configuration['items'][$i]['front']['body']['format'] ?? 'flex_html',
+      ];
+
+      $form['items'][$i]['front']['body_bg_style'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Body Background Styling'),
+        '#options' => [
+          'none' => $this->t('No style'),
+          'semitransparent' => $this->t('SemiTransparent Background'),
+          'white' => $this->t('White Background'),
+          'burnt_orange' => $this->t('Burnt Orange Background'),
+        ],
+        '#default_value' => $this->configuration['items'][$i]['front']['body_bg_style'] ?? 'white',
+        '#description' => $this->t('Choose background styling for the body text.'),
+      ];
+
+      $form['items'][$i]['front']['cta'] = [
+        '#type' => 'details',
+        '#title' => $this->t('Call to Action'),
+        '#open' => FALSE,
+      ];
+
+      $form['items'][$i]['front']['cta']['link'] = [
+        '#type' => 'utexas_link_options_element',
+        '#title' => $this->t('Link'),
+        '#default_value' => [
+          'uri' => $this->configuration['items'][$i]['front']['cta']['link']['uri'] ?? '',
+          'title' => $this->configuration['items'][$i]['front']['cta']['link']['title'] ?? '',
+          'options' => $this->configuration['items'][$i]['front']['cta']['link']['options'] ?? [],
+        ],
+      ];
+
+      $form['items'][$i]['front']['position'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Content Position'),
+        '#options' => $position_options,
+        '#default_value' => $this->configuration['items'][$i]['front']['position'] ?? 'center',
+      ];
+
+      // Back side configuration
+      $form['items'][$i]['back'] = [
+        '#type' => 'details',
+        '#title' => $this->t('Back Side'),
+        '#open' => FALSE,
+      ];
+
+      $form['items'][$i]['back']['media'] = [
+        '#type' => 'media_library',
+        '#allowed_bundles' => ['utexas_image'],
+        '#title' => $this->t('Media'),
+        '#default_value' => $this->configuration['items'][$i]['back']['media'] ?? '',
+        '#cardinality' => 1,
+      ];
+
+      $form['items'][$i]['back']['headline'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Headline'),
+        '#default_value' => $this->configuration['items'][$i]['back']['headline'] ?? '',
+      ];
+
+      $form['items'][$i]['back']['headline_bg_style'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Headline Background Styling'),
+        '#options' => [
+          'none' => $this->t('No style'),
+          'semitransparent' => $this->t('SemiTransparent Background'),
+          'white' => $this->t('White Background'),
+          'burnt_orange' => $this->t('Burnt Orange Background'),
+        ],
+        '#default_value' => $this->configuration['items'][$i]['back']['headline_bg_style'] ?? 'semitransparent',
+        '#description' => $this->t('Choose background styling for the headline text.'),
+      ];
+
+      $form['items'][$i]['back']['body'] = [
+        '#type' => 'text_format',
+        '#title' => $this->t('Body'),
+        '#default_value' => $this->configuration['items'][$i]['back']['body']['value'] ?? '',
+        '#format' => $this->configuration['items'][$i]['back']['body']['format'] ?? 'flex_html',
+      ];
+
+      $form['items'][$i]['back']['body_bg_style'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Body Background Styling'),
+        '#options' => [
+          'none' => $this->t('No style'),
+          'semitransparent' => $this->t('SemiTransparent Background'),
+          'white' => $this->t('White Background'),
+          'burnt_orange' => $this->t('Burnt Orange Background'),
+        ],
+        '#default_value' => $this->configuration['items'][$i]['back']['body_bg_style'] ?? 'semitransparent',
+        '#description' => $this->t('Choose background styling for the body text.'),
+      ];
+
+      $form['items'][$i]['back']['cta'] = [
+        '#type' => 'details',
+        '#title' => $this->t('Call to Action'),
+        '#open' => FALSE,
+      ];
+
+      $form['items'][$i]['back']['cta']['link'] = [
+        '#type' => 'utexas_link_options_element',
+        '#title' => $this->t('Link'),
+        '#default_value' => [
+          'uri' => $this->configuration['items'][$i]['back']['cta']['link']['uri'] ?? '',
+          'title' => $this->configuration['items'][$i]['back']['cta']['link']['title'] ?? '',
+          'options' => $this->configuration['items'][$i]['back']['cta']['link']['options'] ?? [],
+        ],
+      ];
+
+      $form['items'][$i]['back']['position'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Content Position'),
+        '#options' => $position_options,
+        '#default_value' => $this->configuration['items'][$i]['back']['position'] ?? 'center',
+      ];
+    }
+
+    // Add more item button
+    $form['items']['actions'] = [
+      '#type' => 'actions',
+      '#weight' => 100,
+    ];
+
+    $form['items']['actions']['add_item'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Add another item'),
+      '#submit' => [[ $this, 'addItemSubmit' ]],
+      '#ajax' => [
+        'callback' => [ $this, 'itemsAjaxCallback' ],
+        'wrapper' => $wrapper_id,
+      ],
+      '#limit_validation_errors' => [],
+    ];
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function blockSubmit($form, FormStateInterface $form_state): void
+  {
+    $this->configuration['headline'] = $form_state->getValue('headline');
+    $this->configuration['style'] = $form_state->getValue('style');
+    $this->configuration['items_per_row'] = $form_state->getValue('items_per_row');
+    $items = $form_state->getValue('items');
+    
+    // Remove the actions element from items
+    unset($items['actions']);
+    
+    // Clean up any items that might have remove buttons
+    foreach ($items as $key => $item) {
+      if (isset($item['remove_item'])) {
+        unset($items[$key]['remove_item']);
+      }
+    }
+    
+    $this->configuration['items'] = $items;
+  }
+
+  /**
+   * Submit handler for the "Add another item" button.
+   */
+  public function addItemSubmit(array &$form, FormStateInterface $form_state): void
+  {
+    $items_count = $form_state->get('items_count');
+    $items_count++;
+    $form_state->set('items_count', $items_count);
+    $form_state->setRebuild();
+  }
+
+  /**
+   * Submit handler for the "Remove item" buttons.
+   */
+  public function removeItemSubmit(array &$form, FormStateInterface $form_state): void
+  {
+    $triggering_element = $form_state->getTriggeringElement();
+    $item_index = $triggering_element['#item_index'];
+    
+    $items_count = $form_state->get('items_count');
+    
+    // Don't allow removing the last item
+    if ($items_count > 1) {
+      $items_count--;
+      $form_state->set('items_count', $items_count);
+      
+      // Remove the item from configuration
+      $items = $this->configuration['items'] ?? [];
+      unset($items[$item_index]);
+      
+      // Re-index the array to avoid gaps
+      $items = array_values($items);
+      $this->configuration['items'] = $items;
+    }
+    
+    $form_state->setRebuild();
+  }
+
+  /**
+   * AJAX callback for add/remove item operations.
+   */
+  public function itemsAjaxCallback(array &$form, FormStateInterface $form_state): array
+  {
+    return $form['settings']['items'];
+  }
+
+  /**
+   * Process item side data to prepare for rendering.
+   */
+  private function processSideData($side_data) {
+    $processed = $side_data;
+    
+    // Process media
+    if (!empty($side_data['media'])) {
+      $media = $this->entityTypeManager->getStorage('media')->load($side_data['media']);
+      if ($media) {
+        $media_attributes = $media->get('field_utexas_media_image')->getValue();
+        if (!empty($media_attributes[0]['target_id'])) {
+          $file = $this->entityTypeManager->getStorage('file')->load($media_attributes[0]['target_id']);
+          if ($file) {
+            $image_uri = $file->getFileUri();
+            $processed['media_url'] = $this->fileUrlGenerator->generateAbsoluteString($image_uri);
+            $processed['media_alt'] = $media_attributes[0]['alt'] ?? '';
+          }
+        }
+      }
+    }
+
+    // Process headline styling
+    $processed['headline_bg_style'] = $side_data['headline_bg_style'] ?? 'none';
+
+    // Process body content
+    if (!empty($side_data['body']['value'])) {
+      $processed['body_rendered'] = [
+        '#type' => 'processed_text',
+        '#text' => $side_data['body']['value'],
+        '#format' => $side_data['body']['format'] ?? 'flex_html',
+      ];
+    }
+
+    // Process body styling
+    $processed['body_bg_style'] = $side_data['body_bg_style'] ?? 'none';
+
+    // Process CTA
+    if (!empty($side_data['cta']['link']['uri'])) {
+      $cta_item['link']['uri'] = $side_data['cta']['link']['uri'];
+      $cta_item['link']['title'] = $side_data['cta']['link']['title'] ?? '';
+      $cta_item['link']['options'] = $side_data['cta']['link']['options'] ?? [];
+      $processed['cta_render'] = UtexasLinkOptionsHelper::buildLink($cta_item, ['btn', 'btn-primary']);
+    }
+
+    return $processed;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function build(): array
+  {
+    $items = $this->configuration['items'] ?? [];
+    $processed_items = [];
+
+    // Process each item
+    foreach ($items as $key => $item) {
+      $processed_items[$key] = [
+        'front' => $this->processSideData($item['front'] ?? []),
+        'back' => $this->processSideData($item['back'] ?? []),
+      ];
+    }
+
+    // Get chevron images for navigation
+    $module_path = \Drupal::service('extension.list.module')->getPath('moody_flip_things');
+    $chevron_left = '';
+    $chevron_right = '';
+
+    $chevron_left_path = $module_path . '/images/white-chevron-left.svg';
+    if (file_exists($chevron_left_path)) {
+      $chevron_left = file_get_contents($chevron_left_path);
+    }
+
+    $chevron_right_path = $module_path . '/images/white-chevron-right.svg';
+    if (file_exists($chevron_right_path)) {
+      $chevron_right = file_get_contents($chevron_right_path);
+    }
+
+    $position_options = [
+      'top-left' => $this->t('Top Left'),
+      'top-center' => $this->t('Top Center'),
+      'top-right' => $this->t('Top Right'),
+      'center-left' => $this->t('Center Left'),
+      'center' => $this->t('Center'),
+      'center-right' => $this->t('Center Right'),
+      'bottom-left' => $this->t('Bottom Left'),
+      'bottom-center' => $this->t('Bottom Center'),
+      'bottom-right' => $this->t('Bottom Right'),
+    ];
+    return [
+      '#theme' => 'moody_dynamic_flip_grid',
+      '#headline' => $this->configuration['headline'] ?? '',
+      '#style' => $this->configuration['style'] ?? 'round',
+      '#items_per_row' => $this->configuration['items_per_row'] ?? '3',
+      '#items' => $processed_items,
+      '#chevron_left' => $chevron_left,
+      '#chevron_right' => $chevron_right,
+      '#position_options' => $position_options,
+      '#attached' => [
+        'library' => [
+          'moody_flip_things/moody_dynamic_flip_grid',
+        ],
+      ],
+    ];
+  }
+}

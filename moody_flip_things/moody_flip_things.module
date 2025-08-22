@@ -42,5 +42,16 @@ function moody_flip_things_theme($existing, $type, $theme, $path)
                 'chevron_right' => '',
             ],
         ],
+        'moody_dynamic_flip_grid' => [
+            'variables' => [
+                'items' => [],
+                'headline' => '',
+                'style' => '',
+                'items_per_row' => '',
+                'chevron_left' => '',
+                'chevron_right' => '',
+                'position_options' => [],
+            ],
+        ],
     ];
 }

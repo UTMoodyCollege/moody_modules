@@ -1,0 +1,79 @@
+<div class="moody-dynamic-flip-grid-container ut-pt-8 ut-pb-8 style-{{ style|default('round') }} items-per-row-{{ items_per_row|default('3') }}">
+	<div class="container">
+		{% if headline %}
+			<div class="row">
+				<div class="col-12">
+					<div class="ut-text-3xl text-ut-charcoal ut-font-weight-black text-center ut-pb-8">{{ headline }}</div>
+				</div>
+			</div>
+		{% endif %}
+		<div class="row contents-row-max-w">
+			{% 
+				set col_class = items_per_row == '1' ? 'col-12' : 
+				               (items_per_row == '2' ? 'col-12 col-md-6' : 
+				               (items_per_row == '3' ? 'col-12 col-md-6 col-lg-4' : 'col-12 col-sm-6 col-md-4 col-lg-3'))
+			%}
+			{% for item in items %}
+				<div class="{{ col_class }} ut-mb-4">
+					<div class="moody-dynamic-flip-grid-item">
+						<div class="content">
+							<!-- Front Side -->
+							<div class="front">
+								<div class="shape-border">
+									<div class="shape position-{{ item.front.position|default('center') }}" data-position="{{ item.front.position|default('center') }}">
+										{% if item.front.media_url %}
+											<div class="media-content" style="background-image: url('{{ item.front.media_url }}');">
+												{% if item.front.media_alt %}
+													<span class="sr-only">{{ item.front.media_alt }}</span>
+												{% endif %}
+											</div>
+										{% endif %}
+										{% if item.front.headline %}
+											<div class="headline-content bg-style-{{ item.front.headline_bg_style|default('white') }}">{{ item.front.headline }}</div>
+										{% endif %}
+										{% if item.front.body_rendered %}
+											<div class="body-content bg-style-{{ item.front.body_bg_style|default('white') }}">{{ item.front.body_rendered }}</div>
+										{% endif %}
+										{% if item.front.cta_render %}
+											<div class="cta-content">{{ item.front.cta_render }}</div>
+										{% endif %}
+										<!-- Navigation arrows -->
+										<div class="arrow left">{{ chevron_left | raw }}</div>
+										<div class="arrow right">{{ chevron_right | raw }}</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Back Side -->
+							<div class="back">
+								<div class="shape-border">
+									<div class="shape position-{{ item.back.position|default('center') }}" data-position="{{ item.back.position|default('center') }}">
+										{% if item.back.media_url %}
+											<div class="media-content" style="background-image: url('{{ item.back.media_url }}');">
+												{% if item.back.media_alt %}
+													<span class="sr-only">{{ item.back.media_alt }}</span>
+												{% endif %}
+											</div>
+										{% endif %}
+										{% if item.back.headline %}
+											<div class="headline-content bg-style-{{ item.back.headline_bg_style|default('semitransparent') }}">{{ item.back.headline }}</div>
+										{% endif %}
+										{% if item.back.body_rendered %}
+											<div class="body-content bg-style-{{ item.back.body_bg_style|default('semitransparent') }}">{{ item.back.body_rendered }}</div>
+										{% endif %}
+										{% if item.back.cta_render %}
+											<div class="cta-content">{{ item.back.cta_render }}</div>
+										{% endif %}
+										<!-- Navigation arrows -->
+										<div class="arrow left">{{ chevron_left | raw }}</div>
+										<div class="arrow right">{{ chevron_right | raw }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
