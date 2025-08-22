@@ -139,6 +139,11 @@ function moody_feature_page_preprocess_html(&$variables)
  */
 function moody_feature_page_preprocess_page(&$variables)
 {
+  // Attach library for the 'news' view, 'page_1' display.
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if ($route_name === 'view.news.page_1') {
+    $variables["#attached"]["library"][] = 'moody_feature_page/moody_feature_editors_picks';
+  }
   $node_type = FALSE;
   if (isset($variables['node']) && is_object($variables['node'])) {
     $node = $variables['node'];
