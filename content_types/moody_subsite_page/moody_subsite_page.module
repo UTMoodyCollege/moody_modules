@@ -97,6 +97,9 @@ function moody_subsite_page_preprocess_page(&$variables)
       // Custom subsite logo.
       $subsite_logo = $subsite->get('custom_logo')->getValue();
       $subsite_logo_media = $subsite_logo[0]['media'];
+      // This string might be like "0,2998", we want to remove the 0 in these cases, and then if that means only 1 number and a stray comma, remove it too.
+      $subsite_logo_media = preg_replace('/^0,/', '', $subsite_logo_media);
+      $subsite_logo_media = rtrim($subsite_logo_media, ',');
       $subsite_logo_size = $subsite_logo[0]['size'];
       // Pass the default logo URL to use on subsites without custom logo.
       $default_logo_url = theme_get_setting('logo.url');
