@@ -643,7 +643,7 @@ display:
           admin_label: ''
           plugin_id: text_custom
           empty: false
-          content: "<ul class=\"button-list d-flex\">\r\n<li><a href=\"https://texasmoodymedia.org/#post-0\" class=\"ut-btn--homepage\">View All Events</a></li>\r\n<li><a href=\"https://texasmoodymedia.org/submit-event\" class=\"ut-btn--homepage\">Submit an Event</a></li>\r\n</ul>"
+          content: "<ul class=\"button-list d-flex\">\r\n<li><a href=\"https://events.moody.utexas.edu\" class=\"ut-btn--homepage\">View All Events</a></li>\r\n<li><a href=\"https://events.moody.utexas.edu/submit-event\" class=\"ut-btn--homepage\">Submit an Event</a></li>\r\n</ul>"
           tokenize: false
       display_extenders: {  }
     cache_metadata:
