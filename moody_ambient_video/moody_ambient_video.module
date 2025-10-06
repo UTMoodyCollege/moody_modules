@@ -92,7 +92,10 @@ if ($short_mode) {
         $media = Media::load($mid); // Load media.
         $fid = $media ? $media->getSource()->getSourceFieldValue($media) : FALSE; // Get fid.
         $file = File::load($fid); // Get file.
-        $fallback_url = $file ? ImageStyle::load('moody_image_style_650w_x_700h')->buildUrl($file->getFileUri()) : FALSE; // Create URL.
+        // Set the fallbackurl to the original $file->getFileUri() image. but dont use realpath we want a relative link to it via  \Drupal::service('file_url_generator')->generateAbsoluteString($uri)
+        $fallback_url = $file ? \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri()) : FALSE; // Create URL.
+
+
       }
       $variables['#attached']['drupalSettings']['ambientVideo']['ambientVideoFallback'] = isset($fallback_url) ? $fallback_url : '';
 
