@@ -33,6 +33,7 @@
 /* Ensure CTA aligns to flex-start */
 .moody-hero.extrabold-headline .hero-cta {
   align-self: flex-start;
+  /* ut burnt orange color */
 }
 /* Same for hero-subhead */
 .moody-hero.extrabold-headline .hero-subhead {
@@ -45,12 +46,15 @@
 }
 /* We want to defeat the .moody-hero .ut-btn--hero */
 .moody-hero a.ut-btn--hero {
-  color: #fff;
   display: inline-block;
   padding: .75rem 1.5rem;
   font-size: 1rem;
   font-weight: 700;
   border-radius: 4px;
+  color: #BF5700;
+  background-color: white;
+  border: solid 1px #BF5700;
+
 }
 @media screen and (min-width: 900px) {
   .moody-hero.extrabold-headline .ut-btn--hero {
