@@ -19,12 +19,20 @@
 			<span class="sr-only">{{ alt }}</span>
 		</div>
 	{% endif %}
-	{% if heading or subheading or cta_uri %}
+	{% if heading or subheading or cta %}
 		<div class="hero-content {{ text_color }}">
 			<div class="hero-callout">
 				{% if heading %}
 					<h2 class="hero-headline">{{ heading }}</h2>
 				{% endif %}
+                {% if subheading %}
+                <div class="hero-subhead">{{ subheading }}</div>
+                {% endif %}
+                {% if cta %}
+                <div class="hero-cta">
+                    {{ cta }}
+                </div>
+                {% endif %}
 			</div>
 		</div>
 	{% endif %}

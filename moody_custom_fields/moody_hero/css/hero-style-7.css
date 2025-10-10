@@ -27,16 +27,26 @@
   font-weight: 900;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+}
+
+/* Ensure CTA aligns to flex-start */
+.moody-hero.extrabold-headline .hero-cta {
+  align-self: flex-start;
 }
 @media screen and (min-width: 900px) {
   .moody-hero.extrabold-headline .hero-callout {
     height: 100%;
   }
 }
-.moody-hero .ut-btn--hero {
+/* We want to defeat the .moody-hero .ut-btn--hero */
+.moody-hero a.ut-btn--hero {
   color: #fff;
   display: inline-block;
-  padding: .5rem 1rem;
+  padding: .75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 4px;
 }
 @media screen and (min-width: 900px) {
   .moody-hero.extrabold-headline .ut-btn--hero {
@@ -44,5 +54,8 @@
   }
   .moody-hero.extrabold-headline .hero-img {
     height: 750px;
+  }
+  .moody-hero a.ut-btn--hero {
+    font-size: 1.75rem;
   }
 }
