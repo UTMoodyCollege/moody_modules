@@ -34,6 +34,10 @@
 .moody-hero.extrabold-headline .hero-cta {
   align-self: flex-start;
 }
+/* Same for hero-subhead */
+.moody-hero.extrabold-headline .hero-subhead {
+  align-self: flex-start;
+}
 @media screen and (min-width: 900px) {
   .moody-hero.extrabold-headline .hero-callout {
     height: 100%;
@@ -56,6 +60,6 @@
     height: 750px;
   }
   .moody-hero a.ut-btn--hero {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 }
