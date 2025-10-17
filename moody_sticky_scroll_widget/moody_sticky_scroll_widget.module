@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for moody sticky scroll widget block.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function moody_sticky_scroll_widget_theme($existing, $type, $theme, $path)
+{
+    return [
+        'moody_sticky_scroll_widget' => [
+            'variables' => [
+                'text_content' => '',
+                'image_url' => '',
+            ],
+        ],
+    ];
+}
