@@ -1,0 +1,7 @@
+moody_sticky_scroll_widget:
+  version: 1.x
+  css:
+    theme:
+      css/moody-sticky-scroll-widget.css: {}
+  dependencies:
+    - core/drupal

@@ -1,0 +1,117 @@
+.moody-sticky-scroll-widget {
+  width: 100%;
+  
+  .sticky-scroll-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    
+    // Mobile-first: stack vertically on small screens
+    @media (max-width: 767px) {
+      flex-direction: column;
+      
+      .sticky-image-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+      }
+      
+      .scroll-text-wrapper {
+        width: 100%;
+      }
+    }
+    
+    // Desktop: side-by-side layout with sticky image
+    @media (min-width: 768px) {
+      flex-direction: row;
+      gap: 2rem;
+      align-items: flex-start;
+      
+      .sticky-image-wrapper {
+        flex: 0 0 40%;
+        max-width: 400px;
+        position: sticky;
+        top: 2rem;
+        align-self: flex-start;
+      }
+      
+      .scroll-text-wrapper {
+        flex: 1;
+        min-width: 0; // Prevent flex item overflow
+      }
+    }
+    
+    @media (min-width: 992px) {
+      gap: 3rem;
+      
+      .sticky-image-wrapper {
+        flex: 0 0 35%;
+      }
+    }
+  }
+  
+  .sticky-image-wrapper {
+    .sticky-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  .scroll-text-wrapper {
+    .scroll-text-content {
+      line-height: 1.6;
+      color: #333f48;
+      
+      // Style paragraphs
+      p {
+        margin-bottom: 1rem;
+      }
+      
+      // Style headings
+      h2, h3, h4 {
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        color: #333f48;
+      }
+      
+      h2 {
+        font-size: 1.75rem;
+        font-weight: 600;
+      }
+      
+      h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+      
+      h4 {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+      
+      // Style lists
+      ul, ol {
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+        
+        li {
+          margin-bottom: 0.5rem;
+        }
+      }
+      
+      // Style links
+      a {
+        color: #bf5700;
+        text-decoration: none;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
