@@ -1,0 +1,11 @@
+services:
+  feature_page_redirects.redirect_subscriber:
+    class: Drupal\feature_page_redirects\EventSubscriber\FeaturePageRedirectSubscriber
+    arguments:
+      - '@current_route_match'
+      - '@redirect.repository'
+      - '@path.validator'
+      - '@entity_type.manager'
+      - '@path_alias.manager'
+    tags:
+      - { name: event_subscriber }

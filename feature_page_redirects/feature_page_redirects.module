@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * @file
+ * Contains feature_page_redirects.module.
+ *
+ * This module implements automatic redirects for moody_feature_page nodes
+ * when matching redirects are configured. The redirect logic is handled
+ * by the FeaturePageRedirectSubscriber event subscriber.
+ */
