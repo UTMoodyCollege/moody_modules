@@ -45,6 +45,13 @@ class FeaturePageRedirectSubscriber implements EventSubscriberInterface {
   protected $entityTypeManager;
 
   /**
+   * The path alias manager.
+   *
+   * @var \Drupal\path_alias\AliasManagerInterface
+   */
+  protected $pathAliasManager;
+
+  /**
    * Constructs a new FeaturePageRedirectSubscriber.
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
@@ -55,17 +62,21 @@ class FeaturePageRedirectSubscriber implements EventSubscriberInterface {
    *   The path validator service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\path_alias\AliasManagerInterface $path_alias_manager
+   *   The path alias manager.
    */
   public function __construct(
     RouteMatchInterface $route_match,
     RedirectRepository $redirect_repository,
     PathValidatorInterface $path_validator,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
+    $path_alias_manager
   ) {
     $this->routeMatch = $route_match;
     $this->redirectRepository = $redirect_repository;
     $this->pathValidator = $path_validator;
     $this->entityTypeManager = $entity_type_manager;
+    $this->pathAliasManager = $path_alias_manager;
   }
 
   /**
@@ -111,8 +122,7 @@ class FeaturePageRedirectSubscriber implements EventSubscriberInterface {
 
     // Try to get the alias if it exists.
     try {
-      $path_alias_manager = \Drupal::service('path_alias.manager');
-      $alias = $path_alias_manager->getAliasByPath($current_path);
+      $alias = $this->pathAliasManager->getAliasByPath($current_path);
       if ($alias && $alias !== $current_path) {
         $current_path = $alias;
       }
@@ -145,7 +155,8 @@ class FeaturePageRedirectSubscriber implements EventSubscriberInterface {
           // Handle entity: URIs.
           try {
             // Parse the entity URI and generate the URL.
-            $parts = explode('/', substr($destination['uri'], 7));
+            $entity_prefix = 'entity:';
+            $parts = explode('/', substr($destination['uri'], strlen($entity_prefix)));
             if (count($parts) >= 2) {
               $entity_type = $parts[0];
               $entity_id = $parts[1];

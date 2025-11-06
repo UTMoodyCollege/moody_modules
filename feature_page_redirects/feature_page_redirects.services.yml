@@ -6,5 +6,6 @@ services:
       - '@redirect.repository'
       - '@path.validator'
       - '@entity_type.manager'
+      - '@path_alias.manager'
     tags:
       - { name: event_subscriber }

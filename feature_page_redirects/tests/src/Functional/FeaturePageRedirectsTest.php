@@ -55,14 +55,14 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    
+
     // Create users with appropriate permissions.
     $this->contentUser = $this->drupalCreateUser([
       'create moody_feature_page content',
       'edit own moody_feature_page content',
       'view own unpublished content',
     ]);
-    
+
     $this->adminUser = $this->drupalCreateUser([
       'create moody_feature_page content',
       'edit any moody_feature_page content',
@@ -76,7 +76,7 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
    */
   public function testRedirectOnNodeView() {
     $this->drupalLogin($this->adminUser);
-    
+
     // Create a moody_feature_page node.
     $node = Node::create([
       'type' => 'moody_feature_page',
@@ -84,9 +84,9 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
       'status' => 1,
     ]);
     $node->save();
-    
+
     $node_path = '/node/' . $node->id();
-    
+
     // Create a redirect for this node.
     $redirect = Redirect::create([
       'redirect_source' => ltrim($node_path, '/'),
@@ -95,7 +95,7 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
       'language' => 'und',
     ]);
     $redirect->save();
-    
+
     // Visit the node page and verify the redirect happens.
     $this->drupalGet($node_path);
     // After redirect, we should be on the front page.
@@ -107,7 +107,7 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
    */
   public function testEditPageNotRedirected() {
     $this->drupalLogin($this->adminUser);
-    
+
     // Create a moody_feature_page node.
     $node = Node::create([
       'type' => 'moody_feature_page',
@@ -115,9 +115,9 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
       'status' => 1,
     ]);
     $node->save();
-    
+
     $node_path = '/node/' . $node->id();
-    
+
     // Create a redirect for this node.
     $redirect = Redirect::create([
       'redirect_source' => ltrim($node_path, '/'),
@@ -126,7 +126,7 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
       'language' => 'und',
     ]);
     $redirect->save();
-    
+
     // Visit the edit page and verify it loads normally.
     $this->drupalGet($node_path . '/edit');
     // We should still be on the edit page, not redirected.
@@ -139,7 +139,7 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
    */
   public function testNoRedirectWithoutMatchingRedirect() {
     $this->drupalLogin($this->contentUser);
-    
+
     // Create a moody_feature_page node without a redirect.
     $node = Node::create([
       'type' => 'moody_feature_page',
@@ -148,9 +148,9 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
       'uid' => $this->contentUser->id(),
     ]);
     $node->save();
-    
+
     $node_path = '/node/' . $node->id();
-    
+
     // Visit the node page and verify normal viewing works.
     $this->drupalGet($node_path);
     $this->assertSession()->statusCodeEquals(200);
@@ -163,7 +163,7 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
    */
   public function testRemovedRedirectAllowsViewing() {
     $this->drupalLogin($this->adminUser);
-    
+
     // Create a moody_feature_page node.
     $node = Node::create([
       'type' => 'moody_feature_page',
@@ -171,9 +171,9 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
       'status' => 1,
     ]);
     $node->save();
-    
+
     $node_path = '/node/' . $node->id();
-    
+
     // Create a redirect for this node.
     $redirect = Redirect::create([
       'redirect_source' => ltrim($node_path, '/'),
@@ -182,10 +182,10 @@ class FeaturePageRedirectsTest extends BrowserTestBase {
       'language' => 'und',
     ]);
     $redirect->save();
-    
+
     // Delete the redirect.
     $redirect->delete();
-    
+
     // Visit the node page and verify normal viewing works.
     $this->drupalGet($node_path);
     $this->assertSession()->statusCodeEquals(200);
