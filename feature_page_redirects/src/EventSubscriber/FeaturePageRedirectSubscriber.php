@@ -137,7 +137,6 @@ class FeaturePageRedirectSubscriber implements EventSubscriberInterface {
       $redirect_storage = $this->entityTypeManager->getStorage('redirect');
       $query = $redirect_storage->getQuery()
         ->condition('redirect_source.path', ltrim($current_path, '/'))
-        ->condition('status', 1)
         ->accessCheck(FALSE)
         ->range(0, 1);
       
@@ -199,7 +198,7 @@ class FeaturePageRedirectSubscriber implements EventSubscriberInterface {
 
         // Create and set the redirect response.
         $response = new RedirectResponse($url, $status_code);
-        $event->setResponse($response);
+        $response->send();
       }
     }
   }
