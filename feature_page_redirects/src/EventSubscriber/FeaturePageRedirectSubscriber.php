@@ -6,7 +6,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\redirect\RedirectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -83,19 +83,18 @@ class FeaturePageRedirectSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    // Priority of 35 puts this after the redirect module (priority 33)
-    // but before most other event subscribers.
-    $events[KernelEvents::REQUEST][] = ['onRequest', 35];
+    // Subscribe to the controller event which happens after routing is resolved.
+    $events[KernelEvents::CONTROLLER][] = ['onController', 0];
     return $events;
   }
 
   /**
-   * Handles the request event.
+   * Handles the controller event.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
-   *   The request event.
+   * @param \Symfony\Component\HttpKernel\Event\ControllerEvent $event
+   *   The controller event.
    */
-  public function onRequest(RequestEvent $event) {
+  public function onController(ControllerEvent $event) {
     // Only process the main request.
     if (!$event->isMainRequest()) {
       return;
