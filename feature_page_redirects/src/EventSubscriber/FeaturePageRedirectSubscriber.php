@@ -131,11 +131,34 @@ class FeaturePageRedirectSubscriber implements EventSubscriberInterface {
     }
 
     // Look for a redirect matching this path.
-    $redirects = $this->redirectRepository->findBySourcePath(ltrim($current_path, '/'));
+    // Query redirects directly instead of using findBySourcePath() to avoid
+    // the 'enabled' field error. Redirect entities use 'status' field.
+    try {
+      $redirect_storage = $this->entityTypeManager->getStorage('redirect');
+      $query = $redirect_storage->getQuery()
+        ->condition('redirect_source.path', ltrim($current_path, '/'))
+        ->condition('status', 1)
+        ->accessCheck(FALSE)
+        ->range(0, 1);
+      
+      $redirect_ids = $query->execute();
+      
+      if (empty($redirect_ids)) {
+        return;
+      }
+      
+      $redirect = $redirect_storage->load(reset($redirect_ids));
+      
+      if (!$redirect) {
+        return;
+      }
+    }
+    catch (\Exception $e) {
+      // If we can't query redirects, fail gracefully.
+      return;
+    }
 
-    if (!empty($redirects)) {
-      // Get the first matching redirect.
-      $redirect = reset($redirects);
+    if ($redirect) {
 
       // Get the redirect destination.
       $destination = $redirect->getRedirect();
