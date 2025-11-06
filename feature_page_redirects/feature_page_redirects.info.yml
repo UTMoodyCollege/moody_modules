@@ -1,0 +1,9 @@
+name: 'Feature Page Redirects'
+description: 'Implements redirects for moody_feature_page content type when viewing nodes that have matching redirects configured.'
+type: module
+core_version_requirement: '^9.4 || ^10'
+package: 'Moody'
+dependencies:
+  - 'drupal:node'
+  - 'redirect:redirect'
+  - 'moody_feature_page:moody_feature_page'

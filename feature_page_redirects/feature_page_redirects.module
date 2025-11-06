@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * @file
+ * Contains feature_page_redirects.module.
+ */
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\redirect\Entity\Redirect;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
+/**
+ * Implements hook_entity_view_alter().
+ *
+ * Intercepts viewing of moody_feature_page nodes and honors any matching
+ * redirects. This allows nodes to be used in views while redirecting when
+ * viewed directly. Edit pages are not affected.
+ */
+function feature_page_redirects_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // Only process nodes of type moody_feature_page.
+  if ($entity->getEntityTypeId() !== 'node' || $entity->bundle() !== 'moody_feature_page') {
+    return;
+  }
+
+  // Only apply redirects when viewing the node in 'full' view mode.
+  // This ensures the redirect happens on the canonical node page.
+  if ($display->getMode() !== 'full') {
+    return;
+  }
+
+  // Don't redirect if we're on an edit or admin page.
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if (!$route_name || strpos($route_name, 'entity.node.edit') !== FALSE || strpos($route_name, 'entity.node.delete') !== FALSE) {
+    return;
+  }
+
+  // Only redirect on the canonical node view route.
+  if ($route_name !== 'entity.node.canonical') {
+    return;
+  }
+
+  // Get the current path for the node.
+  $current_path = '/node/' . $entity->id();
+  
+  // Try to get the alias if it exists.
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
+  if ($alias && $alias !== $current_path) {
+    $current_path = $alias;
+  }
+
+  // Look for a redirect matching this path.
+  $redirect_repository = \Drupal::service('redirect.repository');
+  $redirects = $redirect_repository->findBySourcePath(ltrim($current_path, '/'));
+
+  if (!empty($redirects)) {
+    // Get the first matching redirect.
+    $redirect = reset($redirects);
+    
+    if ($redirect instanceof Redirect) {
+      // Get the redirect destination.
+      $destination = $redirect->getRedirect();
+      
+      if (!empty($destination['uri'])) {
+        $url = $destination['uri'];
+        
+        // If it's an internal path, convert it to a full URL.
+        if (strpos($url, 'internal:') === 0) {
+          $url = \Drupal::service('path.validator')->getUrlIfValid(substr($url, 9));
+          if ($url) {
+            $url = $url->toString();
+          }
+        } elseif (strpos($url, 'entity:') === 0) {
+          // Handle entity: URIs.
+          try {
+            $url = \Drupal::service('url_generator')->generateFromRoute('<front>', [], ['absolute' => FALSE]);
+            // Parse the entity URI and generate the URL.
+            $parts = explode('/', substr($destination['uri'], 7));
+            if (count($parts) >= 2) {
+              $entity_type = $parts[0];
+              $entity_id = $parts[1];
+              $loaded_entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+              if ($loaded_entity && $loaded_entity->hasLinkTemplate('canonical')) {
+                $url = $loaded_entity->toUrl()->toString();
+              }
+            }
+          } catch (\Exception $e) {
+            // If we can't generate the URL, don't redirect.
+            return;
+          }
+        }
+        
+        // Get the status code (default to 301).
+        $status_code = $redirect->getStatusCode() ?: 301;
+        
+        // Perform the redirect.
+        $response = new RedirectResponse($url, $status_code);
+        $response->send();
+        exit;
+      }
+    }
+  }
+}
