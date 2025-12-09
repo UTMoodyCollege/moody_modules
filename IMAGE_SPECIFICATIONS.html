@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Specifications Reference</title>
+</head>
+<body>
+
+<h1>Image Specifications Reference</h1>
+
+<p>This document provides a quick reference guide for image dimensions and aspect ratios for Moody Modules field widgets and components.</p>
+
+<h2>Quick Reference Table</h2>
+
+<p>Use this table for a quick overview of image requirements:</p>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Widget/Component</th>
+            <th>Aspect Ratio</th>
+            <th>Recommended Size</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Hero (All Styles)</strong></td>
+            <td>87:47</td>
+            <td>2280 x 1232 px</td>
+            <td>Minimum size; 8 display styles available</td>
+        </tr>
+        <tr>
+            <td><strong>Subsite Hero</strong></td>
+            <td>~3:1</td>
+            <td>1800 x 575 px</td>
+            <td>Exact size recommended</td>
+        </tr>
+        <tr>
+            <td><strong>Showcase (Default)</strong></td>
+            <td>~0.93:1</td>
+            <td>900 x 970 px</td>
+            <td>Use for default style</td>
+        </tr>
+        <tr>
+            <td><strong>Showcase (Marketing)</strong></td>
+            <td>~1.5:1</td>
+            <td>1000 x 666 px</td>
+            <td>Use for marketing style</td>
+        </tr>
+        <tr>
+            <td><strong>Quotation</strong></td>
+            <td>1:1 (Square)</td>
+            <td>500 x 500 px</td>
+            <td>Square format</td>
+        </tr>
+        <tr>
+            <td><strong>Flex Grid (Square)</strong></td>
+            <td>1:1 (Square)</td>
+            <td>500 x 500 px</td>
+            <td>Default square style</td>
+        </tr>
+        <tr>
+            <td><strong>Flex Grid (Rectangular)</strong></td>
+            <td>3:2</td>
+            <td>750 x 500 px</td>
+            <td>Rectangular style option</td>
+        </tr>
+        <tr>
+            <td><strong>Focus Areas</strong></td>
+            <td>1:1 (Square)</td>
+            <td>280 x 280 px</td>
+            <td>Small square format</td>
+        </tr>
+        <tr>
+            <td><strong>Card</strong></td>
+            <td>Flexible</td>
+            <td>No specific size</td>
+            <td>No fixed dimensions</td>
+        </tr>
+        <tr>
+            <td><strong>Promotion</strong></td>
+            <td>Flexible</td>
+            <td>No specific size</td>
+            <td>No fixed dimensions</td>
+        </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<h2>Detailed Widget Specifications</h2>
+
+<h3>Hero Widget</h3>
+<p><strong>Widget ID:</strong> <code>moody_hero</code><br>
+<strong>File:</strong> <code>moody_custom_fields/moody_hero/src/Plugin/Field/FieldWidget/MoodyHeroWidget.php</code><br>
+<strong>Aspect Ratio:</strong> 87:47<br>
+<strong>Recommended Resolution:</strong> Minimum 2280x1232 pixels<br>
+<strong>Notes:</strong> Image will be scaled and cropped to maintain the 87:47 ratio. Upload an image with a minimum resolution of 2280x1232 pixels to maintain quality and avoid cropping.</p>
+
+<h4>Hero Styles and Image Processing</h4>
+
+<p>The Hero widget has 8 different display styles. Each style processes images differently:</p>
+
+<p><strong>Styles 1, 2, 3, 5, 6, 7, 8:</strong> (Most styles)</p>
+<ul>
+    <li><strong>Large Image Style:</strong> <code>utexas_image_style_2250w_900h</code> (2250px width, 900px height)</li>
+    <li><strong>Medium Image Style:</strong> <code>utexas_image_style_1200w</code> (1200px width, used for screens ≤900px)</li>
+    <li><strong>Small Image Style:</strong> <code>utexas_image_style_1200w</code> (1200px width, used for screens ≤600px)</li>
+</ul>
+
+<p><strong>Style 4:</strong> (Centered image with dark bottom pane)</p>
+<ul>
+    <li><strong>Responsive Image Style:</strong> <code>moody_responsive_image_hi</code></li>
+    <li>Uses responsive image formatting with multiple breakpoints</li>
+</ul>
+
+<p><strong>Style Details:</strong></p>
+<ul>
+    <li><strong>Style 1:</strong> Bold heading &amp; subheading on burnt orange background, image centered</li>
+    <li><strong>Style 2:</strong> Bold heading on dark background, anchored at base of media</li>
+    <li><strong>Style 3:</strong> White bottom pane with heading, subheading and call-to-action</li>
+    <li><strong>Style 4:</strong> Centered image with dark bottom pane containing heading and CTA</li>
+    <li><strong>Style 5:</strong> Medium image floated right with large heading and CTA</li>
+    <li><strong>Style 6:</strong> Tall image with extra bold headline, supports text color/overlay options</li>
+    <li><strong>Style 7:</strong> Moody homepage design, supports text positioning and color options</li>
+    <li><strong>Style 8:</strong> Moody homepage design variant, supports text positioning and color options</li>
+</ul>
+
+<hr>
+
+<h3>Quotation Widget</h3>
+<p><strong>Widget ID:</strong> <code>moody_quotation_widget</code><br>
+<strong>File:</strong> <code>moody_custom_fields/moody_quotation/src/Plugin/Field/FieldWidget/MoodyQuotationWidget.php</code><br>
+<strong>Aspect Ratio:</strong> 1:1 (square)<br>
+<strong>Recommended Resolution:</strong> 500x500 pixels<br>
+<strong>Notes:</strong> Upload an image of 500 x 500 pixels to maintain resolution &amp; avoid cropping.</p>
+
+<hr>
+
+<h3>Showcase Widget</h3>
+<p><strong>Widget ID:</strong> <code>moody_showcase_widget</code><br>
+<strong>File:</strong> <code>moody_custom_fields/moody_showcase/src/Plugin/Field/FieldWidget/MoodyShowcaseWidget.php</code><br>
+<strong>Aspect Ratio:</strong> Varies by formatter<br>
+<strong>Recommended Resolution:</strong></p>
+<ul>
+    <li>Default Style: 900x970 pixels</li>
+    <li>Marketing Style Formatter: 1000x666 pixels</li>
+</ul>
+<p><strong>Notes:</strong> If using image, upload an image of 900 x 970 pixels to maintain resolution &amp; avoid cropping. If using the Moody Showcase Marketing Style formatter, opt for an image with dimensions of 1000 x 666 pixels to maintain resolution &amp; avoid cropping.</p>
+
+<hr>
+
+<h3>Subsite Hero Widget</h3>
+<p><strong>Widget ID:</strong> <code>moody_subsite_hero</code><br>
+<strong>File:</strong> <code>moody_custom_fields/moody_subsite_hero/src/Plugin/Field/FieldWidget/MoodySubsiteHeroWidget.php</code><br>
+<strong>Aspect Ratio:</strong> Approximately 3.13:1<br>
+<strong>Recommended Resolution:</strong> 1800x575 pixels<br>
+<strong>Notes:</strong> Image will be scaled and cropped to 1800 x 575 pixels. Upload an image with a resolution of 1800 x 575 pixels to maintain quality and avoid cropping.</p>
+
+<hr>
+
+<h3>Flex Grid Element</h3>
+<p><strong>Widget ID:</strong> <code>moody_flex_grid</code><br>
+<strong>File:</strong> <code>moody_custom_fields/moody_flex_grid/src/Element/MoodyFlexGridElement.php</code><br>
+<strong>Aspect Ratio:</strong></p>
+<ul>
+    <li>Default (Square): 1:1</li>
+    <li>Rectangular Style: 3:2</li>
+</ul>
+<p><strong>Recommended Resolution:</strong></p>
+<ul>
+    <li>Square Style: 500x500 pixels</li>
+    <li>Rectangular Style: 750x500 pixels (3:2 aspect ratio)</li>
+</ul>
+<p><strong>Notes:</strong> Image will be scaled and cropped to a 1:1 ratio by default. Ideally, upload an image of 500 x 500 pixels to maintain resolution &amp; avoid cropping. If using the Flex Grid Rectangular Style, opt for an image with a 3:2 aspect ratio.</p>
+
+<hr>
+
+<h3>Focus Areas Element</h3>
+<p><strong>Widget ID:</strong> <code>moody_focus_areas</code><br>
+<strong>File:</strong> <code>moody_custom_fields/moody_focus_areas/src/Element/MoodyFocusAreaElement.php</code><br>
+<strong>Aspect Ratio:</strong> 1:1 (square)<br>
+<strong>Recommended Resolution:</strong> 280x280 pixels<br>
+<strong>Notes:</strong> Image will be scaled and cropped to a 1:1 ratio. Ideally, upload an image of 280 x 280 pixels to maintain resolution &amp; avoid cropping.</p>
+
+<hr>
+
+<h3>Card Widget</h3>
+<p><strong>Widget ID:</strong> <code>moody_card_widget</code><br>
+<strong>File:</strong> <code>moody_custom_fields/moody_card/src/Plugin/Field/FieldWidget/MoodyCardWidget.php</code><br>
+<strong>Aspect Ratio:</strong> No specific requirement<br>
+<strong>Recommended Resolution:</strong> No specific requirement<br>
+<strong>Notes:</strong> No specific image dimensions specified. Image will be displayed as uploaded.</p>
+
+<hr>
+
+<h3>Promotion Widget</h3>
+<p><strong>Widget ID:</strong> <code>moody_promotion_widget</code><br>
+<strong>File:</strong> <code>moody_custom_fields/moody_promotion/src/Plugin/Field/FieldWidget/MoodyPromotionWidget.php</code><br>
+<strong>Aspect Ratio:</strong> No specific requirement<br>
+<strong>Recommended Resolution:</strong> No specific requirement<br>
+<strong>Notes:</strong> No specific image dimensions specified. Image will be displayed as uploaded.</p>
+
+<hr>
+
+<h2>Additional Information</h2>
+
+<h3>Image Optimization</h3>
+<p>Some widgets provide an option to "Disable image size optimization" which allows you to:</p>
+<ul>
+    <li>Display animated GIFs</li>
+    <li>Use specific image dimensions requirements</li>
+</ul>
+<p>This option is available in:</p>
+<ul>
+    <li>Hero Widget</li>
+    <li>Subsite Hero Widget</li>
+</ul>
+
+<h3>Supported Media Types</h3>
+<p>Most widgets use the Media Library with <code>utexas_image</code> bundle. The Showcase Widget also supports <code>utexas_video_external</code> for external videos.</p>
+
+<hr>
+
+<h2>Summary for Content Creators</h2>
+
+<p><strong>Most Common Formats:</strong></p>
+<ul>
+    <li><strong>Square images (1:1):</strong> 500x500 px for most square widgets, 280x280 px for Focus Areas</li>
+    <li><strong>Wide images:</strong> 2280x1232 px for Hero, 1800x575 px for Subsite Hero</li>
+    <li><strong>Portrait/Tall images:</strong> 900x970 px for Showcase default style</li>
+</ul>
+
+<p><strong>General Guidelines:</strong></p>
+<ul>
+    <li>Always upload images at or above the recommended resolution to maintain quality</li>
+    <li>Images will be automatically scaled and cropped to fit the specified aspect ratio</li>
+    <li>Use the "Disable image size optimization" option if you need to display animated GIFs or have specific dimension requirements</li>
+</ul>
+
+<hr>
+
+<p><em>Last Updated: 2025-12-09</em></p>
+
+</body>
+</html>
