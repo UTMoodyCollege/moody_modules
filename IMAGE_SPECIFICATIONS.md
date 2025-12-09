@@ -8,7 +8,7 @@ Use this table for a quick overview of image requirements:
 
 | Widget/Component | Aspect Ratio | Recommended Size | Notes |
 |-----------------|--------------|------------------|-------|
-| **Hero** | 87:47 | 2280 x 1232 px | Minimum size for quality |
+| **Hero (All Styles)** | 87:47 | 2280 x 1232 px | Minimum size; 8 display styles available |
 | **Subsite Hero** | ~3:1 | 1800 x 575 px | Exact size recommended |
 | **Showcase (Default)** | ~0.93:1 | 900 x 970 px | Use for default style |
 | **Showcase (Marketing)** | ~1.5:1 | 1000 x 666 px | Use for marketing style |
@@ -29,6 +29,29 @@ Use this table for a quick overview of image requirements:
 **Aspect Ratio:** 87:47  
 **Recommended Resolution:** Minimum 2280x1232 pixels  
 **Notes:** Image will be scaled and cropped to maintain the 87:47 ratio. Upload an image with a minimum resolution of 2280x1232 pixels to maintain quality and avoid cropping.
+
+#### Hero Styles and Image Processing
+
+The Hero widget has 8 different display styles. Each style processes images differently:
+
+**Styles 1, 2, 3, 5, 6, 7, 8:** (Most styles)
+- **Large Image Style:** `utexas_image_style_2250w_900h` (2250px width, 900px height)
+- **Medium Image Style:** `utexas_image_style_1200w` (1200px width, used for screens ≤900px)
+- **Small Image Style:** `utexas_image_style_1200w` (1200px width, used for screens ≤600px)
+
+**Style 4:** (Centered image with dark bottom pane)
+- **Responsive Image Style:** `moody_responsive_image_hi`
+- Uses responsive image formatting with multiple breakpoints
+
+**Style Details:**
+- **Style 1:** Bold heading & subheading on burnt orange background, image centered
+- **Style 2:** Bold heading on dark background, anchored at base of media
+- **Style 3:** White bottom pane with heading, subheading and call-to-action
+- **Style 4:** Centered image with dark bottom pane containing heading and CTA
+- **Style 5:** Medium image floated right with large heading and CTA
+- **Style 6:** Tall image with extra bold headline, supports text color/overlay options
+- **Style 7:** Moody homepage design, supports text positioning and color options
+- **Style 8:** Moody homepage design variant, supports text positioning and color options
 
 ---
 
@@ -134,4 +157,4 @@ Most widgets use the Media Library with `utexas_image` bundle. The Showcase Widg
 
 ---
 
-*Last Updated: 2025-10-17*
+*Last Updated: 2025-12-09*
