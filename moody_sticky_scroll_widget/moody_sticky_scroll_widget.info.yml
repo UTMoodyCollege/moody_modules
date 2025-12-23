@@ -1,0 +1,5 @@
+name: 'Moody Sticky Scroll Widget'
+type: module
+description: 'Provides a mobile friendly widget with sticky image and scrolling text.'
+package: Moody
+core_version_requirement: ^10 || ^11
