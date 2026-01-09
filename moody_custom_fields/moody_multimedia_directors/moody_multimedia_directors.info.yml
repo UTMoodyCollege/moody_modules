@@ -2,5 +2,5 @@ name: 'Moody Multimedia Directors'
 type: module
 description: 'Moody Multimedia Directors'
 core: 8.x
-core_version_requirement: ^8 || ^9 || ^10
+core_version_requirement: ^8 || ^9 || ^10 || ^11
 package: 'Moody'

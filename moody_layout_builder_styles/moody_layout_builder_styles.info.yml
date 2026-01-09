@@ -1,7 +1,7 @@
 name: 'Moody Layout Builder Styles'
 type: module
 description: 'Add configurable style options to layout builder.'
-core_version_requirement: '^9.4 || ^10'
+core_version_requirement: '^9.4 || ^10 || ^11'
 package: Moody
 dependencies:
   - 'layout_builder_styles:layout_builder_styles'

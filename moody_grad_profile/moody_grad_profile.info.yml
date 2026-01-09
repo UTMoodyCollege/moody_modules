@@ -2,7 +2,7 @@ name: 'Graduate Profile'
 type: module
 description: 'Provides Graduate Profile content type and related configuration. Provides a grad student profile.'
 package: Custom
-core_version_requirement: '^9.4 || ^10'
+core_version_requirement: '^9.4 || ^10 || ^11'
 dependencies:
   - 'breadcrumbs_visibility:breadcrumbs_visibility'
   - 'drupal:content_moderation'

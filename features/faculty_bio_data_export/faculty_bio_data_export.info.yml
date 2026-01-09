@@ -1,6 +1,6 @@
 name: faculty_bio_data_export
 type: module
-core_version_requirement: '^9.4 || ^10'
+core_version_requirement: '^9.4 || ^10 || ^11'
 dependencies:
   - 'csv_serialization:csv_serialization'
   - 'drupal:file'

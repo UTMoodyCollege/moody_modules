@@ -1,7 +1,7 @@
 name: 'Moody Subsite Page'
 description: 'Provides Moody Subsite Page content type and related configuration. '
 type: module
-core_version_requirement: '^9.4 || ^10'
+core_version_requirement: '^9.4 || ^10 || ^11'
 package: 'Moody Content Type'
 dependencies:
   - 'addtoany:addtoany'
