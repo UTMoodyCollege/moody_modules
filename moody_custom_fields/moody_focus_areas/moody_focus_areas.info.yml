@@ -2,7 +2,7 @@ name: 'Moody Focus Areas'
 type: module
 description: 'Themed and configurable focus areas'
 core: 8.x
-core_version_requirement: ^8 || ^9 || ^10
+core_version_requirement: ^8 || ^9 || ^10 || ^11
 package: Moody
 dependencies:
   - block_content

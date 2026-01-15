@@ -88,7 +88,7 @@ abstract class MediaDestination extends DestinationBase implements MigrateDestin
       if (!in_array($dirname, ['public:', 'private:'])) {
         \Drupal::service('file_system')->prepareDirectory($dirname, FileSystemInterface::CREATE_DIRECTORY);
       }
-      $this->importedFile = file_save_data($file_data, $file_uri, FileSystemInterface::EXISTS_REPLACE);
+      $this->importedFile = \Drupal::service('file.repository')->writeData($file_data, $file_uri, FileSystemInterface::EXISTS_REPLACE);
       if ($this->importedFile) {
         $this->mediaElements['name'] = $this->importedFile->getFilename();
         $this->mediaElements['uid'] = $row->getDestinationProperty('uid');
@@ -175,8 +175,12 @@ abstract class MediaDestination extends DestinationBase implements MigrateDestin
       ->fields('file_managed', ['fid']);
     $result = array_keys($query->execute()->fetchAllAssoc('fid'));
     if (!empty($result)) {
+      $file_storage = \Drupal::entityTypeManager()->getStorage('file');
       foreach ($result as $fid) {
-        file_delete($fid);
+        $file = $file_storage->load($fid);
+        if ($file) {
+          \Drupal::service('file.repository')->delete($file);
+        }
       }
     }
   }

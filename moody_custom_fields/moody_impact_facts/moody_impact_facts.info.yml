@@ -2,5 +2,5 @@ name: 'Moody Impact Facts'
 type: module
 description: 'Themed prominent display of impact facts'
 core: 8.x
-core_version_requirement: ^8 || ^9 || ^10
+core_version_requirement: ^8 || ^9 || ^10 || ^11
 package: Moody

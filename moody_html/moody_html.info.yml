@@ -1,7 +1,7 @@
 name: 'Moody HTML'
 description: 'Provides managed text format and editor configuration for Moody sites.'
 type: module
-core_version_requirement: '^9.4 || ^10'
+core_version_requirement: '^9.4 || ^10 || ^11'
 dependencies:
   - ckeditor5
   - editor
