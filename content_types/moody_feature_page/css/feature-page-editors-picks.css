@@ -76,3 +76,7 @@
   color: #fff !important;
   text-decoration: none !important;
 }
+
+div.news-view.latest-news-block > .views-row a img {
+  min-height: 100%;
+}
