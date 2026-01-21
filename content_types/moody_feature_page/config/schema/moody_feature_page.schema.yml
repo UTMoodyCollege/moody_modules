@@ -2,6 +2,12 @@ block.settings.moody_feature_page_feature_pages_editors_picks:
   type: block_settings
   label: 'Feature Pages - Editors Picks block'
   mapping:
-    example:
+    selected_nodes:
+      type: sequence
+      label: 'Selected nodes'
+      sequence:
+        type: string
+        label: 'Node ID'
+    image_style:
       type: string
-      label: Example
+      label: 'Image style override'

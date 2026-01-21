@@ -8,6 +8,8 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -54,6 +56,7 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
   {
     return [
       'selected_nodes' => [],
+      'image_style' => '',
     ];
   }
 
@@ -74,7 +77,7 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
     $nodes = $this->entityTypeManager->getStorage('node')->loadMultiple($nids);
 
     foreach ($nodes as $node) {
-      $options[$node->id()] = $node->getTitle();
+      $options[$node->id()] = $node->label();
     }
 
     $form['selected_nodes'] = [
@@ -82,6 +85,21 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
       '#title' => $this->t('Select Nodes'),
       '#options' => $options,
       '#default_value' => $this->configuration['selected_nodes'],
+    ];
+
+    $image_style_options = [];
+    $image_styles = $this->entityTypeManager->getStorage('image_style')->loadMultiple();
+    foreach ($image_styles as $image_style) {
+      $image_style_options[$image_style->id()] = $image_style->label();
+    }
+    asort($image_style_options, SORT_NATURAL | SORT_FLAG_CASE);
+
+    $form['image_style'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Image style override'),
+      '#options' => ['' => $this->t('- Use view default -')] + $image_style_options,
+      '#default_value' => $this->configuration['image_style'] ?? '',
+      '#description' => $this->t('Optionally override the image style used to render article images in this block.'),
     ];
     return $form;
   }
@@ -93,7 +111,16 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
    */
   public function blockSubmit($form, FormStateInterface $form_state): void
   {
-    $this->configuration['selected_nodes'] = $form_state->getValue('selected_nodes');
+    $selected_nodes = array_values(array_filter(
+      $form_state->getValue('selected_nodes') ?? [],
+      static function ($nid): bool {
+        $nid_string = (string) $nid;
+        return $nid_string !== '' && ctype_digit($nid_string) && (int) $nid_string > 0;
+      }
+    ));
+
+    $this->configuration['selected_nodes'] = $selected_nodes;
+    $this->configuration['image_style'] = (string) $form_state->getValue('image_style');
   }
 
   /**
@@ -101,22 +128,63 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
    */
   public function build(): array
   {
-    // Transform the $this->configuration['selected_nodes'] into a comma separated list of nids
-    $nids = implode(',', $this->configuration['selected_nodes']);
-    // We get a value like "6641,6640,6610,6603,6602,6594,6580,6542,6532,6518,6502,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
-    // Remove any values that are just "0"
-    $nids = preg_replace('/,0/', '', $nids);
-    $build['content'] = [
-      '#type' => 'view',
-      '#name' => 'news_filtered',
-      '#display_id' => 'block_filtered',
-      // We need to add selected_nids as a query parm programmaticallyt
-      '#arguments' => [$nids],
-    ];
+    $selected_nodes = array_values(array_filter(
+      $this->configuration['selected_nodes'] ?? [],
+      static function ($nid): bool {
+        $nid_string = (string) $nid;
+        return $nid_string !== '' && ctype_digit($nid_string) && (int) $nid_string > 0;
+      }
+    ));
 
-    // Attach the moody_feature_editors_picks lib
+    $nids = $selected_nodes ? implode(',', $selected_nodes) : '0';
+    $image_style = (string) ($this->configuration['image_style'] ?? '');
+
+    $view = Views::getView('news_filtered');
+    if (!$view) {
+      return ['#markup' => $this->t('The view @view was not found.', ['@view' => 'news_filtered'])];
+    }
+
+    $view->setDisplay('block_filtered');
+    $view->setArguments([$nids]);
+    $view->initDisplay();
+
+    if ($image_style !== '') {
+      $this->applyImageStyleOverride($view, $image_style);
+    }
+
+    $build = [];
+    $build['content'] = $view->render();
+
     $build['#attached']['library'][] = 'moody_feature_page/moody_feature_editors_picks';
+    if ($image_style !== '') {
+      $build['#cache']['tags'][] = 'config:image.style.' . $image_style;
+    }
 
     return $build;
+  }
+
+  /**
+   * Overrides the image style used by image-like view fields.
+   */
+  private function applyImageStyleOverride(ViewExecutable $view, string $image_style): void
+  {
+    if (!$view->display_handler) {
+      return;
+    }
+
+    $fields = $view->display_handler->getOption('fields') ?? [];
+    foreach ($fields as &$field) {
+      $field_type = $field['type'] ?? '';
+      if (!in_array($field_type, ['media_thumbnail', 'image'], true)) {
+        continue;
+      }
+      if (!isset($field['settings']['image_style'])) {
+        continue;
+      }
+      $field['settings']['image_style'] = $image_style;
+    }
+    unset($field);
+
+    $view->display_handler->setOption('fields', $fields);
   }
 }
