@@ -78,5 +78,25 @@
 }
 
 div.news-view.latest-news-block > .views-row a img {
-  min-height: 100%;
+  min-height: 0;
+  height: auto;
+  width: auto;
+  flex: none;
+  align-self: flex-start;
 }
+
+/* Prevent long text from stretching the image in the flex row layout. */
+div.news-view.latest-news-block > .views-row a {
+  align-items: flex-start;
+}
+
+div.news-view.latest-news-block .latest-news-block-image-field {
+  flex: 0 0 auto;
+  align-self: flex-start;
+}
+
+@media screen and (max-width: 900px) {
+    div.news-view.latest-news-block > .views-row a {
+        flex-direction:column;
+    }
+  }
