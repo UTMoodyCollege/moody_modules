@@ -12,12 +12,12 @@ class FlexTabsConstraintValidator extends ConstraintValidator {
   /**
    * {@inheritdoc}
    */
-  public function onlyOneActive($items, Constraint $constraint) {
+  public function validate($items, Constraint $constraint) {
     foreach ($items as $item) {
       // First check if the value is not empty.
       if (empty($item->value)) {
         // Exactly one flex tab item must be set to active status.
-        $this->context->addViolation($constraint->isEmpty, ['%value' => $item->value]);
+        $this->context->addViolation($constraint->onlyOneActive, ['%value' => $item->value]);
       }
     }
   }
