@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * Validates the UniqueInteger constraint.
+ * Validates the FlexTabs constraint.
  */
 class FlexTabsConstraintValidator extends ConstraintValidator {
   /**
