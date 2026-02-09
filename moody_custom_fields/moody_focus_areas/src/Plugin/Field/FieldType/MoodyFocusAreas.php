@@ -95,6 +95,7 @@ class MoodyFocusAreas extends FieldItemBase {
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $random = new Random();
+    $values = [];
     return $values;
   }
 
