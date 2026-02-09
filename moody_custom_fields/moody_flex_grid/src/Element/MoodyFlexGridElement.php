@@ -2,7 +2,7 @@
 
 namespace Drupal\moody_flex_grid\Element;
 
-use Drupal\Core\Render\Element\FormElement;
+use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FormElement("moody_flex_grid")
  */
-class MoodyFlexGridElement extends FormElement {
+class MoodyFlexGridElement extends FormElementBase {
 
   /**
    * {@inheritdoc}
