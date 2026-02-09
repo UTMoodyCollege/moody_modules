@@ -144,17 +144,18 @@ function moody_feature_page_preprocess_page(&$variables)
   if ($route_name === 'view.news.page_1') {
     $variables["#attached"]["library"][] = 'moody_feature_page/moody_feature_editors_picks';
   }
+  $node = NULL;
   $node_type = FALSE;
-  if (isset($variables['node']) && is_object($variables['node'])) {
+  if (isset($variables['node']) && $variables['node'] instanceof Node) {
     $node = $variables['node'];
-    $node_type = $variables['node']->getType();
-  }
-  // For revision pages.
-  if (isset($variables['node']) && is_string($variables['node'])) {
-    $node = Node::load($variables['node']);
     $node_type = $node->getType();
   }
-  if ($node_type == 'moody_feature_page') {
+  // For revision pages.
+  if (!$node && isset($variables['node']) && is_string($variables['node'])) {
+    $node = Node::load($variables['node']);
+    $node_type = $node ? $node->getType() : FALSE;
+  }
+  if ($node && $node_type == 'moody_feature_page') {
     // Pass color scheme to template for styling.
     $color_scheme = isset($node->get('field_color_scheme')->getValue()[0]['value']) ? $node->get('field_color_scheme')->getValue()[0]['value'] : '';
     $variables['color_scheme'] = $color_scheme;
@@ -265,4 +266,3 @@ function _get_previous_next_nodes($nid)
 
   return $results;
 }
-
