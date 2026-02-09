@@ -16,7 +16,7 @@ use Drupal\media\Entity\Media;
 use Drupal\Core\Language\Language;
 use Drupal\Component\Utility\Html;
 use Drupal\user\Entity\User;
-use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\File\FileExists;
 
 /**
  * Default URL for MMC events.
@@ -112,6 +112,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
   // Import image and create media entity.
   $image_url = $event_data['image']['sizes']['medium']['url'] ?? FALSE;
   $fid = FALSE;
+  $file = NULL;
   if ($image_url) {
     $filename = pathinfo($image_url)['basename'];
     $filename = explode('?', $filename)[0];
@@ -124,13 +125,17 @@ function _create_event_nodes_from_media_channel(&$event_data)
     if (!file_exists($real_path)) {
       // File doesn't exist, so fetch and save it.
       $image = file_get_contents($image_url);
-      $file = \Drupal::service('file.repository')->writeData($image, $file_path, FileSystemInterface::EXISTS_REPLACE);
-      $fid = $file->id();
+      $file = \Drupal::service('file.repository')->writeData($image, $file_path, FileExists::Replace);
+      $fid = $file ? $file->id() : FALSE;
     } else {
       // File exists, load the existing file entity.
       $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_path]);
       $file = reset($file);
-      $fid = $file->id();
+      if (!$file) {
+        $image = file_get_contents($image_url);
+        $file = \Drupal::service('file.repository')->writeData($image, $file_path, FileExists::Replace);
+      }
+      $fid = $file ? $file->id() : FALSE;
     }
   }
 
@@ -209,7 +214,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
           'langcode' => Language::LANGCODE_NOT_SPECIFIED,
           'status' => '1',
           'field_utexas_media_image' => [
-            'target_id' => $file->id(),
+            'target_id' => $fid,
             'alt' => $title,
             'title' => $title,
           ],
