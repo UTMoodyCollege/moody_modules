@@ -12,6 +12,7 @@ use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
+use Drupal\Core\File\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Language\Language;
 
@@ -114,7 +115,10 @@ class MoodyCard extends FieldItemBase {
     $max_resolution = '2280x1232';
     $extensions = ['png', 'gif', 'jpg', 'jpeg'];
     $extension = array_rand(array_combine($extensions, $extensions));
-    if (!isset($images[$extension][$min_resolution][$max_resolution]) || count($images[$extension][$min_resolution][$max_resolution]) <= 5) {
+    $images[$extension] = $images[$extension] ?? [];
+    $images[$extension][$min_resolution] = $images[$extension][$min_resolution] ?? [];
+    $images[$extension][$min_resolution][$max_resolution] = $images[$extension][$min_resolution][$max_resolution] ?? [];
+    if (count($images[$extension][$min_resolution][$max_resolution]) <= 5) {
       /** @var \Drupal\Core\File\FileSystemInterface $file_system */
       $file_system = \Drupal::service('file_system');
       $tmp_file = $file_system->tempnam('temporary://', 'generateImage_');
@@ -129,8 +133,8 @@ class MoodyCard extends FieldItemBase {
         $image = File::create();
         $image->setFileUri($path);
         $image->setOwnerId(\Drupal::currentUser()->id());
-        $image->setMimeType(\Drupal::service('file.mime_type.guesser')->guess($path));
-        $image->setFileName($file_system->basename($path));
+        $image->setMimeType(\Drupal::service('file.mime_type.guesser')->guessMimeType($path));
+        $image->setFileName(basename($path));
         $destination_dir = 'public://generated_sample';
         $file_system->prepareDirectory($destination_dir, FileSystemInterface::CREATE_DIRECTORY);
         $destination = $destination_dir . '/' . basename($path);
@@ -166,7 +170,10 @@ class MoodyCard extends FieldItemBase {
     $max_resolution = '2280x1232';
     $extensions = ['png', 'gif', 'jpg', 'jpeg'];
     $extension = array_rand(array_combine($extensions, $extensions));
-    if (!isset($images[$extension][$min_resolution][$max_resolution]) || count($images[$extension][$min_resolution][$max_resolution]) <= 5) {
+    $images[$extension] = $images[$extension] ?? [];
+    $images[$extension][$min_resolution] = $images[$extension][$min_resolution] ?? [];
+    $images[$extension][$min_resolution][$max_resolution] = $images[$extension][$min_resolution][$max_resolution] ?? [];
+    if (count($images[$extension][$min_resolution][$max_resolution]) <= 5) {
       /** @var \Drupal\Core\File\FileSystemInterface $file_system */
       $file_system = \Drupal::service('file_system');
       $tmp_file = $file_system->tempnam('temporary://', 'generateImage_');
@@ -181,8 +188,8 @@ class MoodyCard extends FieldItemBase {
         $image = File::create();
         $image->setFileUri($path);
         $image->setOwnerId(\Drupal::currentUser()->id());
-        $image->setMimeType(\Drupal::service('file.mime_type.guesser')->guess($path));
-        $image->setFileName($file_system->basename($path));
+        $image->setMimeType(\Drupal::service('file.mime_type.guesser')->guessMimeType($path));
+        $image->setFileName(basename($path));
         $destination_dir = 'public://generated_sample';
         $file_system->prepareDirectory($destination_dir, FileSystemInterface::CREATE_DIRECTORY);
         $destination = $destination_dir . '/' . basename($path);
