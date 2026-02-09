@@ -2,7 +2,7 @@
 
 namespace Drupal\moody_focus_areas\Element;
 
-use Drupal\Core\Render\Element\FormElement;
+use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FormElement("moody_focus_areas")
  */
-class MoodyFocusAreaElement extends FormElement {
+class MoodyFocusAreaElement extends FormElementBase {
 
   /**
    * {@inheritdoc}
