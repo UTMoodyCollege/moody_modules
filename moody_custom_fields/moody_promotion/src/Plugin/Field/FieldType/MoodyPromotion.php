@@ -144,8 +144,8 @@ class MoodyPromotion extends FieldItemBase {
         $image = File::create();
         $image->setFileUri($path);
         $image->setOwnerId(\Drupal::currentUser()->id());
-        $image->setMimeType(\Drupal::service('file.mime_type.guesser')->guess($path));
-        $image->setFileName($file_system->basename($path));
+        $image->setMimeType(\Drupal::service('file.mime_type.guesser')->guessMimeType($path));
+        $image->setFileName(basename($path));
         $destination_dir = 'public://generated_sample';
         $file_system->prepareDirectory($destination_dir, FileSystemInterface::CREATE_DIRECTORY);
         $destination = $destination_dir . '/' . basename($path);
@@ -193,6 +193,7 @@ class MoodyPromotion extends FieldItemBase {
     $media = $this->get('media')->getValue();
     $headline = $this->get('headline')->getValue();
     $copy = $this->get('copy_value')->getValue();
+    $date = $this->get('date')->getValue();
     $link = $this->get('link_uri')->getValue();
     return empty($media) && empty($headline) && empty($date) && empty($copy) && empty($link);
   }

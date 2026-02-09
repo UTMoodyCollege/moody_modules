@@ -269,7 +269,7 @@ function moody_hero_form_block_form_alter(&$form, &$form_state, $form_id) {
     /** @var \Drupal\block\Entity\Block $entity */
     $entity = $form_object->getEntity();
     $uuid = $entity->getPlugin()->getDerivativeId();
-    /** @var Drupal\block_content\Entity\BlockContent $block_content */
+    /** @var \Drupal\block_content\Entity\BlockContent $block_content */
     if (isset($uuid)) {
       $block_content = \Drupal::service('entity.repository')->loadEntityByUuid('block_content', $uuid);
       if (!empty($block_content) && method_exists($block_content, 'bundle')) {

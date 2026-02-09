@@ -108,6 +108,7 @@ class MoodyShowcaseFormatter extends FormatterBase implements ContainerFactoryPl
       $cta_item['link']['options'] = $item->link_options ?? [];
       $cta = UtexasLinkOptionsHelper::buildLink($cta_item, ['ut-btn--homepage', 'mt-4']);
       $image_render_array = [];
+      $media_bundle = NULL;
 
       if ($media = $this->entityTypeManager->getStorage('media')->load($item->image)) {
         // Alter if it's a video.

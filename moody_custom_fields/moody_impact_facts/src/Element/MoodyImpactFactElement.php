@@ -2,7 +2,7 @@
 
 namespace Drupal\moody_impact_facts\Element;
 
-use Drupal\Core\Render\Element\FormElement;
+use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FormElement("moody_impact_facts")
  */
-class MoodyImpactFactElement extends FormElement {
+class MoodyImpactFactElement extends FormElementBase {
 
   /**
    * {@inheritdoc}

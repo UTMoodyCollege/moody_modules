@@ -83,6 +83,7 @@ class MoodyImpactFacts extends FieldItemBase {
     // $values['headline'] = $random->word(10);
     // $values['subheadline'] = $random->word(10);
     // $values['style'] = NULL;
+    $values = [];
     return $values;
   }
 
