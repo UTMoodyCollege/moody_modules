@@ -38,24 +38,26 @@ function moody_subsite_page_preprocess_html(&$variables)
  */
 function moody_subsite_page_preprocess_page(&$variables)
 {
+  $node = NULL;
   $node_type = FALSE;
-  if (isset($variables['node']) && is_object($variables['node'])) {
+  $ssid = NULL;
+  if (isset($variables['node']) && $variables['node'] instanceof Node) {
     $node = $variables['node'];
-    $node_type = $variables['node']->getType();
-  }
-  // For revision pages.
-  if (isset($variables['node']) && is_string($variables['node'])) {
-    $node = Node::load($variables['node']);
     $node_type = $node->getType();
   }
-  if ($node_type == 'moody_subsite_page') {
+  // For revision pages.
+  if (!$node && isset($variables['node']) && is_string($variables['node'])) {
+    $node = Node::load($variables['node']);
+    $node_type = $node ? $node->getType() : FALSE;
+  }
+  if ($node && $node_type == 'moody_subsite_page') {
     $url_generator = $node->get('field_moody_url_generator');
     $tid = $url_generator->getString();
     // Check if there is an associated moody_subsite entity.
     $subsite_entity_preprocessed = \Drupal::service('entity_type.manager')->getStorage('moody_subsite')->loadByProperties(['directory_structure' => $tid]);
     $subsite_entity = array_values($subsite_entity_preprocessed);
-    $subsite = $subsite_entity[0];
-    if ($subsite_entity) {
+    $subsite = $subsite_entity ? $subsite_entity[0] : NULL;
+    if ($subsite) {
       // Get subsite ID.
       $ssid = $subsite->id();
 
@@ -102,7 +104,7 @@ function moody_subsite_page_preprocess_page(&$variables)
       $subsite_logo_media = rtrim($subsite_logo_media, ',');
       $subsite_logo_size = $subsite_logo[0]['size'];
       // Pass the default logo URL to use on subsites without custom logo.
-      $default_logo_url = theme_get_setting('logo.url');
+      $default_logo_url = \Drupal::service('theme.settings')->getSetting('logo.url');
       $variables['default_logo_url'] = $default_logo_url;
       // Pass the custom logo height.
       $variables['subsite_logo_height'] = $subsite_logo_size;
@@ -152,7 +154,7 @@ function moody_subsite_page_preprocess_page(&$variables)
         $variables['info_bars'] = $info_bars;
         // Get subtitle from node if present.
         $subtitle = $node->get('field_subsite_page_subtitle');
-        $variables['page_subtitle'] = isset($subtitle) ? $subtitle->getString() : FALSE;
+        $variables['page_subtitle'] = $subtitle ? $subtitle->getString() : FALSE;
       }
 
       // Get social accounts formatted string.
@@ -179,7 +181,9 @@ function moody_subsite_page_preprocess_page(&$variables)
     $variables['page']['content']['moody_page_title']['#attributes']['class'][] = 'd-none';
 
     // Add cache tag to all subsite pages
-    $node->addCacheTags(['moody_subsite:' . $ssid]);
+    if ($ssid) {
+      $node->addCacheTags(['moody_subsite:' . $ssid]);
+    }
   }
 }
 
@@ -188,39 +192,37 @@ function moody_subsite_page_preprocess_page(&$variables)
  */
 function moody_subsite_preprocess_page_title(&$variables)
 {
-  if ($node = \Drupal::request()->attributes->get('node')) {
-    if (is_object($node) && $node->bundle() == 'moody_subsite_page') {
-      // Check if there is an associated moody_subsite entity.
-      $this_node = \Drupal::request()->attributes->get('node');
-      $url_generator = $this_node->get('field_moody_url_generator');
-      $tid = $url_generator->getString();
-      $subsite_entity_preprocessed = \Drupal::service('entity_type.manager')->getStorage('moody_subsite')->loadByProperties(['directory_structure' => $tid]);
-      if (!empty($subsite_entity_preprocessed)) {
-        $subsite_entity = array_values($subsite_entity_preprocessed);
-        $subsite = $subsite_entity[0];
-        $title_display_option = $subsite->get('title_display_option')->getString();
-        switch ($title_display_option) {
-            // Case '1' is page title only so nothing to do here.
-          case '2':
-            // No page title.
-            $variables['title_attributes']['class'][] = 'sr-only';
-            break;
+  $node = \Drupal::request()->attributes->get('node');
+  if ($node && $node instanceof Node && $node->bundle() == 'moody_subsite_page') {
+    // Check if there is an associated moody_subsite entity.
+    $url_generator = $node->get('field_moody_url_generator');
+    $tid = $url_generator->getString();
+    $subsite_entity_preprocessed = \Drupal::service('entity_type.manager')->getStorage('moody_subsite')->loadByProperties(['directory_structure' => $tid]);
+    if (!empty($subsite_entity_preprocessed)) {
+      $subsite_entity = array_values($subsite_entity_preprocessed);
+      $subsite = $subsite_entity[0];
+      $title_display_option = $subsite->get('title_display_option')->getString();
+      switch ($title_display_option) {
+          // Case '1' is page title only so nothing to do here.
+        case '2':
+          // No page title.
+          $variables['title_attributes']['class'][] = 'sr-only';
+          break;
 
-          case '3':
-            // Subsite name prepeneded to page title.
-            $current_title = $this_node->getTitle();
-            $subsite_title = $subsite->get('display_name')->getString();
-            $variables['title'] = $subsite_title . ': ' . $current_title;
-            break;
-        }
-        // Hide page title on subsites with custom homepage hero images.
-        $custom_homepage = $subsite->get('subsite_home_hero')->getString();
-        $base_url = $subsite->get('base_url')->getString();
-        if ($custom_homepage) {
-          $current_url = Url::fromRoute('<current>')->toString();
-          if ($current_url == $base_url) {
-            $variables['title_attributes']['class'] = 'sr-only';
-          }
+        case '3':
+          // Subsite name prepeneded to page title.
+          $current_title = $node->getTitle();
+          $subsite_title = $subsite->get('display_name')->getString();
+          $variables['title'] = $subsite_title . ': ' . $current_title;
+          break;
+      }
+      // Hide page title on subsites with custom homepage hero images.
+      $custom_homepage = $subsite->get('subsite_home_hero')->getString();
+      $base_url = $subsite->get('base_url')->getString();
+      if ($custom_homepage) {
+        $current_url = Url::fromRoute('<current>')->toString();
+        if ($current_url == $base_url) {
+          $variables['title_attributes']['class'] = 'sr-only';
         }
       }
     }
@@ -240,8 +242,12 @@ function moody_subsite_page_form_node_form_alter(&$form, FormStateInterface $for
  */
 function _moody_subsite_page_node_form_validate($form, FormStateInterface $form_state)
 {
-  $node = $form_state->getFormObject()->getEntity();
-  if ($node->getType() == 'moody_subsite_page') {
+  $form_object = $form_state->getFormObject();
+  if (!$form_object instanceof \Drupal\Core\Entity\EntityFormInterface) {
+    return;
+  }
+  $node = $form_object->getEntity();
+  if ($node && $node->getType() == 'moody_subsite_page') {
     // Get user selected term.
     $url_generator = $form_state->getValue('field_moody_url_generator');
     $tid = $url_generator[0]['target_id'];
