@@ -74,7 +74,12 @@ class SubsiteCustomLogoFormatter extends FormatterBase {
   protected function viewValue(FieldItemInterface $item) {
     // The text value has no text format assigned to it, so the user input
     // should equal the output, including newlines.
-    return nl2br(Html::escape($item->value));
+    $value = $item->value;
+    if ($value === NULL) {
+      return '';
+    }
+
+    return nl2br(Html::escape($value));
   }
 
 }
