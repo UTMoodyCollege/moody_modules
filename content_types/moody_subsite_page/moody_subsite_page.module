@@ -104,7 +104,8 @@ function moody_subsite_page_preprocess_page(&$variables)
       $subsite_logo_media = rtrim($subsite_logo_media, ',');
       $subsite_logo_size = $subsite_logo[0]['size'];
       // Pass the default logo URL to use on subsites without custom logo.
-      $default_logo_url = \Drupal::service('theme.settings')->getSetting('logo.url');
+      $default_theme = \Drupal::config('system.theme')->get('default');
+      $default_logo_url = $default_theme ? \Drupal::config($default_theme . '.settings')->get('logo.url') : NULL;
       $variables['default_logo_url'] = $default_logo_url;
       // Pass the custom logo height.
       $variables['subsite_logo_height'] = $subsite_logo_size;
