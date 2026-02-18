@@ -400,6 +400,16 @@ class MoodySubsite extends ContentEntityBase implements MoodySubsiteInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setRequired(FALSE);
 
+    // Hide all social links in the subsite header.
+    $fields['hide_all_social_accounts'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Hide all social accounts'))
+      ->setDescription(t('Check this box to hide all social account links in the subsite header, including sitewide defaults and subsite overrides.'))
+      ->setDefaultValue(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => 29,
+      ]);
+
     // Taxonomy term selector.
     $fields['directory_structure'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Directory Structure term reference'))

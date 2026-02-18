@@ -51,6 +51,7 @@ function moody_subsite_page_preprocess_page(&$variables)
     $node_type = $node ? $node->getType() : FALSE;
   }
   if ($node && $node_type == 'moody_subsite_page') {
+    $variables['hide_all_social_accounts'] = FALSE;
     $url_generator = $node->get('field_moody_url_generator');
     $tid = $url_generator->getString();
     // Check if there is an associated moody_subsite entity.
@@ -160,7 +161,12 @@ function moody_subsite_page_preprocess_page(&$variables)
 
       // Get social accounts formatted string.
       $variables['subsite_social'] = FALSE;
-      if (isset($subsite->get('subsite_social_links')->view()[0]['#markup'])) {
+      $hide_all_social_accounts = (bool) $subsite->get('hide_all_social_accounts')->value;
+      $variables['hide_all_social_accounts'] = $hide_all_social_accounts;
+      if (
+        !$hide_all_social_accounts &&
+        isset($subsite->get('subsite_social_links')->view()[0]['#markup'])
+      ) {
         $variables['subsite_social'] = $subsite->get('subsite_social_links')->view()[0]['#markup'];
       }
 

@@ -1,0 +1,24 @@
+<?php
+
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Installs storage for the hide_all_social_accounts base field.
+ */
+function moody_subsite_update_9001() {
+  $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $existing_definition = $entity_definition_update_manager->getFieldStorageDefinition('hide_all_social_accounts', 'moody_subsite');
+  if ($existing_definition) {
+    return;
+  }
+
+  $entity_definition_update_manager->installFieldStorageDefinition(
+    'hide_all_social_accounts',
+    'moody_subsite',
+    'moody_subsite',
+    BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Hide all social accounts'))
+      ->setDescription(t('Check this box to hide all social account links in the subsite header, including sitewide defaults and subsite overrides.'))
+      ->setDefaultValue(FALSE)
+  );
+}
