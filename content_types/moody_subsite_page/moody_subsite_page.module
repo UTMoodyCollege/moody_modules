@@ -161,7 +161,8 @@ function moody_subsite_page_preprocess_page(&$variables)
 
       // Get social accounts formatted string.
       $variables['subsite_social'] = FALSE;
-      $hide_all_social_accounts = (bool) $subsite->get('hide_all_social_accounts')->value;
+      $hide_all_social_accounts = $subsite->hasField('hide_all_social_accounts')
+        && $subsite->get('hide_all_social_accounts')->getString() === '1';
       $variables['hide_all_social_accounts'] = $hide_all_social_accounts;
       if (
         !$hide_all_social_accounts &&
