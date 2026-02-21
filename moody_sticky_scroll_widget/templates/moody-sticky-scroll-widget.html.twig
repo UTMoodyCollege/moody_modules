@@ -1,0 +1,14 @@
+<div class="moody-sticky-scroll-widget">
+  <div class="sticky-scroll-container">
+    <div class="sticky-image-wrapper">
+      {% if image_url %}
+        <img src="{{ image_url }}" alt="" class="sticky-image">
+      {% endif %}
+    </div>
+    <div class="scroll-text-wrapper">
+      <div class="scroll-text-content">
+        {{ text_content|raw }}
+      </div>
+    </div>
+  </div>
+</div>
