@@ -80,6 +80,7 @@ function moody_custom_roles_install()
     ->getQuery()
     ->condition('status', 1)
     ->condition('roles', $old_rid)
+    ->accessCheck(FALSE)
     ->execute();
   $site_managers = User::loadMultiple($uids);
   if (!empty($site_managers)) {
@@ -105,6 +106,7 @@ function moody_custom_roles_install()
     ->getQuery()
     ->condition('status', 1)
     ->condition('roles', $old_rid)
+    ->accessCheck(FALSE)
     ->execute();
   $site_managers = User::loadMultiple($uids);
   if (!empty($site_managers)) {
@@ -131,6 +133,7 @@ function moody_custom_roles_install()
       ->getQuery()
       ->condition('status', 1)
       ->condition('roles', $old_rid)
+      ->accessCheck(FALSE)
       ->execute();
 
     $site_managers = User::loadMultiple($uids);
@@ -159,6 +162,7 @@ function moody_custom_roles_install()
       ->getQuery()
       ->condition('status', 1)
       ->condition('roles', $old_rid)
+      ->accessCheck(FALSE)
       ->execute();
 
     $site_managers = User::loadMultiple($uids);
@@ -186,6 +190,7 @@ function moody_custom_roles_install()
     ->getQuery()
     ->condition('status', 1)
     ->condition('roles', $old_rid)
+    ->accessCheck(FALSE)
     ->execute();
   $site_managers = User::loadMultiple($uids);
   if (!empty($site_managers)) {
