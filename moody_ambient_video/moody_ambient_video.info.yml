@@ -12,6 +12,7 @@ dependencies:
   - 'drupal:media_library'
   - 'drupal:options'
   - 'moody_ambient_video:moody_ambient_video'
+  - 'moody_gsap:moody_gsap'
   - 'utexas_call_to_action:utexas_call_to_action'
   - 'utexas_media_types:utexas_media_types'
 version: 1.x

@@ -1,0 +1,9 @@
+{
+  "name": "moody_gsap",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Local build helper for vendoring GSAP into the Drupal module.",
+  "dependencies": {
+    "gsap": "^3.12.5"
+  }
+}

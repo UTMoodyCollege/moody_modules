@@ -17,3 +17,12 @@ ambient-video-natural-height:
     js/ambient-video-natural-height.js: {}
   dependencies:
     - core/drupalSettings
+
+ambient-video-fixed-scroll:
+  version: 1.x
+  js:
+    js/ambient-video-fixed-scroll.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - moody_gsap/scrolltrigger

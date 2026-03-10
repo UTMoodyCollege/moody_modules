@@ -1,0 +1,6 @@
+name: 'Moody GSAP'
+description: 'Shared GSAP v3 libraries (including ScrollTrigger) for Moody custom modules.'
+type: module
+core_version_requirement: '^9.4 || ^10 || ^11'
+package: Moody
+version: 1.x

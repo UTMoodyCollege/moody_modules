@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.ambient_video
+    - field.storage.block_content.field_fixed_video_scroll
+id: block_content.ambient_video.field_fixed_video_scroll
+field_name: field_fixed_video_scroll
+entity_type: block_content
+bundle: ambient_video
+label: 'Fixed Video Scroll'
+description: 'Keeps the video fixed while the text scrolls through the section until the block ends.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

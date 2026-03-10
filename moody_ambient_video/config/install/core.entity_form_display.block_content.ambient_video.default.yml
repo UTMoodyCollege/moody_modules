@@ -14,6 +14,7 @@ dependencies:
     - field.field.block_content.ambient_video.field_mav_poster
     - field.field.block_content.ambient_video.field_mav_text_position
     - field.field.block_content.ambient_video.field_mav_url
+    - field.field.block_content.ambient_video.field_fixed_video_scroll
     - field.field.block_content.ambient_video.field_short_mode
   module:
     - file
@@ -105,6 +106,13 @@ content:
   field_short_mode:
     type: boolean_checkbox
     weight: 26
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_fixed_video_scroll:
+    type: boolean_checkbox
+    weight: 27
     region: content
     settings:
       display_label: true

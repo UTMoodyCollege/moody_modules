@@ -16,6 +16,8 @@
       var videoWrapper = document.getElementById('video-wrapper');
       var video = document.getElementById('moody-video');
       var fallbackImage = document.getElementById('fallback-image');
+        var blockRoot = overflowContainer ? overflowContainer.closest('.moody-ambient-video') : null;
+        var isShortMode = !!(blockRoot && blockRoot.classList.contains('moody-ambient-video-short'));
       var breakpoint = 900;
       var headerHeight = document.getElementById('brandbar').clientHeight + document.querySelector('header').clientHeight;
       var videoUrl = window.drupalSettings.ambientVideo.ambientVideoUrl;
@@ -30,7 +32,15 @@
         currentHeight = window.innerHeight;
         currentWidth = document.documentElement.clientWidth;
         headerHeight = document.getElementById('brandbar').clientHeight + document.querySelector('header').clientHeight;
-        overflowContainer.style.height = (currentHeight - headerHeight) + 'px';
+        var availableHeight = (currentHeight - headerHeight);
+        if (isShortMode) {
+          var shortNaturalHeight = Math.round((currentWidth * 9) / 16);
+          var maxShortHeight = 500;
+          overflowContainer.style.height = Math.min(availableHeight, shortNaturalHeight, maxShortHeight) + 'px';
+        }
+        else {
+          overflowContainer.style.height = availableHeight + 'px';
+        }
         overflowContainer.style.width = currentWidth + 'px';
         overflowContainer.style.overflow = 'hidden';
       }
@@ -38,18 +48,19 @@
       // Function to set the width/height of video based on current width/height.
       var setVideoSize = function() {
         headerHeight = document.getElementById('brandbar').clientHeight + document.querySelector('header').clientHeight;
+        var containerHeight = overflowContainer.getBoundingClientRect().height || (currentHeight - headerHeight);
         // Calculate the natural height of a 16:9 video based on the current width.
-        if ((currentWidth / (currentHeight - headerHeight)) > 1.7777777778) {
+        if ((currentWidth / containerHeight) > 1.7777777778) {
           videoWidth = currentWidth;
           videoHeight = ((currentWidth * 9) / 16);
           videoWrapper.style.width = videoWidth + 'px';
           videoWrapper.style.height = videoHeight + 'px';
           videoWrapper.style.marginLeft = 0;
-          videoWrapper.style.marginTop = '-' + ((videoHeight - (currentHeight - headerHeight)) / 2) + 'px';
+          videoWrapper.style.marginTop = '-' + ((videoHeight - containerHeight) / 2) + 'px';
         }
         // Calculate the natural width of a 16:9 video based on the current height.
         else {
-          videoHeight = (currentHeight - headerHeight);
+          videoHeight = containerHeight;
           videoWidth = ((videoHeight) * 16) / 9;
           videoWrapper.style.width = videoWidth + 'px';
           videoWrapper.style.height = videoHeight + 'px';

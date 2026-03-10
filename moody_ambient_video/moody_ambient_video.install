@@ -1,0 +1,74 @@
+<?php
+
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Adds the fixed video scroll option to ambient video blocks.
+ */
+function moody_ambient_video_update_9001() {
+  $field_storage = FieldStorageConfig::loadByName('block_content', 'field_fixed_video_scroll');
+  if (!$field_storage) {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_fixed_video_scroll',
+      'entity_type' => 'block_content',
+      'type' => 'boolean',
+      'module' => 'core',
+      'cardinality' => 1,
+      'translatable' => TRUE,
+      'settings' => [],
+    ]);
+    $field_storage->save();
+  }
+
+  $field = FieldConfig::loadByName('block_content', 'ambient_video', 'field_fixed_video_scroll');
+  if (!$field) {
+    $field = FieldConfig::create([
+      'field_name' => 'field_fixed_video_scroll',
+      'entity_type' => 'block_content',
+      'bundle' => 'ambient_video',
+      'label' => 'Fixed Video Scroll',
+      'description' => 'Keeps the video fixed while the overlaid text scrolls until the section ends.',
+      'required' => FALSE,
+      'translatable' => FALSE,
+      'settings' => [
+        'on_label' => 'On',
+        'off_label' => 'Off',
+      ],
+    ]);
+    $field->save();
+  }
+
+  $form_display = EntityFormDisplay::load('block_content.ambient_video.default');
+  if ($form_display && !$form_display->getComponent('field_fixed_video_scroll')) {
+    $form_display->setComponent('field_fixed_video_scroll', [
+      'type' => 'boolean_checkbox',
+      'weight' => 27,
+      'region' => 'content',
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+      'third_party_settings' => [],
+    ]);
+    $form_display->save();
+  }
+
+  $view_display = EntityViewDisplay::load('block_content.ambient_video.default');
+  if ($view_display && !$view_display->getComponent('field_fixed_video_scroll')) {
+    $view_display->setComponent('field_fixed_video_scroll', [
+      'type' => 'boolean',
+      'label' => 'hidden',
+      'settings' => [
+        'format' => 'default',
+        'format_custom_false' => '',
+        'format_custom_true' => '',
+      ],
+      'third_party_settings' => [],
+      'weight' => 12,
+      'region' => 'content',
+    ]);
+    $view_display->save();
+  }
+}

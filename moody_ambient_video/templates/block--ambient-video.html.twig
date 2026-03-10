@@ -29,6 +29,9 @@
   set library = (js_library == 'constrained') ? 'moody_ambient_video/ambient-video' : 'moody_ambient_video/ambient-video-natural-height'
 %}
 {{ attach_library(library) }}
+{% if fixed_video_scroll|default(false) %}
+  {{ attach_library('moody_ambient_video/ambient-video-fixed-scroll') }}
+{% endif %}
 {%
   set classes = [
     'block',

@@ -1,0 +1,11 @@
+gsap:
+  version: 3.x
+  js:
+    js/gsap/gsap.min.js: { minified: true }
+
+scrolltrigger:
+  version: 3.x
+  js:
+    js/gsap/ScrollTrigger.min.js: { minified: true }
+  dependencies:
+    - moody_gsap/gsap
