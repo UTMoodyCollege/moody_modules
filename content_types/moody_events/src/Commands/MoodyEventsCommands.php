@@ -60,4 +60,15 @@ class MoodyEventsCommands extends DrushCommands {
 
     $this->output()->writeln("Filename fixing process completed.");
   }
+
+  /**
+   * Re-downloads Moody event images and repairs empty file references.
+   *
+   * @command moody_events:refresh-images
+   * @aliases refresh-event-images
+   */
+  public function refreshImages() {
+    $updated = \_moody_events_refresh_event_images();
+    $this->output()->writeln("Refreshed images for {$updated} moody events.");
+  }
 }

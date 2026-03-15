@@ -63,14 +63,9 @@ function moody_events_theme()
  */
 function _get_events_from_media_channel()
 {
-  $client = \Drupal::httpClient();
-  $request = $client->get(MOODY_EVENTS_MEDIA_CHANNEL_ENDPOINT);
-  $code = $request->getStatusCode();
-  if ($code == 200) {
+  $events = _moody_events_fetch_media_channel_events();
+  if (!empty($events)) {
     \Drupal::logger('moody_events')->warning("Import of events from Moody Media Channel successful.");
-    $response = $request->getBody()->getContents();
-    $json = Json::decode($response);
-    $events = $json['events'];
     // Create empty array for storing only remote ids.
     $remote_ids = [];
     foreach ($events as $event) {
@@ -108,37 +103,6 @@ function _create_event_nodes_from_media_channel(&$event_data)
   $remote_id = isset($event_data['id']) ? $event_data['id'] : FALSE;
   $remote_modified = isset($event_data['modified']) ? strtotime($event_data['modified']) : FALSE;
   $title = isset($event_data['title']) ? Html::decodeEntities($event_data['title']) : '';
-
-  // Import image and create media entity.
-  $image_url = $event_data['image']['sizes']['medium']['url'] ?? FALSE;
-  $fid = FALSE;
-  $file = NULL;
-  if ($image_url) {
-    $filename = _moody_events_normalize_remote_filename($image_url);
-    $file_path = 'public://' . $filename;
-
-    // Convert the Drupal stream wrapper path to a real file system path.
-    $real_path = \Drupal::service('file_system')->realpath($file_path);
-
-    // Check if the file already exists.
-    if (!file_exists($real_path)) {
-      // File doesn't exist, so fetch and save it.
-      $image = file_get_contents($image_url);
-      $file = \Drupal::service('file.repository')->writeData($image, $file_path, FileExists::Replace);
-      $fid = $file ? $file->id() : FALSE;
-    } else {
-      // File exists, load the existing file entity.
-      $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_path]);
-      $file = reset($file);
-      if (!$file) {
-        $image = file_get_contents($image_url);
-        $file = \Drupal::service('file.repository')->writeData($image, $file_path, FileExists::Replace);
-      }
-      $fid = $file ? $file->id() : FALSE;
-    }
-  }
-
-
 
   $body = isset($event_data['description']) ? $event_data['description'] : '';
   $url = isset($event_data['url']) ? $event_data['url'] : '';
@@ -204,24 +168,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
         'value' => $body,
         'format' => 'flex_html',
       ]);
-      // Main image.
-      if ($fid) {
-        $image_media = Media::create([
-          'name' => basename($image_url),
-          'bundle' => 'utexas_image',
-          'uid' => '1',
-          'langcode' => Language::LANGCODE_NOT_SPECIFIED,
-          'status' => '1',
-          'field_utexas_media_image' => [
-            'target_id' => $fid,
-            'alt' => $title,
-            'title' => $title,
-          ],
-        ]);
-        $image_media->save();
-        $media = $image_media->id();
-        $node->set('field_moodyevent_image', $media);
-      }
+      _moody_events_assign_event_image($node, $event_data, $title);
       $node->set('field_moodyevent_datetime', [
         'value' => $startdate,
         'end_value' => $enddate,
@@ -267,6 +214,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
           'value' => $body,
           'format' => 'flex_html',
         ]);
+        _moody_events_assign_event_image($node, $event_data, $title);
         $node->set('field_moodyevent_datetime', [
           'value' => $startdate,
           'end_value' => $enddate,
@@ -291,6 +239,143 @@ function _create_event_nodes_from_media_channel(&$event_data)
 }
 
 /**
+ * Fetches the Moody Media Channel event feed.
+ *
+ * @return array
+ *   The list of event arrays from the remote feed.
+ */
+function _moody_events_fetch_media_channel_events()
+{
+  try {
+    $request = \Drupal::httpClient()->get(MOODY_EVENTS_MEDIA_CHANNEL_ENDPOINT);
+  }
+  catch (\Exception $exception) {
+    \Drupal::logger('moody_events')->warning('Import of events from Moody Media Channel failed: @message', [
+      '@message' => $exception->getMessage(),
+    ]);
+    return [];
+  }
+
+  if ($request->getStatusCode() !== 200) {
+    return [];
+  }
+
+  $response = $request->getBody()->getContents();
+  $json = Json::decode($response);
+
+  return $json['events'] ?? [];
+}
+
+/**
+ * Downloads and assigns the event image media reference to a node.
+ *
+ * @param \Drupal\node\Entity\Node $node
+ *   The moody event node.
+ * @param array $event_data
+ *   The remote event data.
+ * @param string $title
+ *   The event title for alt/title metadata.
+ *
+ * @return bool
+ *   TRUE when an image was assigned, otherwise FALSE.
+ */
+function _moody_events_assign_event_image(Node $node, array $event_data, $title)
+{
+  $image_url = $event_data['image']['sizes']['medium']['url'] ?? NULL;
+  if (empty($image_url)) {
+    return FALSE;
+  }
+
+  $file = _moody_events_import_event_image_file($image_url);
+  if (!$file) {
+    return FALSE;
+  }
+
+  $media = $node->get('field_moodyevent_image')->entity;
+  if (!$media || !$media->hasField('field_utexas_media_image')) {
+    $media = Media::create([
+      'name' => _moody_events_normalize_remote_filename($image_url),
+      'bundle' => 'utexas_image',
+      'uid' => '1',
+      'langcode' => Language::LANGCODE_NOT_SPECIFIED,
+      'status' => '1',
+    ]);
+  }
+
+  $media->set('name', _moody_events_normalize_remote_filename($image_url));
+  $media->set('field_utexas_media_image', [
+    'target_id' => $file->id(),
+    'alt' => $title,
+    'title' => $title,
+  ]);
+  $media->save();
+  $node->set('field_moodyevent_image', $media->id());
+
+  return TRUE;
+}
+
+/**
+ * Imports a remote event image into Drupal files, healing empty files.
+ *
+ * @param string $image_url
+ *   The remote image URL.
+ *
+ * @return \Drupal\file\FileInterface|null
+ *   The managed file entity, or NULL on failure.
+ */
+function _moody_events_import_event_image_file($image_url)
+{
+  $filename = _moody_events_normalize_remote_filename($image_url);
+  if ($filename === '') {
+    return NULL;
+  }
+
+  $file_path = 'public://' . $filename;
+  $file_storage = \Drupal::entityTypeManager()->getStorage('file');
+  $existing_files = $file_storage->loadByProperties(['uri' => $file_path]);
+  $existing_file = reset($existing_files);
+
+  if ($existing_file && _moody_events_is_valid_local_file($existing_file->getFileUri())) {
+    return $existing_file;
+  }
+
+  try {
+    $response = \Drupal::httpClient()->get($image_url, [
+      'headers' => [
+        'Accept' => 'image/*',
+      ],
+      'timeout' => 20,
+      'connect_timeout' => 10,
+    ]);
+  }
+  catch (\Exception $exception) {
+    \Drupal::logger('moody_events')->warning('Unable to download event image from @url: @message', [
+      '@url' => $image_url,
+      '@message' => $exception->getMessage(),
+    ]);
+    return NULL;
+  }
+
+  $image_data = (string) $response->getBody();
+  if ($response->getStatusCode() !== 200 || $image_data === '') {
+    \Drupal::logger('moody_events')->warning('Event image download returned an empty response for @url.', [
+      '@url' => $image_url,
+    ]);
+    return NULL;
+  }
+
+  $file = \Drupal::service('file.repository')->writeData($image_data, $file_path, FileExists::Replace);
+  if (!$file || !_moody_events_is_valid_local_file($file->getFileUri())) {
+    \Drupal::logger('moody_events')->warning('Event image import produced an invalid local file for @url.', [
+      '@url' => $image_url,
+    ]);
+    return NULL;
+  }
+
+  return $file;
+}
+
+/**
  * Builds a Drupal-safe local filename from a remote event image URL.
  *
  * @param string $image_url
@@ -306,6 +391,67 @@ function _moody_events_normalize_remote_filename($image_url)
   $filename = rawurldecode($filename);
 
   return $filename;
+}
+
+/**
+ * Determines whether a local managed file exists and has content.
+ *
+ * @param string $uri
+ *   The Drupal file URI.
+ *
+ * @return bool
+ *   TRUE when the file exists on disk and is non-empty.
+ */
+function _moody_events_is_valid_local_file($uri)
+{
+  $real_path = \Drupal::service('file_system')->realpath($uri);
+
+  return $real_path && is_file($real_path) && filesize($real_path) > 0;
+}
+
+/**
+ * Refreshes imported event images from the remote feed.
+ *
+ * @return int
+ *   The number of moody event nodes whose image field was refreshed.
+ */
+function _moody_events_refresh_event_images()
+{
+  $events = _moody_events_fetch_media_channel_events();
+  $updated = 0;
+
+  foreach ($events as $event) {
+    $remote_id = $event['id'] ?? NULL;
+    if (!$remote_id) {
+      continue;
+    }
+
+    $nids = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->getQuery()
+      ->condition('type', 'moody_event')
+      ->condition('field_moodyevent_remote_id', $remote_id)
+      ->addMetaData('account', User::load(1))
+      ->accessCheck(FALSE)
+      ->execute();
+
+    if (empty($nids)) {
+      continue;
+    }
+
+    $node = Node::load(reset($nids));
+    if (!$node) {
+      continue;
+    }
+
+    $title = isset($event['title']) ? Html::decodeEntities($event['title']) : $node->label();
+    if (_moody_events_assign_event_image($node, $event, $title)) {
+      $node->save();
+      $updated++;
+    }
+  }
+
+  return $updated;
 }
 
 /**
