@@ -9,8 +9,8 @@ class MoodyEventsCommands extends DrushCommands {
   /**
    * Fix bad filenames in utexas_image media entities.
    *
-   * @command moody_events:fix-filenames
-   * @aliases fix-filenames
+   * @command moody-events:fix-filenames
+   * @aliases moody_events:fix-filenames,fix-filenames
    */
   public function fixFilenames() {
     $media_storage = \Drupal::entityTypeManager()->getStorage('media');
@@ -64,8 +64,8 @@ class MoodyEventsCommands extends DrushCommands {
   /**
    * Re-downloads Moody event images and repairs empty file references.
    *
-   * @command moody_events:refresh-images
-   * @aliases refresh-event-images
+   * @command moody-events:refresh-images
+   * @aliases moody_events:refresh-images,refresh-event-images
    */
   public function refreshImages() {
     $updated = \_moody_events_refresh_event_images();

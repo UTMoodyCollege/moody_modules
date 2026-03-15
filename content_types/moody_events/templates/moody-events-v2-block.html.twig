@@ -1,0 +1,63 @@
+<div class="moody-events-v2">
+  {% if events %}
+    <hr class="localist-rule">
+    <ul class="event-list">
+      {% for event in events %}
+        <li>
+          {% if show_images and event.image_url %}
+            <div class="views-field views-field-field-moodyevent-image">
+              <div class="field-content">
+                {% if event.url %}
+                  <a href="{{ event.url }}">
+                    <img loading="lazy" src="{{ event.image_url }}" alt="{{ event.image_alt }}">
+                  </a>
+                {% else %}
+                  <img loading="lazy" src="{{ event.image_url }}" alt="{{ event.image_alt }}">
+                {% endif %}
+                {% if event.url %}
+                  <div class="button-wrapper">
+                    <a class="ut-btn--small" href="{{ event.url }}">View Event Details</a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+          <div class="moody-events-v2__content">
+            <div class="views-field views-field-title">
+              <span class="field-content">
+                {% if event.url %}
+                  <a href="{{ event.url }}">{{ event.title }}</a>
+                {% else %}
+                  {{ event.title }}
+                {% endif %}
+              </span>
+            </div>
+            <div class="views-field views-field-field-moodyevent-datetime">
+              <div class="field-content">{{ event.date_display }}</div>
+            </div>
+            {% if event.description %}
+              <div class="views-field views-field-field-moodyevent-body">
+                <div class="field-content">{{ event.description }}</div>
+              </div>
+            {% endif %}
+            {% if event.url and (not show_images or not event.image_url) %}
+              <div class="views-field views-field-nothing">
+                <div class="field-content">
+                  <div class="button-wrapper">
+                    <a class="ut-btn--small" href="{{ event.url }}">View Event Details</a>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <footer class="moody-events-v2__footer">
+    <ul class="button-list d-flex">
+      <li><a href="https://texasmoodymedia.org/#post-0" class="ut-btn--homepage">View All Events</a></li>
+      <li><a href="https://texasmoodymedia.org/submit-event" class="ut-btn--homepage">Submit an Event</a></li>
+    </ul>
+  </footer>
+</div>

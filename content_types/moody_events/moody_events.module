@@ -55,6 +55,13 @@ function moody_events_theme()
       'template' => 'node--moody-event',
       'base hook' => 'node',
     ],
+    'moody_events_v2_block' => [
+      'template' => 'moody-events-v2-block',
+      'variables' => [
+        'events' => [],
+        'show_images' => TRUE,
+      ],
+    ],
   ];
 }
 

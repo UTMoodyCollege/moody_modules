@@ -1,0 +1,20 @@
+block.settings.moody_events_moody_events_v2:
+  type: block_settings
+  label: 'Moody Events V2 block'
+  mapping:
+    limit:
+      type: integer
+      label: 'Number of events'
+    event_exclusions:
+      type: sequence
+      label: 'Excluded remote event IDs'
+      sequence:
+        type: string
+    event_host:
+      type: sequence
+      label: 'Included event hosts'
+      sequence:
+        type: string
+    show_images:
+      type: boolean
+      label: 'Show event images'

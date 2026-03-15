@@ -1,0 +1,118 @@
+.moody-events-v2 {
+  margin-top: 1.5rem;
+}
+
+.moody-events-v2 .localist-rule {
+  margin: 0 0 2rem;
+}
+
+.moody-events-v2 .event-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.moody-events-v2 .event-list > li {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(180px, 320px) minmax(0, 54rem);
+  margin: 0 0 2rem;
+}
+
+.moody-events-v2 .views-field-field-moodyevent-image {
+  grid-row: 1 / span 3;
+}
+
+.moody-events-v2 .moody-events-v2__content {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.moody-events-v2 .views-field-field-moodyevent-image .field-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.moody-events-v2 .views-field-field-moodyevent-image img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.moody-events-v2 .views-field-title .field-content,
+.moody-events-v2 .views-field-title .field-content a {
+  color: #a14f00;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-decoration: none;
+}
+
+.moody-events-v2 .views-field-title .field-content a:hover,
+.moody-events-v2 .views-field-title .field-content a:focus {
+  text-decoration: underline;
+}
+
+.moody-events-v2 .views-field-field-moodyevent-datetime {
+  align-items: center;
+  display: flex;
+  gap: 5px;
+}
+
+.moody-events-v2 .views-field-field-moodyevent-datetime::before {
+  content: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 1 20 20" version="1.1" height="20" width="20" fill="darkslategrey"><path d="M10 20c-5.523 0-10-4.477-10-10s4.477-10 10-10v0c5.523 0 10 4.477 10 10s-4.477 10-10 10v0zM10 18c4.418 0 8-3.582 8-8s-3.582-8-8-8v0c-4.418 0-8 3.582-8 8s3.582 8 8 8v0zM9 10.41v-6.41h2v5.59l3.95 3.95-1.41 1.41-4.54-4.54z"/></svg>');
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.moody-events-v2 .views-field-field-moodyevent-datetime .field-content {
+  color: #2f4f4f;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.moody-events-v2 .views-field-field-moodyevent-body .field-content {
+  color: #2b3038;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.moody-events-v2 .button-wrapper {
+  margin-top: 0.5rem;
+}
+
+.moody-events-v2 .moody-events-v2__footer {
+  margin-top: 3rem;
+}
+
+.moody-events-v2 .button-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-end;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.moody-events-v2 .button-list li {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .moody-events-v2 .event-list > li {
+    grid-template-columns: 1fr;
+  }
+
+  .moody-events-v2 .views-field-field-moodyevent-image {
+    grid-row: auto;
+    max-width: 26rem;
+  }
+
+  .moody-events-v2 .button-list {
+    justify-content: flex-start;
+  }
+}
