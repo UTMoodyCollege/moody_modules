@@ -496,7 +496,7 @@ function _process_term($term_name, $vocab)
  */
 function moody_events_cron()
 {
-  _get_events_from_media_channel();
+  // Event imports are deprecated in favor of the API-backed block output.
 }
 
 /**

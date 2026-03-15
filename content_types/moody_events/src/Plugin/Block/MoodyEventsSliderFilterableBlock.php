@@ -3,12 +3,11 @@
 namespace Drupal\moody_events\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Drupal\views\Views;
 
 /**
  * Provides a moody events slider - filterable block.
@@ -29,11 +28,11 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
   protected $entityTypeManager;
 
   /**
-   * The request stack.
+   * The block manager.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var \Drupal\Core\Block\BlockManagerInterface
    */
-  protected $requestStack;
+  protected $blockManager;
 
   /**
    * Constructs a new MoodyEventsSliderFilterableBlock instance.
@@ -49,13 +48,13 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
+   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
+   *   The block manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, RequestStack $request_stack) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, BlockManagerInterface $block_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
-    $this->requestStack = $request_stack;
+    $this->blockManager = $block_manager;
   }
 
   /**
@@ -67,7 +66,7 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
-      $container->get('request_stack')
+      $container->get('plugin.manager.block')
     );
   }
 
@@ -148,23 +147,63 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
    * {@inheritdoc}
    */
   public function build() {
-    $view = Views::getView('moody_events');
-    $event_exclusions = $this->configuration['event_exclusions'];
-    if (empty($event_exclusions)) {
-      // Set it to "0"
-      $event_exclusions = '0';
+    $block = $this->blockManager->createInstance('moody_events_moody_events_v2', [
+      'event_exclusions' => $this->normalizeExcludedRemoteIds(),
+      'event_host' => $this->normalizeHostFilters(),
+      'limit' => 4,
+      'show_images' => TRUE,
+    ]);
+
+    return $block->build();
+  }
+
+  /**
+   * Converts the legacy exclusion list into remote event IDs for V2.
+   *
+   * @return string[]
+   *   Remote event IDs.
+   */
+  protected function normalizeExcludedRemoteIds() {
+    $configured_ids = array_filter(explode(',', (string) ($this->configuration['event_exclusions'] ?? '')));
+    if ($configured_ids === []) {
+      return [];
     }
-    $event_host = $this->configuration['event_host'] ?? NULL;
-    //Build an args array
-    $view_args = [
-      'event_exclusions' => $event_exclusions,
-    ];
-    if (!empty($event_host)) {
-      $view_args['event_host'] = $event_host;
+
+    $nodes = $this->entityTypeManager->getStorage('node')->loadMultiple($configured_ids);
+    $remote_ids = [];
+    foreach ($nodes as $node) {
+      if ($node->bundle() !== 'moody_event' || !$node->hasField('field_moodyevent_remote_id')) {
+        continue;
+      }
+
+      $remote_id = $node->get('field_moodyevent_remote_id')->value;
+      if (!empty($remote_id)) {
+        $remote_ids[] = (string) $remote_id;
+      }
     }
-    $build['moody_events'] = $view->buildRenderable('block_1', $view_args);
-    $build['moody_events']['#attributes']['class'][] = 'block-views-blockmoody-events-block-1';
-    return $build;
+
+    return $remote_ids;
+  }
+
+  /**
+   * Converts the legacy department term IDs into V2 host labels.
+   *
+   * @return string[]
+   *   Department names used by the remote API.
+   */
+  protected function normalizeHostFilters() {
+    $configured_ids = array_filter(explode(',', (string) ($this->configuration['event_host'] ?? '')));
+    if ($configured_ids === []) {
+      return [];
+    }
+
+    $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadMultiple($configured_ids);
+    $hosts = [];
+    foreach ($terms as $term) {
+      $hosts[] = $term->label();
+    }
+
+    return $hosts;
   }
 
 }
