@@ -60,6 +60,12 @@ class MoodyShowcaseWidget extends WidgetBase {
         'options' => isset($items[$delta]->link_options) ? $items[$delta]->link_options : [],
       ],
     ];
+    $element['fixed_image_scroll'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Fixed Image Scroll Effect'),
+      '#default_value' => (int) ($items[$delta]->fixed_image_scroll ?? 0),
+      '#description' => $this->t('Locks the image/video column in place while the text column scrolls on desktop.'),
+    ];
 
     return $element;
   }
@@ -84,6 +90,7 @@ class MoodyShowcaseWidget extends WidgetBase {
         $value['link_title'] = $value['cta']['link']['title'] ?? '';
         $value['link_options'] = $value['cta']['link']['options'] ?? [];
       }
+      $value['fixed_image_scroll'] = empty($value['fixed_image_scroll']) ? 0 : 1;
     }
     return $values;
   }

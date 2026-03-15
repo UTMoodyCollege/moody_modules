@@ -154,6 +154,7 @@ class MoodyShowcaseFormatter extends FormatterBase implements ContainerFactoryPl
         '#headline' => $item->headline,
         '#copy' => check_markup($item->copy_value, $item->copy_format),
         '#cta' => $cta,
+        '#fixed_image_scroll' => !empty($item->fixed_image_scroll),
       ];
 
       switch ($media_bundle) {
@@ -175,7 +176,11 @@ class MoodyShowcaseFormatter extends FormatterBase implements ContainerFactoryPl
       $elements[] = $data;
       $elements['#items'][$delta] = new \stdClass();
       $elements['#items'][$delta]->_attributes = [
-        'class' => ['moody-showcase-default-style'],
+        'class' => [
+          'moody-showcase-default-style',
+          'moody-showcase-item',
+          $delta % 2 === 0 ? 'moody-showcase-item--odd' : 'moody-showcase-item--even',
+        ],
       ];
     }
     $elements['#attached']['library'][] = 'moody_showcase/moody-showcase';

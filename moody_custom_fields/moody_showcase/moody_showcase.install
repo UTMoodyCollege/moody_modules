@@ -1,0 +1,48 @@
+<?php
+
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+
+/**
+ * Adds the fixed image scroll property to existing moody_showcase fields.
+ */
+function moody_showcase_update_9001() {
+  $database_schema = \Drupal::database()->schema();
+  $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $field_map = \Drupal::service('entity_field.manager')->getFieldMapByFieldType('moody_showcase');
+
+  foreach ($field_map as $entity_type_id => $fields) {
+    $entity_storage = \Drupal::entityTypeManager()->getStorage($entity_type_id);
+
+    if (!$entity_storage instanceof SqlContentEntityStorage) {
+      continue;
+    }
+
+    foreach (array_keys($fields) as $field_name) {
+      $field_storage_definition = $entity_definition_update_manager->getFieldStorageDefinition($field_name, $entity_type_id);
+
+      if (!$field_storage_definition) {
+        continue;
+      }
+
+      $field_columns = $field_storage_definition->getColumns();
+      $table_mapping = $entity_storage->getTableMapping([
+        $field_name => $field_storage_definition,
+      ]);
+      $table_names = $table_mapping->getDedicatedTableNames();
+      $table_columns = $table_mapping->getColumnNames($field_name);
+      $column_name = $table_columns['fixed_image_scroll'] ?? NULL;
+
+      if (!$column_name || empty($field_columns['fixed_image_scroll'])) {
+        continue;
+      }
+
+      foreach ($table_names as $table_name) {
+        if ($database_schema->tableExists($table_name) && !$database_schema->fieldExists($table_name, $column_name)) {
+          $database_schema->addField($table_name, $column_name, $field_columns['fixed_image_scroll']);
+        }
+      }
+
+      $entity_definition_update_manager->updateFieldStorageDefinition($field_storage_definition);
+    }
+  }
+}

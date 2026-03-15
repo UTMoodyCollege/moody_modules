@@ -54,6 +54,9 @@ class MoodyShowcase extends FieldItemBase {
       ->setRequired(FALSE);
     $properties['link_options'] = MapDataDefinition::create()
       ->setLabel(t('Link Options'));
+    $properties['fixed_image_scroll'] = DataDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('Fixed Image Scroll Effect'))
+      ->setRequired(FALSE);
 
     return $properties;
   }
@@ -97,6 +100,12 @@ class MoodyShowcase extends FieldItemBase {
           'type' => 'blob',
           'size' => 'big',
           'serialize' => TRUE,
+        ],
+        'fixed_image_scroll' => [
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
         ],
       ],
     ];

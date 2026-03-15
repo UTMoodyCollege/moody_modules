@@ -3,3 +3,9 @@ moody-showcase:
   css:
     theme:
       css/moody-showcase.css: {}
+  js:
+    js/moody-showcase.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - moody_gsap/scrolltrigger

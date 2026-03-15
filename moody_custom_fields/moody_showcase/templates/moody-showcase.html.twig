@@ -1,19 +1,29 @@
-<!-- Add you custom twig html here -->
-<div class="moody-showcase">
-	{% if image %}
-		<div class="showcase-image">
-			{{ image }}
-		</div>
-	{% endif %}
-	{% if video %}
-		<div class="showcase-video">
-			{{ video }}
-		</div>
-	{% endif %}
-	<div class="showcase-text">
-		<h3 class="showcase-headline">{{ headline }}</h3>
-		<hr>
-		<div class="showcase-copy">{{ copy }}</div>
-		{{ cta }}
-	</div>
+{% set classes = [
+  'moody-showcase',
+  fixed_image_scroll ? 'moody-showcase--fixed-image-scroll',
+] %}
+
+<div{{ create_attribute({ class: classes }) }}>
+  {% if image or video %}
+    <div class="showcase-media">
+      <div class="showcase-media-pin">
+        {% if image %}
+          <div class="showcase-image">
+            {{ image }}
+          </div>
+        {% endif %}
+        {% if video %}
+          <div class="showcase-video">
+            {{ video }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+  <div class="showcase-text">
+    <h3 class="showcase-headline">{{ headline }}</h3>
+    <hr>
+    <div class="showcase-copy">{{ copy }}</div>
+    {{ cta }}
+  </div>
 </div>
