@@ -114,8 +114,7 @@ function _create_event_nodes_from_media_channel(&$event_data)
   $fid = FALSE;
   $file = NULL;
   if ($image_url) {
-    $filename = pathinfo($image_url)['basename'];
-    $filename = explode('?', $filename)[0];
+    $filename = _moody_events_normalize_remote_filename($image_url);
     $file_path = 'public://' . $filename;
 
     // Convert the Drupal stream wrapper path to a real file system path.
@@ -289,6 +288,24 @@ function _create_event_nodes_from_media_channel(&$event_data)
       }
     }
   }
+}
+
+/**
+ * Builds a Drupal-safe local filename from a remote event image URL.
+ *
+ * @param string $image_url
+ *   The remote image URL.
+ *
+ * @return string
+ *   A decoded filename without any query string.
+ */
+function _moody_events_normalize_remote_filename($image_url)
+{
+  $path = parse_url($image_url, PHP_URL_PATH) ?? '';
+  $filename = basename($path);
+  $filename = rawurldecode($filename);
+
+  return $filename;
 }
 
 /**
