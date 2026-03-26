@@ -49,6 +49,12 @@ class MoodyShowcase extends FieldItemBase {
     $properties['sticky_image'] = DataDefinition::create('boolean')
       ->setLabel(new TranslatableMarkup('Lock media while copy scrolls'))
       ->setRequired(FALSE);
+    $properties['full_media'] = DataDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('Make media fill the full area'))
+      ->setRequired(FALSE);
+    $properties['pinned_reveal_image'] = DataDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('Use pinned image reveal effect'))
+      ->setRequired(FALSE);
     $properties['link_uri'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Link URI'))
       ->setRequired(FALSE);
@@ -86,6 +92,18 @@ class MoodyShowcase extends FieldItemBase {
           'binary' => FALSE,
         ],
         'sticky_image' => [
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => FALSE,
+          'default' => 0,
+        ],
+        'full_media' => [
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => FALSE,
+          'default' => 0,
+        ],
+        'pinned_reveal_image' => [
           'type' => 'int',
           'size' => 'tiny',
           'not null' => FALSE,
@@ -200,6 +218,8 @@ class MoodyShowcase extends FieldItemBase {
     $values['image'] = $image_media->id();
     $values['link_title'] = $random->sentences(1);
     $values['sticky_image'] = 0;
+    $values['full_media'] = 0;
+    $values['pinned_reveal_image'] = 0;
     $values['disable_image_styles'] = 0;
     // // Set of possible top-level domains for sample link value.
     $tlds = ['com', 'net', 'gov', 'org', 'edu', 'biz', 'info'];

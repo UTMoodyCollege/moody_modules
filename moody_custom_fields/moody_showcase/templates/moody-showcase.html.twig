@@ -1,13 +1,21 @@
 <!-- Add you custom twig html here -->
-<div class="moody-showcase{{ sticky_image ? ' moody-showcase--sticky-media' }}">
+<div class="moody-showcase{{ sticky_image ? ' moody-showcase--sticky-media' }}{{ full_media ? ' moody-showcase--full-media' }}{{ pinned_reveal_image ? ' moody-showcase--pinned-reveal' }}">
 	{% if image %}
-		<div class="showcase-image{{ sticky_image ? ' showcase-media--sticky-target' }}">
-			{{ image }}
+		<div class="showcase-image{{ sticky_image ? ' showcase-media--sticky-target' }}{{ pinned_reveal_image ? ' showcase-media--pinned-trigger showcase-media--sticky-target' }}">
+			<div class="showcase-media-frame{{ full_media ? ' showcase-media-frame--full' }}{{ pinned_reveal_image ? ' showcase-media-frame--pinned' }}">
+				<div class="showcase-media-inner{{ pinned_reveal_image ? ' showcase-media-inner--reveal' }}">
+					{{ image }}
+				</div>
+			</div>
 		</div>
 	{% endif %}
 	{% if video %}
 		<div class="showcase-video{{ sticky_image ? ' showcase-media--sticky-target' }}">
-			{{ video }}
+			<div class="showcase-media-frame{{ full_media ? ' showcase-media-frame--full' }}">
+				<div class="showcase-media-inner">
+					{{ video }}
+				</div>
+			</div>
 		</div>
 	{% endif %}
 	<div class="showcase-text">

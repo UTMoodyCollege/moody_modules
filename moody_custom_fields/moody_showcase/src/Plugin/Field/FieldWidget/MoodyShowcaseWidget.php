@@ -54,6 +54,18 @@ class MoodyShowcaseWidget extends WidgetBase {
       '#description' => $this->t('Keeps the selected image or video visible on larger screens while longer copy continues scrolling.'),
       '#default_value' => $items[$delta]->sticky_image ?? 0,
     ];
+    $element['full_media'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Make media fill the full area'),
+      '#description' => $this->t('Expands the image to fill the full height and width of its media column. Best for taller showcase rows and cropped artwork.'),
+      '#default_value' => $items[$delta]->full_media ?? 0,
+    ];
+    $element['pinned_reveal_image'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use pinned image reveal effect'),
+      '#description' => $this->t('Pins the image while it reveals through the viewport as the reader scrolls the copy on larger screens. This effect is intended for images, not external videos.'),
+      '#default_value' => $items[$delta]->pinned_reveal_image ?? 0,
+    ];
     $element['cta'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Call to Action'),
@@ -86,6 +98,8 @@ class MoodyShowcaseWidget extends WidgetBase {
       $value['copy_value'] = $value['copy']['value'];
       $value['copy_format'] = $value['copy']['format'];
       $value['sticky_image'] = !empty($value['sticky_image']) ? 1 : 0;
+      $value['full_media'] = !empty($value['full_media']) ? 1 : 0;
+      $value['pinned_reveal_image'] = !empty($value['pinned_reveal_image']) ? 1 : 0;
       if (isset($value['cta']['link']['uri'])) {
         $value['link_uri'] = $value['cta']['link']['uri'] ?? '';
         $value['link_title'] = $value['cta']['link']['title'] ?? '';

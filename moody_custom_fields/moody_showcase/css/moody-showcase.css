@@ -7,10 +7,94 @@
   align-self: start;
 }
 
+.field--type-moody-showcase .showcase-media-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.field--type-moody-showcase .showcase-media-inner,
+.field--type-moody-showcase .showcase-media-inner picture,
+.field--type-moody-showcase .showcase-media-inner img,
+.field--type-moody-showcase .showcase-media-inner video,
+.field--type-moody-showcase .showcase-media-inner iframe {
+  display: block;
+  width: 100%;
+}
+
 @media (min-width: 900px) {
   .field--type-moody-showcase .moody-showcase--sticky-media .showcase-media--sticky-target {
     position: sticky;
     top: var(--moody-showcase-sticky-offset, 2rem);
     z-index: 1;
+  }
+
+  .field--type-moody-showcase .moody-showcase--full-media,
+  .field--type-moody-showcase .moody-showcase--pinned-reveal {
+    align-items: stretch;
+  }
+
+  .field--type-moody-showcase .moody-showcase--full-media .showcase-image,
+  .field--type-moody-showcase .moody-showcase--full-media .showcase-video,
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-image {
+    height: 100%;
+  }
+
+  .field--type-moody-showcase .moody-showcase--full-media .showcase-media-frame,
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-frame--pinned {
+    height: 100%;
+    min-height: clamp(26rem, 58vw, 44rem);
+  }
+
+  .field--type-moody-showcase .moody-showcase--full-media .showcase-media-frame--full .showcase-media-inner,
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-frame--pinned .showcase-media-inner {
+    height: 100%;
+  }
+
+  .field--type-moody-showcase .moody-showcase--full-media .showcase-media-frame--full picture,
+  .field--type-moody-showcase .moody-showcase--full-media .showcase-media-frame--full img,
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-frame--pinned picture,
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-frame--pinned img {
+    height: 100%;
+  }
+
+  .field--type-moody-showcase .moody-showcase--full-media .showcase-media-frame--full img,
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-frame--pinned img {
+    object-fit: cover;
+  }
+
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-frame--pinned {
+    position: sticky;
+    top: var(--moody-showcase-pinned-top-offset, var(--moody-showcase-sticky-offset, 2rem));
+    height: var(--moody-showcase-pinned-height, calc(100vh - var(--moody-showcase-sticky-offset, 2rem)));
+    min-height: var(--moody-showcase-pinned-height, calc(100vh - var(--moody-showcase-sticky-offset, 2rem)));
+    max-height: var(--moody-showcase-pinned-height, calc(100vh - var(--moody-showcase-sticky-offset, 2rem)));
+    isolation: isolate;
+  }
+
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-inner--reveal {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    will-change: transform;
+  }
+
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-inner--reveal picture,
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-inner--reveal img {
+    height: 100%;
+  }
+
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-inner--reveal picture {
+    width: 100%;
+  }
+
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media-inner--reveal img {
+    width: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-media--pinned-trigger {
+    position: relative;
+    top: auto;
   }
 }

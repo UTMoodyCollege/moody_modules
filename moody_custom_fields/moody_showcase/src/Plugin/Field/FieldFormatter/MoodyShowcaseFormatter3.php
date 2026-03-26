@@ -99,6 +99,8 @@ class MoodyShowcaseFormatter3 extends MoodyShowcaseFormatter {
         '#copy' => check_markup($item->copy_value, $item->copy_format),
         '#cta' => $cta,
         '#sticky_image' => !empty($item->sticky_image),
+        '#full_media' => !empty($item->full_media),
+        '#pinned_reveal_image' => !empty($item->pinned_reveal_image),
       ];
 
       switch ($media_bundle) {

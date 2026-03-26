@@ -8,3 +8,4 @@ moody-showcase:
   dependencies:
     - core/drupal
     - core/once
+    - moody_gsap/scrolltrigger
