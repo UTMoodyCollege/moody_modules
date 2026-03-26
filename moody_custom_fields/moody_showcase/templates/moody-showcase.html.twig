@@ -1,12 +1,12 @@
 <!-- Add you custom twig html here -->
-<div class="moody-showcase">
+<div class="moody-showcase{{ sticky_image ? ' moody-showcase--sticky-media' }}">
 	{% if image %}
-		<div class="showcase-image">
+		<div class="showcase-image{{ sticky_image ? ' showcase-media--sticky-target' }}">
 			{{ image }}
 		</div>
 	{% endif %}
 	{% if video %}
-		<div class="showcase-video">
+		<div class="showcase-video{{ sticky_image ? ' showcase-media--sticky-target' }}">
 			{{ video }}
 		</div>
 	{% endif %}

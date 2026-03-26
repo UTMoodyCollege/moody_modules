@@ -1,0 +1,16 @@
+.field--type-moody-showcase .moody-showcase--sticky-media {
+  align-items: start;
+}
+
+.field--type-moody-showcase .moody-showcase--sticky-media .showcase-image,
+.field--type-moody-showcase .moody-showcase--sticky-media .showcase-video {
+  align-self: start;
+}
+
+@media (min-width: 900px) {
+  .field--type-moody-showcase .moody-showcase--sticky-media .showcase-media--sticky-target {
+    position: sticky;
+    top: var(--moody-showcase-sticky-offset, 2rem);
+    z-index: 1;
+  }
+}

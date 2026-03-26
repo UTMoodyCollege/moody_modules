@@ -48,6 +48,12 @@ class MoodyShowcaseWidget extends WidgetBase {
       // Set allowed formats to basic and restricted_html.
       '#allowed_formats' => ['flex_html'],
     ];
+    $element['sticky_image'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Lock media while copy scrolls'),
+      '#description' => $this->t('Keeps the selected image or video visible on larger screens while longer copy continues scrolling.'),
+      '#default_value' => $items[$delta]->sticky_image ?? 0,
+    ];
     $element['cta'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Call to Action'),
@@ -79,6 +85,7 @@ class MoodyShowcaseWidget extends WidgetBase {
       }
       $value['copy_value'] = $value['copy']['value'];
       $value['copy_format'] = $value['copy']['format'];
+      $value['sticky_image'] = !empty($value['sticky_image']) ? 1 : 0;
       if (isset($value['cta']['link']['uri'])) {
         $value['link_uri'] = $value['cta']['link']['uri'] ?? '';
         $value['link_title'] = $value['cta']['link']['title'] ?? '';

@@ -46,6 +46,9 @@ class MoodyShowcase extends FieldItemBase {
     $properties['copy_format'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Copy format'))
       ->setRequired(FALSE);
+    $properties['sticky_image'] = DataDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('Lock media while copy scrolls'))
+      ->setRequired(FALSE);
     $properties['link_uri'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Link URI'))
       ->setRequired(FALSE);
@@ -81,6 +84,12 @@ class MoodyShowcase extends FieldItemBase {
           'type' => 'varchar',
           'length' => 255,
           'binary' => FALSE,
+        ],
+        'sticky_image' => [
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => FALSE,
+          'default' => 0,
         ],
         'link_uri' => [
           'type' => 'varchar',
@@ -190,6 +199,7 @@ class MoodyShowcase extends FieldItemBase {
     $image_media->save();
     $values['image'] = $image_media->id();
     $values['link_title'] = $random->sentences(1);
+    $values['sticky_image'] = 0;
     $values['disable_image_styles'] = 0;
     // // Set of possible top-level domains for sample link value.
     $tlds = ['com', 'net', 'gov', 'org', 'edu', 'biz', 'info'];

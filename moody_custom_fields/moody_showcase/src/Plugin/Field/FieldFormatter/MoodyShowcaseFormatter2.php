@@ -98,6 +98,7 @@ class MoodyShowcaseFormatter2 extends MoodyShowcaseFormatter {
         '#headline' => $item->headline,
         '#copy' => check_markup($item->copy_value, $item->copy_format),
         '#cta' => $cta,
+        '#sticky_image' => !empty($item->sticky_image),
       ];
 
       switch ($media_bundle) {
@@ -122,14 +123,9 @@ class MoodyShowcaseFormatter2 extends MoodyShowcaseFormatter {
         'class' => ['moody-showcase-default-style', 'moody-showcase-66-33'],
       ];
 
-
-    
     }
-
-    
-
+    $elements['#attached']['library'][] = 'moody_showcase/moody-showcase';
     return $elements;
-    
   }
 
 }

@@ -154,6 +154,7 @@ class MoodyShowcaseFormatter extends FormatterBase implements ContainerFactoryPl
         '#headline' => $item->headline,
         '#copy' => check_markup($item->copy_value, $item->copy_format),
         '#cta' => $cta,
+        '#sticky_image' => !empty($item->sticky_image),
       ];
 
       switch ($media_bundle) {

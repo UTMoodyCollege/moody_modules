@@ -35,6 +35,7 @@ function moody_showcase_theme() {
         'copy' => NULL,
         'cta' => NULL,
         'video' => NULL,
+        'sticky_image' => FALSE,
       ],
       'template' => 'moody-showcase',
     ],
