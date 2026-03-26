@@ -19,19 +19,7 @@
   }
 
   function getPinnedTopOffset() {
-    var brandbar = document.getElementById('brandbar');
-    var header = document.querySelector('header');
-    var offset = 0;
-
-    if (brandbar) {
-      offset += brandbar.offsetHeight;
-    }
-
-    if (header) {
-      offset += header.offsetHeight;
-    }
-
-    return offset;
+    return 0;
   }
 
   function updateStickyOffset() {
@@ -75,68 +63,14 @@
         return;
       }
 
-      if (!window.gsap || !window.ScrollTrigger) {
-        return;
-      }
-
-      if (typeof window.gsap.registerPlugin === 'function') {
-        window.gsap.registerPlugin(window.ScrollTrigger);
-      }
-
       showcases.forEach(function (showcase) {
-        var mediaTarget = showcase.querySelector('.showcase-media--pinned-trigger');
-        var mediaFrame = showcase.querySelector('.showcase-media-frame--pinned');
         var mediaInner = showcase.querySelector('.showcase-media-inner--reveal');
-        var text = showcase.querySelector('.showcase-text');
 
-        if (!mediaTarget || !mediaFrame || !mediaInner || !text) {
+        if (!mediaInner) {
           return;
         }
 
-        var mm = window.gsap.matchMedia();
-
-        mm.add('(min-width: 900px)', function () {
-          var pinnedTopOffset = function () {
-            return getPinnedTopOffset();
-          };
-
-          var startOffset = function () {
-            return 'top top+=' + pinnedTopOffset();
-          };
-
-          var endOffset = function () {
-            return 'bottom top+=' + pinnedTopOffset();
-          };
-
-          var revealTween = window.gsap.fromTo(
-            mediaInner,
-            {
-              yPercent: -10,
-              scale: 1.12
-            },
-            {
-              yPercent: 6,
-              scale: 1,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: showcase,
-                start: startOffset,
-                endTrigger: text,
-                end: endOffset,
-                scrub: 0.35,
-                invalidateOnRefresh: true
-              }
-            }
-          );
-
-          window.setTimeout(updateStickyOffset, 100);
-
-          return function () {
-            if (revealTween && typeof revealTween.kill === 'function') {
-              revealTween.kill();
-            }
-          };
-        });
+        mediaInner.style.transform = 'none';
       });
     }
   };
