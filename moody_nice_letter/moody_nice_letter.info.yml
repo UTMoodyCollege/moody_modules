@@ -1,0 +1,7 @@
+name: 'Moody Nice Letter'
+type: module
+description: 'Provides a text filter for Moody-style decorative lead letters or words.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:filter

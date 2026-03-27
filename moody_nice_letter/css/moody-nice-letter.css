@@ -1,0 +1,59 @@
+.moody-nice-letter {
+  display: grid;
+  grid-template-columns: 6px minmax(0, 1fr);
+  column-gap: 2rem;
+  align-items: start;
+  margin: 2rem 0;
+}
+
+.moody-nice-letter__rule {
+  background: linear-gradient(180deg, #231f20 0%, #355748 100%);
+  min-height: 100%;
+  width: 6px;
+}
+
+.moody-nice-letter__inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.moody-nice-letter__lead {
+  color: #bf5700;
+  flex: 0 0 auto;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(4.5rem, 10vw, 8rem);
+  font-weight: 700;
+  line-height: 0.82;
+  margin-top: 0.2rem;
+}
+
+.moody-nice-letter__lead.moody-nice-letter__lead--word {
+  font-size: clamp(2.5rem, 6vw, 4.75rem);
+  font-style: italic;
+  line-height: 0.95;
+}
+
+.moody-nice-letter__content {
+  color: inherit;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.moody-nice-letter__content > :first-child {
+  margin-top: 0;
+}
+
+.moody-nice-letter__content > :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .moody-nice-letter {
+    column-gap: 1rem;
+  }
+
+  .moody-nice-letter__inner {
+    gap: 1rem;
+  }
+}
