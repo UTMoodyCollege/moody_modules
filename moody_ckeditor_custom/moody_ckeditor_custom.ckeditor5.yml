@@ -1,0 +1,31 @@
+# @see core/modules/ckeditor5/ckeditor5.ckeditor5.yml
+# @see https://www.drupal.org/project/ckeditor5_dev
+moody_ckeditor_custom_moody_content_blocks:
+  # Configuration that will be sent to CKEditor 5 JavaScript plugins.
+  ckeditor5:
+    plugins:
+      - moodyContentBlocks.MoodyContentBlocks
+
+  # Configuration that will be used directly by Drupal.
+  drupal:
+    label: 'Moody Content Blocks'
+    library: moody_ckeditor_custom/moody_content_blocks
+    admin_library: moody_ckeditor_custom/admin.moody_content_blocks
+    toolbar_items:
+      moodyContentBlocks:
+        label: 'Moody Content Blocks'
+    # The plugin does not provide elements.
+    elements: false
+
+moody_ckeditor_custom_moody_nice_letter:
+  ckeditor5:
+    plugins:
+      - moodyNiceLetter.MoodyNiceLetter
+
+  drupal:
+    label: 'Moody Nice Letter'
+    library: moody_ckeditor_custom/moody_nice_letter
+    toolbar_items:
+      moodyNiceLetter:
+        label: 'Moody Nice Letter'
+    elements: false

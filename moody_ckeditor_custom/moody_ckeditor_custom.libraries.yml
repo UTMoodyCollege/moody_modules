@@ -1,0 +1,18 @@
+moody_content_blocks:
+  js:
+    js/build/moodyContentBlocks.js: { preprocess: false, minified: true }
+  dependencies:
+    - ckeditor5/ckeditor5
+
+moody_nice_letter:
+  js:
+    js/build/moodyNiceLetter.js: { preprocess: false, minified: true }
+  dependencies:
+    - ckeditor5/ckeditor5
+
+# Loaded in the text format configuration form to provide styling for the icon
+# used in toolbar config.
+admin.moody_content_blocks:
+  css:
+    theme:
+      css/moody-content-blocks.admin.css: { }

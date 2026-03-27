@@ -1,0 +1,5 @@
+name: 'Moody CKEditor Custom'
+type: module
+description: 'Provides CKEditor customizations'
+package: Custom
+core_version_requirement: ^10 || ^11
