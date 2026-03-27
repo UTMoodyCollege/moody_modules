@@ -1,0 +1,8 @@
+name: 'Moody Fleet Deploy'
+type: module
+description: 'Shared deployment tweaks for all Moody sites.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:filter
+  - moody_nice_letter:moody_nice_letter

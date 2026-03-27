@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for Moody Fleet Deploy.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function moody_fleet_deploy_install() {
+  _moody_fleet_deploy_enable_nice_letter_on_flex_html();
+}
+
+/**
+ * Enable Moody Nice Letter on the shared Flex HTML text format.
+ */
+function moody_fleet_deploy_update_9001() {
+  _moody_fleet_deploy_enable_nice_letter_on_flex_html();
+}
+
+/**
+ * Adds the Moody Nice Letter filter to the Flex HTML text format.
+ */
+function _moody_fleet_deploy_enable_nice_letter_on_flex_html() {
+  $config_factory = \Drupal::configFactory();
+  $format = $config_factory->getEditable('filter.format.flex_html');
+
+  if ($format->isNew()) {
+    return;
+  }
+
+  $modules = $format->get('dependencies.module') ?? [];
+  if (!in_array('moody_nice_letter', $modules, TRUE)) {
+    $modules[] = 'moody_nice_letter';
+    sort($modules);
+    $format->set('dependencies.module', $modules);
+  }
+
+  $filters = $format->get('filters') ?? [];
+  $filters['moody_nice_letter'] = [
+    'id' => 'moody_nice_letter',
+    'provider' => 'moody_nice_letter',
+    'status' => TRUE,
+    'weight' => 1,
+    'settings' => [],
+  ];
+
+  $format->set('filters', $filters)->save();
+}
