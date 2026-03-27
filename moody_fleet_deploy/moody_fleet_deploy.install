@@ -10,6 +10,7 @@
  */
 function moody_fleet_deploy_install() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
+  _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
 }
 
 /**
@@ -17,6 +18,7 @@ function moody_fleet_deploy_install() {
  */
 function moody_fleet_deploy_update_9001() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
+  _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
 }
 
 /**
@@ -47,4 +49,38 @@ function _moody_fleet_deploy_enable_nice_letter_on_flex_html() {
   ];
 
   $format->set('filters', $filters)->save();
+}
+
+/**
+ * Adds the Moody Nice Letter toolbar button to Flex HTML CKEditor 5.
+ */
+function _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html() {
+  $config_factory = \Drupal::configFactory();
+  $editor = $config_factory->getEditable('editor.editor.flex_html');
+
+  if ($editor->isNew() || $editor->get('editor') !== 'ckeditor5') {
+    return;
+  }
+
+  $modules = $editor->get('dependencies.module') ?? [];
+  if (!in_array('moody_ckeditor_custom', $modules, TRUE)) {
+    $modules[] = 'moody_ckeditor_custom';
+    sort($modules);
+    $editor->set('dependencies.module', $modules);
+  }
+
+  $items = $editor->get('settings.toolbar.items') ?? [];
+  if (!in_array('moodyNiceLetter', $items, TRUE)) {
+    $insert_after = array_search('style', $items, TRUE);
+    if ($insert_after !== FALSE) {
+      array_splice($items, $insert_after + 1, 0, ['moodyNiceLetter']);
+    }
+    else {
+      $items[] = 'moodyNiceLetter';
+    }
+    $editor->set('settings.toolbar.items', $items)->save();
+  }
+  else {
+    $editor->save();
+  }
 }
