@@ -1,0 +1,170 @@
+.moody-scroll-reveal-media {
+  --moody-scroll-reveal-media-gap: clamp(1.5rem, 3vw, 3rem);
+  --moody-scroll-reveal-media-radius: 1.5rem;
+  margin: 0 auto;
+}
+
+.moody-scroll-reveal-media__header {
+  margin-bottom: 1.5rem;
+}
+
+.moody-scroll-reveal-media__headline {
+  color: #2f3b4a;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 0.96;
+  margin: 0;
+}
+
+.moody-scroll-reveal-media__viewport {
+  position: relative;
+}
+
+.moody-scroll-reveal-media__stage {
+  display: grid;
+  gap: var(--moody-scroll-reveal-media-gap);
+}
+
+.moody-scroll-reveal-media__slide {
+  align-items: stretch;
+  background: linear-gradient(180deg, #f6f1ea 0%, #efe8de 100%);
+  border-radius: var(--moody-scroll-reveal-media-radius);
+  display: grid;
+  gap: var(--moody-scroll-reveal-media-gap);
+  overflow: clip;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.moody-scroll-reveal-media__media,
+.moody-scroll-reveal-media__content {
+  min-width: 0;
+}
+
+.moody-scroll-reveal-media__media {
+  display: flex;
+  min-height: 0;
+}
+
+.moody-scroll-reveal-media__media-inner {
+  background: #d9d0c4;
+  border-radius: calc(var(--moody-scroll-reveal-media-radius) - 0.5rem);
+  flex: 1 1 auto;
+  min-height: 18rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.moody-scroll-reveal-media__media-inner > *,
+.moody-scroll-reveal-media__media-inner .field,
+.moody-scroll-reveal-media__media-inner .field__item,
+.moody-scroll-reveal-media__media-inner .media,
+.moody-scroll-reveal-media__media-inner .media--type-utexas-image,
+.moody-scroll-reveal-media__media-inner .media--type-utexas-video-external,
+.moody-scroll-reveal-media__media-inner .utexas-field,
+.moody-scroll-reveal-media__media-inner .utexas-image-link {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.moody-scroll-reveal-media__media-inner img,
+.moody-scroll-reveal-media__media-inner video,
+.moody-scroll-reveal-media__media-inner iframe {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.moody-scroll-reveal-media__media-inner iframe {
+  border: 0;
+}
+
+.moody-scroll-reveal-media__content {
+  align-content: center;
+  color: #233142;
+  display: grid;
+  gap: 1rem;
+}
+
+.moody-scroll-reveal-media__slide--media-only {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.moody-scroll-reveal-media__eyebrow {
+  color: #bf5700;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.moody-scroll-reveal-media__title {
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  line-height: 0.98;
+  margin: 0;
+}
+
+.moody-scroll-reveal-media__body {
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.65;
+}
+
+.moody-scroll-reveal-media__body > :first-child {
+  margin-top: 0;
+}
+
+.moody-scroll-reveal-media__body > :last-child {
+  margin-bottom: 0;
+}
+
+.moody-scroll-reveal-media__counter {
+  color: rgba(47, 59, 74, 0.66);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+@media (min-width: 900px) {
+  .moody-scroll-reveal-media__slide {
+    grid-template-columns: minmax(0, 1.1fr) minmax(22rem, 0.9fr);
+    min-height: 100svh;
+    padding: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .moody-scroll-reveal-media__slide--media-only {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .moody-scroll-reveal-media__content {
+    padding-block: clamp(1rem, 2vw, 2rem);
+  }
+
+  .moody-scroll-reveal-media__media-inner {
+    min-height: 100%;
+  }
+}
+
+.moody-scroll-reveal-media.is-enhanced .moody-scroll-reveal-media__viewport {
+  min-height: 100svh;
+}
+
+.moody-scroll-reveal-media.is-enhanced .moody-scroll-reveal-media__stage {
+  min-height: 100svh;
+  position: relative;
+}
+
+.moody-scroll-reveal-media.is-enhanced .moody-scroll-reveal-media__slide {
+  inset: 0;
+  margin: 0;
+  position: absolute;
+}
+
+@media (max-width: 767px) {
+  .moody-scroll-reveal-media__slide {
+    min-height: 100svh;
+  }
+
+  .moody-scroll-reveal-media__media-inner {
+    min-height: min(56svh, 32rem);
+  }
+}

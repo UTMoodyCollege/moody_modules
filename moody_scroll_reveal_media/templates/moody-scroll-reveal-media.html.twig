@@ -1,0 +1,35 @@
+<section class="moody-scroll-reveal-media" id="{{ block_id }}">
+  {% if headline %}
+    <header class="moody-scroll-reveal-media__header">
+      <h2 class="moody-scroll-reveal-media__headline">{{ headline }}</h2>
+    </header>
+  {% endif %}
+
+  <div class="moody-scroll-reveal-media__viewport" data-scroll-reveal-media>
+    <div class="moody-scroll-reveal-media__stage">
+      {% for slide in slides %}
+        <article class="moody-scroll-reveal-media__slide{{ not slide.has_content ? ' moody-scroll-reveal-media__slide--media-only' : '' }}" data-reveal-direction="{{ slide.direction }}" aria-label="Reveal step {{ loop.index }} of {{ slides|length }}">
+          <div class="moody-scroll-reveal-media__media">
+            <div class="moody-scroll-reveal-media__media-inner">
+              {{ slide.media }}
+            </div>
+          </div>
+
+          {% if slide.has_content %}
+            <div class="moody-scroll-reveal-media__content">
+              {% if slide.eyebrow %}
+                <p class="moody-scroll-reveal-media__eyebrow">{{ slide.eyebrow }}</p>
+              {% endif %}
+              {% if slide.title %}
+                <h3 class="moody-scroll-reveal-media__title">{{ slide.title }}</h3>
+              {% endif %}
+              {% if slide.body %}
+                <div class="moody-scroll-reveal-media__body">{{ slide.body }}</div>
+              {% endif %}
+            </div>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>

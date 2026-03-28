@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Primary hooks for Moody Scroll Reveal Media.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function moody_scroll_reveal_media_theme($existing, $type, $theme, $path) {
+  return [
+    'moody_scroll_reveal_media' => [
+      'variables' => [
+        'headline' => '',
+        'slides' => [],
+        'block_id' => '',
+      ],
+    ],
+  ];
+}

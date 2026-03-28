@@ -1,0 +1,9 @@
+name: 'Moody Scroll Reveal Media'
+type: module
+description: 'Provides a pinned scroll-reveal media block with GSAP-powered slide transitions.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:media_library
+  - drupal:filter
+  - moody_gsap:moody_gsap
