@@ -1,0 +1,10 @@
+moody_image_gallery:
+  version: 1.x
+  css:
+    theme:
+      css/moody-image-gallery.css: {}
+  js:
+    js/moody-image-gallery.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

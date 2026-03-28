@@ -1,0 +1,80 @@
+<section class="moody-image-gallery" id="{{ gallery_id }}" style="--moody-image-gallery-gap: {{ gutter }}rem;">
+  {% if headline %}
+    <header class="moody-image-gallery__header">
+      <h2 class="moody-image-gallery__headline">{{ headline }}</h2>
+    </header>
+  {% endif %}
+
+  <div class="moody-image-gallery__grid">
+    {% for item in items %}
+      <button
+        class="moody-image-gallery__tile"
+        type="button"
+        data-gallery-trigger
+        data-gallery-index="{{ loop.index0 }}"
+        aria-label="Open gallery image {{ loop.index }} of {{ items|length }}{% if item.caption %}: {{ item.caption }}{% elseif item.alt %}: {{ item.alt }}{% endif %}"
+      >
+        <div class="moody-image-gallery__image-wrap">
+          {{ {
+            '#theme': 'image',
+            '#uri': item.thumbnail_uri,
+            '#alt': item.alt,
+            '#attributes': {
+              class: ['moody-image-gallery__image'],
+              loading: 'lazy',
+            }
+          } }}
+        </div>
+      </button>
+    {% endfor %}
+  </div>
+
+  <div
+    class="moody-image-gallery__lightbox"
+    data-gallery-dialog
+    hidden
+  >
+    <div class="moody-image-gallery__backdrop" data-gallery-close tabindex="-1"></div>
+    <div
+      class="moody-image-gallery__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image gallery"
+      aria-describedby="{{ gallery_id }}-caption"
+      tabindex="-1"
+    >
+      <button class="moody-image-gallery__close" type="button" data-gallery-close aria-label="Close gallery">
+        <span aria-hidden="true">&times;</span>
+      </button>
+
+      <div class="moody-image-gallery__stage">
+        <button class="moody-image-gallery__nav moody-image-gallery__nav--prev" type="button" data-gallery-prev aria-label="Previous image">
+          <span aria-hidden="true">&#8592;</span>
+        </button>
+
+        <figure class="moody-image-gallery__figure">
+          <img class="moody-image-gallery__modal-image" data-gallery-image src="" alt="">
+          <figcaption class="moody-image-gallery__caption" id="{{ gallery_id }}-caption" data-gallery-caption></figcaption>
+        </figure>
+
+        <button class="moody-image-gallery__nav moody-image-gallery__nav--next" type="button" data-gallery-next aria-label="Next image">
+          <span aria-hidden="true">&#8594;</span>
+        </button>
+      </div>
+
+      <div class="moody-image-gallery__counter" data-gallery-counter></div>
+    </div>
+
+    <script type="application/json" data-gallery-items>
+      [
+        {% for item in items %}
+          {
+            "src": {{ file_url(item.uri)|json_encode|raw }},
+            "alt": {{ item.alt|json_encode|raw }},
+            "caption": {{ item.caption|json_encode|raw }}
+          }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    </script>
+  </div>
+</section>

@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Primary hooks for Moody Image Gallery.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function moody_image_gallery_theme($existing, $type, $theme, $path) {
+  return [
+    'moody_image_gallery' => [
+      'variables' => [
+        'headline' => '',
+        'items' => [],
+        'gallery_id' => '',
+        'gutter' => '1.25',
+      ],
+    ],
+  ];
+}

@@ -1,0 +1,7 @@
+name: 'Moody Image Gallery'
+type: module
+description: 'Provides a patterned image gallery wall block with an accessible fullscreen gallery.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:media_library
