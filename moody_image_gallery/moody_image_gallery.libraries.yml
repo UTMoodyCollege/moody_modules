@@ -8,3 +8,8 @@ moody_image_gallery:
   dependencies:
     - core/drupal
     - core/once
+
+admin:
+  css:
+    theme:
+      css/moody-image-gallery.admin.css: {}

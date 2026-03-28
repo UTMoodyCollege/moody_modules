@@ -6,26 +6,75 @@
   {% endif %}
 
   <div class="moody-image-gallery__grid">
-    {% for item in items %}
-      <button
-        class="moody-image-gallery__tile"
-        type="button"
-        data-gallery-trigger
-        data-gallery-index="{{ loop.index0 }}"
-        aria-label="Open gallery image {{ loop.index }} of {{ items|length }}{% if item.caption %}: {{ item.caption }}{% elseif item.alt %}: {{ item.alt }}{% endif %}"
-      >
-        <div class="moody-image-gallery__image-wrap">
-          {{ {
-            '#theme': 'image',
-            '#uri': item.thumbnail_uri,
-            '#alt': item.alt,
-            '#attributes': {
-              class: ['moody-image-gallery__image'],
-              loading: 'lazy',
-            }
-          } }}
+    {% for group in items|batch(3, null) %}
+      <div class="moody-image-gallery__group">
+        <div class="moody-image-gallery__group-top">
+          {% if group[0] %}
+            <button
+              class="moody-image-gallery__tile moody-image-gallery__tile--primary"
+              type="button"
+              data-gallery-trigger
+              data-gallery-index="{{ group[0].index }}"
+              aria-label="Open gallery image {{ group[0].index + 1 }} of {{ items|length }}{% if group[0].caption %}: {{ group[0].caption }}{% elseif group[0].alt %}: {{ group[0].alt }}{% endif %}"
+            >
+              <div class="moody-image-gallery__image-wrap" style="--moody-image-gallery-focus: {{ group[0].focus_position }};">
+                {{ {
+                  '#theme': 'image',
+                  '#uri': group[0].thumbnail_uri,
+                  '#alt': group[0].alt,
+                  '#attributes': {
+                    class: ['moody-image-gallery__image'],
+                    loading: 'lazy',
+                  }
+                } }}
+              </div>
+            </button>
+          {% endif %}
+          {% if group[1] %}
+            <button
+              class="moody-image-gallery__tile moody-image-gallery__tile--secondary"
+              type="button"
+              data-gallery-trigger
+              data-gallery-index="{{ group[1].index }}"
+              aria-label="Open gallery image {{ group[1].index + 1 }} of {{ items|length }}{% if group[1].caption %}: {{ group[1].caption }}{% elseif group[1].alt %}: {{ group[1].alt }}{% endif %}"
+            >
+              <div class="moody-image-gallery__image-wrap" style="--moody-image-gallery-focus: {{ group[1].focus_position }};">
+                {{ {
+                  '#theme': 'image',
+                  '#uri': group[1].thumbnail_uri,
+                  '#alt': group[1].alt,
+                  '#attributes': {
+                    class: ['moody-image-gallery__image'],
+                    loading: 'lazy',
+                  }
+                } }}
+              </div>
+            </button>
+          {% endif %}
         </div>
-      </button>
+
+        {% if group[2] %}
+          <button
+            class="moody-image-gallery__tile moody-image-gallery__tile--full"
+            type="button"
+            data-gallery-trigger
+            data-gallery-index="{{ group[2].index }}"
+            aria-label="Open gallery image {{ group[2].index + 1 }} of {{ items|length }}{% if group[2].caption %}: {{ group[2].caption }}{% elseif group[2].alt %}: {{ group[2].alt }}{% endif %}"
+          >
+            <div class="moody-image-gallery__image-wrap" style="--moody-image-gallery-focus: {{ group[2].focus_position }};">
+              {{ {
+                '#theme': 'image',
+                '#uri': group[2].thumbnail_uri,
+                '#alt': group[2].alt,
+                '#attributes': {
+                  class: ['moody-image-gallery__image'],
+                  loading: 'lazy',
+                }
+              } }}
+            </div>
+          </button>
+        {% endif %}
+      </div>
     {% endfor %}
   </div>
 

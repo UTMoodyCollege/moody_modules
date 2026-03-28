@@ -1,0 +1,59 @@
+.moody-image-gallery-focus-preview {
+  aspect-ratio: 4 / 3;
+  background-color: #efe9e2;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: 1px solid #d6d2cc;
+  border-radius: 0.35rem;
+  margin-bottom: 0.75rem;
+  max-width: 16rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.moody-image-gallery-focus-preview::after {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.55) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.55) 1px, transparent 1px);
+  background-size: 20% 100%, 100% 20%;
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.moody-image-gallery-focus-radios .form-radios {
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  max-width: 16rem;
+}
+
+.moody-image-gallery-focus-radios .form-item {
+  margin: 0;
+}
+
+.moody-image-gallery-focus-radios input {
+  left: -9999px;
+  position: absolute;
+}
+
+.moody-image-gallery-focus-radios label {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #b7b2a8;
+  border-radius: 0.35rem;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.85rem;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0.35rem;
+  text-align: center;
+}
+
+.moody-image-gallery-focus-radios input:checked + label {
+  background: #bf5700;
+  border-color: #bf5700;
+  color: #fff;
+}
