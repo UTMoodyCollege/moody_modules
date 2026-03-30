@@ -4,3 +4,76 @@
  * @file
  * Install, update and uninstall functions for the Moody CKEditor Custom module.
  */
+
+/**
+ * Adds UT brand color and text-size style options to CKEditor style dropdowns.
+ */
+function moody_ckeditor_custom_update_9001() {
+  foreach (['editor.editor.flex_html', 'editor.editor.moody_flex_html'] as $config_name) {
+    _moody_ckeditor_custom_append_style_definitions($config_name);
+  }
+}
+
+/**
+ * Appends Moody utility style definitions to a CKEditor 5 editor config.
+ */
+function _moody_ckeditor_custom_append_style_definitions(string $config_name): void {
+  $config = \Drupal::configFactory()->getEditable($config_name);
+
+  if ($config->isNew()) {
+    return;
+  }
+
+  $styles = $config->get('settings.plugins.ckeditor5_style.styles') ?? [];
+  if (!is_array($styles)) {
+    return;
+  }
+
+  $existing = [];
+  foreach ($styles as $style) {
+    if (!empty($style['element'])) {
+      $existing[$style['element']] = TRUE;
+    }
+  }
+
+  foreach (_moody_ckeditor_custom_style_definitions() as $style) {
+    if (empty($existing[$style['element']])) {
+      $styles[] = $style;
+    }
+  }
+
+  $config->set('settings.plugins.ckeditor5_style.styles', $styles)->save(TRUE);
+}
+
+/**
+ * Returns Moody utility styles for CKEditor.
+ */
+function _moody_ckeditor_custom_style_definitions(): array {
+  return [
+    ['label' => 'UT Text: Burnt Orange', 'element' => '<span class="moody-text-color-burnt-orange">'],
+    ['label' => 'UT Text: White', 'element' => '<span class="moody-text-color-white">'],
+    ['label' => 'UT Text: Charcoal', 'element' => '<span class="moody-text-color-charcoal">'],
+    ['label' => 'UT Text: Light Orange', 'element' => '<span class="moody-text-color-light-orange">'],
+    ['label' => 'UT Text: Limestone', 'element' => '<span class="moody-text-color-limestone">'],
+    ['label' => 'UT Text: Blue Gray', 'element' => '<span class="moody-text-color-blue-gray">'],
+    ['label' => 'UT Text: Deep Blue', 'element' => '<span class="moody-text-color-deep-blue">'],
+    ['label' => 'UT Text: Teal', 'element' => '<span class="moody-text-color-teal">'],
+    ['label' => 'UT Text: Green', 'element' => '<span class="moody-text-color-green">'],
+    ['label' => 'UT Text: Lime', 'element' => '<span class="moody-text-color-lime">'],
+    ['label' => 'UT Text: Gold', 'element' => '<span class="moody-text-color-gold">'],
+    ['label' => 'UT Background: Burnt Orange', 'element' => '<span class="moody-bg-burnt-orange">'],
+    ['label' => 'UT Background: Charcoal', 'element' => '<span class="moody-bg-charcoal">'],
+    ['label' => 'UT Background: Light Orange', 'element' => '<span class="moody-bg-light-orange">'],
+    ['label' => 'UT Background: Limestone', 'element' => '<span class="moody-bg-limestone">'],
+    ['label' => 'UT Background: Blue Gray', 'element' => '<span class="moody-bg-blue-gray">'],
+    ['label' => 'UT Background: Deep Blue', 'element' => '<span class="moody-bg-deep-blue">'],
+    ['label' => 'UT Background: Teal', 'element' => '<span class="moody-bg-teal">'],
+    ['label' => 'UT Background: Green', 'element' => '<span class="moody-bg-green">'],
+    ['label' => 'UT Background: Lime', 'element' => '<span class="moody-bg-lime">'],
+    ['label' => 'UT Background: Gold', 'element' => '<span class="moody-bg-gold">'],
+    ['label' => 'UT Size: Small', 'element' => '<span class="moody-text-size-sm">'],
+    ['label' => 'UT Size: Large', 'element' => '<span class="moody-text-size-lg">'],
+    ['label' => 'UT Size: XL', 'element' => '<span class="moody-text-size-xl">'],
+    ['label' => 'UT Size: 2XL', 'element' => '<span class="moody-text-size-2xl">'],
+  ];
+}

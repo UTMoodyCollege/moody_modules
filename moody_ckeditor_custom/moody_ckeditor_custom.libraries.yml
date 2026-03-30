@@ -10,6 +10,11 @@ moody_nice_letter:
   dependencies:
     - ckeditor5/ckeditor5
 
+moody_editor_utility_styles:
+  css:
+    theme:
+      css/moody-editor-utility-styles.css: {}
+
 # Loaded in the text format configuration form to provide styling for the icon
 # used in toolbar config.
 admin.moody_content_blocks:

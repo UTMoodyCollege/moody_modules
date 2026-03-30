@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Primary hooks for Moody CKEditor Custom.
+ */
+
+/**
+ * Implements hook_page_attachments().
+ */
+function moody_ckeditor_custom_page_attachments(array &$attachments) {
+  $attachments['#attached']['library'][] = 'moody_ckeditor_custom/moody_editor_utility_styles';
+}

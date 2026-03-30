@@ -1,0 +1,159 @@
+.ck-content .moody-text-color-burnt-orange,
+.moody-text-color-burnt-orange {
+  color: #bf5700;
+}
+
+.ck-content .moody-text-color-white,
+.moody-text-color-white {
+  color: #ffffff;
+}
+
+.ck-content .moody-text-color-charcoal,
+.moody-text-color-charcoal {
+  color: #333f48;
+}
+
+.ck-content .moody-text-color-light-orange,
+.moody-text-color-light-orange {
+  color: #f8971f;
+}
+
+.ck-content .moody-text-color-limestone,
+.moody-text-color-limestone {
+  color: #d6d2c4;
+}
+
+.ck-content .moody-text-color-blue-gray,
+.moody-text-color-blue-gray {
+  color: #9cadb7;
+}
+
+.ck-content .moody-text-color-deep-blue,
+.moody-text-color-deep-blue {
+  color: #005f86;
+}
+
+.ck-content .moody-text-color-teal,
+.moody-text-color-teal {
+  color: #00a9b7;
+}
+
+.ck-content .moody-text-color-green,
+.moody-text-color-green {
+  color: #579d42;
+}
+
+.ck-content .moody-text-color-lime,
+.moody-text-color-lime {
+  color: #a6cd57;
+}
+
+.ck-content .moody-text-color-gold,
+.moody-text-color-gold {
+  color: #ffd600;
+}
+
+.ck-content .moody-bg-burnt-orange,
+.ck-content .moody-bg-charcoal,
+.ck-content .moody-bg-deep-blue,
+.ck-content .moody-bg-green,
+.moody-bg-burnt-orange,
+.moody-bg-charcoal,
+.moody-bg-deep-blue,
+.moody-bg-green {
+  color: #ffffff;
+}
+
+.ck-content .moody-bg-light-orange,
+.ck-content .moody-bg-limestone,
+.ck-content .moody-bg-blue-gray,
+.ck-content .moody-bg-teal,
+.ck-content .moody-bg-lime,
+.ck-content .moody-bg-gold,
+.moody-bg-light-orange,
+.moody-bg-limestone,
+.moody-bg-blue-gray,
+.moody-bg-teal,
+.moody-bg-lime,
+.moody-bg-gold {
+  color: #333f48;
+}
+
+.ck-content .moody-bg-burnt-orange,
+.moody-bg-burnt-orange {
+  background-color: #bf5700;
+}
+
+.ck-content .moody-bg-charcoal,
+.moody-bg-charcoal {
+  background-color: #333f48;
+}
+
+.ck-content .moody-bg-light-orange,
+.moody-bg-light-orange {
+  background-color: #f8971f;
+}
+
+.ck-content .moody-bg-limestone,
+.moody-bg-limestone {
+  background-color: #d6d2c4;
+}
+
+.ck-content .moody-bg-blue-gray,
+.moody-bg-blue-gray {
+  background-color: #9cadb7;
+}
+
+.ck-content .moody-bg-deep-blue,
+.moody-bg-deep-blue {
+  background-color: #005f86;
+}
+
+.ck-content .moody-bg-teal,
+.moody-bg-teal {
+  background-color: #00a9b7;
+}
+
+.ck-content .moody-bg-green,
+.moody-bg-green {
+  background-color: #579d42;
+}
+
+.ck-content .moody-bg-lime,
+.moody-bg-lime {
+  background-color: #a6cd57;
+}
+
+.ck-content .moody-bg-gold,
+.moody-bg-gold {
+  background-color: #ffd600;
+}
+
+.ck-content [class*="moody-bg-"],
+[class*="moody-bg-"] {
+  border-radius: 0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  display: inline;
+  padding: 0.08em 0.3em;
+}
+
+.ck-content .moody-text-size-sm,
+.moody-text-size-sm {
+  font-size: 0.875rem;
+}
+
+.ck-content .moody-text-size-lg,
+.moody-text-size-lg {
+  font-size: 1.125rem;
+}
+
+.ck-content .moody-text-size-xl,
+.moody-text-size-xl {
+  font-size: 1.375rem;
+}
+
+.ck-content .moody-text-size-2xl,
+.moody-text-size-2xl {
+  font-size: 1.75rem;
+}
