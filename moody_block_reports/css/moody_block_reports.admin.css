@@ -1,0 +1,26 @@
+.moody-block-reports-summary {
+  margin: 0 0 1.5rem;
+}
+
+.moody-block-reports-summary p {
+  margin: 0.25rem 0;
+}
+
+.moody-block-reports-table th,
+.moody-block-reports-table td {
+  vertical-align: top;
+}
+
+.moody-block-reports-table details {
+  min-width: 22rem;
+}
+
+.moody-block-reports-table details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.moody-block-reports-table ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+}

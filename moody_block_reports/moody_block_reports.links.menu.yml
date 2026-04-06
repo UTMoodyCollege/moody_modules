@@ -1,0 +1,5 @@
+moody_block_reports.audit_form:
+  title: 'Moody block reports'
+  description: 'Audit Layout Builder block usage across Moody page types.'
+  route_name: moody_block_reports.audit_form
+  parent: system.admin_reports

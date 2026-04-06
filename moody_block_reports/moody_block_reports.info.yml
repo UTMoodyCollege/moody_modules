@@ -1,0 +1,9 @@
+name: 'Moody Block Reports'
+type: module
+description: 'Admin reports for Layout Builder block usage on Moody pages.'
+core_version_requirement: ^10 || ^11
+package: Moody
+dependencies:
+  - drupal:block_content
+  - drupal:layout_builder
+  - drupal:node

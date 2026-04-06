@@ -1,0 +1,4 @@
+admin:
+  css:
+    theme:
+      css/moody_block_reports.admin.css: {}

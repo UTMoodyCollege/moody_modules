@@ -1,0 +1,8 @@
+services:
+  moody_block_reports.audit:
+    class: Drupal\moody_block_reports\BlockUsageAudit
+    arguments:
+      - '@entity_type.manager'
+      - '@plugin.manager.block'
+      - '@entity_type.bundle.info'
+      - '@string_translation'

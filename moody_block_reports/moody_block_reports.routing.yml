@@ -1,0 +1,7 @@
+moody_block_reports.audit_form:
+  path: '/admin/reports/moody-block-reports'
+  defaults:
+    _form: '\Drupal\moody_block_reports\Form\BlockUsageAuditForm'
+    _title: 'Moody block reports'
+  requirements:
+    _permission: 'administer site configuration'
