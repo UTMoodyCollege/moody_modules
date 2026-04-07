@@ -110,7 +110,7 @@ class MoodyShowcaseFormatter extends FormatterBase implements ContainerFactoryPl
       $image_render_array = [];
       $media_bundle = NULL;
 
-      if ($media = $this->entityTypeManager->getStorage('media')->load($item->image)) {
+      if (!empty($item->image) && ($media = $this->entityTypeManager->getStorage('media')->load($item->image))) {
         // Alter if it's a video.
         $media_bundle = $media->bundle();
         switch ($media_bundle) {
