@@ -43,7 +43,7 @@ class MoodyNiceLetterFilter extends FilterBase {
    * {@inheritdoc}
    */
   public function tips($long = FALSE) {
-    return $this->t('Use <code>[nice_letter lead="A"]s we reflected on the past year...[/nice_letter]</code> or <code>[nice_letter lead="Moody"]College is always evolving.[/nice_letter]</code>.');
+    return $this->t('Use <code>[nice_letter lead="A"]s we reflected on the past year...[/nice_letter]</code>, <code>[nice_letter lead="Moody"]College is always evolving.[/nice_letter]</code>, or set <code>color="burnt-orange|orange|default|black|charcoal|ut-gray|ut-grey|gray|grey|ut"</code>.');
   }
 
   /**
@@ -69,6 +69,8 @@ class MoodyNiceLetterFilter extends FilterBase {
       $lead_classes[] = 'moody-nice-letter__lead--word';
     }
 
+    $lead_classes[] = $this->resolveLeadColorClass($attributes['color'] ?? '');
+
     return '<div class="moody-nice-letter">'
       . '<div class="moody-nice-letter__rule" aria-hidden="true"></div>'
       . '<div class="moody-nice-letter__inner">'
@@ -76,6 +78,40 @@ class MoodyNiceLetterFilter extends FilterBase {
       . '<div class="moody-nice-letter__content">' . $content . '</div>'
       . '</div>'
       . '</div>';
+  }
+
+  /**
+   * Maps the optional color attribute to a supported CSS class.
+   *
+   * @param string $color
+   *   The requested color token.
+   *
+   * @return string
+   *   The CSS class for the lead color.
+   */
+  protected function resolveLeadColorClass($color) {
+    $color = trim(mb_strtolower($color));
+
+    $map = [
+      'burnt-orange' => 'moody-nice-letter__lead--burnt-orange',
+      'burnt_orange' => 'moody-nice-letter__lead--burnt-orange',
+      'orange' => 'moody-nice-letter__lead--burnt-orange',
+      'default' => 'moody-nice-letter__lead--burnt-orange',
+      '' => 'moody-nice-letter__lead--burnt-orange',
+      'black' => 'moody-nice-letter__lead--black',
+      'charcoal' => 'moody-nice-letter__lead--black',
+      'dark' => 'moody-nice-letter__lead--black',
+      'ut-gray' => 'moody-nice-letter__lead--ut-gray',
+      'ut-grey' => 'moody-nice-letter__lead--ut-gray',
+      'ut_grey' => 'moody-nice-letter__lead--ut-gray',
+      'ut_gray' => 'moody-nice-letter__lead--ut-gray',
+      'ut-gray-dark' => 'moody-nice-letter__lead--ut-gray',
+      'ut' => 'moody-nice-letter__lead--ut-gray',
+      'gray' => 'moody-nice-letter__lead--ut-gray',
+      'grey' => 'moody-nice-letter__lead--ut-gray',
+    ];
+
+    return $map[$color] ?? 'moody-nice-letter__lead--burnt-orange';
   }
 
   /**

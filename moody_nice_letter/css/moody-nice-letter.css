@@ -19,13 +19,24 @@
 }
 
 .moody-nice-letter__lead {
-  color: #bf5700;
   flex: 0 0 auto;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(4.5rem, 10vw, 8rem);
   font-weight: 700;
   line-height: 0.82;
   margin-top: 0.2rem;
+}
+
+.moody-nice-letter__lead--burnt-orange {
+  color: #bf5700;
+}
+
+.moody-nice-letter__lead--black {
+  color: #000;
+}
+
+.moody-nice-letter__lead--ut-gray {
+  color: #333f48;
 }
 
 .moody-nice-letter__lead.moody-nice-letter__lead--word {
