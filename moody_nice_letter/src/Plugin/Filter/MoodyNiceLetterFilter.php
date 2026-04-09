@@ -70,14 +70,33 @@ class MoodyNiceLetterFilter extends FilterBase {
     }
 
     $lead_classes[] = $this->resolveLeadColorClass($attributes['color'] ?? '');
+    $is_inline_content = !$this->containsBlockMarkup($content);
+    $wrapper_tag = $is_inline_content ? 'span' : 'div';
+    $wrapper_classes = ['moody-nice-letter'];
+    if ($is_inline_content) {
+      $wrapper_classes[] = 'moody-nice-letter--inline';
+    }
 
-    return '<div class="moody-nice-letter">'
-      . '<div class="moody-nice-letter__rule" aria-hidden="true"></div>'
-      . '<div class="moody-nice-letter__inner">'
-      . '<div class="' . implode(' ', $lead_classes) . '">' . Html::escape($lead) . '</div>'
-      . '<div class="moody-nice-letter__content">' . $content . '</div>'
-      . '</div>'
-      . '</div>';
+    return '<' . $wrapper_tag . ' class="' . implode(' ', $wrapper_classes) . '">'
+      . '<span class="moody-nice-letter__rule" aria-hidden="true"></span>'
+      . '<span class="moody-nice-letter__inner">'
+      . '<span class="' . implode(' ', $lead_classes) . '">' . Html::escape($lead) . '</span>'
+      . '<span class="moody-nice-letter__content">' . $content . '</span>'
+      . '</span>'
+      . '</' . $wrapper_tag . '>';
+  }
+
+  /**
+   * Determines whether shortcode content contains block-level markup.
+   *
+   * @param string $content
+   *   The shortcode content.
+   *
+   * @return bool
+   *   TRUE when the content includes block-level HTML.
+   */
+  protected function containsBlockMarkup($content) {
+    return (bool) preg_match('/<(address|article|aside|blockquote|details|div|dl|figure|figcaption|footer|form|h[1-6]|header|hr|nav|ol|p|pre|section|table|ul)\b/i', $content);
   }
 
   /**

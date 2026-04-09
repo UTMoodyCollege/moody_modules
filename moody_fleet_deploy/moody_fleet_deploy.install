@@ -11,6 +11,7 @@
 function moody_fleet_deploy_install() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
+  _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
 }
 
 /**
@@ -19,6 +20,7 @@ function moody_fleet_deploy_install() {
 function moody_fleet_deploy_update_9001() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
+  _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
 }
 
 /**
@@ -27,6 +29,14 @@ function moody_fleet_deploy_update_9001() {
 function moody_fleet_deploy_update_9002() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
+  _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
+}
+
+/**
+ * Ensure Moody text size styles are available on Flex HTML.
+ */
+function moody_fleet_deploy_update_9003() {
+  _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
 }
 
 /**
@@ -90,5 +100,56 @@ function _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html() {
   }
   else {
     $editor->save();
+  }
+}
+
+/**
+ * Adds Moody text size style definitions to Flex HTML CKEditor 5.
+ */
+function _moody_fleet_deploy_enable_moody_text_styles_on_flex_html() {
+  $config_factory = \Drupal::configFactory();
+  $editor = $config_factory->getEditable('editor.editor.flex_html');
+
+  if ($editor->isNew() || $editor->get('editor') !== 'ckeditor5') {
+    return;
+  }
+
+  $styles = $editor->get('settings.plugins.ckeditor5_style.styles') ?? [];
+  $definitions = [
+    [
+      'label' => 'UT Size: Small',
+      'element' => '<span class="moody-text-size-sm">',
+    ],
+    [
+      'label' => 'UT Size: Large',
+      'element' => '<span class="moody-text-size-lg">',
+    ],
+    [
+      'label' => 'UT Size: XL',
+      'element' => '<span class="moody-text-size-xl">',
+    ],
+    [
+      'label' => 'UT Size: 2XL',
+      'element' => '<span class="moody-text-size-2xl">',
+    ],
+  ];
+
+  $existing_elements = [];
+  foreach ($styles as $style) {
+    if (!empty($style['element']) && is_string($style['element'])) {
+      $existing_elements[] = $style['element'];
+    }
+  }
+
+  $updated = FALSE;
+  foreach ($definitions as $definition) {
+    if (!in_array($definition['element'], $existing_elements, TRUE)) {
+      $styles[] = $definition;
+      $updated = TRUE;
+    }
+  }
+
+  if ($updated) {
+    $editor->set('settings.plugins.ckeditor5_style.styles', $styles)->save();
   }
 }

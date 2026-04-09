@@ -6,6 +6,12 @@
   margin: 2rem 0;
 }
 
+.moody-nice-letter--inline {
+  display: inline-grid;
+  margin: 0;
+  vertical-align: top;
+}
+
 .moody-nice-letter__rule {
   background: linear-gradient(180deg, #231f20 0%, #355748 100%);
   min-height: 100%;
@@ -49,6 +55,10 @@
   color: inherit;
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.moody-nice-letter--inline .moody-nice-letter__content {
+  display: inline;
 }
 
 .moody-nice-letter__content > :first-child {
