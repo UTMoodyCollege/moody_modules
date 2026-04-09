@@ -22,6 +22,14 @@ function moody_fleet_deploy_update_9001() {
 }
 
 /**
+ * Re-apply shared Flex HTML nice-letter rollout on existing fleet sites.
+ */
+function moody_fleet_deploy_update_9002() {
+  _moody_fleet_deploy_enable_nice_letter_on_flex_html();
+  _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
+}
+
+/**
  * Adds the Moody Nice Letter filter to the Flex HTML text format.
  */
 function _moody_fleet_deploy_enable_nice_letter_on_flex_html() {
