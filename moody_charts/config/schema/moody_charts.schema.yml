@@ -1,0 +1,25 @@
+block.settings.moody_charts_block:
+  type: block_settings
+  label: 'Moody Charts block'
+  mapping:
+    chart_type:
+      type: string
+      label: 'Chart type'
+    chart_title:
+      type: string
+      label: 'Chart title'
+    chart_data:
+      type: string
+      label: 'Chart data (JSON)'
+    color_scheme:
+      type: string
+      label: 'Colour scheme'
+    show_legend:
+      type: boolean
+      label: 'Show legend'
+    show_grid:
+      type: boolean
+      label: 'Show grid lines'
+    aspect_ratio:
+      type: string
+      label: 'Aspect ratio'

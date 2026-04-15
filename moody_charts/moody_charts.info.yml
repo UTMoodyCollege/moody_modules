@@ -1,0 +1,6 @@
+name: 'Moody Charts'
+description: 'Provides Chart.js-powered data visualization blocks with UT-branded styling. Accepts CSV and XLSX data sources.'
+type: module
+core_version_requirement: '^10 || ^11'
+package: Moody
+version: 1.x
