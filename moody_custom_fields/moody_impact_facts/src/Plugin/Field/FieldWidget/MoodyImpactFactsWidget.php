@@ -57,6 +57,9 @@ class MoodyImpactFactsWidget extends WidgetBase {
 
     // Gather the number of items in the Moody Impact Facts.
     $items = !empty($items[$delta]->impact_items) ? unserialize($items[$delta]->impact_items) : [];
+    if (!is_array($items)) {
+      $items = [];
+    }
     // Ensure item keys are consecutive.
     $items = array_values($items);
     // Retrieve the form element that is using this widget.
