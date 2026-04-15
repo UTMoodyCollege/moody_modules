@@ -47,6 +47,9 @@
   /** Current scroll offset (index of first visible card). */
   var carouselOffset = 0;
 
+  /** Prevent duplicate delegated event binding across repeated attaches. */
+  var carouselEventsBound = false;
+
   /**
    * Define a Drupal behavior to create custom hero select elements.
    */
@@ -79,6 +82,7 @@
           var style_and_anchor = getStyleAndAnchorValue(default_style);
 
           createSelectors($sourceWrapper);
+          var enhancementScope = $sourceWrapper.parent().find('.moody-hero-form-enhancements').first();
 
           var heroStyleSelect = $sourceWrapper.parent().find("select[name='hero_style']").first();
           var anchorSelect = $sourceWrapper.parent().find("select[name='anchor_position']").first();
@@ -95,9 +99,9 @@
           toggleAnchorSelectElement(default_style, anchorSelect);
 
           var carousel_style = (default_style === "moody_hero" ? "default" : default_style);
-          syncCarouselActiveCard(carousel_style, $sourceWrapper);
-          scrollCarouselToActive(carousel_style, $sourceWrapper);
-          updateCarouselNavButtons($sourceWrapper);
+          syncCarouselActiveCard(carousel_style, enhancementScope);
+          scrollCarouselToActive(carousel_style, enhancementScope);
+          updateCarouselNavButtons(enhancementScope);
 
           heroStyleSelect.on('change', function () {
             var selected = $(this).val();
@@ -106,9 +110,9 @@
               : selected;
             updateSelectors(original_select_element, anchorSelect, "", hero_style);
             var carousel_val = (hero_style === "moody_hero" ? "default" : hero_style);
-            syncCarouselActiveCard(carousel_val, $sourceWrapper);
-            scrollCarouselToActive(carousel_val, $sourceWrapper);
-            updateCarouselNavButtons($sourceWrapper);
+            syncCarouselActiveCard(carousel_val, enhancementScope);
+            scrollCarouselToActive(carousel_val, enhancementScope);
+            updateCarouselNavButtons(enhancementScope);
           });
 
           anchorSelect.on('change', function () {
@@ -130,6 +134,7 @@
    *     the new selectors into.
    */
   function createSelectors($sourceWrapper) {
+    var $formContainer = $sourceWrapper.parent();
     var hero_style_selector =
       `<div class="js-form-item form-item js-form-type-select
       form-item-hero-style js-form-item-hero-style">
@@ -190,15 +195,29 @@
       </div>`
       ;
     // We loop through each element within the parent DOM.
-    if ($sourceWrapper.parent().find("#edit-hero-style").length !== 0) {
+    if ($formContainer.find("#edit-hero-style").length !== 0) {
       return;
     }
 
     var carousel_html = buildCarouselHtml();
-    $sourceWrapper
-      .after(anchor_position_selector)
-      .after(hero_style_selector)
-      .after(carousel_html);
+    var enhancement_markup = $(
+      '<div class="moody-hero-form-enhancements">' +
+        carousel_html +
+        hero_style_selector +
+        anchor_position_selector +
+      '</div>'
+    );
+    var $labelDisplayWrapper = $formContainer
+      .find('.js-form-item-settings-label-display')
+      .first();
+
+    if ($labelDisplayWrapper.length) {
+      $labelDisplayWrapper.after(enhancement_markup);
+    }
+    else {
+      $sourceWrapper.before(enhancement_markup);
+    }
+
     $sourceWrapper.hide();
     bindCarouselEvents();
   }
@@ -245,11 +264,17 @@
    * Called once immediately after the carousel is inserted into the DOM.
    */
   function bindCarouselEvents() {
+    if (carouselEventsBound) {
+      return;
+    }
+
+    carouselEventsBound = true;
+
     // Card click — select that hero style.
     $(document).on('click', '.moody-hero-carousel-card', function () {
       var style_value = $(this).data('style');
-      $(this).closest('.moody-hero-preview-carousel')
-        .siblings(".js-form-item-hero-style")
+      $(this).closest('.moody-hero-form-enhancements')
+        .find(".js-form-item-hero-style")
         .find("select[name='hero_style']")
         .val(style_value)
         .trigger('change');
@@ -257,22 +282,22 @@
 
     // Previous button.
     $(document).on('click', '.moody-hero-carousel-prev', function () {
-      var $sourceWrapper = $(this).closest('.moody-hero-preview-carousel').siblings('.js-form-item-settings-view-mode, .js-form-item-settings-formatter-type').first();
+      var $scope = $(this).closest('.moody-hero-form-enhancements');
       if (carouselOffset > 0) {
         carouselOffset--;
-        updateCarouselTransform($sourceWrapper);
-        updateCarouselNavButtons($sourceWrapper);
+        updateCarouselTransform($scope);
+        updateCarouselNavButtons($scope);
       }
     });
 
     // Next button.
     $(document).on('click', '.moody-hero-carousel-next', function () {
-      var $sourceWrapper = $(this).closest('.moody-hero-preview-carousel').siblings('.js-form-item-settings-view-mode, .js-form-item-settings-formatter-type').first();
+      var $scope = $(this).closest('.moody-hero-form-enhancements');
       var max_offset = CAROUSEL_STYLES.length - CARDS_VISIBLE;
       if (carouselOffset < max_offset) {
         carouselOffset++;
-        updateCarouselTransform($sourceWrapper);
-        updateCarouselNavButtons($sourceWrapper);
+        updateCarouselTransform($scope);
+        updateCarouselNavButtons($scope);
       }
     });
   }
@@ -282,8 +307,7 @@
    *
    * @param {string} style_value The base hero style value (no anchor suffix).
    */
-  function syncCarouselActiveCard(style_value, $sourceWrapper) {
-    var $scope = $sourceWrapper.parent();
+  function syncCarouselActiveCard(style_value, $scope) {
     $scope.find('.moody-hero-carousel-card').removeClass('is-active');
     $scope.find('.moody-hero-carousel-card[data-style="' + style_value + '"]')
       .addClass('is-active');
@@ -294,21 +318,21 @@
    *
    * @param {string} style_value The base hero style value.
    */
-  function scrollCarouselToActive(style_value, $sourceWrapper) {
+  function scrollCarouselToActive(style_value, $scope) {
     var active_index = findStyleIndex(style_value);
     var max_offset = CAROUSEL_STYLES.length - CARDS_VISIBLE;
     // Try to centre the active card in the visible window.
     var desired = active_index - Math.floor(CARDS_VISIBLE / 2);
     carouselOffset = Math.max(0, Math.min(desired, max_offset));
-    updateCarouselTransform($sourceWrapper);
+    updateCarouselTransform($scope);
   }
 
   /**
    * Apply CSS transform to slide the carousel track to the current offset.
    */
-  function updateCarouselTransform($sourceWrapper) {
+  function updateCarouselTransform($scope) {
     var offset_pct = -(carouselOffset * (100 / CARDS_VISIBLE));
-    $sourceWrapper.parent().find('.moody-hero-carousel-track')
+    $scope.find('.moody-hero-carousel-track')
       .css('transform', 'translateX(' + offset_pct + '%)');
   }
 
@@ -316,9 +340,8 @@
    * Enable or disable the carousel navigation buttons based on the current
    * offset and the total number of cards.
    */
-  function updateCarouselNavButtons($sourceWrapper) {
+  function updateCarouselNavButtons($scope) {
     var max_offset = CAROUSEL_STYLES.length - CARDS_VISIBLE;
-    var $scope = $sourceWrapper.parent();
     $scope.find('.moody-hero-carousel-prev').prop('disabled', carouselOffset <= 0);
     $scope.find('.moody-hero-carousel-next').prop('disabled', carouselOffset >= max_offset);
   }
