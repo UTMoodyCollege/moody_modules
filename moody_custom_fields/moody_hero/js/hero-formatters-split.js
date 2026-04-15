@@ -1,4 +1,4 @@
-(function ($, Drupal, drupalSettings) {
+(function ($, Drupal, drupalSettings, once) {
   "use strict";
 
   /**
@@ -52,103 +52,70 @@
    */
   Drupal.behaviors.moodyHeroCustomSelectors = {
     attach: function (context, settings) {
-      // 1. Hero styles may be accessed via field formatter or view mode.
-      // Determine which of these is active, or exit if neither.
-      var form_mode = getFormMode();
-      if (form_mode === null) {
-        return;
-      }
-      // Determine original select HTML element, depending on the form mode.
-      var form_mode_dom =
-        (form_mode === "formatter" ? ".js-form-item-settings-formatter-type"
-          : ".js-form-item-settings-view-mode");
-      // If there is no hero default selector, we are not on a hero
-      // configuration form.
-      $(form_mode_dom).each(function () {
-        if ($(form_mode_dom)
-          .find("select option[value=moody_hero_1_left]").length === null) {
-          return;
-        }
-      });
-      // Set the formatter type which differ between formatter and view mode.
-      var formatter_type =
-        (form_mode === "view_mode" ? "settings[" + form_mode + "]"
-          : "settings[" + form_mode + "][type]");
-      // Set jquery element for original hidden select element.
-      var original_select_element = $("select[name='" + formatter_type + "']");
-      var current_formatter_style = original_select_element.val();
-      // Since formatter and view mode don't have a consistent value for the
-      // default select element, we attempt to set the value to "default" if the
-      // current style is indeed set to any of the default values.
-      var default_style = ((current_formatter_style === undefined
-        || current_formatter_style === "full"
-        || current_formatter_style === "moody_hero") ? "default"
-        : current_formatter_style);
-      // Access helper function to split the current formatter into custom
-      // style and anchor position.
-      var style_and_anchor = getStyleAndAnchorValue(default_style);
+      once('moody-hero-custom-selectors', '.js-form-item-settings-view-mode, .js-form-item-settings-formatter-type', context)
+        .forEach(function (element) {
+          var $sourceWrapper = $(element);
+          var form_mode = $sourceWrapper.hasClass('js-form-item-settings-formatter-type')
+            ? 'formatter'
+            : 'view_mode';
+          var formatter_type =
+            (form_mode === "view_mode" ? "settings[" + form_mode + "]"
+              : "settings[" + form_mode + "][type]");
+          var original_select_element = $sourceWrapper.find("select[name='" + formatter_type + "']");
 
-      // 2. Create custom select HTML elements and preview carousel if not
-      // already present.
-      createSelectors(form_mode_dom);
+          if (!original_select_element.length) {
+            return;
+          }
 
-      // 3. Set values of custom select HTML elements.
-      // Update the value in the style custom select element.
-      $("select[name='hero_style']")
-        .val(default_style !== "default" ? style_and_anchor.style
-          : default_style);
-      // Update the value in the anchor custom select element.
-      if (default_style !== "default") {
-        $("select[name='anchor_position']").val(style_and_anchor.anchor);
-      }
-      // Convert default_style if "default" is set but we use a formatter form
-      // mode.
-      default_style = (form_mode === "formatter"
-        && default_style === "default" ? "moody_hero"
-        : default_style);
-      // Update the values in the original hidden select element.
-      original_select_element.val(default_style);
-      // Toggle anchor select element if current hero don't use anchor.
-      toggleAnchorSelectElement(default_style);
+          if (!original_select_element.find("option[value='moody_hero_1_left']").length) {
+            return;
+          }
 
-      // Sync the carousel to highlight the active card and scroll it into view.
-      var carousel_style = (default_style === "moody_hero" ? "default"
-        : default_style);
-      syncCarouselActiveCard(carousel_style);
-      scrollCarouselToActive(carousel_style);
-      updateCarouselNavButtons();
+          var current_formatter_style = original_select_element.val();
+          var default_style = ((current_formatter_style === undefined
+            || current_formatter_style === "full"
+            || current_formatter_style === "moody_hero") ? "default"
+            : current_formatter_style);
+          var style_and_anchor = getStyleAndAnchorValue(default_style);
 
-      // 4. Watch for changes on the custom select elements, and keep
-      // the original select element in sync.
+          createSelectors($sourceWrapper);
 
-      // Watch the hero style custom select element.
-      $("select[name='hero_style']", context).change(function () {
-        var hero_style = "";
-        $("select[name='hero_style'] option:selected").each(function () {
-          // Get the hero style and convert to moody_hero if form mode is set
-          // to formatter.
-          hero_style = (form_mode === "formatter"
-            && $("select[name='hero_style'] option:selected").val() === "default"
+          var heroStyleSelect = $sourceWrapper.parent().find("select[name='hero_style']").first();
+          var anchorSelect = $sourceWrapper.parent().find("select[name='anchor_position']").first();
+
+          heroStyleSelect.val(default_style !== "default" ? style_and_anchor.style : default_style);
+          if (default_style !== "default") {
+            anchorSelect.val(style_and_anchor.anchor);
+          }
+
+          default_style = (form_mode === "formatter" && default_style === "default")
             ? "moody_hero"
-            : $("select[name='hero_style'] option:selected").val());
-        });
-        updateSelectors(original_select_element, "", hero_style);
-        // Keep carousel in sync with the text select.
-        var carousel_val = (hero_style === "moody_hero" ? "default" : hero_style);
-        syncCarouselActiveCard(carousel_val);
-        scrollCarouselToActive(carousel_val);
-        updateCarouselNavButtons();
-      });
+            : default_style;
+          original_select_element.val(default_style);
+          toggleAnchorSelectElement(default_style, anchorSelect);
 
-      // Watch the hero anchor custom select element.
-      $("select[name='anchor_position']", context).change(function () {
-        var anchor;
-        $("select[name='anchor_position'] option:selected").each(function () {
-          anchor = "_" + $("select[name='anchor_position'] option:selected")
-            .val();
+          var carousel_style = (default_style === "moody_hero" ? "default" : default_style);
+          syncCarouselActiveCard(carousel_style, $sourceWrapper);
+          scrollCarouselToActive(carousel_style, $sourceWrapper);
+          updateCarouselNavButtons($sourceWrapper);
+
+          heroStyleSelect.on('change', function () {
+            var selected = $(this).val();
+            var hero_style = (form_mode === "formatter" && selected === "default")
+              ? "moody_hero"
+              : selected;
+            updateSelectors(original_select_element, anchorSelect, "", hero_style);
+            var carousel_val = (hero_style === "moody_hero" ? "default" : hero_style);
+            syncCarouselActiveCard(carousel_val, $sourceWrapper);
+            scrollCarouselToActive(carousel_val, $sourceWrapper);
+            updateCarouselNavButtons($sourceWrapper);
+          });
+
+          anchorSelect.on('change', function () {
+            var anchor = "_" + $(this).val();
+            updateSelectors(original_select_element, anchorSelect, anchor, "");
+          });
         });
-        updateSelectors(original_select_element, anchor, "");
-      });
     }
   };
 
@@ -162,7 +129,7 @@
    * @param {string} form_mode_dom The parent element where we create and set
    *     the new selectors into.
    */
-  function createSelectors(form_mode_dom) {
+  function createSelectors($sourceWrapper) {
     var hero_style_selector =
       `<div class="js-form-item form-item js-form-type-select
       form-item-hero-style js-form-item-hero-style">
@@ -223,24 +190,17 @@
       </div>`
       ;
     // We loop through each element within the parent DOM.
-    $(form_mode_dom).each(function () {
-      // Check if hero style default selector is present.
-      if ($(form_mode_dom)
-        .find("select option[value=moody_hero_1_left]").length) {
-        // Validate custom selectors exist and create them if they don't.
-        if ($("#edit-hero-style").length === 0) {
-          var carousel_html = buildCarouselHtml();
-          $(form_mode_dom)
-            .after(anchor_position_selector)
-            .after(hero_style_selector)
-            .after(carousel_html);
-          // Hide the original selector after appending the custom ones.
-          $(form_mode_dom).hide();
-          // Bind carousel navigation and card-click events.
-          bindCarouselEvents();
-        }
-      }
-    });
+    if ($sourceWrapper.parent().find("#edit-hero-style").length !== 0) {
+      return;
+    }
+
+    var carousel_html = buildCarouselHtml();
+    $sourceWrapper
+      .after(anchor_position_selector)
+      .after(hero_style_selector)
+      .after(carousel_html);
+    $sourceWrapper.hide();
+    bindCarouselEvents();
   }
 
   /**
@@ -288,25 +248,31 @@
     // Card click — select that hero style.
     $(document).on('click', '.moody-hero-carousel-card', function () {
       var style_value = $(this).data('style');
-      $("select[name='hero_style']").val(style_value).trigger('change');
+      $(this).closest('.moody-hero-preview-carousel')
+        .siblings(".js-form-item-hero-style")
+        .find("select[name='hero_style']")
+        .val(style_value)
+        .trigger('change');
     });
 
     // Previous button.
     $(document).on('click', '.moody-hero-carousel-prev', function () {
+      var $sourceWrapper = $(this).closest('.moody-hero-preview-carousel').siblings('.js-form-item-settings-view-mode, .js-form-item-settings-formatter-type').first();
       if (carouselOffset > 0) {
         carouselOffset--;
-        updateCarouselTransform();
-        updateCarouselNavButtons();
+        updateCarouselTransform($sourceWrapper);
+        updateCarouselNavButtons($sourceWrapper);
       }
     });
 
     // Next button.
     $(document).on('click', '.moody-hero-carousel-next', function () {
+      var $sourceWrapper = $(this).closest('.moody-hero-preview-carousel').siblings('.js-form-item-settings-view-mode, .js-form-item-settings-formatter-type').first();
       var max_offset = CAROUSEL_STYLES.length - CARDS_VISIBLE;
       if (carouselOffset < max_offset) {
         carouselOffset++;
-        updateCarouselTransform();
-        updateCarouselNavButtons();
+        updateCarouselTransform($sourceWrapper);
+        updateCarouselNavButtons($sourceWrapper);
       }
     });
   }
@@ -316,9 +282,10 @@
    *
    * @param {string} style_value The base hero style value (no anchor suffix).
    */
-  function syncCarouselActiveCard(style_value) {
-    $('.moody-hero-carousel-card').removeClass('is-active');
-    $('.moody-hero-carousel-card[data-style="' + style_value + '"]')
+  function syncCarouselActiveCard(style_value, $sourceWrapper) {
+    var $scope = $sourceWrapper.parent();
+    $scope.find('.moody-hero-carousel-card').removeClass('is-active');
+    $scope.find('.moody-hero-carousel-card[data-style="' + style_value + '"]')
       .addClass('is-active');
   }
 
@@ -327,21 +294,21 @@
    *
    * @param {string} style_value The base hero style value.
    */
-  function scrollCarouselToActive(style_value) {
+  function scrollCarouselToActive(style_value, $sourceWrapper) {
     var active_index = findStyleIndex(style_value);
     var max_offset = CAROUSEL_STYLES.length - CARDS_VISIBLE;
     // Try to centre the active card in the visible window.
     var desired = active_index - Math.floor(CARDS_VISIBLE / 2);
     carouselOffset = Math.max(0, Math.min(desired, max_offset));
-    updateCarouselTransform();
+    updateCarouselTransform($sourceWrapper);
   }
 
   /**
    * Apply CSS transform to slide the carousel track to the current offset.
    */
-  function updateCarouselTransform() {
+  function updateCarouselTransform($sourceWrapper) {
     var offset_pct = -(carouselOffset * (100 / CARDS_VISIBLE));
-    $('.moody-hero-carousel-track')
+    $sourceWrapper.parent().find('.moody-hero-carousel-track')
       .css('transform', 'translateX(' + offset_pct + '%)');
   }
 
@@ -349,10 +316,11 @@
    * Enable or disable the carousel navigation buttons based on the current
    * offset and the total number of cards.
    */
-  function updateCarouselNavButtons() {
+  function updateCarouselNavButtons($sourceWrapper) {
     var max_offset = CAROUSEL_STYLES.length - CARDS_VISIBLE;
-    $('.moody-hero-carousel-prev').prop('disabled', carouselOffset <= 0);
-    $('.moody-hero-carousel-next').prop('disabled', carouselOffset >= max_offset);
+    var $scope = $sourceWrapper.parent();
+    $scope.find('.moody-hero-carousel-prev').prop('disabled', carouselOffset <= 0);
+    $scope.find('.moody-hero-carousel-next').prop('disabled', carouselOffset >= max_offset);
   }
 
   /**
@@ -381,19 +349,18 @@
    *    and define the official formatter/view mode value. Will also be used to
    *    validate and massage the hero_style value.
    */
-  function updateSelectors(original_select_element, anchor = "", hero_style = "") {
+  function updateSelectors(original_select_element, anchorSelect, anchor = "", hero_style = "") {
     // If no hero style passed as argument, get the current value.
     hero_style = ((hero_style === "")
-      ? $("select[name='hero_style'] option:selected").val()
+      ? original_select_element.closest('form').find("select[name='hero_style'] option:selected").val()
       : hero_style);
     // If no anchor passed as argument, get the current value
     anchor = ((anchor === "")
-      ? "_" + $("select[name='anchor_position'] option:selected").val()
+      ? "_" + anchorSelect.find("option:selected").val()
       : anchor);
     // Massage the custom anchor position value.
-    toggleAnchorSelectElement(hero_style);
-    var disabled_anchor = ($("#edit-anchor-position").prop("disabled") ? true
-      : false);
+    toggleAnchorSelectElement(hero_style, anchorSelect);
+    var disabled_anchor = anchorSelect.prop("disabled") ? true : false;
     // Don't add suffix if anchor is center or anchor select is disabled.
     anchor = ((anchor === "_center" || disabled_anchor) ? ""
       : anchor);
@@ -471,14 +438,14 @@
    *
    * @param {string} hero_style The current hero style.
    */
-  function toggleAnchorSelectElement(hero_style) {
+  function toggleAnchorSelectElement(hero_style, anchorSelect) {
     if (hero_style === "default" || hero_style === "moody_hero"
       || hero_style === "moody_hero_4"
       || hero_style === "moody_hero_6_short") {
-      $("#edit-anchor-position").prop("disabled", true);
+      anchorSelect.prop("disabled", true);
     } else {
-      $("#edit-anchor-position").removeAttr("disabled");
+      anchorSelect.removeAttr("disabled");
     }
   }
 
-})(jQuery, Drupal, drupalSettings);
+})(jQuery, Drupal, drupalSettings, once);
