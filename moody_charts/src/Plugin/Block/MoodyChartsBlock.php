@@ -116,7 +116,7 @@ final class MoodyChartsBlock extends BlockBase implements ContainerFactoryPlugin
       '#type'          => 'textarea',
       '#title'         => $this->t('Paste CSV data'),
       '#description'   => $this->t(
-        'Paste comma-separated values. The first row is used as labels; each subsequent row is a dataset. Example:<br><code>Month,Jan,Feb,Mar<br>Sales,10,20,30<br>Returns,2,4,6</code>'
+        'Paste comma-separated values. The first row contains dataset names (first cell is ignored). Each subsequent row starts with an x-axis label followed by values. Example:<br><code>Label,Sales,Returns<br>Jan,10,2<br>Feb,20,4<br>Mar,30,6</code>'
       ),
       '#rows'          => 8,
       '#default_value' => '',
