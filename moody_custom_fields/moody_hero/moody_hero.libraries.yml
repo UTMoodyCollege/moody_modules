@@ -56,6 +56,9 @@ hero_formatters_split:
   version: 1.x
   js:
     js/hero-formatters-split.js: {}
+  css:
+    component:
+      css/hero-form-preview.css: {}
 hero-style-6-short:
   version: 1.x
   css:

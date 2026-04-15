@@ -1,4 +1,4 @@
-(function ($, Drupal) {
+(function ($, Drupal, drupalSettings) {
   "use strict";
 
   /**
@@ -13,7 +13,39 @@
    * modifies the now hidden original select element. Drupal then saves
    * things as it normally would. This is purely a user facing change,
    * not a data storage change.
+   *
+   * A visual preview carousel is also rendered above the custom selects so
+   * editors can see a thumbnail for each hero style. Preview images are loaded
+   * from {module}/preview-images/{style_value}.jpg and fall back gracefully to
+   * a labelled placeholder when no image file exists yet.
    */
+
+  /**
+   * Ordered list of base hero styles shown in the preview carousel.
+   * Each entry maps to an option in the hero_style custom select and to a
+   * preview image at {modulePath}/preview-images/{value}.jpg.
+   */
+  var CAROUSEL_STYLES = [
+    { value: 'default',          label: 'Default' },
+    { value: 'moody_hero_1',     label: 'Style 1' },
+    { value: 'moody_hero_2',     label: 'Style 2' },
+    { value: 'moody_hero_3',     label: 'Style 3' },
+    { value: 'moody_hero_4',     label: 'Style 4' },
+    { value: 'moody_hero_5',     label: 'Style 5' },
+    { value: 'moody_hero_6',     label: 'Style 6' },
+    { value: 'moody_hero_6_short', label: 'Style 6 Short' },
+    { value: 'moody_hero_7',     label: 'Style 7' },
+    { value: 'moody_hero_8',     label: 'Style 8' },
+  ];
+
+  /** Valid anchor suffixes (excludes style-name suffixes such as "_short"). */
+  var ANCHOR_VALUES = ['left', 'right'];
+
+  /** Number of carousel cards visible at one time. */
+  var CARDS_VISIBLE = 3;
+
+  /** Current scroll offset (index of first visible card). */
+  var carouselOffset = 0;
 
   /**
    * Define a Drupal behavior to create custom hero select elements.
@@ -56,7 +88,8 @@
       // style and anchor position.
       var style_and_anchor = getStyleAndAnchorValue(default_style);
 
-      // 2. Create custom select HTML elements if not already present.
+      // 2. Create custom select HTML elements and preview carousel if not
+      // already present.
       createSelectors(form_mode_dom);
 
       // 3. Set values of custom select HTML elements.
@@ -78,6 +111,13 @@
       // Toggle anchor select element if current hero don't use anchor.
       toggleAnchorSelectElement(default_style);
 
+      // Sync the carousel to highlight the active card and scroll it into view.
+      var carousel_style = (default_style === "moody_hero" ? "default"
+        : default_style);
+      syncCarouselActiveCard(carousel_style);
+      scrollCarouselToActive(carousel_style);
+      updateCarouselNavButtons();
+
       // 4. Watch for changes on the custom select elements, and keep
       // the original select element in sync.
 
@@ -93,6 +133,11 @@
             : $("select[name='hero_style'] option:selected").val());
         });
         updateSelectors(original_select_element, "", hero_style);
+        // Keep carousel in sync with the text select.
+        var carousel_val = (hero_style === "moody_hero" ? "default" : hero_style);
+        syncCarouselActiveCard(carousel_val);
+        scrollCarouselToActive(carousel_val);
+        updateCarouselNavButtons();
       });
 
       // Watch the hero anchor custom select element.
@@ -110,7 +155,10 @@
 
 
   /**
-   * Create the custom select HTML elements and appends them to the form.
+   * Create the custom select HTML elements and preview carousel, and append
+   * them to the form. The carousel is inserted first so it appears at the
+   * top of the hero settings area.
+   *
    * @param {string} form_mode_dom The parent element where we create and set
    *     the new selectors into.
    */
@@ -146,6 +194,9 @@
           <option value="moody_hero_6">
             Style 6: Taller image with extra bold headline, subheadline, call-to-action, text color and overlay options.
           </option>
+          <option value="moody_hero_6_short">
+            Style 6 Short: Short image and extra bold headline
+          </option>
           <option value="moody_hero_7">
             Style 7: Taller image with extra bold headline and configurable text color, overlay and text position
           </option>
@@ -178,13 +229,145 @@
         .find("select option[value=moody_hero_1_left]").length) {
         // Validate custom selectors exist and create them if they don't.
         if ($("#edit-hero-style").length === 0) {
-          $(form_mode_dom).after(anchor_position_selector)
-            .after(hero_style_selector);
+          var carousel_html = buildCarouselHtml();
+          $(form_mode_dom)
+            .after(anchor_position_selector)
+            .after(hero_style_selector)
+            .after(carousel_html);
           // Hide the original selector after appending the custom ones.
           $(form_mode_dom).hide();
+          // Bind carousel navigation and card-click events.
+          bindCarouselEvents();
         }
       }
     });
+  }
+
+  /**
+   * Build the HTML string for the preview carousel.
+   *
+   * @return {string} The carousel HTML.
+   */
+  function buildCarouselHtml() {
+    var module_path = (drupalSettings.moodyHero && drupalSettings.moodyHero.modulePath)
+      ? drupalSettings.moodyHero.modulePath
+      : '';
+
+    var cards_html = '';
+    for (var i = 0; i < CAROUSEL_STYLES.length; i++) {
+      var style = CAROUSEL_STYLES[i];
+      var img_src = module_path + '/preview-images/' + style.value + '.jpg';
+      cards_html +=
+        '<div class="moody-hero-carousel-card" data-style="' + style.value + '">' +
+          '<div class="card-image">' +
+            '<img src="' + img_src + '" alt="' + style.label + ' preview"' +
+              ' onload="this.nextElementSibling.style.display=\'none\'"' +
+              ' onerror="this.style.display=\'none\'">' +
+            '<div class="card-placeholder">(preview image)</div>' +
+          '</div>' +
+          '<div class="card-label">' + style.label + '</div>' +
+        '</div>';
+    }
+
+    return '<div class="moody-hero-preview-carousel">' +
+        '<button type="button" class="moody-hero-carousel-nav moody-hero-carousel-prev"' +
+          ' aria-label="Previous styles">&#8592;</button>' +
+        '<div class="moody-hero-carousel-track-wrapper">' +
+          '<div class="moody-hero-carousel-track">' + cards_html + '</div>' +
+        '</div>' +
+        '<button type="button" class="moody-hero-carousel-nav moody-hero-carousel-next"' +
+          ' aria-label="Next styles">&#8594;</button>' +
+      '</div>';
+  }
+
+  /**
+   * Bind click events to the carousel navigation buttons and cards.
+   * Called once immediately after the carousel is inserted into the DOM.
+   */
+  function bindCarouselEvents() {
+    // Card click — select that hero style.
+    $(document).on('click', '.moody-hero-carousel-card', function () {
+      var style_value = $(this).data('style');
+      $("select[name='hero_style']").val(style_value).trigger('change');
+    });
+
+    // Previous button.
+    $(document).on('click', '.moody-hero-carousel-prev', function () {
+      if (carouselOffset > 0) {
+        carouselOffset--;
+        updateCarouselTransform();
+        updateCarouselNavButtons();
+      }
+    });
+
+    // Next button.
+    $(document).on('click', '.moody-hero-carousel-next', function () {
+      var max_offset = CAROUSEL_STYLES.length - CARDS_VISIBLE;
+      if (carouselOffset < max_offset) {
+        carouselOffset++;
+        updateCarouselTransform();
+        updateCarouselNavButtons();
+      }
+    });
+  }
+
+  /**
+   * Highlight the carousel card that corresponds to the given style value.
+   *
+   * @param {string} style_value The base hero style value (no anchor suffix).
+   */
+  function syncCarouselActiveCard(style_value) {
+    $('.moody-hero-carousel-card').removeClass('is-active');
+    $('.moody-hero-carousel-card[data-style="' + style_value + '"]')
+      .addClass('is-active');
+  }
+
+  /**
+   * Shift the carousel track so the active card is visible.
+   *
+   * @param {string} style_value The base hero style value.
+   */
+  function scrollCarouselToActive(style_value) {
+    var active_index = findStyleIndex(style_value);
+    var max_offset = CAROUSEL_STYLES.length - CARDS_VISIBLE;
+    // Try to centre the active card in the visible window.
+    var desired = active_index - Math.floor(CARDS_VISIBLE / 2);
+    carouselOffset = Math.max(0, Math.min(desired, max_offset));
+    updateCarouselTransform();
+  }
+
+  /**
+   * Apply CSS transform to slide the carousel track to the current offset.
+   */
+  function updateCarouselTransform() {
+    var offset_pct = -(carouselOffset * (100 / CARDS_VISIBLE));
+    $('.moody-hero-carousel-track')
+      .css('transform', 'translateX(' + offset_pct + '%)');
+  }
+
+  /**
+   * Enable or disable the carousel navigation buttons based on the current
+   * offset and the total number of cards.
+   */
+  function updateCarouselNavButtons() {
+    var max_offset = CAROUSEL_STYLES.length - CARDS_VISIBLE;
+    $('.moody-hero-carousel-prev').prop('disabled', carouselOffset <= 0);
+    $('.moody-hero-carousel-next').prop('disabled', carouselOffset >= max_offset);
+  }
+
+  /**
+   * Return the index of a style value in CAROUSEL_STYLES, or 0 if not found.
+   *
+   * @param {string} style_value
+   * @return {number}
+   */
+  function findStyleIndex(style_value) {
+    for (var i = 0; i < CAROUSEL_STYLES.length; i++) {
+      if (CAROUSEL_STYLES[i].value === style_value) {
+        return i;
+      }
+    }
+    return 0;
   }
 
   /**
@@ -248,44 +431,54 @@
   }
 
   /**
-   * Return the current style and anchor values from the default Drupal
-   * select element.
+   * Return the current base style and anchor values from the default Drupal
+   * select element value.
    *
-   * @param {string} default_style Should contain
-   *    a value similar to "moody_hero_X_[anchor]" where X is a number that
-   *    defines the style number to select in the custom hero style selector.
-   *    And an optional anchor that defines the value of the anchor selector.
-   * @return {array} The style and anchor settings.
+   * Anchor suffixes are strictly "_left" or "_right". Any other trailing
+   * segment (e.g. "_short" in "moody_hero_6_short") is treated as part of
+   * the style name, not as an anchor.
+   *
+   * @param {string} default_style Should contain a value similar to
+   *    "moody_hero_X[_anchor]" where X identifies the style and the optional
+   *    anchor is "left" or "right".
+   * @return {object} An object with "style" and "anchor" properties.
    */
   function getStyleAndAnchorValue(default_style) {
     // Split and return an array.
     var default_style_split = default_style.split("moody_hero_");
-    // Will return the style and anchor if found, e.g. ['1', 'left'],
-    // or 'moody_hero'.
-    var style_and_anchor = (default_style_split[1] !== undefined
+    // Will return the style suffix after "moody_hero_", e.g. "1_left",
+    // "6_short", "7", or fall back to "moody_hero" when not split.
+    var style_suffix_parts = (default_style_split[1] !== undefined
       ? default_style_split[1].split("_")
-      : "moody_hero");
-    var anchorDefined = style_and_anchor[1] !== undefined;
+      : ["moody_hero"]);
+    // Only treat the last segment as an anchor if it is a known anchor value.
+    var last_segment = style_suffix_parts[style_suffix_parts.length - 1];
+    var anchorDefined = (style_suffix_parts.length > 1)
+      && (ANCHOR_VALUES.indexOf(last_segment) !== -1);
+    // Re-assemble the base style name (without anchor suffix when present).
+    var base_suffix = anchorDefined
+      ? style_suffix_parts.slice(0, -1).join("_")
+      : default_style_split[1];
     return {
-      "style": "moody_hero_" + style_and_anchor[0],
-      "anchor": (anchorDefined ? style_and_anchor[1]
-        : "center"),
+      "style": "moody_hero_" + base_suffix,
+      "anchor": anchorDefined ? last_segment : "center",
     };
   }
 
   /**
    * Toggle anchor select element state depending on selected hero style.
+   * Anchor positioning is irrelevant for Default, Style 4, and Style 6 Short.
    *
    * @param {string} hero_style The current hero style.
    */
   function toggleAnchorSelectElement(hero_style) {
-    // Disable anchor select element if using default or style 4.
     if (hero_style === "default" || hero_style === "moody_hero"
-      || hero_style === "moody_hero_4") {
+      || hero_style === "moody_hero_4"
+      || hero_style === "moody_hero_6_short") {
       $("#edit-anchor-position").prop("disabled", true);
     } else {
       $("#edit-anchor-position").removeAttr("disabled");
     }
   }
 
-})(jQuery, Drupal);
+})(jQuery, Drupal, drupalSettings);

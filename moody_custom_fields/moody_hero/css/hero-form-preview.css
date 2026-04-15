@@ -1,0 +1,156 @@
+/* =============================================================================
+   Moody Hero Form: Preview Carousel
+   ============================================================================= */
+
+.moody-hero-preview-carousel {
+  display: flex;
+  align-items: center;
+  background-color: #111;
+  border-radius: 8px;
+  padding: 16px 4px;
+  margin: 0 0 20px;
+}
+
+.moody-hero-carousel-track-wrapper {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.moody-hero-carousel-track {
+  display: flex;
+  transition: transform 0.35s ease;
+  will-change: transform;
+}
+
+.moody-hero-carousel-card {
+  flex: 0 0 33.3333%;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.moody-hero-carousel-card:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.moody-hero-carousel-card.is-active {
+  border-color: #fff;
+}
+
+/* Card image area — always shows placeholder until image loads */
+.moody-hero-carousel-card .card-image {
+  background-color: #222;
+  border: 2px solid #444;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  /* 3:2 aspect ratio */
+  padding-top: 66.6%;
+  margin-bottom: 8px;
+}
+
+.moody-hero-carousel-card .card-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Shown by default; hidden via JS once the image loads successfully */
+.moody-hero-carousel-card .card-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 11px;
+  text-align: center;
+  padding: 8px;
+  box-sizing: border-box;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.moody-hero-carousel-card .card-label {
+  color: #fff;
+  font-size: 13px;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 0 4px;
+}
+
+/* Navigation arrows */
+.moody-hero-carousel-nav {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 8px 10px;
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  line-height: 1;
+}
+
+.moody-hero-carousel-nav:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.moody-hero-carousel-nav:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* =============================================================================
+   Moody Hero Form: Modernized Select Elements
+   ============================================================================= */
+
+.js-form-item-hero-style select,
+.js-form-item-anchor-position select {
+  display: block;
+  width: 100%;
+  padding: 10px 40px 10px 14px;
+  font-size: 15px;
+  color: #222;
+  background-color: #fff;
+  border: 2px solid #00a651;
+  border-radius: 4px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* Chevron down icon in UT green */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath fill='%2300a651' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  cursor: pointer;
+  box-shadow: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  line-height: 1.5;
+}
+
+.js-form-item-hero-style select:focus,
+.js-form-item-anchor-position select:focus {
+  outline: none;
+  border-color: #007d3f;
+  box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.2);
+}
+
+.js-form-item-hero-style select:disabled,
+.js-form-item-anchor-position select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

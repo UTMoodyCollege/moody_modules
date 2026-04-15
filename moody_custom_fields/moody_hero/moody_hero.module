@@ -253,7 +253,9 @@ function _moody_hero_formatter_split_entity_type_validation(&$form) {
  * Helper function that creates the necessary form elements to pick a style.
  */
 function _add_new_moody_hero_image_form_elements($form, $entity_type) {
+  $module_path = \Drupal::service('extension.list.module')->getPath('moody_hero');
   $form['#attached']['library'][] = 'moody_hero/hero_formatters_split';
+  $form['#attached']['drupalSettings']['moodyHero']['modulePath'] = base_path() . $module_path;
   return $form;
 }
 
