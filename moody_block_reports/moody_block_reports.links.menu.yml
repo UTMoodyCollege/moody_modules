@@ -2,4 +2,6 @@ moody_block_reports.audit_form:
   title: 'Moody block reports'
   description: 'Audit Layout Builder block usage across Moody page types.'
   route_name: moody_block_reports.audit_form
+  menu_name: admin
   parent: system.admin_reports
+  weight: 50
