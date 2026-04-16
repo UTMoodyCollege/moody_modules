@@ -1,0 +1,61 @@
+/**
+ * @file
+ * Moody Charts — UT-branded chart container styles.
+ *
+ * UT brand colour reference:
+ *   Burnt Orange  #bf5700
+ *   Charcoal      #333f48
+ *   Bluebonnet    #005f86
+ *   Turtlepond    #579d42
+ *   Limestone     #d6d2c4
+ *   Tan           #cabfad
+ */
+
+.moody-chart-wrapper {
+  margin: 1.5rem 0;
+  font-family: inherit;
+}
+
+.moody-chart-title {
+  color: #333f48;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  border-left: 4px solid #bf5700;
+  padding-left: 0.75rem;
+}
+
+.moody-chart-canvas-container {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #d6d2c4;
+  border-radius: 4px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(51, 63, 72, 0.08);
+}
+
+.moody-chart-canvas {
+  display: block;
+  width: 100% !important;
+}
+
+/* Empty-state notice shown when no data has been configured yet */
+.moody-chart-empty {
+  color: #9cadb7;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+  border: 2px dashed #d6d2c4;
+  border-radius: 4px;
+}
+
+/* Responsive: full-width on narrow screens */
+@media (max-width: 767px) {
+  .moody-chart-canvas-container {
+    padding: 1rem;
+  }
+
+  .moody-chart-title {
+    font-size: 1.2rem;
+  }
+}

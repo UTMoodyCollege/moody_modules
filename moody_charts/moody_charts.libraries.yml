@@ -1,0 +1,16 @@
+chartjs:
+  version: 4.x
+  js:
+    js/chartjs/chart.umd.min.js: { minified: true }
+
+moody_charts:
+  version: 1.x
+  js:
+    js/moody-charts.js: {}
+  css:
+    theme:
+      css/moody-charts.css: {}
+  dependencies:
+    - moody_charts/chartjs
+    - core/drupal
+    - core/once

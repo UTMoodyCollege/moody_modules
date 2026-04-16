@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Template for a Moody Chart block.
+ *
+ * Available variables:
+ * - chart_id: Unique HTML id for the <canvas> element.
+ * - chart_type: Chart.js chart type string (bar, line, pie, etc.).
+ * - chart_data: JSON-encoded Chart.js data object.
+ * - chart_title: Optional plain-text title string.
+ * - options: JSON-encoded Chart.js options object.
+ */
+#}
+<div class="moody-chart-wrapper">
+  {% if chart_title %}
+    <h3 class="moody-chart-title">{{ chart_title }}</h3>
+  {% endif %}
+  <div class="moody-chart-canvas-container">
+    <canvas
+      id="{{ chart_id }}"
+      class="moody-chart-canvas"
+      data-chart-type="{{ chart_type }}"
+      data-chart-data="{{ chart_data }}"
+      data-chart-options="{{ options }}"
+      role="img"
+      aria-label="{{ chart_title ? chart_title : 'Chart' }}"
+    ></canvas>
+  </div>
+</div>
