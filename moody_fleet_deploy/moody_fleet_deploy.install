@@ -12,6 +12,8 @@ function moody_fleet_deploy_install() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
   _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
+  _moody_fleet_deploy_enable_moody_layout_builder_browser();
+  _moody_fleet_deploy_revert_moody_layout_builder_browser();
 }
 
 /**
@@ -37,6 +39,14 @@ function moody_fleet_deploy_update_9002() {
  */
 function moody_fleet_deploy_update_9003() {
   _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
+}
+
+/**
+ * Enable and revert the Moody Layout Builder Browser feature module.
+ */
+function moody_fleet_deploy_update_9004() {
+  _moody_fleet_deploy_enable_moody_layout_builder_browser();
+  _moody_fleet_deploy_revert_moody_layout_builder_browser();
 }
 
 /**
@@ -152,4 +162,30 @@ function _moody_fleet_deploy_enable_moody_text_styles_on_flex_html() {
   if ($updated) {
     $editor->set('settings.plugins.ckeditor5_style.styles', $styles)->save();
   }
+}
+
+/**
+ * Ensures the Moody Layout Builder Browser feature module is enabled.
+ */
+function _moody_fleet_deploy_enable_moody_layout_builder_browser() {
+  if (\Drupal::moduleHandler()->moduleExists('moody_layout_builder_browser')) {
+    return;
+  }
+
+  \Drupal::service('module_installer')->install(['moody_layout_builder_browser'], TRUE);
+}
+
+/**
+ * Imports and reverts config from the Moody Layout Builder Browser feature.
+ */
+function _moody_fleet_deploy_revert_moody_layout_builder_browser() {
+  if (!\Drupal::moduleHandler()->moduleExists('moody_layout_builder_browser')) {
+    return;
+  }
+
+  if (!\Drupal::moduleHandler()->moduleExists('features')) {
+    return;
+  }
+
+  \Drupal::service('features.manager')->import(['moody_layout_builder_browser']);
 }
