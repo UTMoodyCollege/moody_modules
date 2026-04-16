@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: basic_block
+block_id: 'inline_block:basic'
+category: moody_site_building
+label: 'Basic block'
+image_path: /themes/custom/moody/moody_components_images/basic_block.jpg
+image_alt: 'Basic Block Image'
+weight: -9

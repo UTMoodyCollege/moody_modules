@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: image_gallery
+block_id: moody_image_gallery_block
+category: moody_site_building
+label: 'Image Gallery'
+image_path: ''
+image_alt: ''
+weight: 4

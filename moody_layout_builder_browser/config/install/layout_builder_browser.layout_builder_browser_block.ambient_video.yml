@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: ambient_video
+block_id: 'inline_block:ambient_video'
+category: moody_site_building
+label: 'Ambient Video'
+image_path: ''
+image_alt: ''
+weight: 6

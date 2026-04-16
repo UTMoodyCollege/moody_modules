@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: promotion
+block_id: 'inline_block:moody_promotion'
+category: moody_site_building
+label: Promotion
+image_path: /themes/custom/moody/moody_components_images/promotion.jpg
+image_alt: Promotion
+weight: -1

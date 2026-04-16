@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: impact_facts
+block_id: 'inline_block:moody_impact_facts'
+category: moody_site_building
+label: 'Impact Facts'
+image_path: /themes/custom/moody/moody_components_images/impact_facts.jpg
+image_alt: 'Impact Facts'
+weight: 3

@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: flex_content_area
+block_id: 'inline_block:utexas_flex_content_area'
+category: moody_site_building
+label: 'Flex Content Area'
+image_path: /themes/custom/moody/moody_components_images/fca.jpg
+image_alt: 'Flex Content Area'
+weight: -3

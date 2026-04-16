@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: chart
+block_id: moody_charts_block
+category: specialty_blocks
+label: Chart
+image_path: ''
+image_alt: ''
+weight: -100

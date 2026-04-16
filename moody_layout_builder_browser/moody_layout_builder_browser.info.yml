@@ -1,0 +1,5 @@
+name: 'Moody Layout Builder Browser'
+type: module
+core_version_requirement: '^10 || ^11'
+dependencies:
+  - 'layout_builder_browser:layout_builder_browser'

@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: flipbook
+block_id: moody_flipbook_example
+category: specialty_blocks
+label: Flipbook
+image_path: ''
+image_alt: ''
+weight: -7

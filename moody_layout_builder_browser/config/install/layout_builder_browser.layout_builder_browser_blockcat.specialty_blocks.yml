@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: specialty_blocks
+label: 'Specialty Blocks'
+weight: null
+opened: false
+image_path: ''
+image_alt: ''

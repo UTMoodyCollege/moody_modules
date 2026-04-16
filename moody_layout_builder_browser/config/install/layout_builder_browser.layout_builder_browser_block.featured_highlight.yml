@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: featured_highlight
+block_id: 'inline_block:utexas_featured_highlight'
+category: moody_site_building
+label: 'Featured Highlight'
+image_path: /themes/custom/moody/moody_components_images/fh.jpg
+image_alt: 'Featured Highlight'
+weight: -4

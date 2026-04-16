@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: hero
+block_id: 'inline_block:moody_hero'
+category: moody_site_building
+label: Hero
+image_path: /themes/custom/moody/moody_components_images/hero.jpg
+image_alt: 'Hero image'
+weight: -8

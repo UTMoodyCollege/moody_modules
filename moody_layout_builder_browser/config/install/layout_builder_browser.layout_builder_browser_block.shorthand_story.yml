@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: shorthand_story
+block_id: moody_shorthand_zip_shorthand_zip_story
+category: specialty_blocks
+label: 'Shorthand Story'
+image_path: ''
+image_alt: ''
+weight: -9

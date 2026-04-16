@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: showcase
+block_id: 'inline_block:moody_showcase'
+category: moody_site_building
+label: Showcase
+image_path: /themes/custom/moody/moody_components_images/showcase.jpg
+image_alt: ''
+weight: 1

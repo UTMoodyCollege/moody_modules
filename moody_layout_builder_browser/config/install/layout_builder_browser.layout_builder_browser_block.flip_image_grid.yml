@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: flip_image_grid
+block_id: moody_flip_things_flip_image_grid
+category: specialty_blocks
+label: 'Flip Image Grid'
+image_path: /themes/custom/moody/moody_components_images/flip-image-grid.png
+image_alt: 'Flip Image Grid example'
+weight: -8

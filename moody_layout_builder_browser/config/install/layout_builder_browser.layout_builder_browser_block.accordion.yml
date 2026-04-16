@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: accordion
+block_id: 'inline_block:moody_accordion'
+category: moody_site_building
+label: Accordion
+image_path: /themes/custom/moody/moody_components_images/accordion.jpg
+image_alt: 'An accordion widget'
+weight: -6
