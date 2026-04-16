@@ -97,10 +97,16 @@ class BlockUsageAudit {
             'label' => $this->resolveBlockLabel($plugin_id, $configuration),
             'source' => str_starts_with($plugin_id, 'inline_block:') ? 'Inline block' : 'Plugin block',
             'machine_name' => $this->resolveMachineName($plugin_id),
+            'view_modes' => [],
             'pages' => [],
             'usage_items' => [],
             'placements' => 0,
           ];
+        }
+
+        $view_mode = $this->resolveViewMode($plugin_id, $configuration);
+        if ($view_mode !== '') {
+          $usage['view_modes'][$view_mode] = $view_mode;
         }
 
         $usage['placements']++;
@@ -111,6 +117,7 @@ class BlockUsageAudit {
         ];
         $usage['usage_items'][] = [
           'instance_label' => $this->resolveInstanceLabel($plugin_id, $configuration),
+          'view_mode' => $view_mode,
           'nid' => (int) $node->id(),
           'title' => $node->label(),
           'bundle' => $this->getBundleLabel($node->bundle()),
@@ -146,6 +153,7 @@ class BlockUsageAudit {
         'label' => $block['label'],
         'source' => $block['source'],
         'machine_name' => $block['machine_name'],
+        'view_modes' => array_values($block['view_modes'] ?? []),
         'pages_count' => count($pages),
         'placements' => $block['placements'],
         'pages' => $pages,
@@ -317,6 +325,36 @@ class BlockUsageAudit {
     }
 
     return $plugin_id;
+  }
+
+  /**
+   * Resolves the configured formatter or view mode for a placement.
+   *
+   * @param string $plugin_id
+   *   The block plugin ID.
+   * @param array $configuration
+   *   The block configuration.
+   *
+   * @return string
+   *   The resolved view mode, or an empty string when not available.
+   */
+  protected function resolveViewMode($plugin_id, array $configuration) {
+    $candidates = [
+      $configuration['view_mode'] ?? NULL,
+      $configuration['settings']['view_mode'] ?? NULL,
+      $configuration['settings']['formatter']['type'] ?? NULL,
+    ];
+
+    foreach ($candidates as $candidate) {
+      if (is_string($candidate)) {
+        $candidate = trim($candidate);
+        if ($candidate !== '') {
+          return $candidate;
+        }
+      }
+    }
+
+    return '';
   }
 
   /**

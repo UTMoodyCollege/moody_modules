@@ -329,6 +329,7 @@ class BlockUsageAuditForm extends FormBase {
     foreach ($blocks as $block) {
       $plugin_id = (string) ($block['plugin_id'] ?? 'unknown');
       $source = (string) ($block['source'] ?? 'Unknown');
+      $view_modes = is_array($block['view_modes'] ?? NULL) ? array_values(array_filter($block['view_modes'])) : [];
       $pages_count = (int) ($block['pages_count'] ?? 0);
       $placements = (int) ($block['placements'] ?? 0);
       $usage_items = is_array($block['usage_items'] ?? NULL) ? $block['usage_items'] : [];
@@ -337,6 +338,7 @@ class BlockUsageAuditForm extends FormBase {
         foreach ($block['pages'] as $page) {
           $usage_items[] = [
             'instance_label' => (string) ($block['label'] ?? $plugin_id),
+            'view_mode' => '',
             'nid' => (int) ($page['nid'] ?? 0),
             'title' => (string) ($page['title'] ?? 'Untitled'),
             'bundle' => (string) ($page['bundle'] ?? 'Unknown'),
@@ -347,6 +349,7 @@ class BlockUsageAuditForm extends FormBase {
       $usage_links = [];
       foreach ($usage_items as $item) {
         $instance_label = trim((string) ($item['instance_label'] ?? $plugin_id));
+        $view_mode = trim((string) ($item['view_mode'] ?? ''));
         $title = (string) ($item['title'] ?? 'Untitled');
         $nid = (int) ($item['nid'] ?? 0);
         $bundle = (string) ($item['bundle'] ?? 'Unknown');
@@ -354,8 +357,12 @@ class BlockUsageAuditForm extends FormBase {
         $link = $nid > 0
           ? Link::createFromRoute($title, 'entity.node.canonical', ['node' => $nid])->toRenderable()
           : ['#plain_text' => $title];
+        $usage_prefix = Html::escape($instance_label);
+        if ($view_mode !== '') {
+          $usage_prefix .= ' [' . Html::escape($view_mode) . ']';
+        }
         $usage_links[] = [
-          '#markup' => Html::escape($instance_label) . ' - ',
+          '#markup' => $usage_prefix . ' - ',
           'link' => $link,
           'bundle' => [
             '#markup' => ' <span>(' . Html::escape($bundle) . ')</span>',
@@ -371,6 +378,7 @@ class BlockUsageAuditForm extends FormBase {
             ],
           ],
           ['data' => ['#plain_text' => $source]],
+          ['data' => ['#plain_text' => implode(', ', $view_modes)]],
           ['data' => ['#plain_text' => (string) $pages_count]],
           ['data' => ['#plain_text' => (string) $placements]],
           [
@@ -410,6 +418,10 @@ class BlockUsageAuditForm extends FormBase {
       $this->t('Block'),
       $this->t('Source'),
       [
+        'data' => $this->t('View mode'),
+        'field' => 'view_mode',
+      ],
+      [
         'data' => $this->t('Pages'),
         'field' => 'pages_count',
         'sort' => TableSort::DESC,
@@ -444,6 +456,7 @@ class BlockUsageAuditForm extends FormBase {
           (string) ($block['machine_name'] ?? ''),
           (string) ($block['plugin_id'] ?? ''),
           (string) ($block['source'] ?? ''),
+          (string) ($block['view_mode'] ?? ''),
         ]));
 
         return stripos($haystack, $filter) !== FALSE;
@@ -490,6 +503,8 @@ class BlockUsageAuditForm extends FormBase {
           'label' => (string) ($block['label'] ?? $plugin_id),
           'source' => (string) ($block['source'] ?? 'Unknown'),
           'machine_name' => (string) ($block['machine_name'] ?? $plugin_id),
+          'view_modes' => array_values(array_filter($block['view_modes'] ?? [])),
+          'view_mode' => implode(', ', array_values(array_filter($block['view_modes'] ?? []))),
           'pages_count' => 0,
           'placements' => 0,
           'pages' => [],
@@ -498,6 +513,12 @@ class BlockUsageAuditForm extends FormBase {
       }
 
       $merged[$plugin_id]['placements'] += (int) ($block['placements'] ?? 0);
+      foreach ((array) ($block['view_modes'] ?? []) as $view_mode) {
+        $view_mode = trim((string) $view_mode);
+        if ($view_mode !== '') {
+          $merged[$plugin_id]['view_modes'][] = $view_mode;
+        }
+      }
 
       foreach (($block['pages'] ?? []) as $page) {
         $nid = (int) ($page['nid'] ?? 0);
@@ -513,6 +534,7 @@ class BlockUsageAuditForm extends FormBase {
       foreach (($block['usage_items'] ?? []) as $item) {
         $merged[$plugin_id]['usage_items'][] = [
           'instance_label' => (string) ($item['instance_label'] ?? $merged[$plugin_id]['label']),
+          'view_mode' => (string) ($item['view_mode'] ?? ''),
           'nid' => (int) ($item['nid'] ?? 0),
           'title' => (string) ($item['title'] ?? 'Untitled'),
           'bundle' => (string) ($item['bundle'] ?? 'Unknown'),
@@ -522,6 +544,8 @@ class BlockUsageAuditForm extends FormBase {
 
     foreach ($merged as &$block) {
       $block['pages'] = array_values($block['pages']);
+      $block['view_modes'] = array_values(array_unique(array_filter($block['view_modes'] ?? [])));
+      $block['view_mode'] = implode(', ', $block['view_modes']);
       $block['pages_count'] = count($block['pages']);
 
       usort($block['pages'], static function (array $a, array $b) {
