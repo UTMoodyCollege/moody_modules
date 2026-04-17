@@ -67,13 +67,13 @@
             ease: 'none'
           },
           scrollTrigger: {
-            trigger: block,
+            trigger: viewport,
             start: 'top top',
             end: function () {
-              return '+=' + ((slides.length - 1) * window.innerHeight);
+              return '+=' + ((slides.length - 1) * viewport.offsetHeight);
             },
             scrub: 0.4,
-            pin: viewport,
+            pin: true,
             anticipatePin: 1,
             invalidateOnRefresh: true
           }
