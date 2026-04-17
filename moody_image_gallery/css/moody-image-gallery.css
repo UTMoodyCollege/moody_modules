@@ -1,8 +1,8 @@
 .moody-image-gallery {
   --moody-image-gallery-gap: 1.25rem;
   --moody-image-gallery-top-columns: minmax(0, 1.8fr) minmax(0, 1fr);
-  --moody-image-gallery-top-height: calc(clamp(9rem, 34vw, 15rem) / 4);
-  --moody-image-gallery-bottom-height: calc(clamp(15rem, 58vw, 28rem) / 4);
+  --moody-image-gallery-top-height: calc(clamp(9rem, 34vw, 15rem) / 3);
+  --moody-image-gallery-bottom-height: calc(clamp(15rem, 58vw, 28rem) / 3);
   margin: 0 auto;
 }
 
@@ -92,9 +92,16 @@
   transform: scale(1.03);
 }
 
+@media (max-width: 899px) {
+  .moody-image-gallery {
+    --moody-image-gallery-top-height: clamp(10rem, 48vw, 13rem);
+    --moody-image-gallery-bottom-height: clamp(8rem, 38vw, 11rem);
+  }
+}
+
 @media (min-width: 900px) {
   .moody-image-gallery {
-  --moody-image-gallery-top-height: calc(clamp(11rem, 16vw, 15rem) / 1);
+  --moody-image-gallery-top-height: calc(clamp(11rem, 16vw, 15rem) * 1.5);
   --moody-image-gallery-bottom-height: calc(clamp(16rem, 22vw, 26rem) / 1);
   }
 
