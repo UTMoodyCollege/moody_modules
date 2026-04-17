@@ -41,7 +41,24 @@ final class SectionComponentRenderSubscriber implements EventSubscriberInterface
 
     $event->getCacheableMetadata()->addCacheContexts(['user.permissions']);
 
-    if ($event->inPreview() || $this->currentUser->hasPermission('view unpublished layout builder blocks')) {
+    if ($event->inPreview()) {
+      $build = $event->getBuild();
+      $build['#attached']['library'][] = 'moody_block_publishing/layout_builder_preview';
+      $build['#attributes']['class'][] = 'moody-block-publishing--unpublished';
+      $build['content']['moody_block_publishing_badge'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#value' => 'Unpublished block',
+        '#attributes' => [
+          'class' => ['moody-block-publishing__badge'],
+        ],
+        '#weight' => -100,
+      ];
+      $event->setBuild($build);
+      return;
+    }
+
+    if ($this->currentUser->hasPermission('view unpublished layout builder blocks')) {
       return;
     }
 
