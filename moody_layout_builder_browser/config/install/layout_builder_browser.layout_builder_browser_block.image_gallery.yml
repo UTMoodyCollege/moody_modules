@@ -4,7 +4,7 @@ dependencies: {  }
 id: image_gallery
 block_id: moody_image_gallery_block
 category: moody_site_building
-label: 'Image Gallery'
+label: 'Moody Image Gallery'
 image_path: ''
 image_alt: ''
-weight: 4
+weight: 2

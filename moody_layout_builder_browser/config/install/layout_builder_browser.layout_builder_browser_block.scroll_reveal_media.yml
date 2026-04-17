@@ -4,7 +4,7 @@ dependencies: {  }
 id: scroll_reveal_media
 block_id: moody_scroll_reveal_media_block
 category: moody_site_building
-label: 'Scroll Reveal Media'
+label: 'Moody Scroll Reveal Media'
 image_path: ''
 image_alt: ''
 weight: 5

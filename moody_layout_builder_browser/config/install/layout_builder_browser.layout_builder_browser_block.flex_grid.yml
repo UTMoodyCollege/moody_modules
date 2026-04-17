@@ -4,7 +4,7 @@ dependencies: {  }
 id: flex_grid
 block_id: 'inline_block:moody_flex_grid'
 category: moody_site_building
-label: 'Flex Grid'
+label: 'Moody Flex Grid'
 image_path: /themes/custom/moody/moody_components_images/flex-grid-default.jpg
 image_alt: 'Flex Grid Default'
-weight: 2
+weight: 0

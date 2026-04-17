@@ -4,7 +4,7 @@ dependencies: {  }
 id: flex_color_blocks
 block_id: 'inline_block:moody_flex_color_blocks'
 category: moody_site_building
-label: 'Flex Color Blocks'
+label: 'Moody Flex Color Blocks'
 image_path: /themes/custom/moody/moody_components_images/flex_color_blocks.jpg
 image_alt: 'Flex Color Blocks'
-weight: -7
+weight: -1

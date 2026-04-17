@@ -4,7 +4,7 @@ dependencies: {  }
 id: contact_info
 block_id: 'inline_block:moody_contact_info'
 category: moody_site_building
-label: 'Contact Info'
+label: 'Moody Contact Info'
 image_path: /themes/custom/moody/moody_components_images/contact-info.jpg
 image_alt: ''
-weight: -5
+weight: -2

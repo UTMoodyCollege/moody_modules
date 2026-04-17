@@ -7,4 +7,4 @@ category: moody_site_building
 label: 'Promo Unit'
 image_path: /themes/custom/moody/moody_components_images/pu.jpg
 image_alt: 'Promo Unit'
-weight: 0
+weight: -5
