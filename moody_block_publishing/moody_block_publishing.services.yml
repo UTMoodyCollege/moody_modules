@@ -1,0 +1,7 @@
+services:
+  moody_block_publishing.section_component_subscriber:
+    class: Drupal\moody_block_publishing\EventSubscriber\SectionComponentRenderSubscriber
+    arguments:
+      - '@current_user'
+    tags:
+      - { name: event_subscriber }

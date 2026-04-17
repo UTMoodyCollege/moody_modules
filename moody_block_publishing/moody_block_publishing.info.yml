@@ -1,0 +1,7 @@
+name: Moody Block Publishing
+type: module
+description: Adds opt-in unpublished state for Layout Builder blocks.
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:layout_builder

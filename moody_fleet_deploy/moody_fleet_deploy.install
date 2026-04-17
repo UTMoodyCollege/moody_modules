@@ -12,6 +12,7 @@ function moody_fleet_deploy_install() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
   _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
+  _moody_fleet_deploy_enable_moody_block_publishing();
   _moody_fleet_deploy_enable_moody_media_image_helper();
   _moody_fleet_deploy_enable_moody_layout_builder_browser();
   _moody_fleet_deploy_revert_moody_layout_builder_browser();
@@ -55,6 +56,13 @@ function moody_fleet_deploy_update_9004() {
  */
 function moody_fleet_deploy_update_9005() {
   _moody_fleet_deploy_enable_moody_media_image_helper();
+}
+
+/**
+ * Ensures the Moody Block Publishing module is enabled.
+ */
+function moody_fleet_deploy_update_9006() {
+  _moody_fleet_deploy_enable_moody_block_publishing();
 }
 
 /**
@@ -192,6 +200,17 @@ function _moody_fleet_deploy_enable_moody_media_image_helper() {
   }
 
   \Drupal::service('module_installer')->install(['moody_media_image_helper'], TRUE);
+}
+
+/**
+ * Ensures the Moody Block Publishing module is enabled.
+ */
+function _moody_fleet_deploy_enable_moody_block_publishing() {
+  if (\Drupal::moduleHandler()->moduleExists('moody_block_publishing')) {
+    return;
+  }
+
+  \Drupal::service('module_installer')->install(['moody_block_publishing'], TRUE);
 }
 
 /**
