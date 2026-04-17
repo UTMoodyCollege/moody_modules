@@ -1,0 +1,113 @@
+.moody-media-image-helper__actions {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.moody-media-image-helper__actions .button {
+  margin-bottom: 0;
+  width: fit-content;
+}
+
+.moody-media-image-helper__meta {
+  color: #5f6b7a;
+  font-size: 0.85rem;
+}
+
+.moody-media-image-helper__source {
+  color: #5f6b7a;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.moody-media-image-helper__form {
+  min-width: min(92vw, 68rem);
+}
+
+.moody-media-image-helper__workspace {
+  display: grid;
+  gap: 1rem;
+}
+
+.moody-media-image-helper__stage {
+  background: linear-gradient(180deg, #f7f2ec 0%, #ece3d9 100%);
+  border: 1px solid #d3c4b1;
+  border-radius: 0.5rem;
+  cursor: crosshair;
+  overflow: hidden;
+  position: relative;
+}
+
+.moody-media-image-helper__image {
+  display: block;
+  height: auto;
+  max-height: 70vh;
+  width: 100%;
+}
+
+.moody-media-image-helper__selection {
+  border: 2px solid #bf5700;
+  box-shadow: 0 0 0 9999px rgba(20, 19, 23, 0.38);
+  cursor: move;
+  position: absolute;
+}
+
+.moody-media-image-helper__selection-label {
+  background: rgba(20, 19, 23, 0.85);
+  color: #fff;
+  font-size: 0.85rem;
+  left: 0.5rem;
+  padding: 0.2rem 0.45rem;
+  position: absolute;
+  top: 0.5rem;
+}
+
+.moody-media-image-helper__handle {
+  background: #fff;
+  border: 2px solid #bf5700;
+  border-radius: 999px;
+  height: 1rem;
+  position: absolute;
+  width: 1rem;
+}
+
+.moody-media-image-helper__handle--nw {
+  cursor: nwse-resize;
+  left: -0.5rem;
+  top: -0.5rem;
+}
+
+.moody-media-image-helper__handle--ne {
+  cursor: nesw-resize;
+  right: -0.5rem;
+  top: -0.5rem;
+}
+
+.moody-media-image-helper__handle--se {
+  bottom: -0.5rem;
+  cursor: nwse-resize;
+  right: -0.5rem;
+}
+
+.moody-media-image-helper__handle--sw {
+  bottom: -0.5rem;
+  cursor: nesw-resize;
+  left: -0.5rem;
+}
+
+.moody-media-image-helper__meta-panel {
+  background: #f7f2ec;
+  border: 1px solid #d3c4b1;
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem 1rem;
+}
+
+@media (min-width: 900px) {
+  .moody-media-image-helper__workspace {
+    grid-template-columns: minmax(0, 3fr) minmax(16rem, 1fr);
+    align-items: start;
+  }
+}

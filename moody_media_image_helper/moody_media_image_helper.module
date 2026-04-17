@@ -1,0 +1,234 @@
+<?php
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
+use Drupal\media\MediaInterface;
+
+/**
+ * Implements hook_form_alter().
+ */
+function moody_media_image_helper_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $form['#after_build'][] = 'moody_media_image_helper_form_after_build';
+}
+
+/**
+ * After-build callback to inject media helper actions after widget processing.
+ */
+function moody_media_image_helper_form_after_build(array $form, FormStateInterface $form_state): array {
+  $altered = _moody_media_image_helper_alter_element($form, []);
+  if ($altered) {
+    $form['#attached']['library'][] = 'moody_media_image_helper/media_helper';
+  }
+  return $form;
+}
+
+/**
+ * Recursively alters form elements that expose selected media items.
+ */
+function _moody_media_image_helper_alter_element(array &$element, array $parents): bool {
+  $altered = FALSE;
+
+  if (isset($element['selection']) && is_array($element['selection'])) {
+    $altered = _moody_media_image_helper_alter_selection_widget($element, $parents) || $altered;
+  }
+
+  foreach (Element::children($element) as $child_key) {
+    if (is_array($element[$child_key])) {
+      $child_parents = [...$parents, $child_key];
+      $altered = _moody_media_image_helper_alter_element($element[$child_key], $child_parents) || $altered;
+    }
+  }
+
+  return $altered;
+}
+
+/**
+ * Adds crop actions to selected media items in a widget-like element.
+ */
+function _moody_media_image_helper_alter_selection_widget(array &$element, array $parents): bool {
+  $crop_manager = \Drupal::service('moody_media_image_helper.crop_manager');
+  $widget_hash = substr(hash('sha256', implode(':', $parents)), 0, 10);
+  $widget_root_id = $element['#attributes']['id'] ?? Html::getId('moody-media-image-helper-widget-' . $widget_hash);
+  $element['#attributes']['id'] = $widget_root_id;
+
+  $selection_input_id = NULL;
+  if (isset($element['media_library_selection']['#attributes']) && is_array($element['media_library_selection']['#attributes'])) {
+    $selection_input_id = Html::getId($widget_root_id . '-selection');
+    $element['media_library_selection']['#attributes']['id'] = $selection_input_id;
+  }
+
+  $altered = FALSE;
+  foreach (Element::children($element['selection']) as $delta) {
+    $item =& $element['selection'][$delta];
+    $target_input =& _moody_media_image_helper_get_item_target_input($item);
+    $rendered_entity =& _moody_media_image_helper_get_item_rendered_entity($item);
+
+    if (empty($target_input) || !isset($target_input['#value']) || empty($rendered_entity)) {
+      continue;
+    }
+
+    $media_id = (int) $target_input['#value'];
+    if ($media_id <= 0) {
+      continue;
+    }
+
+    $media = \Drupal::entityTypeManager()->getStorage('media')->load($media_id);
+    if (!$media instanceof MediaInterface || !$crop_manager->supportsMedia($media)) {
+      continue;
+    }
+
+    $id_suffix = substr(hash('sha256', $widget_root_id . ':' . $delta . ':' . $media_id), 0, 10);
+    $target_input_id = Html::getId('moody-media-image-helper-target-' . $id_suffix);
+    $preview_wrapper_id = Html::getId('moody-media-image-helper-preview-' . $id_suffix);
+    $action_wrapper_id = Html::getId('moody-media-image-helper-action-' . $id_suffix);
+
+    $target_input['#attributes'] = $target_input['#attributes'] ?? [];
+    $target_input['#attributes']['id'] = $target_input_id;
+    $target_input['#attributes']['class'][] = 'moody-media-image-helper__target-input';
+
+    $existing_rendered_entity = $rendered_entity;
+    $rendered_entity = [
+      '#type' => 'container',
+      '#media' => $media,
+      '#attributes' => [
+        'id' => $preview_wrapper_id,
+        'class' => ['moody-media-image-helper__preview'],
+      ],
+      'content' => $existing_rendered_entity,
+      '#weight' => 5,
+    ];
+
+    $item['crop_action'] = moody_media_image_helper_build_crop_action(
+      $media,
+      $widget_root_id,
+      $selection_input_id,
+      $target_input_id,
+      $preview_wrapper_id,
+      $action_wrapper_id,
+    ) + [
+      '#weight' => 15,
+    ];
+
+    $altered = TRUE;
+  }
+
+  return $altered;
+}
+
+/**
+ * Returns a reference to a selected item's hidden target ID input.
+ */
+function &_moody_media_image_helper_get_item_target_input(array &$item): array {
+  if (isset($item['target_id'])) {
+    return $item['target_id'];
+  }
+
+  if (isset($item['preview']['target_id'])) {
+    return $item['preview']['target_id'];
+  }
+
+  $null = [];
+  return $null;
+}
+
+/**
+ * Returns a reference to a selected item's preview render array.
+ */
+function &_moody_media_image_helper_get_item_rendered_entity(array &$item): array {
+  if (isset($item['rendered_entity'])) {
+    return $item['rendered_entity'];
+  }
+
+  if (isset($item['preview']['rendered_entity'])) {
+    return $item['preview']['rendered_entity'];
+  }
+
+  $null = [];
+  return $null;
+}
+
+/**
+ * Builds the crop action link for a selected media item.
+ */
+function moody_media_image_helper_build_crop_action(
+  MediaInterface $media,
+  string $widget_root_id,
+  ?string $selection_input_id,
+  string $target_input_id,
+  string $preview_wrapper_id,
+  string $action_wrapper_id,
+): array {
+  $crop_manager = \Drupal::service('moody_media_image_helper.crop_manager');
+  $file_url_generator = \Drupal::service('file_url_generator');
+  $dimensions = $crop_manager->getImageDimensions($media);
+  $source_field = $crop_manager->getSourceFieldName($media);
+  $image_item = $source_field ? $media->get($source_field)->first() : NULL;
+  $source_file = $image_item && !empty($image_item->entity) ? $image_item->entity : NULL;
+  $source_uri = $source_file ? $source_file->getFileUri() : '';
+  $source_url = $source_file ? $file_url_generator->generateString($source_uri) : '';
+
+  $query = [
+    'widget_root_id' => $widget_root_id,
+    'selection_input_id' => $selection_input_id,
+    'target_input_id' => $target_input_id,
+    'preview_wrapper_id' => $preview_wrapper_id,
+    'action_wrapper_id' => $action_wrapper_id,
+  ];
+
+  return [
+    '#type' => 'container',
+    '#attributes' => [
+      'id' => $action_wrapper_id,
+      'class' => ['moody-media-image-helper__actions'],
+    ],
+    'link' => [
+      '#type' => 'link',
+      '#title' => t('Crop / Edit Image'),
+      '#url' => Url::fromRoute('moody_media_image_helper.crop_form', ['media' => $media->id()], ['query' => $query]),
+      '#attributes' => [
+        'class' => ['use-ajax', 'button', 'button--small', 'button--extrasmall'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => json_encode(['width' => 1120]),
+      ],
+    ],
+    'edit_original' => [
+      '#type' => 'link',
+      '#title' => t('Edit original media'),
+      '#url' => $media->toUrl('edit-form'),
+      '#attributes' => [
+        'class' => ['button', 'button--small', 'button--extrasmall', 'button--secondary'],
+        'target' => '_blank',
+        'rel' => 'noopener noreferrer',
+      ],
+    ],
+    'meta' => [
+      '#markup' => '<div class="moody-media-image-helper__meta">' . t('Original: @width × @height px', [
+        '@width' => $dimensions['width'],
+        '@height' => $dimensions['height'],
+      ]) . '</div>',
+    ],
+    'source_url' => [
+      '#markup' => $source_url !== ''
+        ? '<div class="moody-media-image-helper__source"><strong>' . t('Source file') . ':</strong> <a href="' . Html::escape($source_url) . '" target="_blank" rel="noopener noreferrer">' . Html::escape($source_url) . '</a></div>'
+        : '',
+    ],
+  ];
+}
+
+/**
+ * Builds a crop selection handle element.
+ */
+function moody_media_image_helper_build_handle(string $position): array {
+  return [
+    '#type' => 'container',
+    '#attributes' => [
+      'class' => [
+        'moody-media-image-helper__handle',
+        'moody-media-image-helper__handle--' . $position,
+      ],
+      'data-moody-media-helper-handle' => $position,
+    ],
+  ];
+}

@@ -1,0 +1,11 @@
+media_helper:
+  css:
+    component:
+      css/moody-media-image-helper.css: {}
+  js:
+    js/moody-media-image-helper.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.ajax
+    - core/drupal.dialog.ajax
+    - core/once

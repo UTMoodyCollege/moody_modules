@@ -1,0 +1,11 @@
+moody_media_image_helper.crop_form:
+  path: '/media/{media}/crop-edit'
+  defaults:
+    _form: '\Drupal\moody_media_image_helper\Form\MediaCropForm'
+    _title: 'Crop / Edit Image'
+  requirements:
+    _entity_access: 'media.update'
+  options:
+    parameters:
+      media:
+        type: entity:media

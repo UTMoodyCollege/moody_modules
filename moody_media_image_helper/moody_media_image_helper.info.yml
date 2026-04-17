@@ -1,0 +1,10 @@
+name: 'Moody Media Image Helper'
+type: module
+description: 'Adds inline crop and duplicate workflows for image media selections.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:image
+  - drupal:media
+  - drupal:media_library
+  - media_library_form_element:media_library_form_element

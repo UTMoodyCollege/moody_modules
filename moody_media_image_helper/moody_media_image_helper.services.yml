@@ -1,0 +1,8 @@
+services:
+  moody_media_image_helper.crop_manager:
+    class: Drupal\moody_media_image_helper\MediaCropManager
+    arguments:
+      - '@entity_type.manager'
+      - '@file_system'
+      - '@file.repository'
+      - '@image.factory'
