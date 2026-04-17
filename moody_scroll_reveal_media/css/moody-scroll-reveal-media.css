@@ -146,10 +146,12 @@
 
 .moody-scroll-reveal-media.is-enhanced .moody-scroll-reveal-media__viewport {
   min-height: 100svh;
+  overflow: hidden;
 }
 
 .moody-scroll-reveal-media.is-enhanced .moody-scroll-reveal-media__stage {
   min-height: 100svh;
+  overflow: hidden;
   position: relative;
 }
 

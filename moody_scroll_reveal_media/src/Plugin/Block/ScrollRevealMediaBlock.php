@@ -51,6 +51,7 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
   public function defaultConfiguration(): array {
     return [
       'headline' => '',
+      'animation_style' => 'fade',
       'slides' => [],
     ];
   }
@@ -67,6 +68,17 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
       '#title' => $this->t('Section headline'),
       '#description' => $this->t('Optional heading displayed above the pinned reveal block.'),
       '#default_value' => $config['headline'] ?? '',
+    ];
+
+    $form['animation_style'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Animation style'),
+      '#description' => $this->t('Choose whether the next slide fades in while moving, or slides in at full opacity.'),
+      '#options' => [
+        'fade' => $this->t('Fade'),
+        'slide' => $this->t('Slide'),
+      ],
+      '#default_value' => $this->normalizeAnimationStyle($config['animation_style'] ?? 'fade'),
     ];
 
     $form['slides'] = [
@@ -132,8 +144,9 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state): void {
-    $this->configuration['headline'] = $form_state->getValue('headline');
-    $this->configuration['slides'] = $form_state->getValue('slides');
+    $this->configuration['headline'] = (string) $this->getSubmittedSetting($form_state, 'headline', '');
+    $this->configuration['animation_style'] = $this->normalizeAnimationStyle((string) $this->getSubmittedSetting($form_state, 'animation_style', 'fade'));
+    $this->configuration['slides'] = $this->getSubmittedSetting($form_state, 'slides', []);
   }
 
   /**
@@ -181,11 +194,13 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
       return [];
     }
 
+    $animation_style = $this->normalizeAnimationStyle($config['animation_style'] ?? 'fade');
     $block_id = 'moody-scroll-reveal-media-' . substr(hash('sha256', serialize($slides)), 0, 10);
 
     return [
       '#theme' => 'moody_scroll_reveal_media',
       '#headline' => $config['headline'] ?? '',
+      '#animation_style' => $animation_style,
       '#slides' => $slides,
       '#block_id' => $block_id,
       '#attached' => [
@@ -201,6 +216,26 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
    */
   private function normalizeDirection(string $direction): string {
     return in_array($direction, ['top', 'right', 'bottom', 'left'], TRUE) ? $direction : 'right';
+  }
+
+  /**
+   * Retrieves a submitted block setting from the block form state.
+   */
+  private function getSubmittedSetting(FormStateInterface $form_state, string $key, mixed $default = NULL): mixed {
+    $settings_value = $form_state->getValue(['settings', $key]);
+    if ($settings_value !== NULL) {
+      return $settings_value;
+    }
+
+    $value = $form_state->getValue($key);
+    return $value !== NULL ? $value : $default;
+  }
+
+  /**
+   * Normalizes an animation style value.
+   */
+  private function normalizeAnimationStyle(string $animation_style): string {
+    return in_array($animation_style, ['fade', 'slide'], TRUE) ? $animation_style : 'fade';
   }
 
 }
