@@ -28,7 +28,12 @@ function moody_block_publishing_form_layout_builder_configure_block_alter(array 
     '#default_value' => $is_unpublished,
   ];
 
-  $form['actions']['submit']['#submit'][] = 'moody_block_publishing_layout_builder_block_submit';
+  if (!isset($form['#submit'])) {
+    $form['#submit'] = [];
+  }
+
+  // Run before Layout Builder persists the component configuration.
+  array_unshift($form['#submit'], 'moody_block_publishing_layout_builder_block_submit');
 }
 
 /**
@@ -42,5 +47,4 @@ function moody_block_publishing_layout_builder_block_submit(array &$form, FormSt
 
   $component = $form_object->getCurrentComponent();
   $component->set('moody_block_publishing_unpublished', (bool) $form_state->getValue(['moody_block_publishing', 'unpublished']));
-  \Drupal::service('layout_builder.tempstore_repository')->set($form_object->getSectionStorage());
 }
