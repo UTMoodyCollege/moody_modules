@@ -3,6 +3,20 @@ moody-flex-grid:
   css:
     theme:
       css/moody-flex-grid.css: {}
+
+flex_grid_view_mode_preview:
+  version: 1.x
+  js:
+    js/flex-grid-view-mode-preview.js: {}
+  css:
+    component:
+      css/flex-grid-form-preview.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+
 # moody-flex-grid-flip-card, which adds js/jquery.flip.min.js
 moody-flex-grid-flip-card:
   js:
