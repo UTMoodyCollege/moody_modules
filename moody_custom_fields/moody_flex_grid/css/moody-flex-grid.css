@@ -29,6 +29,21 @@
   margin-top: 1rem;
 }
 
+.moody-flex-grid-wrapper .mfg--button.mfg--button-align-left {
+  align-self: flex-start;
+  text-align: left;
+}
+
+.moody-flex-grid-wrapper .mfg--button.mfg--button-align-center {
+  align-self: center;
+  text-align: center;
+}
+
+.moody-flex-grid-wrapper .mfg--button.mfg--button-align-right {
+  align-self: flex-end;
+  text-align: right;
+}
+
 .flex-grid-wrapper.has-rounded-edges .flex-grid-item,
 .flex-grid-wrapper.has-rounded-edges .linked-flex-grid-item,
 .flex-grid-wrapper.has-rounded-edges .person-card,

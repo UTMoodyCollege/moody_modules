@@ -148,6 +148,7 @@ class MoodyFlexGridWidget extends WidgetBase {
           'copy' => $items[$i]['item']['copy'] ?? '',
           'link' => $items[$i]['item']['link'] ?? '',
           'link_button_text' => $items[$i]['item']['link_button_text'] ?? '',
+          'link_button_alignment' => $items[$i]['item']['link_button_alignment'] ?? 'left',
         ],
       ];
       // Weight column.
@@ -210,6 +211,7 @@ class MoodyFlexGridWidget extends WidgetBase {
           }
           if (!empty($elements['link_button_text']) && !empty($elements['link']['uri'])) {
             $storage[$delta]['flex_grid_items'][$weight]['item']['link_button_text'] = $elements['link_button_text'];
+            $storage[$delta]['flex_grid_items'][$weight]['item']['link_button_alignment'] = $elements['link_button_alignment'] ?? 'left';
           }
           // Remove empty items
           // (i.e., user has manually emptied the field contents).

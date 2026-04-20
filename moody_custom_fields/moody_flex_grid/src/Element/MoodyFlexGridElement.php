@@ -80,6 +80,21 @@ class MoodyFlexGridElement extends FormElementBase {
       '#default_value' => $element['#default_value']['link_button_text'] ?? '',
       '#description' => t('Optional. If provided and this item has a URL, a UT button will be shown using this text.'),
     ];
+    $element['link_button_alignment'] = [
+      '#type' => 'radios',
+      '#title' => t('Link Button Alignment'),
+      '#options' => [
+        'left' => t('Left'),
+        'center' => t('Center'),
+        'right' => t('Right'),
+      ],
+      '#default_value' => $element['#default_value']['link_button_alignment'] ?? 'left',
+      '#states' => [
+        'visible' => [
+          ':input[name$="[link_button_text]"]' => ['!value' => ''],
+        ],
+      ],
+    ];
     return $element;
   }
 

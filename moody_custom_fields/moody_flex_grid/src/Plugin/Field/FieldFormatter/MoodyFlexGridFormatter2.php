@@ -128,6 +128,7 @@ class MoodyFlexGridFormatter2 extends FormatterBase implements ContainerFactoryP
           }
           if (!empty($instance_item['link_button_text']) && !empty($instance_item['link']['uri'])) {
             $instances[$key]['link_button_text'] = $instance_item['link_button_text'];
+            $instances[$key]['link_button_alignment'] = $instance_item['link_button_alignment'] ?? 'left';
           }
         }
       }
