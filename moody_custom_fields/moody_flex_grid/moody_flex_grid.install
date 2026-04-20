@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for Moody Flex Grid.
+ */
+
+/**
+ * Adds rounded edge and overlay text settings to existing Flex Grid fields.
+ */
+function moody_flex_grid_update_11001() {
+  _moody_flex_grid_update_storage_tables();
+}
+
+/**
+ * Ensures all Flex Grid storage tables include the new setting columns.
+ */
+function moody_flex_grid_update_11002() {
+  _moody_flex_grid_update_storage_tables();
+}
+
+/**
+ * Adds Flex Grid settings columns to every physical storage table in use.
+ */
+function _moody_flex_grid_update_storage_tables() {
+  $schema = \Drupal::database()->schema();
+  $database = \Drupal::database();
+  $legacy_fields = [
+    'rounded_edges',
+    'overlay_text',
+  ];
+  $fields = [
+    'field_block_moody_flex_grid_rounded_edges' => [
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => FALSE,
+      'default' => 0,
+    ],
+    'field_block_moody_flex_grid_overlay_text' => [
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => FALSE,
+      'default' => 0,
+    ],
+  ];
+  $tables = $database->query("
+    SELECT DISTINCT TABLE_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND COLUMN_NAME = :headline_column
+  ", [
+    ':headline_column' => 'field_block_moody_flex_grid_headline',
+  ])->fetchCol();
+
+  foreach ($tables as $table) {
+    if (!$schema->tableExists($table)) {
+      continue;
+    }
+
+    foreach ($legacy_fields as $legacy_field) {
+      if ($schema->fieldExists($table, $legacy_field)) {
+        $schema->dropField($table, $legacy_field);
+      }
+    }
+
+    foreach ($fields as $field_name => $spec) {
+      if (!$schema->fieldExists($table, $field_name)) {
+        $schema->addField($table, $field_name, $spec);
+      }
+    }
+  }
+}

@@ -16,7 +16,14 @@
  */
 #}
 
-<div class="flex-grid-wrapper card-display">
+{% set wrapper_classes = [
+  'flex-grid-wrapper',
+  'card-display',
+  rounded_edges ? 'has-rounded-edges' : '',
+  overlay_text ? 'has-overlay-text' : '',
+] %}
+
+<div class="{{ wrapper_classes|join(' ')|trim }}">
   {% if headline %}
     <div class="row">
       <div class="col-12">
@@ -27,9 +34,11 @@
   {% if flex_grid_items %}
     <div class="flex-grid-items {{ style }}-columns">
       {% for item in flex_grid_items %}
-        <article class="flex-grid-item person-card">
-          <div class="bg-ut-burntorange" style="height: 10px;"></div>
-          {% if item.link %}
+        <article class="flex-grid-item person-card{{ overlay_text ? ' person-card--overlay' : '' }}">
+          {% if not overlay_text %}
+            <div class="bg-ut-burntorange" style="height: 10px;"></div>
+          {% endif %}
+          {% if item.link and not item.link_button_text and not overlay_text %}
             <a href="{{ item.link }}" class="person-card__link">
           {% endif %}
           <div class="mfg--image">
@@ -47,13 +56,21 @@
                 </div>
             {% endif %}
 
-            {% if item.link %}
+            {% if item.link and item.link_button_text %}
+              <div class="mfg--button">
+                <a href="{{ item.link }}" class="ut-btn">{{ item.link_button_text }}</a>
+              </div>
+            {% elseif item.link and not overlay_text %}
               <div class="mfg--link">
                 <a href="{{ item.link }}" class="text-ut-burntorange text-decoration-none ut-font-weight-bold">View<span aria-hidden="true">→</span></a>
               </div>
+            {% elseif item.link and overlay_text %}
+              <div class="mfg--button">
+                <a href="{{ item.link }}" class="ut-btn">View more</a>
+              </div>
             {% endif %}
           </div>
-          {% if item.link %}
+          {% if item.link and not item.link_button_text and not overlay_text %}
             </a>
           {% endif %}
         </article>

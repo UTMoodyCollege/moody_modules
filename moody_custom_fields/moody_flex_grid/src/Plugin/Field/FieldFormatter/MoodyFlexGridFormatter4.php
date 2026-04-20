@@ -126,6 +126,9 @@ class MoodyFlexGridFormatter4 extends FormatterBase implements ContainerFactoryP
             // $instances[$key]['link'] = UtexasLinkOptionsHelper::buildLink($instance_item, ['ut-link--darker']);
             $instances[$key]['link'] = Url::fromUri($instance_item['link']['uri']);
           }
+          if (!empty($instance_item['link_button_text']) && !empty($instance_item['link']['uri'])) {
+            $instances[$key]['link_button_text'] = $instance_item['link_button_text'];
+          }
         }
       }
 
@@ -133,6 +136,8 @@ class MoodyFlexGridFormatter4 extends FormatterBase implements ContainerFactoryP
         '#theme' => 'moody_flex_grid_rectangular',
         '#headline' => $item->headline,
         '#style' => $item->style,
+        '#rounded_edges' => !empty($item->rounded_edges),
+        '#overlay_text' => !empty($item->overlay_text),
         '#flex_grid_items' => $instances,
       ];
       $elements['#items'][$delta] = new \stdClass();

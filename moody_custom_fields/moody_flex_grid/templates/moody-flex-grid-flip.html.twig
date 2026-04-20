@@ -17,7 +17,15 @@
  */
 #}
 
-<div class="flex-grid-wrapper promo-display flip">
+{% set wrapper_classes = [
+  'flex-grid-wrapper',
+  'promo-display',
+  'flip',
+  rounded_edges ? 'has-rounded-edges' : '',
+  overlay_text ? 'has-overlay-text' : '',
+] %}
+
+<div class="{{ wrapper_classes|join(' ')|trim }}">
 	{% if headline %}
 		<div class="row">
 			<div class="col-12">
@@ -39,10 +47,23 @@
 						</div>
 					</div>
 					<div class="back">
-						<a class="mfg--text--promo" href="{{ item.link }}">
+						{% if item.link and not item.link_button_text %}
+							<a class="mfg--text--promo" href="{{ item.link }}">
+						{% else %}
+							<div class="mfg--text--promo">
+						{% endif %}
 							<h3 class="ut--headline text-{{ item.headline_alignment }}">{{ item.headline }}</h3>
 							<p>{{ item.copy }}</p>
-						</a>
+							{% if item.link and item.link_button_text %}
+								<div class="mfg--button">
+									<a href="{{ item.link }}" class="ut-btn">{{ item.link_button_text }}</a>
+								</div>
+							{% endif %}
+						{% if item.link and not item.link_button_text %}
+							</a>
+						{% else %}
+							</div>
+						{% endif %}
 					</div>
 				</div>
 

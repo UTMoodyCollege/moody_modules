@@ -40,6 +40,12 @@ class MoodyFlexGrid extends FieldItemBase {
     $properties['style'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Style value'))
       ->setRequired(FALSE);
+    $properties['rounded_edges'] = DataDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('Rounded edges'))
+      ->setRequired(FALSE);
+    $properties['overlay_text'] = DataDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('Overlay text'))
+      ->setRequired(FALSE);
     $properties['flex_grid_items'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Flex Grid Items'))
       ->setRequired(FALSE);
@@ -61,6 +67,18 @@ class MoodyFlexGrid extends FieldItemBase {
           'type' => 'varchar',
           'length' => 255,
           'binary' => FALSE,
+        ],
+        'rounded_edges' => [
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => FALSE,
+          'default' => 0,
+        ],
+        'overlay_text' => [
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => FALSE,
+          'default' => 0,
         ],
         'flex_grid_items' => [
           'type' => 'blob',

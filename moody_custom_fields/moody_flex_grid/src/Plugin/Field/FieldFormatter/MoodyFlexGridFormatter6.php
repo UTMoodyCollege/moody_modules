@@ -121,6 +121,9 @@ class MoodyFlexGridFormatter6 extends FormatterBase implements ContainerFactoryP
           if (!empty($instance_item['link']['uri'])) {
             $instances[$key]['link'] =   Url::fromUri($instance_item['link']['uri'], ['absolute' => TRUE]);
           }
+          if (!empty($instance_item['link_button_text']) && !empty($instance_item['link']['uri'])) {
+            $instances[$key]['link_button_text'] = $instance_item['link_button_text'];
+          }
           // copy
             if (!empty($instance_item['copy'])) {
               // Render as Markkup with the flex_html text format
@@ -138,6 +141,8 @@ class MoodyFlexGridFormatter6 extends FormatterBase implements ContainerFactoryP
         '#theme' => 'moody_flex_grid_card',
         '#headline' => $item->headline,
         '#style' => $item->style,
+        '#rounded_edges' => !empty($item->rounded_edges),
+        '#overlay_text' => !empty($item->overlay_text),
         '#flex_grid_items' => $instances,
       ];
       $elements['#items'][$delta] = new \stdClass();

@@ -45,6 +45,18 @@ class MoodyFlexGridWidget extends WidgetBase {
       ],
       '#default_value' => isset($items[$delta]->style) ? $items[$delta]->style : 'three',
     ];
+    $element['rounded_edges'] = [
+      '#title' => $this->t('Rounded Edges'),
+      '#type' => 'checkbox',
+      '#default_value' => !empty($items[$delta]->rounded_edges),
+      '#description' => $this->t('Apply rounded corners to the Flex Grid cards and media.'),
+    ];
+    $element['overlay_text'] = [
+      '#title' => $this->t('Overlay Text'),
+      '#type' => 'checkbox',
+      '#default_value' => !empty($items[$delta]->overlay_text),
+      '#description' => $this->t('Place the card text over the image with a gradient overlay. Best suited for image-forward layouts.'),
+    ];
     // Gather the number of items in the Moody Flex Grid.
     $items = !empty($items[$delta]->flex_grid_items) ? unserialize($items[$delta]->flex_grid_items) : [];
     // Ensure item keys are consecutive.
@@ -135,6 +147,7 @@ class MoodyFlexGridWidget extends WidgetBase {
           'headline_alignment' => $items[$i]['item']['headline_alignment'] ?? '',
           'copy' => $items[$i]['item']['copy'] ?? '',
           'link' => $items[$i]['item']['link'] ?? '',
+          'link_button_text' => $items[$i]['item']['link_button_text'] ?? '',
         ],
       ];
       // Weight column.
@@ -164,6 +177,12 @@ class MoodyFlexGridWidget extends WidgetBase {
         // The overall group style.
         $storage[$delta]['style'] = $field['style'];
       }
+      if (isset($field['rounded_edges'])) {
+        $storage[$delta]['rounded_edges'] = (int) !empty($field['rounded_edges']);
+      }
+      if (isset($field['overlay_text'])) {
+        $storage[$delta]['overlay_text'] = (int) !empty($field['overlay_text']);
+      }
       if (isset($field['flex_grid_items'])) {
         // Re-sort by the order provided by tabledrag.
         usort($field['flex_grid_items']['items'], function ($item1, $item2) {
@@ -188,6 +207,9 @@ class MoodyFlexGridWidget extends WidgetBase {
             $storage[$delta]['flex_grid_items'][$weight]['item']['link']['uri'] = $elements['link']['uri'];
             $storage[$delta]['flex_grid_items'][$weight]['item']['link']['title'] = $elements['link']['title'];
             $storage[$delta]['flex_grid_items'][$weight]['item']['link']['options'] = $elements['link']['options'];
+          }
+          if (!empty($elements['link_button_text']) && !empty($elements['link']['uri'])) {
+            $storage[$delta]['flex_grid_items'][$weight]['item']['link_button_text'] = $elements['link_button_text'];
           }
           // Remove empty items
           // (i.e., user has manually emptied the field contents).

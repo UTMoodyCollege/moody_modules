@@ -74,6 +74,12 @@ class MoodyFlexGridElement extends FormElementBase {
       '%external' => 'https://example.com',
       '%front' => '<front>',
     ]);
+    $element['link_button_text'] = [
+      '#type' => 'textfield',
+      '#title' => t('Link Button Text'),
+      '#default_value' => $element['#default_value']['link_button_text'] ?? '',
+      '#description' => t('Optional. If provided and this item has a URL, a UT button will be shown using this text.'),
+    ];
     return $element;
   }
 
