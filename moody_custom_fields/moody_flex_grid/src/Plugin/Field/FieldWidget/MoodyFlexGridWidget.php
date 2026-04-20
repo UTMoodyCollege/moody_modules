@@ -144,8 +144,10 @@ class MoodyFlexGridWidget extends WidgetBase {
         '#default_value' => [
           'image' => $items[$i]['item']['image'] ?? '',
           'headline' => $items[$i]['item']['headline'] ?? '',
+          'headline_color' => $items[$i]['item']['headline_color'] ?? '',
           'headline_alignment' => $items[$i]['item']['headline_alignment'] ?? '',
           'copy' => $items[$i]['item']['copy'] ?? '',
+          'copy_format' => $items[$i]['item']['copy_format'] ?? 'flex_html',
           'link' => $items[$i]['item']['link'] ?? '',
           'link_button_text' => $items[$i]['item']['link_button_text'] ?? '',
           'link_button_alignment' => $items[$i]['item']['link_button_alignment'] ?? 'left',
@@ -198,8 +200,12 @@ class MoodyFlexGridWidget extends WidgetBase {
           if (!empty($elements['headline'])) {
             $storage[$delta]['flex_grid_items'][$weight]['item']['headline'] = $elements['headline'];
           }
-          if (!empty($elements['copy'])) {
-            $storage[$delta]['flex_grid_items'][$weight]['item']['copy'] = $elements['copy'];
+          if (!empty($elements['headline_color'])) {
+            $storage[$delta]['flex_grid_items'][$weight]['item']['headline_color'] = $elements['headline_color'];
+          }
+          if (!empty($elements['copy']['value'])) {
+            $storage[$delta]['flex_grid_items'][$weight]['item']['copy'] = $elements['copy']['value'];
+            $storage[$delta]['flex_grid_items'][$weight]['item']['copy_format'] = $elements['copy']['format'] ?? 'flex_html';
           }
           if (!empty($elements['headline_alignment'])) {
             $storage[$delta]['flex_grid_items'][$weight]['item']['headline_alignment'] = $elements['headline_alignment'];
@@ -219,7 +225,7 @@ class MoodyFlexGridWidget extends WidgetBase {
             unset($storage[$delta]['flex_grid_items'][$weight]);
           }
           // If we *only* have the "headline_alignment" and EVERYTHING ELSE is empty, its a removal... so in othe words, if at this point we have an empty image, headline, copy, and link[uri], we should remove the item.
-          if (empty($elements['image']) && empty($elements['headline']) && empty($elements['copy']) && empty($elements['link']['uri'])) {
+          if (empty($elements['image']) && empty($elements['headline']) && empty($elements['copy']['value']) && empty($elements['link']['uri'])) {
             unset($storage[$delta]['flex_grid_items'][$weight]);
           }
         }

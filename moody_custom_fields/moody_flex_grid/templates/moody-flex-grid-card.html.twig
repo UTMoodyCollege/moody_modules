@@ -45,7 +45,7 @@
             {{ item.image }}
           </div>
           <div class="mfg--content">
-            <h3 class="ut--headline mt-3 mb-2 ut-font-weight-black">{{ item.headline }}</h3>
+            <h3 class="ut--headline mt-3 mb-2 ut-font-weight-black{{ item.headline_color ? ' mfg--headline-color-' ~ item.headline_color : '' }}">{{ item.headline }}</h3>
             {% if item.title %}
               <div class="mfg--title">{{ item.title }}</div>
             {% endif %}

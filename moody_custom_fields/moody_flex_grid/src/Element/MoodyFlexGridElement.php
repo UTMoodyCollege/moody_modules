@@ -45,6 +45,19 @@ class MoodyFlexGridElement extends FormElementBase {
       '#title' => t('Item Headline'),
       '#default_value' => isset($element['#default_value']['headline']) ? $element['#default_value']['headline'] : '',
     ];
+    $element['headline_color'] = [
+      '#type' => 'select',
+      '#title' => t('Headline Color'),
+      '#options' => [
+        '' => t('Default'),
+        'burnt-orange' => t('Burnt Orange'),
+        'charcoal' => t('Charcoal'),
+        'white' => t('White'),
+        'black' => t('Black'),
+      ],
+      '#default_value' => $element['#default_value']['headline_color'] ?? '',
+      '#description' => t('Optional. Restrict headline color to approved UT brand colors.'),
+    ];
     $element['headline_alignment'] = [
       '#title' => t('Headline text alignment'),
       '#type' => 'radios',
@@ -56,9 +69,10 @@ class MoodyFlexGridElement extends FormElementBase {
       '#default_value' => $element['#default_value']['headline_alignment'] ?? 'left',
     ];
     $element['copy'] = [
-      '#title' => 'Copy',
-      '#type' => 'textarea',
-      '#default_value' => isset($element['#default_value']['copy']) ? $element['#default_value']['copy'] : NULL,
+      '#title' => t('Copy'),
+      '#type' => 'text_format',
+      '#format' => $element['#default_value']['copy_format'] ?? 'flex_html',
+      '#default_value' => $element['#default_value']['copy'] ?? NULL,
     ];
     $element['link'] = [
       '#type' => 'utexas_link_options_element',

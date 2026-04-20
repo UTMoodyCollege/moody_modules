@@ -47,7 +47,7 @@
 						{% endif %}
 						<div class="content">
 							{% if item.headline %}
-								<h3 class="mfg--headline text-{{ item.headline_alignment }}">{{ item.headline }}</h3>
+								<h3 class="mfg--headline text-{{ item.headline_alignment }}{{ item.headline_color ? ' mfg--headline-color-' ~ item.headline_color : '' }}">{{ item.headline }}</h3>
 							{% endif %}
 							{% if item.copy %}
 								<div class="mfg--copy ut-copy text-{{ item.headline_alignment }}">
