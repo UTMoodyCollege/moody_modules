@@ -8,10 +8,43 @@
   <div class="moody-scroll-reveal-media__viewport" data-scroll-reveal-media>
     <div class="moody-scroll-reveal-media__stage">
       {% for slide in slides %}
-        <article class="moody-scroll-reveal-media__slide{{ not slide.has_content ? ' moody-scroll-reveal-media__slide--media-only' : '' }}" data-reveal-direction="{{ slide.direction }}" aria-label="Reveal step {{ loop.index }} of {{ slides|length }}">
+        <article class="moody-scroll-reveal-media__slide{{ not slide.has_content ? ' moody-scroll-reveal-media__slide--media-only' : '' }}{{ slide.has_overlay_title ? ' moody-scroll-reveal-media__slide--title-overlay' : '' }}" data-reveal-direction="{{ slide.direction }}" aria-label="Reveal step {{ loop.index }} of {{ slides|length }}">
           <div class="moody-scroll-reveal-media__media">
             <div class="moody-scroll-reveal-media__media-inner">
-              {{ slide.media }}
+              {% if slide.video %}
+                {% if slide.video.kind == 'file' %}
+                  <video
+                    class="moody-scroll-reveal-media__video"
+                    data-html5-video
+                    data-video-autoplay="{{ slide.video.autoplay ? 'true' : 'false' }}"
+                    id="{{ slide.video.player_id }}"
+                    {% if slide.video.autoplay %}autoplay muted loop playsinline{% else %}controls{% endif %}
+                    preload="metadata"
+                    title="{{ slide.video.title }}">
+                    <source src="{{ slide.video.src }}" type="video/mp4">
+                  </video>
+                {% else %}
+                  <iframe
+                    class="moody-scroll-reveal-media__video"
+                    data-vimeo-player
+                    data-video-autoplay="{{ slide.video.autoplay ? 'true' : 'false' }}"
+                    id="{{ slide.video.player_id }}"
+                    src="{{ slide.video.src }}"
+                    title="{{ slide.video.title }}"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    loading="lazy"
+                    frameborder="0"
+                    allowfullscreen></iframe>
+                {% endif %}
+              {% else %}
+                {{ slide.media }}
+              {% endif %}
+
+              {% if slide.has_overlay_title %}
+                <div class="moody-scroll-reveal-media__overlay moody-scroll-reveal-media__overlay--{{ slide.title_position }}">
+                  <h3 class="moody-scroll-reveal-media__title moody-scroll-reveal-media__title--overlay">{{ slide.title }}</h3>
+                </div>
+              {% endif %}
             </div>
           </div>
 
@@ -20,7 +53,7 @@
               {% if slide.eyebrow %}
                 <p class="moody-scroll-reveal-media__eyebrow">{{ slide.eyebrow }}</p>
               {% endif %}
-              {% if slide.title %}
+              {% if slide.title and slide.title_display != 'overlay' %}
                 <h3 class="moody-scroll-reveal-media__title">{{ slide.title }}</h3>
               {% endif %}
               {% if slide.body %}

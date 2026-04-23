@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\moody_scroll_reveal_media\Plugin\Block;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -98,10 +99,25 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
       $form['slides'][$i]['media'] = [
         '#type' => 'media_library',
         '#title' => $this->t('Media'),
-        '#description' => $this->t('Choose the media shown alongside this reveal step.'),
+        '#description' => $this->t('Choose the media shown alongside this reveal step. This is ignored when a Vimeo URL is provided below.'),
         '#allowed_bundles' => ['utexas_image', 'utexas_video_external'],
         '#cardinality' => 1,
         '#default_value' => $slide['media'] ?? NULL,
+      ];
+
+      $form['slides'][$i]['video_url'] = [
+        '#type' => 'url',
+        '#title' => $this->t('Vimeo video URL'),
+        '#description' => $this->t('Optional Vimeo URL to embed in place of the selected media for this slide.'),
+        '#default_value' => $slide['video_url'] ?? '',
+        '#placeholder' => 'https://vimeo.com/123456789',
+      ];
+
+      $form['slides'][$i]['video_autoplay'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Autoplay Vimeo video'),
+        '#description' => $this->t('When enabled, the video plays automatically while this slide is active.'),
+        '#default_value' => !empty($slide['video_autoplay']),
       ];
 
       $form['slides'][$i]['eyebrow'] = [
@@ -114,6 +130,34 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
         '#type' => 'textfield',
         '#title' => $this->t('Title'),
         '#default_value' => $slide['title'] ?? '',
+      ];
+
+      $form['slides'][$i]['title_display'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Title display'),
+        '#options' => [
+          'inline' => $this->t('Inline'),
+          'overlay' => $this->t('Overlay'),
+        ],
+        '#default_value' => $this->normalizeTitleDisplay((string) ($slide['title_display'] ?? 'inline')),
+      ];
+
+      $form['slides'][$i]['title_position'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Overlay position'),
+        '#description' => $this->t('Used when the title display is set to Overlay.'),
+        '#options' => [
+          'top-left' => $this->t('Top left'),
+          'top-center' => $this->t('Top center'),
+          'top-right' => $this->t('Top right'),
+          'center-left' => $this->t('Center left'),
+          'center' => $this->t('Center'),
+          'center-right' => $this->t('Center right'),
+          'bottom-left' => $this->t('Bottom left'),
+          'bottom-center' => $this->t('Bottom center'),
+          'bottom-right' => $this->t('Bottom right'),
+        ],
+        '#default_value' => $this->normalizeTitlePosition((string) ($slide['title_position'] ?? 'center')),
       ];
 
       $form['slides'][$i]['body'] = [
@@ -162,13 +206,20 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
       $eyebrow = trim((string) ($slide['eyebrow'] ?? ''));
       $title = trim((string) ($slide['title'] ?? ''));
       $body_value = trim((string) ($slide['body']['value'] ?? ''));
+      $video_url = trim((string) ($slide['video_url'] ?? ''));
+      $title_display = $this->normalizeTitleDisplay((string) ($slide['title_display'] ?? 'inline'));
+      $title_position = $this->normalizeTitlePosition((string) ($slide['title_position'] ?? 'center'));
+      $has_media_source = !empty($media_id) || $video_url !== '';
+      $video = $this->buildVideoSource($video_url, !empty($slide['video_autoplay']), $delta);
+      $has_overlay_title = $title !== '' && $title_display === 'overlay';
+      $has_inline_content = ($eyebrow !== '' || $body_value !== '' || ($title !== '' && !$has_overlay_title));
 
-      if (!$media_id && $eyebrow === '' && $title === '' && $body_value === '') {
+      if (!$has_media_source && $eyebrow === '' && $title === '' && $body_value === '') {
         continue;
       }
 
       $media_render = [];
-      if (!empty($media_id)) {
+      if ($video === [] && !empty($media_id)) {
         $media = $this->entityTypeManager->getStorage('media')->load($media_id);
         if ($media) {
           $media_render = $media_view_builder->view($media, 'default');
@@ -179,18 +230,22 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
         'delta' => $delta,
         'eyebrow' => $eyebrow,
         'title' => $title,
-        'has_content' => ($eyebrow !== '' || $title !== '' || $body_value !== ''),
+        'has_content' => $has_inline_content,
+        'has_overlay_title' => $has_overlay_title,
         'body' => [
           '#type' => 'processed_text',
           '#text' => $slide['body']['value'] ?? '',
           '#format' => $slide['body']['format'] ?? 'flex_html',
         ],
         'direction' => $this->normalizeDirection($slide['direction'] ?? 'right'),
+        'title_display' => $title_display,
+        'title_position' => $title_position,
         'media' => $media_render,
+        'video' => $video,
       ];
     }
 
-    if (count($slides) < 2) {
+    if (count($slides) < 1) {
       return [];
     }
 
@@ -236,6 +291,119 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
    */
   private function normalizeAnimationStyle(string $animation_style): string {
     return in_array($animation_style, ['fade', 'slide'], TRUE) ? $animation_style : 'fade';
+  }
+
+  /**
+   * Normalizes a title display value.
+   */
+  private function normalizeTitleDisplay(string $title_display): string {
+    return in_array($title_display, ['inline', 'overlay'], TRUE) ? $title_display : 'inline';
+  }
+
+  /**
+   * Normalizes an overlay title position value.
+   */
+  private function normalizeTitlePosition(string $title_position): string {
+    return in_array($title_position, [
+      'top-left',
+      'top-center',
+      'top-right',
+      'center-left',
+      'center',
+      'center-right',
+      'bottom-left',
+      'bottom-center',
+      'bottom-right',
+    ], TRUE) ? $title_position : 'center';
+  }
+
+  /**
+   * Builds Vimeo embed data for a slide.
+   */
+  private function buildVideoSource(string $video_url, bool $autoplay, int $delta): array {
+    if ($video_url === '' || !UrlHelper::isValid($video_url, TRUE)) {
+      return [];
+    }
+
+    if ($this->isDirectVideoUrl($video_url)) {
+      return [
+        'autoplay' => $autoplay,
+        'kind' => 'file',
+        'player_id' => 'moody-scroll-reveal-media-video-' . $delta,
+        'src' => $video_url,
+        'title' => $this->t('Embedded video for slide @number', ['@number' => $delta + 1]),
+      ];
+    }
+
+    $video_id = $this->extractVimeoVideoId($video_url);
+    if ($video_id === NULL) {
+      return [];
+    }
+
+    $query = [
+      'api' => '1',
+      'autopause' => '0',
+      'byline' => '0',
+      'controls' => $autoplay ? '0' : '1',
+      'dnt' => '1',
+      'loop' => $autoplay ? '1' : '0',
+      'muted' => $autoplay ? '1' : '0',
+      'portrait' => '0',
+      'title' => '0',
+    ];
+
+    if ($autoplay) {
+      $query['autoplay'] = '1';
+      $query['background'] = '1';
+    }
+
+    return [
+      'autoplay' => $autoplay,
+      'kind' => 'vimeo',
+      'player_id' => 'moody-scroll-reveal-media-video-' . $delta,
+      'src' => 'https://player.vimeo.com/video/' . $video_id . '?' . http_build_query($query),
+      'title' => $this->t('Embedded Vimeo video for slide @number', ['@number' => $delta + 1]),
+    ];
+  }
+
+  /**
+   * Determines whether a URL points directly to a video file.
+   */
+  private function isDirectVideoUrl(string $video_url): bool {
+    $path = strtolower((string) parse_url($video_url, PHP_URL_PATH));
+
+    return preg_match('/\.(mp4|m4v|webm|ogv|ogg|mov)$/', $path) === 1;
+  }
+
+  /**
+   * Extracts a Vimeo video id from a supported Vimeo URL.
+   */
+  private function extractVimeoVideoId(string $video_url): ?string {
+    $parts = parse_url($video_url);
+    $host = strtolower((string) ($parts['host'] ?? ''));
+
+    if ($host === '') {
+      return NULL;
+    }
+
+    if ($host !== 'vimeo.com' && !str_ends_with($host, '.vimeo.com')) {
+      return NULL;
+    }
+
+    $path = trim((string) ($parts['path'] ?? ''), '/');
+    if ($path === '') {
+      return NULL;
+    }
+
+    $segments = array_values(array_filter(explode('/', $path), static fn (string $segment): bool => $segment !== ''));
+
+    foreach (array_reverse($segments) as $segment) {
+      if (ctype_digit($segment)) {
+        return $segment;
+      }
+    }
+
+    return NULL;
   }
 
 }
