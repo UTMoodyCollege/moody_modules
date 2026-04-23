@@ -31,7 +31,7 @@
   display: grid;
   gap: var(--moody-scroll-reveal-media-gap);
   overflow: clip;
-  padding: clamp(1.25rem, 3vw, 2.5rem);
+  padding: 0;
 }
 
 .moody-scroll-reveal-media__media,
@@ -46,7 +46,6 @@
 
 .moody-scroll-reveal-media__media-inner {
   background: #d9d0c4;
-  border-radius: calc(var(--moody-scroll-reveal-media-radius) - 0.5rem);
   flex: 1 1 auto;
   min-height: 18rem;
   overflow: hidden;
@@ -149,6 +148,7 @@
   color: #233142;
   display: grid;
   gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
 }
 
 .moody-scroll-reveal-media__slide--media-only {
@@ -203,7 +203,6 @@
   .moody-scroll-reveal-media__slide {
     grid-template-columns: minmax(0, 1.1fr) minmax(22rem, 0.9fr);
     min-height: 100svh;
-    padding: clamp(2rem, 4vw, 3.5rem);
   }
 
   .moody-scroll-reveal-media__slide--media-only {
@@ -211,7 +210,7 @@
   }
 
   .moody-scroll-reveal-media__content {
-    padding-block: clamp(1rem, 2vw, 2rem);
+    padding: clamp(2rem, 4vw, 3.5rem);
   }
 
   .moody-scroll-reveal-media__media-inner {
