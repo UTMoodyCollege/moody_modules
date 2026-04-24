@@ -13,3 +13,8 @@ admin:
   css:
     theme:
       css/moody-image-gallery.admin.css: {}
+  js:
+    js/moody-image-gallery.admin.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

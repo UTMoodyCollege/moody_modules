@@ -8,7 +8,10 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\media\MediaInterface;
+use Drupal\Component\Utility\NestedArray;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -87,10 +90,12 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
     $form['items'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Gallery Images'),
-      '#description' => $this->t('Add up to 12 images. The layout repeats in a 60/40/full-width pattern on larger screens. Use the horizontal and vertical focus controls to choose the crop anchor for each image. Leave unused slots empty.'),
+      '#description' => $this->t('Add up to 12 images. The layout repeats in a 60/40/full-width pattern on larger screens. Drag the focal point marker to choose the crop anchor for each image. Leave unused slots empty.'),
     ];
 
     for ($i = 0; $i < 12; $i++) {
+      $item_config = $this->getCurrentItemConfig($form_state, $config['items'][$i] ?? [], $i);
+
       $form['items'][$i] = [
         '#type' => 'fieldset',
         '#title' => $this->t('Image @number', ['@number' => $i + 1]),
@@ -100,51 +105,61 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
         '#allowed_bundles' => ['utexas_image'],
         '#title' => $this->t('Image'),
         '#cardinality' => 1,
-        '#default_value' => $config['items'][$i]['media'] ?? NULL,
+        '#default_value' => $this->extractMediaId($item_config['media'] ?? NULL),
       ];
-      $preview_url = $this->getPreviewImageUrl($config['items'][$i]['media'] ?? NULL);
-      $focus_parts = $this->getFocusParts($config['items'][$i] ?? []);
+      $preview_url = $this->getPreviewImageUrl($this->extractMediaId($item_config['media'] ?? NULL));
+      $focus_parts = $this->getFocusParts($item_config);
       $form['items'][$i]['focus_preview'] = [
         '#type' => 'container',
         '#attributes' => [
           'class' => ['moody-image-gallery-focus-preview'],
+          'data-focus-picker' => 'true',
+          'tabindex' => '0',
+          'role' => 'slider',
+          'aria-label' => (string) $this->t('Image @number focal point', ['@number' => $i + 1]),
+          'aria-valuemin' => '0',
+          'aria-valuemax' => '100',
+          'aria-valuenow' => (string) round((float) rtrim($focus_parts['x'], '%')),
+          'aria-valuetext' => (string) $this->t('Horizontal @x percent, vertical @y percent', [
+            '@x' => rtrim($focus_parts['x'], '%'),
+            '@y' => rtrim($focus_parts['y'], '%'),
+          ]),
+          'data-focus-x' => $focus_parts['x'],
+          'data-focus-y' => $focus_parts['y'],
           'style' => $preview_url ? 'background-image:url(' . $preview_url . ');background-position:' . $focus_parts['x'] . ' ' . $focus_parts['y'] . ';' : 'background-image:none;',
+        ],
+        'marker' => [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#attributes' => [
+            'class' => ['moody-image-gallery-focus-preview__marker'],
+            'aria-hidden' => 'true',
+          ],
         ],
       ];
       $form['items'][$i]['focus_x'] = [
-        '#type' => 'radios',
-        '#title' => $this->t('Horizontal focus'),
+        '#type' => 'hidden',
         '#default_value' => $focus_parts['x'],
-        '#options' => [
-          '0%' => $this->t('Far left'),
-          '25%' => $this->t('Left'),
-          '50%' => $this->t('Center'),
-          '75%' => $this->t('Right'),
-          '100%' => $this->t('Far right'),
-        ],
         '#attributes' => [
-          'class' => ['moody-image-gallery-focus-radios'],
+          'class' => ['moody-image-gallery-focus-input', 'moody-image-gallery-focus-input--x'],
         ],
       ];
       $form['items'][$i]['focus_y'] = [
-        '#type' => 'radios',
-        '#title' => $this->t('Vertical focus'),
+        '#type' => 'hidden',
         '#default_value' => $focus_parts['y'],
-        '#options' => [
-          '0%' => $this->t('Top'),
-          '25%' => $this->t('Upper'),
-          '50%' => $this->t('Center'),
-          '75%' => $this->t('Lower'),
-          '100%' => $this->t('Bottom'),
-        ],
         '#attributes' => [
-          'class' => ['moody-image-gallery-focus-radios'],
+          'class' => ['moody-image-gallery-focus-input', 'moody-image-gallery-focus-input--y'],
         ],
+      ];
+      $form['items'][$i]['focus_help'] = [
+        '#type' => 'item',
+        '#title' => $this->t('Focus area'),
+        '#markup' => $this->t('Drag the marker, or use arrow keys while the image preview is focused.'),
       ];
       $form['items'][$i]['caption'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Optional caption'),
-        '#default_value' => $config['items'][$i]['caption'] ?? '',
+        '#default_value' => $item_config['caption'] ?? '',
       ];
     }
 
@@ -173,6 +188,7 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
         continue;
       }
 
+      /** @var \Drupal\media\MediaInterface|null $media */
       $media = $this->entityTypeManager->getStorage('media')->load($media_id);
       if (!$media || $media->bundle() !== 'utexas_image' || $media->get('field_utexas_media_image')->isEmpty()) {
         continue;
@@ -226,6 +242,7 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
       return '';
     }
 
+    /** @var \Drupal\media\MediaInterface|null $media */
     $media = $this->entityTypeManager->getStorage('media')->load($media_id);
     if (!$media || $media->bundle() !== 'utexas_image' || $media->get('field_utexas_media_image')->isEmpty()) {
       return '';
@@ -272,6 +289,46 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
       'x' => '50%',
       'y' => '50%',
     ];
+  }
+
+  /**
+   * Returns the current item config from form state when available.
+   */
+  private function getCurrentItemConfig(FormStateInterface $form_state, array $default_item, int $delta): array {
+    $complete_form_state = $form_state instanceof SubformStateInterface ? $form_state->getCompleteFormState() : $form_state;
+    $user_input = $complete_form_state->getUserInput();
+
+    foreach ([['settings', 'items', $delta], ['items', $delta]] as $path) {
+      $exists = FALSE;
+      $item = NestedArray::getValue($user_input, $path, $exists);
+
+      if ($exists && is_array($item)) {
+        return $item + $default_item;
+      }
+    }
+
+    return $default_item;
+  }
+
+  /**
+   * Extracts a media id from a block form item value.
+   */
+  private function extractMediaId(mixed $media_value): ?int {
+    if (is_numeric($media_value)) {
+      return (int) $media_value;
+    }
+
+    if (is_array($media_value)) {
+      if (isset($media_value[0]) && is_numeric($media_value[0])) {
+        return (int) $media_value[0];
+      }
+
+      if (isset($media_value['target_id']) && is_numeric($media_value['target_id'])) {
+        return (int) $media_value['target_id'];
+      }
+    }
+
+    return NULL;
   }
 
 }
