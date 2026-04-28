@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the moody_accordion module.
+ */
+
+/**
+ * Add block_id and block_config columns to support embedded blocks.
+ */
+function moody_accordion_update_9001() {
+  $database = \Drupal::database();
+  $schema = $database->schema();
+
+  $tables = [
+    'block_content__field_block_moody_accordion',
+    'block_content_revision__field_block_moody_accordion',
+  ];
+
+  $new_columns = [
+    'field_block_moody_accordion_block_id' => [
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => NULL,
+      'description' => 'Block plugin ID for embedded block accordion items.',
+    ],
+    'field_block_moody_accordion_block_config' => [
+      'type' => 'text',
+      'size' => 'normal',
+      'not null' => FALSE,
+      'description' => 'Serialized block configuration for embedded block accordion items.',
+    ],
+  ];
+
+  foreach ($tables as $table) {
+    if ($schema->tableExists($table)) {
+      foreach ($new_columns as $column => $spec) {
+        if (!$schema->fieldExists($table, $column)) {
+          $schema->addField($table, $column, $spec);
+        }
+      }
+    }
+  }
+
+  // Update the field storage definition to include the new columns.
+  /** @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $definition_update_manager */
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $storage_definition = $definition_update_manager->getFieldStorageDefinition(
+    'field_block_moody_accordion',
+    'block_content'
+  );
+  if ($storage_definition) {
+    $definition_update_manager->updateFieldStorageDefinition($storage_definition);
+  }
+}
