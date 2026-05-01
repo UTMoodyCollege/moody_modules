@@ -27,6 +27,31 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class MoodyFocusAreasFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
 
   /**
+   * Spacing preset CSS class names keyed by stored pixel values.
+   */
+  protected const GAP_PRESET_CLASSES = [
+    0 => 'gap-touching',
+    1 => 'gap-small',
+    2 => 'gap-medium',
+    3 => 'gap-max',
+  ];
+
+  /**
+   * Maps legacy stored values to stable preset codes.
+   */
+  protected const LEGACY_GAP_VALUES = [
+    0 => 0,
+    1 => 1,
+    2 => 2,
+    3 => 3,
+    10 => 1,
+    30 => 2,
+    50 => 1,
+    200 => 2,
+    400 => 3,
+  ];
+
+  /**
    * The entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -134,6 +159,7 @@ class MoodyFocusAreasFormatter extends FormatterBase implements ContainerFactory
         '#cta' => $cta,
         '#style' => $item->style,
         '#items_style' => $item->items_style,
+        '#items_gap_preset' => $this->resolveGapPresetClass($item->items_gap !== NULL ? max(0, (int) $item->items_gap) : 3),
         '#focus_areas_items_title' => $item->items_title,
         '#focus_areas_items' => $instances,
         '#wrapper' => '',
@@ -175,6 +201,34 @@ class MoodyFocusAreasFormatter extends FormatterBase implements ContainerFactory
       $this->renderer->addCacheableDependency($image_render_array, $file);
     }
     return $image_render_array;
+  }
+
+  /**
+   * Resolves an item gap value to the nearest preset class.
+   *
+   * @param int $gap
+   *   The stored gap value.
+   *
+   * @return string
+   *   The CSS class name for the nearest preset.
+   */
+  protected function resolveGapPresetClass($gap) {
+    if (isset(self::LEGACY_GAP_VALUES[$gap])) {
+      return self::GAP_PRESET_CLASSES[self::LEGACY_GAP_VALUES[$gap]];
+    }
+
+    $closest_gap = 3;
+    $smallest_difference = PHP_INT_MAX;
+
+    foreach (array_keys(self::GAP_PRESET_CLASSES) as $preset_gap) {
+      $difference = abs($gap - $preset_gap);
+      if ($difference < $smallest_difference) {
+        $closest_gap = $preset_gap;
+        $smallest_difference = $difference;
+      }
+    }
+
+    return self::GAP_PRESET_CLASSES[$closest_gap];
   }
 
 }

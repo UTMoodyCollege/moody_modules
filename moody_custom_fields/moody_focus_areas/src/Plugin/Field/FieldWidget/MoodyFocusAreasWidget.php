@@ -23,6 +23,50 @@ use Drupal\Core\Form\FormStateInterface;
 class MoodyFocusAreasWidget extends WidgetBase {
 
   /**
+   * Stable preset codes keyed by legacy or current stored values.
+   */
+  protected const GAP_VALUE_MAP = [
+    0 => 0,
+    1 => 1,
+    2 => 2,
+    3 => 3,
+    10 => 1,
+    30 => 2,
+    50 => 1,
+    200 => 2,
+    400 => 3,
+  ];
+
+  /**
+   * Preset spacing options in pixels.
+   *
+   * @return array
+   *   Spacing preset labels keyed by stored pixel values.
+   */
+  protected function getGapOptions() {
+    return [
+      0 => $this->t('Touching'),
+      1 => $this->t('Small amount of space between'),
+      2 => $this->t('Medium space between'),
+      3 => $this->t('Max space between'),
+    ];
+  }
+
+  /**
+   * Normalizes stored gap values to the current preset scale.
+   *
+   * @param int|null $gap
+   *   The stored gap value.
+   *
+   * @return int
+   *   A valid preset value.
+   */
+  protected function normalizeGapValue($gap) {
+    $gap = (int) $gap;
+    return self::GAP_VALUE_MAP[$gap] ?? 3;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
@@ -43,6 +87,14 @@ class MoodyFocusAreasWidget extends WidgetBase {
         'four-per-row' => 'Four items per row',
       ],
       '#default_value' => isset($items[$delta]->items_style) ? $items[$delta]->items_style : 'three-per-row',
+    ];
+
+    $element['items_gap'] = [
+      '#title' => $this->t('Space Between'),
+      '#type' => 'select',
+      '#options' => $this->getGapOptions(),
+      '#default_value' => isset($items[$delta]->items_gap) && $items[$delta]->items_gap !== NULL ? $this->normalizeGapValue($items[$delta]->items_gap) : 3,
+      '#description' => $this->t('Choose the spacing between focus area items.'),
     ];
 
     $element['cta'] = [
@@ -179,6 +231,10 @@ class MoodyFocusAreasWidget extends WidgetBase {
       if (isset($field['items_style'])) {
         // The overall group style.
         $storage[$delta]['items_style'] = $field['items_style'];
+      }
+      if (isset($field['items_gap']) && $field['items_gap'] !== '') {
+        // The gap between items.
+        $storage[$delta]['items_gap'] = max(0, (int) $field['items_gap']);
       }
       if (isset($field['items_title'])) {
         // The items title.
