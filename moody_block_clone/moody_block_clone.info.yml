@@ -1,0 +1,8 @@
+name: 'Moody Block Clone'
+type: module
+description: 'Adds a Layout Builder action to clone inline blocks from other published pages.'
+core_version_requirement: '^10 || ^11'
+dependencies:
+  - drupal:block_content
+  - drupal:layout_builder
+  - drupal:node

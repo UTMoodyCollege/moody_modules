@@ -1,0 +1,105 @@
+<?php
+
+declare(strict_types=1);
+
+use Drupal\Component\Serialization\Json;
+use Drupal\Core\Url;
+use Drupal\layout_builder\SectionStorageInterface;
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+function moody_block_clone_page_attachments_alter(array &$attachments): void {
+  $route_match = \Drupal::routeMatch();
+  if ($route_match->getRouteName() !== 'layout_builder.choose_block') {
+    return;
+  }
+
+  $section_storage = $route_match->getParameter('section_storage');
+  $delta = $route_match->getParameter('delta');
+  $region = $route_match->getParameter('region');
+
+  if (!$section_storage instanceof SectionStorageInterface || $delta === NULL || $region === NULL) {
+    return;
+  }
+
+  $attachments['#attached']['library'][] = 'moody_block_clone/chooser';
+  $attachments['#attached']['drupalSettings']['moodyBlockClone'] = [
+    'chooseUrl' => Url::fromRoute('moody_block_clone.choose', [
+      'section_storage_type' => $section_storage->getStorageType(),
+      'section_storage' => $section_storage->getStorageId(),
+      'delta' => $delta,
+      'region' => $region,
+    ])->toString(),
+  ];
+}
+
+/**
+ * Implements hook_layout_builder_browser_alter().
+ */
+function moody_block_clone_layout_builder_browser_alter(array &$build, array $context): void {
+  $section_storage = $context['section_storage'] ?? NULL;
+  $delta = $context['delta'] ?? NULL;
+  $region = $context['region'] ?? NULL;
+
+  if (!$section_storage instanceof SectionStorageInterface || $delta === NULL || $region === NULL) {
+    return;
+  }
+
+  $attributes = moody_block_clone_dialog_attributes();
+  $build['#attached']['library'][] = 'moody_block_clone/chooser';
+  $build['moody_block_clone_action'] = [
+    '#type' => 'details',
+    '#weight' => -20,
+    '#title' => t('Clone block from other page'),
+    '#open' => FALSE,
+    '#attributes' => [
+      'class' => ['moody-block-clone__browser-action'],
+    ],
+    'description' => [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['moody-block-clone__browser-description'],
+      ],
+      'text' => [
+        '#markup' => t('Browse published pages, preview their inline blocks, and duplicate one into this section.'),
+      ],
+    ],
+    'link' => [
+      '#type' => 'link',
+      '#title' => t('Open clone browser'),
+      '#url' => Url::fromRoute('moody_block_clone.choose', [
+        'section_storage_type' => $section_storage->getStorageType(),
+        'section_storage' => $section_storage->getStorageId(),
+        'delta' => $delta,
+        'region' => $region,
+      ]),
+      '#attributes' => $attributes,
+    ],
+  ];
+}
+
+/**
+ * Builds dialog attributes that match the active browser presentation.
+ */
+function moody_block_clone_dialog_attributes(): array {
+  if (\Drupal::config('layout_builder_browser.settings')->get('use_modal')) {
+    return [
+      'class' => ['button', 'button--primary', 'use-ajax', 'moody-block-clone__browser-link'],
+      'data-dialog-type' => 'dialog',
+      'data-dialog-options' => Json::encode([
+        'width' => '80%',
+        'height' => 'auto',
+        'target' => 'layout-builder-modal',
+        'autoResize' => TRUE,
+        'modal' => TRUE,
+      ]),
+    ];
+  }
+
+  return [
+    'class' => ['button', 'button--primary', 'use-ajax', 'moody-block-clone__browser-link'],
+    'data-dialog-type' => 'dialog',
+    'data-dialog-renderer' => 'off_canvas',
+  ];
+}

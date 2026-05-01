@@ -1,0 +1,27 @@
+moody_block_clone.choose:
+  path: '/layout_builder/clone/block/{section_storage_type}/{section_storage}/{delta}/{region}'
+  defaults:
+    _form: '\Drupal\moody_block_clone\Form\CloneBlockChooserForm'
+    _title: 'Clone block from other page'
+  requirements:
+    _layout_builder_access: 'add_block'
+  options:
+    _admin_route: TRUE
+    parameters:
+      section_storage:
+        layout_builder_tempstore: TRUE
+
+moody_block_clone.clone:
+  path: '/layout_builder/clone/block/{section_storage_type}/{section_storage}/{delta}/{region}/source/{source_node}/{source_component_uuid}'
+  defaults:
+    _controller: '\Drupal\moody_block_clone\Controller\CloneBlockController::clone'
+  requirements:
+    _layout_builder_access: 'add_block'
+    _entity_access: 'source_node.view'
+  options:
+    _admin_route: TRUE
+    parameters:
+      section_storage:
+        layout_builder_tempstore: TRUE
+      source_node:
+        type: entity:node

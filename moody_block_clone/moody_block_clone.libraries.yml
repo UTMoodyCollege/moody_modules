@@ -1,0 +1,11 @@
+chooser:
+  js:
+    js/moody-block-clone.js: {}
+  css:
+    theme:
+      css/moody-block-clone.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.ajax
+    - core/drupalSettings
+    - core/once
