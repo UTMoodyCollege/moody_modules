@@ -149,6 +149,7 @@ class MediaCropManager {
       'status' => $media->isPublished(),
       'langcode' => $media->language()->getId(),
     ]);
+    assert($new_media instanceof MediaInterface);
 
     $new_media->set($source_field, [
       'target_id' => $new_file->id(),

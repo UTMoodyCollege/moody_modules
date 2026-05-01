@@ -78,6 +78,10 @@
   position: absolute;
 }
 
+.moody-media-image-helper__selection.is-hidden {
+  display: none;
+}
+
 .moody-media-image-helper__selection-label {
   background: rgba(20, 19, 23, 0.85);
   color: #fff;

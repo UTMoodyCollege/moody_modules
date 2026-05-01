@@ -29,6 +29,7 @@
       naturalWidth: Number(workspace.dataset.originalWidth || 0),
       naturalHeight: Number(workspace.dataset.originalHeight || 0),
       rect: { x: 0, y: 0, width: 0, height: 0 },
+      hasSelection: false,
       dragMode: "move",
       handle: null,
       pointerId: null,
@@ -71,6 +72,21 @@
     }
 
     function updateReadout() {
+      if (!state.hasSelection) {
+        selection.classList.add("is-hidden");
+        label.textContent = "";
+        sizeReadout.textContent = "Drag to select";
+        if (outputReadout) {
+          outputReadout.textContent = getRequestedResize(state.naturalWidth, state.naturalHeight).width + " × " + getRequestedResize(state.naturalWidth, state.naturalHeight).height + " px";
+        }
+        offsetReadout.textContent = "0, 0";
+        inputs.x.value = 0;
+        inputs.y.value = 0;
+        inputs.width.value = 0;
+        inputs.height.value = 0;
+        return;
+      }
+
       const scale = displayScale();
       const width = Math.round(state.rect.width * scale.x);
       const height = Math.round(state.rect.height * scale.y);
@@ -78,6 +94,7 @@
       const y = Math.round(state.rect.y * scale.y);
       syncResizeInputs(width, height, false);
       const requestedResize = getRequestedResize(width, height);
+      selection.classList.remove("is-hidden");
 
       selection.style.left = state.rect.x + "px";
       selection.style.top = state.rect.y + "px";
@@ -96,16 +113,7 @@
       inputs.height.value = height;
     }
 
-    function setDefaultRect() {
-      const rect = stageRect();
-      const width = rect.width;
-      const height = rect.height;
-      state.rect = {
-        x: 0,
-        y: 0,
-        width,
-        height
-      };
+    function setDefaultState() {
       syncResizeInputs(Math.round(state.naturalWidth), Math.round(state.naturalHeight), true);
       updateReadout();
     }
@@ -202,6 +210,7 @@
       const bounds = stageRect();
       const startX = clamp(event.clientX - bounds.left, 0, bounds.width);
       const startY = clamp(event.clientY - bounds.top, 0, bounds.height);
+      state.hasSelection = true;
       state.rect = { x: startX, y: startY, width: 24, height: 24 };
       updateReadout();
       startInteraction(event, "draw");
@@ -224,10 +233,10 @@
     });
 
     if (image.complete) {
-      setDefaultRect();
+      setDefaultState();
     }
     else {
-      image.addEventListener("load", setDefaultRect, { once: true });
+      image.addEventListener("load", setDefaultState, { once: true });
     }
   }
 
