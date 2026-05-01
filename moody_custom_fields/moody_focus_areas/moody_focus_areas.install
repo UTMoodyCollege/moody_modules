@@ -39,3 +39,38 @@ function moody_focus_areas_update_11003() {
     }
   }
 }
+
+/**
+ * Adds row spacing storage to existing Moody Focus Areas field tables.
+ */
+function moody_focus_areas_update_11004() {
+  $schema = \Drupal::database()->schema();
+  $field = [
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => FALSE,
+    'size' => 'normal',
+  ];
+
+  foreach (['block_content__field_focus_areas', 'block_content_revision__field_focus_areas'] as $table) {
+    if ($schema->tableExists($table) && !$schema->fieldExists($table, 'field_focus_areas_items_row_gap')) {
+      $schema->addField($table, 'field_focus_areas_items_row_gap', $field);
+    }
+  }
+}
+
+/**
+ * Defaults unset row spacing values to the max spacing preset.
+ */
+function moody_focus_areas_update_11005() {
+  $database = \Drupal::database();
+
+  foreach (['block_content__field_focus_areas', 'block_content_revision__field_focus_areas'] as $table) {
+    if ($database->schema()->tableExists($table)) {
+      $database->update($table)
+        ->fields(['field_focus_areas_items_row_gap' => 3])
+        ->isNull('field_focus_areas_items_row_gap')
+        ->execute();
+    }
+  }
+}

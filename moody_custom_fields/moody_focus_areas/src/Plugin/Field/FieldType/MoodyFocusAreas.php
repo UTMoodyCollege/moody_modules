@@ -42,6 +42,9 @@ class MoodyFocusAreas extends FieldItemBase {
     $properties['items_gap'] = DataDefinition::create('integer')
       ->setLabel(new TranslatableMarkup('Items Gap'))
       ->setRequired(FALSE);
+    $properties['items_row_gap'] = DataDefinition::create('integer')
+      ->setLabel(new TranslatableMarkup('Items Row Gap'))
+      ->setRequired(FALSE);
     $properties['items_title'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Focus Areas Items Title'))
       ->setRequired(FALSE);
@@ -79,6 +82,12 @@ class MoodyFocusAreas extends FieldItemBase {
           'binary' => FALSE,
         ],
         'items_gap' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+          'size' => 'normal',
+        ],
+        'items_row_gap' => [
           'type' => 'int',
           'unsigned' => TRUE,
           'not null' => FALSE,

@@ -97,6 +97,14 @@ class MoodyFocusAreasWidget extends WidgetBase {
       '#description' => $this->t('Choose the spacing between focus area items.'),
     ];
 
+    $element['items_row_gap'] = [
+      '#title' => $this->t('Space Between Rows'),
+      '#type' => 'select',
+      '#options' => $this->getGapOptions(),
+      '#default_value' => isset($items[$delta]->items_row_gap) && $items[$delta]->items_row_gap !== NULL ? $this->normalizeGapValue($items[$delta]->items_row_gap) : 3,
+      '#description' => $this->t('Choose the spacing between rows of focus area items.'),
+    ];
+
     $element['cta'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Focus Areas Call to Action'),
@@ -235,6 +243,10 @@ class MoodyFocusAreasWidget extends WidgetBase {
       if (isset($field['items_gap']) && $field['items_gap'] !== '') {
         // The gap between items.
         $storage[$delta]['items_gap'] = max(0, (int) $field['items_gap']);
+      }
+      if (isset($field['items_row_gap']) && $field['items_row_gap'] !== '') {
+        // The gap between rows.
+        $storage[$delta]['items_row_gap'] = max(0, (int) $field['items_row_gap']);
       }
       if (isset($field['items_title'])) {
         // The items title.

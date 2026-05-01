@@ -37,6 +37,16 @@ class MoodyFocusAreasFormatter extends FormatterBase implements ContainerFactory
   ];
 
   /**
+   * Row spacing preset CSS class names keyed by stored preset codes.
+   */
+  protected const ROW_GAP_PRESET_CLASSES = [
+    0 => 'gap-row-touching',
+    1 => 'gap-row-small',
+    2 => 'gap-row-medium',
+    3 => 'gap-row-max',
+  ];
+
+  /**
    * Maps legacy stored values to stable preset codes.
    */
   protected const LEGACY_GAP_VALUES = [
@@ -160,6 +170,7 @@ class MoodyFocusAreasFormatter extends FormatterBase implements ContainerFactory
         '#style' => $item->style,
         '#items_style' => $item->items_style,
         '#items_gap_preset' => $this->resolveGapPresetClass($item->items_gap !== NULL ? max(0, (int) $item->items_gap) : 3),
+        '#items_row_gap_preset' => $this->resolveRowGapPresetClass($item->items_row_gap !== NULL ? max(0, (int) $item->items_row_gap) : 3),
         '#focus_areas_items_title' => $item->items_title,
         '#focus_areas_items' => $instances,
         '#wrapper' => '',
@@ -229,6 +240,34 @@ class MoodyFocusAreasFormatter extends FormatterBase implements ContainerFactory
     }
 
     return self::GAP_PRESET_CLASSES[$closest_gap];
+  }
+
+  /**
+   * Resolves a row gap value to the nearest row gap preset class.
+   *
+   * @param int $gap
+   *   The stored row gap value.
+   *
+   * @return string
+   *   The row gap CSS class name.
+   */
+  protected function resolveRowGapPresetClass($gap) {
+    if (isset(self::LEGACY_GAP_VALUES[$gap])) {
+      return self::ROW_GAP_PRESET_CLASSES[self::LEGACY_GAP_VALUES[$gap]];
+    }
+
+    $closest_gap = 3;
+    $smallest_difference = PHP_INT_MAX;
+
+    foreach (array_keys(self::ROW_GAP_PRESET_CLASSES) as $preset_gap) {
+      $difference = abs($gap - $preset_gap);
+      if ($difference < $smallest_difference) {
+        $closest_gap = $preset_gap;
+        $smallest_difference = $difference;
+      }
+    }
+
+    return self::ROW_GAP_PRESET_CLASSES[$closest_gap];
   }
 
 }
