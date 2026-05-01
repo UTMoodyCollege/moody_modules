@@ -5,6 +5,6 @@ id: chart
 block_id: moody_charts_block
 category: specialty_blocks
 label: Chart
+weight: -100
 image_path: ''
 image_alt: ''
-weight: -100

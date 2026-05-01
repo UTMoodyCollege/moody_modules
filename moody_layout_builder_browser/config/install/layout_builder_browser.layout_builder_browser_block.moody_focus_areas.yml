@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: moody_focus_areas
+block_id: 'inline_block:moody_focus_areas'
+category: moody_site_building
+label: 'Moody Focus Areas'
+image_path: /themes/custom/moody/moody_components_images/moody_focus_areas.jpg
+image_alt: 'The moody focus area'
+weight: -100
