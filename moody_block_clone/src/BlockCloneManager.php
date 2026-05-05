@@ -185,6 +185,52 @@ final class BlockCloneManager {
   }
 
   /**
+   * Converts an inline Layout Builder component to a reusable block.
+   *
+   * @return \Drupal\block_content\BlockContentInterface
+   *   The newly created reusable block entity.
+   */
+  public function convertInlineComponentToReusable(SectionStorageInterface $section_storage, int $delta, string $uuid): BlockContentInterface {
+    $sections = $section_storage->getSections();
+    if (!isset($sections[$delta])) {
+      throw new NotFoundHttpException('The selected Layout Builder section could not be found.');
+    }
+
+    $component = $sections[$delta]->getComponent($uuid);
+    if (!$component) {
+      throw new NotFoundHttpException('The selected Layout Builder block could not be found.');
+    }
+
+    $configuration = (array) $component->get('configuration');
+    $plugin_id = (string) ($configuration['id'] ?? '');
+    if (!str_starts_with($plugin_id, 'inline_block:')) {
+      throw new AccessDeniedHttpException('Only inline blocks can be converted to reusable blocks.');
+    }
+
+    $source_block = $this->resolveInlineBlockEntity($configuration);
+    if (!$source_block instanceof BlockContentInterface) {
+      throw new NotFoundHttpException('The inline block entity could not be loaded.');
+    }
+
+    /** @var \Drupal\block_content\BlockContentInterface $reusable_block */
+    $reusable_block = $source_block->createDuplicate();
+    $reusable_block->setReusable();
+    $reusable_block->setInfo($this->resolvePlacementLabel($configuration, $reusable_block));
+    $reusable_block->save();
+
+    $configuration['id'] = 'block_content:' . $reusable_block->uuid();
+    $configuration['provider'] = 'block_content';
+    $configuration['label'] = $this->resolvePlacementLabel($configuration, $reusable_block);
+    $configuration['status'] = TRUE;
+    $configuration['info'] = '';
+    unset($configuration['block_id'], $configuration['block_revision_id'], $configuration['block_serialized']);
+
+    $component->setConfiguration($configuration);
+
+    return $reusable_block;
+  }
+
+  /**
    * Resolves an inline block entity from stored component configuration.
    */
   protected function resolveInlineBlockEntity(array $configuration): ?BlockContentInterface {

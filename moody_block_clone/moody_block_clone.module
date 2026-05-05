@@ -35,6 +35,85 @@ function moody_block_clone_page_attachments_alter(array &$attachments): void {
 }
 
 /**
+ * Implements hook_preprocess().
+ */
+function moody_block_clone_preprocess(array &$variables, $hook, array $info): void {
+  $element = NULL;
+  if (!empty($info['variables'])) {
+    $keys = array_keys($info['variables']);
+    $key = $keys[0] ?? NULL;
+    if ($key && isset($variables[$key])) {
+      $element = $variables[$key];
+    }
+  }
+  elseif (!empty($info['render element']) && isset($variables[$info['render element']])) {
+    $element = $variables[$info['render element']];
+  }
+
+  if (!is_array($element) || empty($element['#contextual_links']['layout_builder_block'])) {
+    return;
+  }
+
+  $metadata = $element['#contextual_links']['layout_builder_block']['metadata'] ?? [];
+  $operations = array_filter(explode(':', (string) ($metadata['operations'] ?? '')));
+  if (!in_array('convert_reusable', $operations, TRUE)) {
+    $operations[] = 'convert_reusable';
+  }
+  $element['#contextual_links']['layout_builder_block']['metadata']['operations'] = implode(':', $operations);
+
+  if (!empty($info['variables']) && !empty($key)) {
+    $variables[$key] = $element;
+  }
+  elseif (!empty($info['render element'])) {
+    $variables[$info['render element']] = $element;
+  }
+}
+
+/**
+ * Implements hook_contextual_links_alter().
+ */
+function moody_block_clone_contextual_links_alter(array &$links, $group, array $route_parameters): void {
+  if ($group !== 'layout_builder_block' || !moody_block_clone_route_exists('moody_block_clone.convert_reusable')) {
+    return;
+  }
+
+  $links['moody_block_clone_convert_reusable'] = [
+    'route_name' => 'moody_block_clone.convert_reusable',
+    'route_parameters' => $route_parameters,
+    'localized_options' => [],
+    'title' => t('Convert to Reusable Block'),
+    'weight' => 15,
+  ];
+}
+
+/**
+ * Implements hook_link_alter().
+ */
+function moody_block_clone_link_alter(array &$variables): void {
+  if (empty($variables['url']) || !$variables['url'] instanceof Url || !$variables['url']->isRouted()) {
+    return;
+  }
+
+  $route_name = $variables['url']->getRouteName();
+  if (!in_array($route_name, ['moody_block_clone.convert_reusable', 'moody_block_clone.choose'], TRUE)) {
+    return;
+  }
+
+  $attributes = moody_block_clone_dialog_attributes();
+  if (!isset($variables['options']['attributes'])) {
+    $variables['options']['attributes'] = [];
+  }
+
+  foreach ($attributes as $key => $value) {
+    if ($key === 'class') {
+      $variables['options']['attributes']['class'] = array_values(array_unique(array_merge($variables['options']['attributes']['class'] ?? [], $value)));
+      continue;
+    }
+    $variables['options']['attributes'][$key] = $value;
+  }
+}
+
+/**
  * Implements hook_layout_builder_browser_alter().
  */
 function moody_block_clone_layout_builder_browser_alter(array &$build, array $context): void {
@@ -102,4 +181,17 @@ function moody_block_clone_dialog_attributes(): array {
     'data-dialog-type' => 'dialog',
     'data-dialog-renderer' => 'off_canvas',
   ];
+}
+
+/**
+ * Checks whether a route exists before adding optional UI links.
+ */
+function moody_block_clone_route_exists(string $route_name): bool {
+  try {
+    \Drupal::service('router.route_provider')->getRouteByName($route_name);
+    return TRUE;
+  }
+  catch (\Exception $exception) {
+    return FALSE;
+  }
 }

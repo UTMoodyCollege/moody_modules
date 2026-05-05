@@ -25,3 +25,16 @@ moody_block_clone.clone:
         layout_builder_tempstore: TRUE
       source_node:
         type: entity:node
+
+moody_block_clone.convert_reusable:
+  path: '/layout_builder/convert/reusable/{section_storage_type}/{section_storage}/{delta}/{region}/{uuid}'
+  defaults:
+    _form: '\Drupal\moody_block_clone\Form\ConvertToReusableBlockForm'
+    _title: 'Convert to reusable block'
+  requirements:
+    _layout_builder_access: 'view'
+  options:
+    _admin_route: TRUE
+    parameters:
+      section_storage:
+        layout_builder_tempstore: TRUE
