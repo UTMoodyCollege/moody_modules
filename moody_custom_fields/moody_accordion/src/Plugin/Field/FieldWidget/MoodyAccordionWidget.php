@@ -75,7 +75,7 @@ class MoodyAccordionWidget extends WidgetBase implements ContainerFactoryPluginI
    */
   protected function getBlockOptions() {
     $definitions = $this->blockManager->getDefinitions();
-    $options = ['' => $this->t('- Select a block -')];
+    $options = [];
     $grouped = [];
     foreach ($definitions as $id => $definition) {
       $category = (string) ($definition['category'] ?? $this->t('Other'));
