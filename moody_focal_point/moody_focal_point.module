@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for moody_focal_point module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function moody_focal_point_theme($existing, $type, $theme, $path): array {
+  return [
+    'moody_focal_point' => [
+      'variables' => [
+        'image' => NULL,
+        'focal_points' => [],
+        'block_id' => '',
+      ],
+    ],
+  ];
+}

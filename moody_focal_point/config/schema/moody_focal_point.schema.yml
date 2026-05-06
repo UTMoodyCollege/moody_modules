@@ -1,0 +1,45 @@
+block.settings.moody_focal_point_block:
+  type: block_settings
+  label: 'Moody Focal Point block'
+  mapping:
+    image:
+      type: integer
+      label: 'Image media ID'
+    focal_points:
+      type: sequence
+      label: 'Focal points'
+      sequence:
+        type: mapping
+        label: 'Focal point'
+        mapping:
+          caption_title:
+            type: string
+            label: 'Caption title'
+          caption_body:
+            type: mapping
+            label: 'Caption body'
+            mapping:
+              value:
+                type: string
+                label: 'Body text'
+              format:
+                type: string
+                label: 'Text format'
+          x_position:
+            type: float
+            label: 'Horizontal position (%)'
+          y_position:
+            type: float
+            label: 'Vertical position (%)'
+          show_square:
+            type: boolean
+            label: 'Show square'
+          square_color:
+            type: string
+            label: 'Square color'
+          show_arrow:
+            type: boolean
+            label: 'Show arrow'
+          caption_border:
+            type: string
+            label: 'Caption border style'
