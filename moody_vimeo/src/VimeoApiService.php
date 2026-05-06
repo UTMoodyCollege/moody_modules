@@ -21,7 +21,7 @@ class VimeoApiService {
   /**
    * Vimeo API base URL.
    */
-  const API_BASE = 'https://api.vimeo.com';
+  public const API_BASE = 'https://api.vimeo.com';
 
   /**
    * The logger channel.
@@ -239,7 +239,7 @@ class VimeoApiService {
           'height'  => $file['height']           ?? 0,
           'type'    => $file['type']             ?? '',
           'link'    => $file['link'],
-          'rendition' => $file['rendition'] ?? '',
+          'rendition_type' => $file['rendition'] ?? '',
         ];
       }
     }
