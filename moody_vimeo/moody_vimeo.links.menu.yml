@@ -1,0 +1,13 @@
+moody_vimeo.admin_config:
+  title: 'Vimeo Settings'
+  description: 'Configure Vimeo API credentials'
+  route_name: moody_vimeo.settings
+  parent: system.admin_config_media
+  weight: 10
+
+moody_vimeo.admin_content:
+  title: 'Vimeo Videos'
+  description: 'Browse and manage your Vimeo video library'
+  route_name: moody_vimeo.video_list
+  parent: system.admin_content
+  weight: 10

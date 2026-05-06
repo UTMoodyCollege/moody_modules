@@ -6,28 +6,36 @@
   }
 
   function initCropWorkspace(workspace) {
+    const form = workspace.closest("form");
     const stage = workspace.querySelector("[data-moody-media-helper-stage]");
     const image = workspace.querySelector("[data-moody-media-helper-image]");
     const selection = workspace.querySelector("[data-moody-media-helper-selection]");
     const label = workspace.querySelector("[data-moody-media-helper-selection-label]");
     const sizeReadout = workspace.querySelector("[data-moody-media-helper-size]");
     const offsetReadout = workspace.querySelector("[data-moody-media-helper-offset]");
+    const outputReadout = workspace.querySelector("[data-moody-media-helper-output-size]");
     const inputs = {
-      x: workspace.closest("form").querySelector("[data-moody-media-helper-input='x']"),
-      y: workspace.closest("form").querySelector("[data-moody-media-helper-input='y']"),
-      width: workspace.closest("form").querySelector("[data-moody-media-helper-input='width']"),
-      height: workspace.closest("form").querySelector("[data-moody-media-helper-input='height']")
+      x: form.querySelector("[data-moody-media-helper-input='x']"),
+      y: form.querySelector("[data-moody-media-helper-input='y']"),
+      width: form.querySelector("[data-moody-media-helper-input='width']"),
+      height: form.querySelector("[data-moody-media-helper-input='height']")
+    };
+    const resizeInputs = {
+      width: form.querySelector("[data-moody-media-helper-resize-input='width']"),
+      height: form.querySelector("[data-moody-media-helper-resize-input='height']")
     };
 
     const state = {
       naturalWidth: Number(workspace.dataset.originalWidth || 0),
       naturalHeight: Number(workspace.dataset.originalHeight || 0),
       rect: { x: 0, y: 0, width: 0, height: 0 },
+      hasSelection: false,
       dragMode: "move",
       handle: null,
       pointerId: null,
       startPointer: null,
-      startRect: null
+      startRect: null,
+      resizeCustomized: false
     };
 
     function stageRect() {
@@ -42,12 +50,51 @@
       };
     }
 
+    function getRequestedResize(cropWidth, cropHeight) {
+      const width = Number.parseInt(resizeInputs.width && resizeInputs.width.value, 10);
+      const height = Number.parseInt(resizeInputs.height && resizeInputs.height.value, 10);
+
+      return {
+        width: Number.isFinite(width) && width > 0 ? width : cropWidth,
+        height: Number.isFinite(height) && height > 0 ? height : cropHeight
+      };
+    }
+
+    function syncResizeInputs(width, height, force) {
+      if (!resizeInputs.width || !resizeInputs.height) {
+        return;
+      }
+
+      if (force || !state.resizeCustomized) {
+        resizeInputs.width.value = String(width);
+        resizeInputs.height.value = String(height);
+      }
+    }
+
     function updateReadout() {
+      if (!state.hasSelection) {
+        selection.classList.add("is-hidden");
+        label.textContent = "";
+        sizeReadout.textContent = "Drag to select";
+        if (outputReadout) {
+          outputReadout.textContent = getRequestedResize(state.naturalWidth, state.naturalHeight).width + " × " + getRequestedResize(state.naturalWidth, state.naturalHeight).height + " px";
+        }
+        offsetReadout.textContent = "0, 0";
+        inputs.x.value = 0;
+        inputs.y.value = 0;
+        inputs.width.value = 0;
+        inputs.height.value = 0;
+        return;
+      }
+
       const scale = displayScale();
       const width = Math.round(state.rect.width * scale.x);
       const height = Math.round(state.rect.height * scale.y);
       const x = Math.round(state.rect.x * scale.x);
       const y = Math.round(state.rect.y * scale.y);
+      syncResizeInputs(width, height, false);
+      const requestedResize = getRequestedResize(width, height);
+      selection.classList.remove("is-hidden");
 
       selection.style.left = state.rect.x + "px";
       selection.style.top = state.rect.y + "px";
@@ -56,6 +103,9 @@
 
       label.textContent = width + " × " + height + " px";
       sizeReadout.textContent = width + " × " + height + " px";
+      if (outputReadout) {
+        outputReadout.textContent = requestedResize.width + " × " + requestedResize.height + " px";
+      }
       offsetReadout.textContent = x + ", " + y;
       inputs.x.value = x;
       inputs.y.value = y;
@@ -63,16 +113,8 @@
       inputs.height.value = height;
     }
 
-    function setDefaultRect() {
-      const rect = stageRect();
-      const width = rect.width * 0.72;
-      const height = rect.height * 0.72;
-      state.rect = {
-        x: (rect.width - width) / 2,
-        y: (rect.height - height) / 2,
-        width,
-        height
-      };
+    function setDefaultState() {
+      syncResizeInputs(Math.round(state.naturalWidth), Math.round(state.naturalHeight), true);
       updateReadout();
     }
 
@@ -168,6 +210,7 @@
       const bounds = stageRect();
       const startX = clamp(event.clientX - bounds.left, 0, bounds.width);
       const startY = clamp(event.clientY - bounds.top, 0, bounds.height);
+      state.hasSelection = true;
       state.rect = { x: startX, y: startY, width: 24, height: 24 };
       updateReadout();
       startInteraction(event, "draw");
@@ -177,11 +220,23 @@
     stage.addEventListener("pointerup", onPointerUp);
     stage.addEventListener("pointercancel", onPointerUp);
 
+    ["width", "height"].forEach(function (key) {
+      const input = resizeInputs[key];
+      if (!input) {
+        return;
+      }
+
+      input.addEventListener("input", function () {
+        state.resizeCustomized = true;
+        updateReadout();
+      });
+    });
+
     if (image.complete) {
-      setDefaultRect();
+      setDefaultState();
     }
     else {
-      image.addEventListener("load", setDefaultRect, { once: true });
+      image.addEventListener("load", setDefaultState, { once: true });
     }
   }
 
@@ -195,6 +250,13 @@
     const targetInput = document.getElementById(response.targetInputId);
     if (targetInput) {
       targetInput.value = String(response.mediaId);
+      targetInput.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    const fileInput = response.fileInputId ? document.getElementById(response.fileInputId) : null;
+    if (fileInput && response.fileId) {
+      fileInput.value = String(response.fileId);
+      fileInput.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
     const previewWrapper = document.getElementById(response.previewWrapperId);
@@ -207,7 +269,7 @@
       actionWrapper.outerHTML = response.actionHtml;
     }
 
-    const widgetRoot = document.getElementById(response.widgetRootId);
+    const widgetRoot = response.widgetRootId ? document.getElementById(response.widgetRootId) : null;
     if (widgetRoot && response.selectionInputId) {
       const selectionInput = document.getElementById(response.selectionInputId);
       if (selectionInput) {
@@ -215,6 +277,7 @@
           .map(function (input) { return input.value; })
           .filter(Boolean);
         selectionInput.value = ids.join(",");
+        selectionInput.dispatchEvent(new Event("change", { bubbles: true }));
       }
     }
 

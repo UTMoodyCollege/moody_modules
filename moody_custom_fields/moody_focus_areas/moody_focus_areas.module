@@ -33,6 +33,8 @@ function moody_focus_areas_theme() {
         'headline' => NULL,
         'style' => NULL,
         'items_style' => NULL,
+        'items_gap_preset' => 'gap-max',
+        'items_row_gap_preset' => 'gap-row-max',
         'cta' => NULL,
         'focus_areas_items_title' => NULL,
         'focus_areas_items' => NULL,

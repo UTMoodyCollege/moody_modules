@@ -1,0 +1,8 @@
+name: 'Moody Vimeo'
+description: 'Vimeo API integration: configure credentials, list videos, upload new videos, and retrieve direct links for use in other widgets.'
+type: module
+core_version_requirement: '^10 || ^11'
+package: Moody
+version: 1.x
+dependencies:
+  - drupal:system

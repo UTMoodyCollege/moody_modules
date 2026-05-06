@@ -1,0 +1,65 @@
+{#
+/**
+ * @file
+ * Template for the Moody Focal Point block.
+ *
+ * Available variables:
+ * - image: Render array for the full source image.
+ * - focal_points: Array of focal point items, each containing:
+ *   - caption_title: Plain-text heading string.
+ *   - caption_body: Render array of processed body text.
+ *   - x_position: Float, horizontal % position on the image.
+ *   - y_position: Float, vertical % position on the image.
+ *   - show_square: Boolean, whether to render the highlight square.
+ *   - square_color: CSS color string for the highlight square.
+ *   - show_arrow: Boolean, whether to render an arrow from caption to point.
+ *   - caption_border: One of none|thin|thick|rounded|rounded-thick.
+ * - block_id: Unique HTML id for this block instance.
+ */
+#}
+<section class="moody-focal-point" id="{{ block_id }}" aria-label="{{ 'Focal point viewer'|t }}">
+  <div class="moody-focal-point__image-wrapper" data-focal-point-stage>
+    <figure class="moody-focal-point__figure">
+      {{ image }}
+    </figure>
+
+    {% for point in focal_points %}
+      {# Marker placed at the focal coordinate #}
+      <div
+        class="moody-focal-point__marker{% if point.show_square %} moody-focal-point__marker--square{% endif %}"
+        data-focal-index="{{ loop.index0 }}"
+        style="left:{{ point.x_position }}%; top:{{ point.y_position }}%;{% if point.show_square %} --fp-square-color:{{ point.square_color }};{% endif %}"
+        aria-hidden="true">
+        <span class="moody-focal-point__marker-dot"></span>
+        {% if point.show_square %}
+          <span class="moody-focal-point__marker-square" style="border-color:{{ point.square_color }};"></span>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="moody-focal-point__captions" data-focal-captions>
+    {% for point in focal_points %}
+      <div
+        class="moody-focal-point__caption moody-focal-point__caption--border-{{ point.caption_border }}"
+        data-focal-index="{{ loop.index0 }}"
+        aria-label="{{ 'Focal point @num of @total'|t({'@num': loop.index, '@total': focal_points|length}) }}">
+
+        {% if point.show_arrow %}
+          <div class="moody-focal-point__arrow" aria-hidden="true"></div>
+        {% endif %}
+
+        <div class="moody-focal-point__caption-inner">
+          {% if point.caption_title %}
+            <h3 class="moody-focal-point__caption-title">{{ point.caption_title }}</h3>
+          {% endif %}
+          {% if point.caption_body %}
+            <div class="moody-focal-point__caption-body">{{ point.caption_body }}</div>
+          {% endif %}
+        </div>
+
+        <p class="moody-focal-point__counter" aria-hidden="true">{{ loop.index }} / {{ focal_points|length }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>

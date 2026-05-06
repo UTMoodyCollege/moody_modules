@@ -13,14 +13,17 @@ class UpdateMediaSelectionCommand implements CommandInterface {
    * Constructs the command.
    */
   public function __construct(
+    protected string $contextMode,
     protected string $widgetRootId,
     protected ?string $selectionInputId,
     protected string $targetInputId,
+    protected ?string $fileInputId,
     protected string $previewWrapperId,
     protected string $previewHtml,
     protected string $actionWrapperId,
     protected string $actionHtml,
     protected int $mediaId,
+    protected ?int $fileId,
   ) {}
 
   /**
@@ -29,14 +32,17 @@ class UpdateMediaSelectionCommand implements CommandInterface {
   public function render(): array {
     return [
       'command' => 'moodyMediaImageHelperUpdateSelection',
+      'contextMode' => $this->contextMode,
       'widgetRootId' => $this->widgetRootId,
       'selectionInputId' => $this->selectionInputId,
       'targetInputId' => $this->targetInputId,
+      'fileInputId' => $this->fileInputId,
       'previewWrapperId' => $this->previewWrapperId,
       'previewHtml' => $this->previewHtml,
       'actionWrapperId' => $this->actionWrapperId,
       'actionHtml' => $this->actionHtml,
       'mediaId' => $this->mediaId,
+      'fileId' => $this->fileId,
     ];
   }
 

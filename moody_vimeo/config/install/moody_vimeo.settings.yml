@@ -1,0 +1,5 @@
+client_id: ''
+client_secret: ''
+access_token: ''
+default_privacy: 'nobody'
+videos_per_page: 25

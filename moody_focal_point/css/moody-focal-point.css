@@ -1,0 +1,215 @@
+/* ============================================================
+   Moody Focal Point – base layout
+   ============================================================ */
+
+.moody-focal-point {
+  --fp-accent: #bf5700;
+  --fp-dot-size: 1rem;
+  --fp-square-size: 4rem;
+  --fp-caption-bg: #fff;
+  --fp-caption-radius: 0.5rem;
+  --fp-caption-padding: clamp(1.25rem, 3vw, 2rem);
+  --fp-arrow-size: 1.25rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ============================================================
+   Image stage
+   ============================================================ */
+
+.moody-focal-point__image-wrapper {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: #d9d0c4;
+}
+
+.moody-focal-point__figure {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.moody-focal-point__figure img,
+.moody-focal-point__figure .moody-focal-point__image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* ============================================================
+   Focal-point markers
+   ============================================================ */
+
+.moody-focal-point__marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Pulsing dot */
+.moody-focal-point__marker-dot {
+  display: block;
+  width: var(--fp-dot-size);
+  height: var(--fp-dot-size);
+  border-radius: 50%;
+  background: var(--fp-accent);
+  box-shadow: 0 0 0 0.25rem rgba(191, 87, 0, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.moody-focal-point__marker.is-active .moody-focal-point__marker-dot {
+  transform: scale(1.35);
+  box-shadow: 0 0 0 0.5rem rgba(191, 87, 0, 0.2);
+}
+
+/* Highlight square */
+.moody-focal-point__marker-square {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--fp-square-size);
+  height: var(--fp-square-size);
+  border: 2px solid var(--fp-square-color, #ffffff);
+  border-radius: 2px;
+  opacity: 0.85;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.moody-focal-point__marker--square.is-active .moody-focal-point__marker-square {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+/* ============================================================
+   Captions panel
+   ============================================================ */
+
+.moody-focal-point__captions {
+  position: relative;
+  overflow: hidden;
+}
+
+.moody-focal-point__caption {
+  background: var(--fp-caption-bg);
+  padding: var(--fp-caption-padding);
+  display: grid;
+  gap: 1rem;
+  position: relative;
+}
+
+/* Border variants */
+.moody-focal-point__caption--border-thin {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.moody-focal-point__caption--border-thick {
+  border: 3px solid rgba(0, 0, 0, 0.2);
+}
+
+.moody-focal-point__caption--border-rounded {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: var(--fp-caption-radius);
+}
+
+.moody-focal-point__caption--border-rounded-thick {
+  border: 3px solid rgba(0, 0, 0, 0.2);
+  border-radius: var(--fp-caption-radius);
+}
+
+/* Arrow decoration */
+.moody-focal-point__arrow {
+  width: var(--fp-arrow-size);
+  height: var(--fp-arrow-size);
+  background: var(--fp-accent);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  justify-self: start;
+}
+
+.moody-focal-point__caption-title {
+  color: #2f3b4a;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.moody-focal-point__caption-body {
+  color: #233142;
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.65;
+}
+
+.moody-focal-point__caption-body > :first-child {
+  margin-top: 0;
+}
+
+.moody-focal-point__caption-body > :last-child {
+  margin-bottom: 0;
+}
+
+.moody-focal-point__counter {
+  color: rgba(47, 59, 74, 0.55);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ============================================================
+   Desktop: side-by-side layout
+   ============================================================ */
+
+@media (min-width: 900px) {
+  .moody-focal-point {
+    grid-template-columns: minmax(0, 1.25fr) minmax(22rem, 0.75fr);
+    min-height: 100svh;
+  }
+
+  .moody-focal-point__image-wrapper {
+    aspect-ratio: unset;
+    height: 100%;
+  }
+
+  .moody-focal-point__captions {
+    align-content: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* ============================================================
+   Enhanced (JS) state – pinned scroll-through
+   ============================================================ */
+
+.moody-focal-point.is-enhanced .moody-focal-point__image-wrapper {
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.moody-focal-point.is-enhanced .moody-focal-point__captions {
+  min-height: 100svh;
+  overflow: hidden;
+  position: relative;
+}
+
+.moody-focal-point.is-enhanced .moody-focal-point__caption {
+  inset: 0;
+  position: absolute;
+}
+
+/* ============================================================
+   Mobile
+   ============================================================ */
+
+@media (max-width: 899px) {
+  .moody-focal-point__image-wrapper {
+    min-height: min(56svh, 32rem);
+  }
+}

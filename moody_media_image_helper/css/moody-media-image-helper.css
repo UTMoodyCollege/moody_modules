@@ -4,6 +4,12 @@
   margin-top: 0.75rem;
 }
 
+.moody-media-image-helper__edit-panel {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 0.9rem;
+}
+
 .moody-media-image-helper__actions .button {
   margin-bottom: 0;
   width: fit-content;
@@ -23,6 +29,25 @@
 
 .moody-media-image-helper__form {
   min-width: min(92vw, 68rem);
+}
+
+.moody-media-image-helper__preview {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.moody-media-image-helper__preview--file {
+  background: #f7f2ec;
+  border: 1px solid #d3c4b1;
+  border-radius: 0.5rem;
+  padding: 0.9rem;
+}
+
+.moody-media-image-helper__preview-image {
+  border-radius: 0.35rem;
+  display: block;
+  height: auto;
+  max-width: min(100%, 22rem);
 }
 
 .moody-media-image-helper__workspace {
@@ -51,6 +76,10 @@
   box-shadow: 0 0 0 9999px rgba(20, 19, 23, 0.38);
   cursor: move;
   position: absolute;
+}
+
+.moody-media-image-helper__selection.is-hidden {
+  display: none;
 }
 
 .moody-media-image-helper__selection-label {
@@ -103,6 +132,16 @@
   display: grid;
   gap: 0.45rem;
   padding: 0.9rem 1rem;
+}
+
+.moody-media-image-helper__resize-controls {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+.moody-media-image-helper__resize-title {
+  margin-bottom: -0.2rem;
 }
 
 @media (min-width: 900px) {

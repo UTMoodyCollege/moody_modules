@@ -1,0 +1,36 @@
+# Vimeo settings – admin/config/media/vimeo
+moody_vimeo.settings:
+  path: '/admin/config/media/vimeo'
+  defaults:
+    _form: '\Drupal\moody_vimeo\Form\VimeoSettingsForm'
+    _title: 'Vimeo Settings'
+  requirements:
+    _permission: 'administer moody vimeo'
+
+# Video library listing
+moody_vimeo.video_list:
+  path: '/admin/content/vimeo'
+  defaults:
+    _controller: '\Drupal\moody_vimeo\Controller\VimeoVideoListController::listVideos'
+    _title: 'Vimeo Videos'
+  requirements:
+    _permission: 'access moody vimeo library'
+
+# Upload / add a new video
+moody_vimeo.video_upload:
+  path: '/admin/content/vimeo/upload'
+  defaults:
+    _form: '\Drupal\moody_vimeo\Form\VimeoVideoUploadForm'
+    _title: 'Upload Video to Vimeo'
+  requirements:
+    _permission: 'administer moody vimeo'
+
+# Single-video detail / link helper
+moody_vimeo.video_detail:
+  path: '/admin/content/vimeo/{video_id}'
+  defaults:
+    _controller: '\Drupal\moody_vimeo\Controller\VimeoVideoListController::videoDetail'
+    _title: 'Vimeo Video Details'
+  requirements:
+    _permission: 'access moody vimeo library'
+    video_id: '\d+'
