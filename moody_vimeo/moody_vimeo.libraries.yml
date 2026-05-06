@@ -1,0 +1,11 @@
+moody_vimeo:
+  version: 1.x
+  css:
+    theme:
+      css/moody-vimeo.css: {}
+  js:
+    js/moody-vimeo.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/drupal.ajax

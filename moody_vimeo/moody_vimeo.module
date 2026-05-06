@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for moody_vimeo module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function moody_vimeo_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.moody_vimeo':
+      $output  = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Provides Vimeo API integration. Configure API credentials, browse your Vimeo library, upload new videos, and copy embed or direct-link URLs for use in other Moody widgets.') . '</p>';
+      $output .= '<h3>' . t('Getting started') . '</h3>';
+      $output .= '<ol>';
+      $output .= '<li>' . t('Create a Vimeo app at <a href="https://developer.vimeo.com/apps" target="_blank">developer.vimeo.com</a> and note your Client ID, Client Secret, and Personal Access Token.') . '</li>';
+      $output .= '<li>' . t('Enter those credentials at <a href="/admin/config/media/vimeo">Administration &gt; Configuration &gt; Media &gt; Vimeo Settings</a>.') . '</li>';
+      $output .= '<li>' . t('Browse your videos at <a href="/admin/content/vimeo">Administration &gt; Content &gt; Vimeo Videos</a>.') . '</li>';
+      $output .= '</ol>';
+      return $output;
+  }
+}
