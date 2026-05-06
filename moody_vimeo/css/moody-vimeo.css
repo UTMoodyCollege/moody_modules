@@ -98,6 +98,37 @@
   background: #8a3d00;
 }
 
+/* ---- Upload status ---- */
+.moody-vimeo-upload-status {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #c9d8e0;
+  border-radius: 4px;
+  background: #f7fbfd;
+}
+
+.moody-vimeo-upload-status.is-error {
+  border-color: #c73e1d;
+  background: #fff6f4;
+}
+
+.moody-vimeo-upload-status__message {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.moody-vimeo-upload-status__progress {
+  display: block;
+  width: 100%;
+  height: 16px;
+  margin: 0 0 0.5rem;
+}
+
+.moody-vimeo-upload-status__meta {
+  font-size: 0.9rem;
+  color: #475467;
+}
+
 /* ---- Pager ---- */
 .moody-vimeo-pager {
   margin-top: 1rem;

@@ -12,10 +12,7 @@ use Drupal\moody_vimeo\VimeoApiService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Form for adding a new video to Vimeo by supplying a public URL.
- *
- * Uses the Vimeo "pull" upload approach: Vimeo fetches the file from the given
- * public URL, so no binary transfer is required from the Drupal server.
+ * Form for adding a new video to Vimeo by source URL or direct file upload.
  */
 class VimeoVideoUploadForm extends FormBase {
 
@@ -74,13 +71,65 @@ class VimeoVideoUploadForm extends FormBase {
       '#rows'  => 4,
     ];
 
+    $form['upload_method'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Upload method'),
+      '#options' => [
+        'url' => $this->t('Provide source video URL'),
+        'file' => $this->t('Upload file'),
+      ],
+      '#default_value' => $form_state->getValue('upload_method', 'url'),
+      '#required' => TRUE,
+    ];
+
+    $form['upload_help'] = [
+      '#type' => 'item',
+      '#markup' => '<p class="description">' . $this->t('Source URL uploads are submitted through Drupal. File uploads stream directly from your browser to Vimeo with live progress updates.') . '</p>',
+    ];
+
     $form['video_url'] = [
       '#type'        => 'url',
-      '#title'       => $this->t('Public video URL'),
+      '#title'       => $this->t('Source video file URL'),
       '#description' => $this->t(
-        'A publicly accessible URL to your video file (mp4, mov, etc.). Vimeo will fetch it directly. The URL must be reachable by Vimeo servers.'
+        'Provide a publicly reachable video file URL. Vimeo will fetch the file directly from that address.'
       ),
-      '#required'    => TRUE,
+      '#states' => [
+        'visible' => [
+          ':input[name="upload_method"]' => ['value' => 'url'],
+        ],
+      ],
+    ];
+
+    $form['video_file'] = [
+      '#type' => 'file',
+      '#title' => $this->t('Video file'),
+      '#description' => $this->t('Select a local video file. The upload will stream directly to Vimeo from your browser.'),
+      '#attributes' => [
+        'accept' => '.mp4,.mov,.m4v,.avi,.mpg,.mpeg,.webm,.mkv,video/*',
+      ],
+      '#states' => [
+        'visible' => [
+          ':input[name="upload_method"]' => ['value' => 'file'],
+        ],
+      ],
+    ];
+
+    $form['upload_status'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['moody-vimeo-upload-status'],
+        'hidden' => 'hidden',
+        'aria-live' => 'polite',
+      ],
+      'label' => [
+        '#markup' => '<div class="moody-vimeo-upload-status__message"></div>',
+      ],
+      'progress' => [
+        '#markup' => '<progress class="moody-vimeo-upload-status__progress" max="100" value="0"></progress>',
+      ],
+      'meta' => [
+        '#markup' => '<div class="moody-vimeo-upload-status__meta"></div>',
+      ],
     ];
 
     $form['privacy'] = [
@@ -101,22 +150,57 @@ class VimeoVideoUploadForm extends FormBase {
       '#value' => $this->t('Upload to Vimeo'),
     ];
 
+    $form['#attached']['library'][] = 'moody_vimeo/moody_vimeo';
+    $form['#attached']['drupalSettings']['moodyVimeo']['browserUpload'] = [
+      'sessionUrl' => Url::fromRoute('moody_vimeo.video_upload_session')->toString(),
+      'token' => \Drupal::service('csrf_token')->get('moody_vimeo.upload_session'),
+      'allowedExtensions' => ['mp4', 'mov', 'm4v', 'avi', 'mpg', 'mpeg', 'webm', 'mkv'],
+    ];
+
     return $form;
   }
 
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    $upload_method = $form_state->getValue('upload_method');
+
+    if ($upload_method === 'url' && trim((string) $form_state->getValue('video_url')) === '') {
+      $form_state->setErrorByName('video_url', $this->t('Enter a source video file URL.'));
+    }
+
+    if ($upload_method === 'file') {
+      $form_state->setErrorByName('video_file', $this->t('JavaScript is required for browser-based file uploads. Use the source URL option if you need a non-JavaScript fallback.'));
+    }
+
+    parent::validateForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
-    $result = $this->vimeoApi->uploadByUrl(
-      $form_state->getValue('video_url'),
-      $form_state->getValue('name'),
-      (string) $form_state->getValue('description'),
-      $form_state->getValue('privacy'),
-    );
+    $upload_method = $form_state->getValue('upload_method');
+    $name = (string) $form_state->getValue('name');
+    $description = (string) $form_state->getValue('description');
+    $privacy = (string) $form_state->getValue('privacy');
+
+    if ($upload_method === 'file') {
+      $this->messenger()->addError($this->t('Browser-based file uploads must be started from the page UI. Use the source URL option for standard form submission.'));
+      return;
+    }
+    else {
+      $result = $this->vimeoApi->uploadByUrl(
+        (string) $form_state->getValue('video_url'),
+        $name,
+        $description,
+        $privacy,
+      );
+    }
 
     if ($result === NULL) {
-      $this->messenger()->addError($this->t('Upload request failed. Check the Vimeo API credentials and the video URL, then try again.'));
+      $this->messenger()->addError($this->t('Upload request failed. Check the Vimeo API credentials and the selected upload source, then try again.'));
       return;
     }
 

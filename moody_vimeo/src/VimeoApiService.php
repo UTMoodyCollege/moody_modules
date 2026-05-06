@@ -188,6 +188,80 @@ class VimeoApiService {
   }
 
   /**
+   * Uploads a local file to Vimeo using a tus upload session.
+   *
+   * @param string $file_path
+   *   Absolute path to the local file.
+   * @param string $name
+   *   Video title.
+   * @param string $description
+   *   Optional description.
+   * @param string $privacy
+   *   Privacy setting.
+   *
+   * @return array|null
+   *   Vimeo API response metadata containing at least the video URI, or NULL on
+   *   failure.
+   */
+  public function uploadLocalFile(string $file_path, string $name, string $description = '', string $privacy = 'nobody'): ?array {
+    if (!is_file($file_path) || !is_readable($file_path)) {
+      $this->logger->error('Vimeo local upload failed: file @path is not readable.', [
+        '@path' => $file_path,
+      ]);
+      return NULL;
+    }
+
+    $file_size = filesize($file_path);
+    if ($file_size === FALSE || $file_size <= 0) {
+      $this->logger->error('Vimeo local upload failed: file @path has an invalid size.', [
+        '@path' => $file_path,
+      ]);
+      return NULL;
+    }
+
+    $session = $this->createUploadSession($file_size, $name, $description, $privacy);
+    if ($session === NULL || empty($session['upload_link']) || empty($session['uri'])) {
+      return NULL;
+    }
+
+    $handle = fopen($file_path, 'rb');
+    if ($handle === FALSE) {
+      $this->logger->error('Vimeo local upload failed: could not open @path.', [
+        '@path' => $file_path,
+      ]);
+      return NULL;
+    }
+
+    try {
+      $this->httpClient->request('PATCH', $session['upload_link'], [
+        'headers' => [
+          'Tus-Resumable' => '1.0.0',
+          'Upload-Offset' => '0',
+          'Content-Type' => 'application/offset+octet-stream',
+          'Content-Length' => (string) $file_size,
+          'Accept' => 'application/vnd.vimeo.*+json;version=3.4',
+        ],
+        'body' => $handle,
+      ]);
+
+      return [
+        'uri' => $session['uri'],
+        'upload_link' => $session['upload_link'],
+      ];
+    }
+    catch (GuzzleException $e) {
+      $this->logger->error('Vimeo tus upload failed for @path: @message', [
+        '@path' => $file_path,
+        '@message' => $e->getMessage(),
+      ]);
+      return NULL;
+    }
+    finally {
+      fclose($handle);
+    }
+  }
+
+  /**
    * Updates video metadata (title, description, privacy).
    *
    * @param string|int $video_id

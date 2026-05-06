@@ -7,5 +7,6 @@ moody_vimeo:
     js/moody-vimeo.js: {}
   dependencies:
     - core/drupal
+    - core/drupalSettings
     - core/once
     - core/drupal.ajax

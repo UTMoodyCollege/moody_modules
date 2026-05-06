@@ -208,14 +208,14 @@ class VimeoVideoListController extends ControllerBase {
     if ($links['vimeo_url']) {
       $link_rows[] = [
         $this->t('Vimeo page'),
-        ['data' => ['#markup' => '<code class="moody-vimeo-link-value">' . htmlspecialchars($links['vimeo_url'], ENT_QUOTES | ENT_HTML5) . '</code> <button class="moody-vimeo-copy-btn button button--small" data-copy="' . htmlspecialchars($links['vimeo_url'], ENT_QUOTES | ENT_HTML5) . '">' . $this->t('Copy') . '</button>']],
+        ['data' => ['#markup' => $this->buildLinkRowMarkup($links['vimeo_url'])]],
       ];
     }
 
     if ($links['embed_url']) {
       $link_rows[] = [
         $this->t('Player embed URL'),
-        ['data' => ['#markup' => '<code class="moody-vimeo-link-value">' . htmlspecialchars($links['embed_url'], ENT_QUOTES | ENT_HTML5) . '</code> <button class="moody-vimeo-copy-btn button button--small" data-copy="' . htmlspecialchars($links['embed_url'], ENT_QUOTES | ENT_HTML5) . '">' . $this->t('Copy') . '</button>']],
+        ['data' => ['#markup' => $this->buildLinkRowMarkup($links['embed_url'])]],
       ];
     }
 
@@ -235,7 +235,7 @@ class VimeoVideoListController extends ControllerBase {
       ]);
       $link_rows[] = [
         $label,
-        ['data' => ['#markup' => '<code class="moody-vimeo-link-value">' . htmlspecialchars($file['link'], ENT_QUOTES | ENT_HTML5) . '</code> <button class="moody-vimeo-copy-btn button button--small" data-copy="' . htmlspecialchars($file['link'], ENT_QUOTES | ENT_HTML5) . '">' . $this->t('Copy') . '</button>']],
+        ['data' => ['#markup' => $this->buildLinkRowMarkup($file['link'])]],
       ];
     }
 
@@ -324,17 +324,33 @@ class VimeoVideoListController extends ControllerBase {
     $parts = [];
 
     if ($links['vimeo_url']) {
-      $parts[] = '<a href="' . htmlspecialchars($links['vimeo_url'], ENT_QUOTES | ENT_HTML5) . '" target="_blank" rel="noopener noreferrer" class="moody-vimeo-badge">' . $this->t('Vimeo page') . '</a>';
+      $parts[] = $this->buildBadgeLink($links['vimeo_url'], (string) $this->t('Vimeo page'));
     }
     if ($links['embed_url']) {
-      $parts[] = '<button class="moody-vimeo-copy-btn moody-vimeo-badge" data-copy="' . htmlspecialchars($links['embed_url'], ENT_QUOTES | ENT_HTML5) . '">' . $this->t('Copy embed URL') . '</button>';
+      $parts[] = $this->buildBadgeLink($links['embed_url'], (string) $this->t('Embed URL'));
     }
     if (!empty($links['direct_files'])) {
       $first = reset($links['direct_files']);
-      $parts[] = '<button class="moody-vimeo-copy-btn moody-vimeo-badge" data-copy="' . htmlspecialchars($first['link'], ENT_QUOTES | ENT_HTML5) . '">' . $this->t('Copy direct link') . '</button>';
+      $parts[] = $this->buildBadgeLink($first['link'], (string) $this->t('Direct link'));
     }
 
     return implode(' ', $parts);
+  }
+
+  /**
+   * Builds markup for a clickable external link plus a copy button.
+   */
+  protected function buildLinkRowMarkup(string $url): string {
+    $safe_url = htmlspecialchars($url, ENT_QUOTES | ENT_HTML5);
+
+    return '<a href="' . $safe_url . '" target="_blank" rel="noopener noreferrer" class="button button--small moody-vimeo-open-link">' . $this->t('Open') . '</a> <code class="moody-vimeo-link-value">' . $safe_url . '</code> <button type="button" class="moody-vimeo-copy-btn button button--small" data-copy="' . $safe_url . '">' . $this->t('Copy') . '</button>';
+  }
+
+  /**
+   * Builds a compact badge link for the listing page.
+   */
+  protected function buildBadgeLink(string $url, string $label): string {
+    return '<a href="' . htmlspecialchars($url, ENT_QUOTES | ENT_HTML5) . '" target="_blank" rel="noopener noreferrer" class="moody-vimeo-badge">' . htmlspecialchars($label, ENT_QUOTES | ENT_HTML5) . '</a>';
   }
 
 }
