@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the moody_accordion module.
+ */
+
+/**
+ * Add block_id and block_config columns to support embedded blocks.
+ */
+function moody_accordion_update_9001() {
+  $database = \Drupal::database();
+  $schema = $database->schema();
+
+  /** @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $definition_update_manager */
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $storage_definition = $definition_update_manager->getFieldStorageDefinition(
+    'field_block_moody_accordion',
+    'block_content'
+  );
+
+  if (!$storage_definition) {
+    return;
+  }
+
+  $entity_type = \Drupal::entityTypeManager()->getDefinition('block_content');
+  $entity_storage = \Drupal::entityTypeManager()->getStorage('block_content');
+  $table_mapping = $entity_storage->getTableMapping([
+    'field_block_moody_accordion' => $storage_definition,
+  ]);
+
+  $tables = [];
+  if ($table_mapping->requiresDedicatedTableStorage($storage_definition)) {
+    $tables[] = $table_mapping->getDedicatedDataTableName($storage_definition);
+    if ($entity_type->isRevisionable() && $storage_definition->isRevisionable()) {
+      $tables[] = $table_mapping->getDedicatedRevisionTableName($storage_definition);
+    }
+  }
+
+  $new_columns = [
+    'block_id' => [
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => NULL,
+      'description' => 'Block plugin ID for embedded block accordion items.',
+    ],
+    'block_config' => [
+      'type' => 'text',
+      'size' => 'normal',
+      'not null' => FALSE,
+      'description' => 'Serialized block configuration for embedded block accordion items.',
+    ],
+  ];
+
+  foreach ($tables as $table) {
+    if ($schema->tableExists($table)) {
+      foreach ($new_columns as $property => $spec) {
+        $column = $table_mapping->getFieldColumnName($storage_definition, $property);
+        if (!$schema->fieldExists($table, $column)) {
+          $schema->addField($table, $column, $spec);
+        }
+      }
+    }
+  }
+
+  // Update the field storage definition to include the new columns.
+  $definition_update_manager->updateFieldStorageDefinition($storage_definition);
+}
