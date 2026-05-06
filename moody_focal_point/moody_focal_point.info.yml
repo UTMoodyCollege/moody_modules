@@ -1,0 +1,5 @@
+name: 'Moody Focal Point'
+type: module
+description: 'Provides a focal point block that highlights areas of a utexas_image with smooth scroll-driven transitions.'
+package: Custom
+core_version_requirement: ^10 || ^11
