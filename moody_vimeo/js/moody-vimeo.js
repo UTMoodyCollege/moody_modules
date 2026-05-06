@@ -11,7 +11,11 @@
   Drupal.behaviors.moodyVimeo = {
     attach: function (context) {
       once('moody-vimeo-copy', '.moody-vimeo-copy-btn', context).forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (event) {
+          if (btn.tagName === 'A') {
+            event.preventDefault();
+          }
+
           var text = btn.dataset.copy || '';
           if (!text) {
             return;

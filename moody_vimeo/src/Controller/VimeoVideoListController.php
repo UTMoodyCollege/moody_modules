@@ -88,7 +88,7 @@ class VimeoVideoListController extends ControllerBase {
         'status'   => $video['status'] ?? '',
         'links'    => [
           'data' => [
-            '#markup' => $this->buildLinkBadges($links),
+            '#markup' => $this->buildLinkSummary($links),
           ],
         ],
       ];
@@ -228,11 +228,7 @@ class VimeoVideoListController extends ControllerBase {
     }
 
     foreach ($links['direct_files'] as $file) {
-      $label = $this->t('Direct file (@quality @width×@height)', [
-        '@quality' => $file['quality'],
-        '@width'   => $file['width'],
-        '@height'  => $file['height'],
-      ]);
+      $label = $this->buildDirectFileLabel($file);
       $link_rows[] = [
         $label,
         ['data' => ['#markup' => $this->buildLinkRowMarkup($file['link'])]],
@@ -320,21 +316,32 @@ class VimeoVideoListController extends ControllerBase {
    * @return string
    *   HTML string.
    */
-  protected function buildLinkBadges(array $links): string {
+  protected function buildLinkSummary(array $links): string {
     $parts = [];
+    $details = [];
 
     if ($links['vimeo_url']) {
       $parts[] = $this->buildBadgeLink($links['vimeo_url'], (string) $this->t('Vimeo page'));
     }
     if ($links['embed_url']) {
       $parts[] = $this->buildBadgeLink($links['embed_url'], (string) $this->t('Embed URL'));
+      $details[] = '<div class="moody-vimeo-link-inline">' . $this->buildCopyBadge($links['embed_url'], (string) $this->t('Copy embed URL')) . '</div>';
     }
     if (!empty($links['direct_files'])) {
       $first = reset($links['direct_files']);
-      $parts[] = $this->buildBadgeLink($first['link'], (string) $this->t('Direct link'));
+      $parts[] = $this->buildBadgeLink($first['link'], (string) $this->t('Direct links'));
+
+      foreach ($links['direct_files'] as $file) {
+        $details[] = '<div class="moody-vimeo-link-inline">' . $this->buildCopyBadge($file['link'], (string) $this->t('Copy @label', ['@label' => $this->buildDirectFileLabelText($file)])) . '</div>';
+      }
     }
 
-    return implode(' ', $parts);
+    $output = implode(' ', $parts);
+    if ($details) {
+      $output .= '<div class="moody-vimeo-link-summary">' . implode('', $details) . '</div>';
+    }
+
+    return $output;
   }
 
   /**
@@ -343,7 +350,7 @@ class VimeoVideoListController extends ControllerBase {
   protected function buildLinkRowMarkup(string $url): string {
     $safe_url = htmlspecialchars($url, ENT_QUOTES | ENT_HTML5);
 
-    return '<a href="' . $safe_url . '" target="_blank" rel="noopener noreferrer" class="button button--small moody-vimeo-open-link">' . $this->t('Open') . '</a> <code class="moody-vimeo-link-value">' . $safe_url . '</code> <button type="button" class="moody-vimeo-copy-btn button button--small" data-copy="' . $safe_url . '">' . $this->t('Copy') . '</button>';
+    return '<a href="' . $safe_url . '" target="_blank" rel="noopener noreferrer" class="button button--small moody-vimeo-open-link">' . $this->t('Open') . '</a> ' . $this->buildCopyBadge($url, (string) $this->t('Copy URL'));
   }
 
   /**
@@ -351,6 +358,55 @@ class VimeoVideoListController extends ControllerBase {
    */
   protected function buildBadgeLink(string $url, string $label): string {
     return '<a href="' . htmlspecialchars($url, ENT_QUOTES | ENT_HTML5) . '" target="_blank" rel="noopener noreferrer" class="moody-vimeo-badge">' . htmlspecialchars($label, ENT_QUOTES | ENT_HTML5) . '</a>';
+  }
+
+  /**
+   * Builds readable inline URL markup.
+   */
+  protected function buildInlineUrl(string $url): string {
+    $safe_url = htmlspecialchars($url, ENT_QUOTES | ENT_HTML5);
+    return '<code class="moody-vimeo-url">' . $safe_url . '</code>';
+  }
+
+  /**
+   * Builds a copy-to-clipboard button.
+   */
+  protected function buildCopyBadge(string $url, string $label): string {
+    return '<a href="#" role="button" class="moody-vimeo-copy-btn moody-vimeo-badge" data-copy="' . htmlspecialchars($url, ENT_QUOTES | ENT_HTML5) . '">' . htmlspecialchars($label, ENT_QUOTES | ENT_HTML5) . '</a>';
+  }
+
+  /**
+   * Builds a human-friendly label for a direct Vimeo file.
+   */
+  protected function buildDirectFileLabel(array $file): string {
+    return $this->t('@label direct file', [
+      '@label' => $this->buildDirectFileLabelText($file),
+    ])->render();
+  }
+
+  /**
+   * Builds human-friendly direct-file label text.
+   */
+  protected function buildDirectFileLabelText(array $file): string {
+    $parts = [];
+
+    if (!empty($file['quality'])) {
+      $parts[] = (string) $file['quality'];
+    }
+
+    if (!empty($file['width']) && !empty($file['height'])) {
+      $parts[] = $file['width'] . 'x' . $file['height'];
+    }
+
+    if (!empty($file['rendition_type'])) {
+      $parts[] = (string) $file['rendition_type'];
+    }
+
+    if (!empty($file['type'])) {
+      $parts[] = strtoupper(str_replace('video/', '', (string) $file['type']));
+    }
+
+    return $parts ? implode(' ', $parts) : (string) $this->t('Direct');
   }
 
 }

@@ -29,6 +29,16 @@
   line-height: 1.4;
 }
 
+button.moody-vimeo-badge,
+input.moody-vimeo-badge {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #005f86 !important;
+  color: #fff !important;
+  border: none;
+  text-align: left;
+}
+
 .moody-vimeo-badge:hover,
 .moody-vimeo-badge:focus {
   background-color: #003d56;
@@ -62,15 +72,30 @@
 
 .moody-vimeo-link-value {
   display: inline-block;
-  max-width: 520px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 100%;
   vertical-align: middle;
-  white-space: nowrap;
+  white-space: normal;
   font-size: 0.85em;
+}
+
+.moody-vimeo-url {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
   background: #f5f5f5;
   padding: 2px 6px;
   border-radius: 2px;
+}
+
+.moody-vimeo-link-summary {
+  margin-top: 0.5rem;
+}
+
+.moody-vimeo-link-inline {
+  margin-top: 0.35rem;
+  font-size: 0.85em;
 }
 
 .moody-vimeo-embed-code {
