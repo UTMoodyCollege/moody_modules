@@ -1,0 +1,105 @@
+/**
+ * @file
+ * Styles for the Moody Vimeo admin UI.
+ */
+
+/* ---- Library table ---- */
+.moody-vimeo-table img {
+  display: block;
+  border-radius: 3px;
+}
+
+.moody-vimeo-table td,
+.moody-vimeo-table th {
+  vertical-align: middle;
+}
+
+/* ---- Link badges ---- */
+.moody-vimeo-badge {
+  display: inline-block;
+  margin: 2px 4px 2px 0;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  text-decoration: none;
+  background-color: #005f86;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.moody-vimeo-badge:hover,
+.moody-vimeo-badge:focus {
+  background-color: #003d56;
+  color: #fff;
+}
+
+/* ---- Copy button ---- */
+.moody-vimeo-copy-btn--success {
+  background-color: #579d42 !important;
+}
+
+/* ---- Detail page ---- */
+.moody-vimeo-detail-thumb {
+  max-width: 320px;
+  height: auto;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  display: block;
+}
+
+.moody-vimeo-meta-table td:first-child {
+  font-weight: bold;
+  width: 120px;
+}
+
+.moody-vimeo-links-table td:first-child {
+  font-weight: bold;
+  white-space: nowrap;
+  width: 200px;
+}
+
+.moody-vimeo-link-value {
+  display: inline-block;
+  max-width: 520px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: 0.85em;
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.moody-vimeo-embed-code {
+  width: 100%;
+  max-width: 520px;
+  font-size: 0.85em;
+  resize: vertical;
+}
+
+/* ---- Actions bar ---- */
+.moody-vimeo-actions {
+  margin-bottom: 1rem;
+}
+
+.moody-vimeo-actions a {
+  padding: 6px 14px;
+  background: #bf5700;
+  color: #fff;
+  border-radius: 3px;
+  text-decoration: none;
+}
+
+.moody-vimeo-actions a:hover,
+.moody-vimeo-actions a:focus {
+  background: #8a3d00;
+}
+
+/* ---- Pager ---- */
+.moody-vimeo-pager {
+  margin-top: 1rem;
+  font-size: 0.9em;
+}

@@ -1,0 +1,19 @@
+moody_vimeo.settings:
+  type: config_object
+  label: 'Moody Vimeo settings'
+  mapping:
+    client_id:
+      type: string
+      label: 'Client ID'
+    client_secret:
+      type: string
+      label: 'Client Secret'
+    access_token:
+      type: string
+      label: 'Personal Access Token'
+    default_privacy:
+      type: string
+      label: 'Default video privacy'
+    videos_per_page:
+      type: integer
+      label: 'Videos per page'

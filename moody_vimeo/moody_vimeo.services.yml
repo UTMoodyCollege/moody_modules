@@ -1,0 +1,7 @@
+services:
+  moody_vimeo.api:
+    class: Drupal\moody_vimeo\VimeoApiService
+    arguments:
+      - '@config.factory'
+      - '@http_client'
+      - '@logger.factory'
