@@ -24,7 +24,7 @@ class VimeoVideoUploadForm extends FormBase {
    */
   public function __construct(
     protected readonly VimeoApiService $vimeoApi,
-    protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly ConfigFactoryInterface $moodyVimeoConfigFactory,
   ) {}
 
   /**
@@ -59,7 +59,7 @@ class VimeoVideoUploadForm extends FormBase {
       return $form;
     }
 
-    $config = $this->configFactory->get('moody_vimeo.settings');
+    $config = $this->moodyVimeoConfigFactory->get('moody_vimeo.settings');
 
     $form['name'] = [
       '#type'        => 'textfield',

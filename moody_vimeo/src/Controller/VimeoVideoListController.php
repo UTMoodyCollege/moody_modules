@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\moody_vimeo\Controller;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
@@ -21,7 +20,6 @@ class VimeoVideoListController extends ControllerBase {
    */
   public function __construct(
     protected readonly VimeoApiService $vimeoApi,
-    protected readonly ConfigFactoryInterface $configFactory,
   ) {}
 
   /**
@@ -30,7 +28,6 @@ class VimeoVideoListController extends ControllerBase {
   public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('moody_vimeo.api'),
-      $container->get('config.factory'),
     );
   }
 
@@ -46,7 +43,7 @@ class VimeoVideoListController extends ControllerBase {
       return $this->notConfiguredBuild();
     }
 
-    $config     = $this->configFactory->get('moody_vimeo.settings');
+    $config     = $this->config('moody_vimeo.settings');
     $per_page   = (int) ($config->get('videos_per_page') ?: 25);
     $page       = (int) (\Drupal::request()->query->get('page', 1));
     $page       = max(1, $page);
