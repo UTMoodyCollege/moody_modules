@@ -1,6 +1,10 @@
 (function (Drupal, once) {
   'use strict';
 
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
   /**
    * Schedules two animation frames so layout is fully settled before acting.
    */
@@ -62,17 +66,9 @@
   }
 
   /**
-   * Activates a single focal point (marker + caption) and deactivates others.
+   * Activates a single caption and deactivates others.
    */
-  function activateFocalPoint(markers, captions, index) {
-    Array.prototype.forEach.call(markers, function (marker, i) {
-      if (i === index) {
-        marker.classList.add('is-active');
-      } else {
-        marker.classList.remove('is-active');
-      }
-    });
-
+  function activateFocalPoint(captions, index) {
     Array.prototype.forEach.call(captions, function (caption, i) {
       if (i === index) {
         caption.classList.add('is-active');
@@ -82,17 +78,107 @@
     });
   }
 
+  function readFocusPoint(element) {
+    return {
+      x: parseFloat(element.dataset.focalX) || 50,
+      y: parseFloat(element.dataset.focalY) || 50,
+      width: parseFloat(element.dataset.focalWidth) || 24,
+      height: parseFloat(element.dataset.focalHeight) || 24,
+      captionX: parseFloat(element.dataset.captionX) || 50,
+      captionY: parseFloat(element.dataset.captionY) || 82,
+    };
+  }
+
+  function positionCaption(stage, caption, focusPoint) {
+    var stageRect = stage.getBoundingClientRect();
+    var x = (focusPoint.captionX / 100) * stageRect.width;
+    var y = (focusPoint.captionY / 100) * stageRect.height;
+    var maxWidth = Math.min(448, stageRect.width - 24);
+
+    caption.style.width = maxWidth + 'px';
+    caption.style.maxWidth = maxWidth + 'px';
+
+    var captionRect = caption.getBoundingClientRect();
+    var halfWidth = captionRect.width / 2;
+    var halfHeight = captionRect.height / 2;
+    var left = clamp(x, 12 + halfWidth, stageRect.width - 12 - halfWidth);
+    var top = clamp(y, 12 + halfHeight, stageRect.height - 12 - halfHeight);
+
+    caption.style.left = left + 'px';
+    caption.style.top = top + 'px';
+  }
+
+  function setMediaBounds(stage, media, image) {
+    var stageRect = stage.getBoundingClientRect();
+    var naturalWidth = image.naturalWidth || stageRect.width;
+    var naturalHeight = image.naturalHeight || stageRect.height;
+    var scale = Math.max(stageRect.width / naturalWidth, stageRect.height / naturalHeight);
+    var width = naturalWidth * scale;
+    var height = naturalHeight * scale;
+    var left = (stageRect.width - width) / 2;
+    var top = (stageRect.height - height) / 2;
+
+    media.style.width = width + 'px';
+    media.style.height = height + 'px';
+    media.style.left = left + 'px';
+    media.style.top = top + 'px';
+
+    return {
+      stageWidth: stageRect.width,
+      stageHeight: stageRect.height,
+      mediaWidth: width,
+      mediaHeight: height,
+      mediaLeft: left,
+      mediaTop: top,
+    };
+  }
+
+  function applyFocus(stage, media, image, focusState) {
+    var metrics = setMediaBounds(stage, media, image);
+    var boxWidth = metrics.mediaWidth * (focusState.width / 100);
+    var boxHeight = metrics.mediaHeight * (focusState.height / 100);
+    var centerX = metrics.mediaWidth * (focusState.x / 100);
+    var centerY = metrics.mediaHeight * (focusState.y / 100);
+    var scale = clamp(
+      Math.min(metrics.stageWidth / boxWidth, metrics.stageHeight / boxHeight),
+      1,
+      8
+    );
+    var translateX = (metrics.stageWidth / 2) - (metrics.mediaLeft + (centerX * scale));
+    var translateY = (metrics.stageHeight / 2) - (metrics.mediaTop + (centerY * scale));
+    var minTranslateX = metrics.stageWidth - metrics.mediaLeft - (metrics.mediaWidth * scale);
+    var maxTranslateX = -metrics.mediaLeft;
+    var minTranslateY = metrics.stageHeight - metrics.mediaTop - (metrics.mediaHeight * scale);
+    var maxTranslateY = -metrics.mediaTop;
+
+    if (metrics.mediaWidth * scale <= metrics.stageWidth) {
+      translateX = (metrics.stageWidth - (metrics.mediaWidth * scale)) / 2 - metrics.mediaLeft;
+    } else {
+      translateX = clamp(translateX, minTranslateX, maxTranslateX);
+    }
+
+    if (metrics.mediaHeight * scale <= metrics.stageHeight) {
+      translateY = (metrics.stageHeight - (metrics.mediaHeight * scale)) / 2 - metrics.mediaTop;
+    } else {
+      translateY = clamp(translateY, minTranslateY, maxTranslateY);
+    }
+
+    media.style.transform = 'translate(' + translateX + 'px, ' + translateY + 'px) scale(' + scale + ')';
+  }
+
   /**
    * Initializes a single focal-point block.
    */
   function initBlock(block) {
     var stage = block.querySelector('[data-focal-point-stage]');
+    var media = block.querySelector('[data-focal-point-media]');
+    var image = media && media.querySelector('img');
     var captionsWrapper = block.querySelector('[data-focal-captions]');
-    var markers = block.querySelectorAll('[data-focal-point-stage] [data-focal-index]');
     var captions = block.querySelectorAll('[data-focal-captions] [data-focal-index]');
     var count = captions.length;
+    var focusPoints = Array.prototype.map.call(captions, readFocusPoint);
 
-    if (!stage || !captionsWrapper || count < 1 || !window.gsap || !window.ScrollTrigger) {
+    if (!stage || !media || !image || !captionsWrapper || count < 1 || !window.gsap || !window.ScrollTrigger) {
       return;
     }
 
@@ -101,12 +187,24 @@
     whenImagesReady(block, function () {
       block.classList.add('is-enhanced');
 
+      Array.prototype.forEach.call(captions, function (caption, index) {
+        positionCaption(stage, caption, focusPoints[index]);
+      });
+
       // Initial state: show only the first caption; others are hidden.
       window.gsap.set(captions, { autoAlpha: 0, yPercent: 8, pointerEvents: 'none' });
       window.gsap.set(captions[0], { autoAlpha: 1, yPercent: 0, pointerEvents: 'auto' });
-      activateFocalPoint(markers, captions, 0);
+      activateFocalPoint(captions, 0);
 
       var activeIndex = 0;
+      var activeFocus = {
+        x: focusPoints[0].x,
+        y: focusPoints[0].y,
+        width: focusPoints[0].width,
+        height: focusPoints[0].height,
+      };
+
+      applyFocus(stage, media, image, activeFocus);
 
       if (count === 1) {
         // Single focal point – just show it, no scroll behaviour needed.
@@ -132,9 +230,15 @@
             );
             if (nextIndex !== activeIndex) {
               activeIndex = nextIndex;
-              activateFocalPoint(markers, captions, activeIndex);
+              activateFocalPoint(captions, activeIndex);
             }
           },
+          onRefresh: function () {
+            applyFocus(stage, media, image, activeFocus);
+            Array.prototype.forEach.call(captions, function (caption, index) {
+              positionCaption(stage, caption, focusPoints[index]);
+            });
+          }
         },
       });
 
@@ -154,29 +258,29 @@
           i - 1
         );
 
-        // Animate the focal-point marker dot to its new position using a
-        // "ghost" element on the stage.  We use a CSS custom-property approach
-        // so the marker repositions smoothly without a full GSAP target.
-        (function (markerFrom, markerTo) {
-          if (!markerFrom || !markerTo) { return; }
-          var fromX = parseFloat(markerFrom.style.left) || 50;
-          var fromY = parseFloat(markerFrom.style.top) || 50;
-          var toX   = parseFloat(markerTo.style.left)   || 50;
-          var toY   = parseFloat(markerTo.style.top)    || 50;
+        (function (fromFocus, toFocus) {
+          var proxy = {
+            x: fromFocus.x,
+            y: fromFocus.y,
+            width: fromFocus.width,
+            height: fromFocus.height,
+          };
 
-          // We animate a proxy object and update the active marker's position
-          // manually so the marker visually travels across the image.
-          var proxy = { x: fromX, y: fromY };
           timeline.to(proxy, {
-            x: toX,
-            y: toY,
+            x: toFocus.x,
+            y: toFocus.y,
+            width: toFocus.width,
+            height: toFocus.height,
             ease: 'power2.inOut',
             onUpdate: function () {
-              markerTo.style.left = proxy.x + '%';
-              markerTo.style.top  = proxy.y + '%';
+              activeFocus.x = proxy.x;
+              activeFocus.y = proxy.y;
+              activeFocus.width = proxy.width;
+              activeFocus.height = proxy.height;
+              applyFocus(stage, media, image, activeFocus);
             },
           }, i - 1);
-        }(markers[i - 1], markers[i]));
+        }(focusPoints[i - 1], focusPoints[i]));
       }
 
       scheduleRefresh();

@@ -8,3 +8,13 @@ moody_focal_point:
     - core/drupal
     - core/once
     - moody_gsap/scrolltrigger
+
+moody_focal_point.admin:
+  css:
+    theme:
+      css/moody-focal-point-admin.css: {}
+  js:
+    js/moody-focal-point-admin.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

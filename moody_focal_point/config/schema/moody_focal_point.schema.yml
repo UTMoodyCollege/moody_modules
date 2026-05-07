@@ -5,6 +5,9 @@ block.settings.moody_focal_point_block:
     image:
       type: integer
       label: 'Image media ID'
+    show_slide_counter:
+      type: boolean
+      label: 'Show slide counter'
     focal_points:
       type: sequence
       label: 'Focal points'
@@ -31,6 +34,18 @@ block.settings.moody_focal_point_block:
           y_position:
             type: float
             label: 'Vertical position (%)'
+          area_width:
+            type: float
+            label: 'Focus width (%)'
+          area_height:
+            type: float
+            label: 'Focus height (%)'
+          caption_x_position:
+            type: float
+            label: 'Caption X position (%)'
+          caption_y_position:
+            type: float
+            label: 'Caption Y position (%)'
           show_square:
             type: boolean
             label: 'Show square'

@@ -4,16 +4,12 @@
 
 .moody-focal-point {
   --fp-accent: #bf5700;
-  --fp-dot-size: 1rem;
-  --fp-square-size: 4rem;
-  --fp-caption-bg: #fff;
+  --fp-caption-bg: rgba(255, 255, 255, 0.94);
   --fp-caption-radius: 0.5rem;
-  --fp-caption-padding: clamp(1.25rem, 3vw, 2rem);
+  --fp-caption-padding: clamp(1rem, 2vw, 1.5rem);
   --fp-arrow-size: 1.25rem;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0;
   margin: 0 auto;
+  min-height: 100svh;
   position: relative;
 }
 
@@ -22,15 +18,19 @@
    ============================================================ */
 
 .moody-focal-point__image-wrapper {
+  min-height: 100svh;
   position: relative;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
   background: #d9d0c4;
 }
 
 .moody-focal-point__figure {
   margin: 0;
   height: 100%;
+  left: 0;
+  position: relative;
+  top: 0;
+  transform-origin: 0 0;
   width: 100%;
 }
 
@@ -43,67 +43,31 @@
 }
 
 /* ============================================================
-   Focal-point markers
-   ============================================================ */
-
-.moody-focal-point__marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Pulsing dot */
-.moody-focal-point__marker-dot {
-  display: block;
-  width: var(--fp-dot-size);
-  height: var(--fp-dot-size);
-  border-radius: 50%;
-  background: var(--fp-accent);
-  box-shadow: 0 0 0 0.25rem rgba(191, 87, 0, 0.25);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.moody-focal-point__marker.is-active .moody-focal-point__marker-dot {
-  transform: scale(1.35);
-  box-shadow: 0 0 0 0.5rem rgba(191, 87, 0, 0.2);
-}
-
-/* Highlight square */
-.moody-focal-point__marker-square {
-  display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: var(--fp-square-size);
-  height: var(--fp-square-size);
-  border: 2px solid var(--fp-square-color, #ffffff);
-  border-radius: 2px;
-  opacity: 0.85;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.moody-focal-point__marker--square.is-active .moody-focal-point__marker-square {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1.08);
-}
-
-/* ============================================================
    Captions panel
    ============================================================ */
 
 .moody-focal-point__captions {
+  inset: 0;
   position: relative;
   overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 3;
 }
 
 .moody-focal-point__caption {
   background: var(--fp-caption-bg);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.16);
   padding: var(--fp-caption-padding);
   display: grid;
   gap: 1rem;
-  position: relative;
+  left: 0;
+  max-width: min(28rem, calc(100% - 2rem));
+  pointer-events: auto;
+  position: absolute;
+  top: 0;
+  width: min(28rem, calc(100% - 2rem));
 }
 
 /* Border variants */
@@ -129,7 +93,7 @@
 .moody-focal-point__arrow {
   width: var(--fp-arrow-size);
   height: var(--fp-arrow-size);
-  background: var(--fp-accent);
+  background: color-mix(in srgb, var(--fp-accent) 82%, white 18%);
   clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
   justify-self: start;
 }
@@ -162,29 +126,6 @@
 }
 
 /* ============================================================
-   Desktop: side-by-side layout
-   ============================================================ */
-
-@media (min-width: 900px) {
-  .moody-focal-point {
-    grid-template-columns: minmax(0, 1.25fr) minmax(22rem, 0.75fr);
-    min-height: 100svh;
-  }
-
-  .moody-focal-point__image-wrapper {
-    aspect-ratio: unset;
-    height: 100%;
-  }
-
-  .moody-focal-point__captions {
-    align-content: start;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-}
-
-/* ============================================================
    Enhanced (JS) state – pinned scroll-through
    ============================================================ */
 
@@ -193,15 +134,22 @@
   overflow: hidden;
 }
 
+.moody-focal-point.is-enhanced .moody-focal-point__figure {
+  position: absolute;
+  will-change: transform, width, height, left, top;
+}
+
+.moody-focal-point.is-enhanced .moody-focal-point__figure img,
+.moody-focal-point.is-enhanced .moody-focal-point__figure .moody-focal-point__image {
+  object-fit: fill;
+}
+
 .moody-focal-point.is-enhanced .moody-focal-point__captions {
-  min-height: 100svh;
-  overflow: hidden;
-  position: relative;
+  min-height: 100%;
 }
 
 .moody-focal-point.is-enhanced .moody-focal-point__caption {
-  inset: 0;
-  position: absolute;
+  will-change: transform, opacity, left, top;
 }
 
 /* ============================================================
@@ -210,6 +158,11 @@
 
 @media (max-width: 899px) {
   .moody-focal-point__image-wrapper {
-    min-height: min(56svh, 32rem);
+    min-height: min(72svh, 42rem);
+  }
+
+  .moody-focal-point__caption {
+    max-width: min(22rem, calc(100% - 1.5rem));
+    width: min(22rem, calc(100% - 1.5rem));
   }
 }

@@ -14,6 +14,7 @@ function moody_focal_point_theme($existing, $type, $theme, $path): array {
       'variables' => [
         'image' => NULL,
         'focal_points' => [],
+        'show_slide_counter' => FALSE,
         'block_id' => '',
       ],
     ],
