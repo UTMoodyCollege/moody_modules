@@ -5,6 +5,6 @@ id: ambient_video
 block_id: 'inline_block:ambient_video'
 category: moody_site_building
 label: 'Moody Ambient Video'
-image_path: ''
-image_alt: ''
+image_path: /themes/custom/moody/moody_components_images/ambient-video.jpeg
+image_alt: 'The ambient video component'
 weight: -4

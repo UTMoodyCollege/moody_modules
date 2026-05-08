@@ -5,6 +5,6 @@ id: moody_focal_point
 block_id: moody_focal_point_block
 category: moody_site_building
 label: 'Moody Focal Point'
-image_path: ''
-image_alt: ''
+image_path: /themes/custom/moody/moody_components_images/moody-focal-point.jpeg
+image_alt: 'The moody focal point component'
 weight: 0
