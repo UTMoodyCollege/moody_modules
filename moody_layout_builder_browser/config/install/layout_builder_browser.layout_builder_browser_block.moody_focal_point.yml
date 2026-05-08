@@ -1,10 +1,10 @@
 langcode: en
 status: true
 dependencies: {  }
-id: ambient_video
-block_id: 'inline_block:ambient_video'
+id: moody_focal_point
+block_id: moody_focal_point_block
 category: moody_site_building
-label: 'Moody Ambient Video'
+label: 'Moody Focal Point'
 image_path: ''
 image_alt: ''
-weight: -4
+weight: 0

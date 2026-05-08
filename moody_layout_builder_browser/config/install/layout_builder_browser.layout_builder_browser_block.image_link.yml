@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: image_link
+block_id: 'inline_block:utexas_image_link'
+category: moody_site_building
+label: 'Image Link'
+image_path: /web/themes/custom/moody/moody_component_images/image_link.jpg
+image_alt: 'The image link component preview'
+weight: -8

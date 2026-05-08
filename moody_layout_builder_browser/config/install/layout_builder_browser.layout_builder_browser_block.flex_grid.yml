@@ -7,4 +7,4 @@ category: moody_site_building
 label: 'Moody Flex Grid'
 image_path: /themes/custom/moody/moody_components_images/flex-grid-default.jpg
 image_alt: 'Flex Grid Default'
-weight: 0
+weight: -1

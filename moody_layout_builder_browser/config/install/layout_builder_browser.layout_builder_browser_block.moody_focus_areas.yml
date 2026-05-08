@@ -7,4 +7,4 @@ category: moody_site_building
 label: 'Moody Focus Areas'
 image_path: /themes/custom/moody/moody_components_images/moody_focus_areas.jpg
 image_alt: 'The moody focus area'
-weight: -100
+weight: 1
