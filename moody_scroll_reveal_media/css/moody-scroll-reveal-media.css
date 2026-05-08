@@ -27,7 +27,6 @@
 .moody-scroll-reveal-media__slide {
   align-items: stretch;
   background: linear-gradient(180deg, #f6f1ea 0%, #efe8de 100%);
-  border-radius: var(--moody-scroll-reveal-media-radius);
   display: grid;
   gap: var(--moody-scroll-reveal-media-gap);
   overflow: clip;
