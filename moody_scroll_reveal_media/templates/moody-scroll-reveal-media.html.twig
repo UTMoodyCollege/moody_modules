@@ -8,7 +8,7 @@
   <div class="moody-scroll-reveal-media__viewport" data-scroll-reveal-media>
     <div class="moody-scroll-reveal-media__stage">
       {% for slide in slides %}
-        <article class="moody-scroll-reveal-media__slide{{ not slide.has_content ? ' moody-scroll-reveal-media__slide--media-only' : '' }}{{ slide.has_overlay_title ? ' moody-scroll-reveal-media__slide--title-overlay' : '' }}" data-reveal-direction="{{ slide.direction }}" aria-label="Reveal step {{ loop.index }} of {{ slides|length }}">
+        <article class="moody-scroll-reveal-media__slide{{ not slide.has_content ? ' moody-scroll-reveal-media__slide--media-only' : '' }}{{ slide.has_overlay_content ? ' moody-scroll-reveal-media__slide--title-overlay' : '' }}" data-reveal-direction="{{ slide.direction }}" aria-label="Reveal step {{ loop.index }} of {{ slides|length }}">
           <div class="moody-scroll-reveal-media__media">
             <div class="moody-scroll-reveal-media__media-inner">
               {% if slide.video %}
@@ -40,9 +40,16 @@
                 {{ slide.media }}
               {% endif %}
 
-              {% if slide.has_overlay_title %}
+              {% if slide.has_overlay_content %}
                 <div class="moody-scroll-reveal-media__overlay moody-scroll-reveal-media__overlay--{{ slide.title_position }}">
-                  <h3 class="moody-scroll-reveal-media__title moody-scroll-reveal-media__title--overlay">{{ slide.title }}</h3>
+                  <div class="moody-scroll-reveal-media__overlay-copy">
+                    {% if slide.title %}
+                      <h3 class="moody-scroll-reveal-media__title moody-scroll-reveal-media__title--overlay">{{ slide.title }}</h3>
+                    {% endif %}
+                    {% if slide.body %}
+                      <div class="moody-scroll-reveal-media__body moody-scroll-reveal-media__body--overlay{{ slide.use_overlay_body_defaults ? ' moody-scroll-reveal-media__body--overlay-default' : '' }}">{{ slide.body }}</div>
+                    {% endif %}
+                  </div>
                 </div>
               {% endif %}
             </div>

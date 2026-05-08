@@ -88,6 +88,12 @@
   z-index: 2;
 }
 
+.moody-scroll-reveal-media__overlay-copy {
+  display: grid;
+  gap: 1rem;
+  max-width: min(40rem, 100%);
+}
+
 .moody-scroll-reveal-media__overlay--top-left {
   align-items: flex-start;
   justify-content: flex-start;
@@ -174,9 +180,53 @@
   font-size: clamp(2.4rem, 6vw, 5.75rem);
   font-weight: 800;
   line-height: 0.94;
-  max-width: min(12ch, 100%);
   text-shadow: 0 0.08em 0.35em rgba(0, 0, 0, 0.35);
   text-transform: uppercase;
+}
+
+.moody-scroll-reveal-media__body--overlay {
+  max-width: min(34rem, 100%);
+}
+
+.moody-scroll-reveal-media__body--overlay > * {
+  max-width: 100%;
+}
+
+.moody-scroll-reveal-media__body--overlay-default {
+  color: #fff;
+  text-shadow: 0 0.08em 0.35em rgba(0, 0, 0, 0.35);
+}
+
+.moody-scroll-reveal-media__body--overlay-default :where(p, ul, ol, blockquote) {
+  color: inherit;
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.65;
+}
+
+.moody-scroll-reveal-media__body--overlay-default :where(a) {
+  color: inherit;
+  text-decoration-color: currentColor;
+}
+
+.moody-scroll-reveal-media__overlay--top-left .moody-scroll-reveal-media__overlay-copy,
+.moody-scroll-reveal-media__overlay--center-left .moody-scroll-reveal-media__overlay-copy,
+.moody-scroll-reveal-media__overlay--bottom-left .moody-scroll-reveal-media__overlay-copy {
+  justify-items: start;
+  text-align: left;
+}
+
+.moody-scroll-reveal-media__overlay--top-center .moody-scroll-reveal-media__overlay-copy,
+.moody-scroll-reveal-media__overlay--center .moody-scroll-reveal-media__overlay-copy,
+.moody-scroll-reveal-media__overlay--bottom-center .moody-scroll-reveal-media__overlay-copy {
+  justify-items: center;
+  text-align: center;
+}
+
+.moody-scroll-reveal-media__overlay--top-right .moody-scroll-reveal-media__overlay-copy,
+.moody-scroll-reveal-media__overlay--center-right .moody-scroll-reveal-media__overlay-copy,
+.moody-scroll-reveal-media__overlay--bottom-right .moody-scroll-reveal-media__overlay-copy {
+  justify-items: end;
+  text-align: right;
 }
 
 .moody-scroll-reveal-media__body {

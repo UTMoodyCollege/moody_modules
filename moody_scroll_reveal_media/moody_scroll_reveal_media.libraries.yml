@@ -9,3 +9,13 @@ moody_scroll_reveal_media:
     - core/drupal
     - core/once
     - moody_gsap/scrolltrigger
+
+admin:
+  css:
+    theme:
+      css/moody-scroll-reveal-media.admin.css: {}
+  js:
+    js/moody-scroll-reveal-media.admin.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

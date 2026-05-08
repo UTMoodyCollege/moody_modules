@@ -63,6 +63,7 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
   public function blockForm($form, FormStateInterface $form_state): array {
     $form = parent::blockForm($form, $form_state);
     $config = $this->getConfiguration();
+    $form['#attached']['library'][] = 'moody_scroll_reveal_media/admin';
 
     $form['headline'] = [
       '#type' => 'textfield',
@@ -134,7 +135,7 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
 
       $form['slides'][$i]['title_display'] = [
         '#type' => 'select',
-        '#title' => $this->t('Title display'),
+        '#title' => $this->t('Text display'),
         '#options' => [
           'inline' => $this->t('Inline'),
           'overlay' => $this->t('Overlay'),
@@ -142,22 +143,41 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
         '#default_value' => $this->normalizeTitleDisplay((string) ($slide['title_display'] ?? 'inline')),
       ];
 
-      $form['slides'][$i]['title_position'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Overlay position'),
-        '#description' => $this->t('Used when the title display is set to Overlay.'),
-        '#options' => [
-          'top-left' => $this->t('Top left'),
-          'top-center' => $this->t('Top center'),
-          'top-right' => $this->t('Top right'),
-          'center-left' => $this->t('Center left'),
-          'center' => $this->t('Center'),
-          'center-right' => $this->t('Center right'),
-          'bottom-left' => $this->t('Bottom left'),
-          'bottom-center' => $this->t('Bottom center'),
-          'bottom-right' => $this->t('Bottom right'),
+      $position = $this->normalizeTitlePosition((string) ($slide['title_position'] ?? 'center'));
+      $position_parts = $this->splitTitlePosition($position);
+
+      $form['slides'][$i]['text_position_picker'] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['moody-scroll-reveal-media-position-picker'],
+          'data-text-position-picker' => 'true',
+          'data-text-position-value' => $position,
+          'tabindex' => '0',
+          'role' => 'grid',
+          'aria-label' => (string) $this->t('Slide @number overlay text position', ['@number' => $i + 1]),
         ],
-        '#default_value' => $this->normalizeTitlePosition((string) ($slide['title_position'] ?? 'center')),
+        'markup' => [
+          '#markup' => $this->buildTextPositionPickerMarkup(),
+        ],
+      ];
+      $form['slides'][$i]['title_position_y'] = [
+        '#type' => 'hidden',
+        '#default_value' => $position_parts['y'],
+        '#attributes' => [
+          'class' => ['moody-scroll-reveal-media-position-input', 'moody-scroll-reveal-media-position-input--y'],
+        ],
+      ];
+      $form['slides'][$i]['title_position_x'] = [
+        '#type' => 'hidden',
+        '#default_value' => $position_parts['x'],
+        '#attributes' => [
+          'class' => ['moody-scroll-reveal-media-position-input', 'moody-scroll-reveal-media-position-input--x'],
+        ],
+      ];
+      $form['slides'][$i]['title_position_help'] = [
+        '#type' => 'item',
+        '#title' => $this->t('Overlay position'),
+        '#markup' => $this->t('Click the preview to place the overlaid title and body. Use arrow keys while the preview is focused.'),
       ];
 
       $form['slides'][$i]['body'] = [
@@ -190,7 +210,20 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
   public function blockSubmit($form, FormStateInterface $form_state): void {
     $this->configuration['headline'] = (string) $this->getSubmittedSetting($form_state, 'headline', '');
     $this->configuration['animation_style'] = $this->normalizeAnimationStyle((string) $this->getSubmittedSetting($form_state, 'animation_style', 'fade'));
-    $this->configuration['slides'] = $this->getSubmittedSetting($form_state, 'slides', []);
+    $slides = $this->getSubmittedSetting($form_state, 'slides', []);
+
+    foreach ($slides as $delta => $slide) {
+      if (!is_array($slide)) {
+        continue;
+      }
+
+      $slides[$delta]['title_position'] = $this->normalizeSubmittedTitlePosition(
+        (string) ($slide['title_position_y'] ?? 'center'),
+        (string) ($slide['title_position_x'] ?? 'center'),
+      );
+    }
+
+    $this->configuration['slides'] = $slides;
   }
 
   /**
@@ -211,8 +244,9 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
       $title_position = $this->normalizeTitlePosition((string) ($slide['title_position'] ?? 'center'));
       $has_media_source = !empty($media_id) || $video_url !== '';
       $video = $this->buildVideoSource($video_url, !empty($slide['video_autoplay']), $delta);
-      $has_overlay_title = $title !== '' && $title_display === 'overlay';
-      $has_inline_content = ($eyebrow !== '' || $body_value !== '' || ($title !== '' && !$has_overlay_title));
+      $has_overlay_content = $title_display === 'overlay' && ($title !== '' || $body_value !== '');
+      $has_inline_content = ($eyebrow !== '' || ($title_display !== 'overlay' && ($body_value !== '' || $title !== '')));
+      $use_overlay_body_defaults = !$this->bodyUsesCustomPresentation($body_value);
 
       if (!$has_media_source && $eyebrow === '' && $title === '' && $body_value === '') {
         continue;
@@ -231,7 +265,8 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
         'eyebrow' => $eyebrow,
         'title' => $title,
         'has_content' => $has_inline_content,
-        'has_overlay_title' => $has_overlay_title,
+        'has_overlay_content' => $has_overlay_content,
+        'use_overlay_body_defaults' => $use_overlay_body_defaults,
         'body' => [
           '#type' => 'processed_text',
           '#text' => $slide['body']['value'] ?? '',
@@ -318,6 +353,73 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
   }
 
   /**
+   * Normalizes separate x/y inputs into one overlay position value.
+   */
+  private function normalizeSubmittedTitlePosition(string $vertical, string $horizontal): string {
+    $allowed_vertical = ['top', 'center', 'bottom'];
+    $allowed_horizontal = ['left', 'center', 'right'];
+
+    $vertical = in_array($vertical, $allowed_vertical, TRUE) ? $vertical : 'center';
+    $horizontal = in_array($horizontal, $allowed_horizontal, TRUE) ? $horizontal : 'center';
+
+    if ($vertical === 'center' && $horizontal === 'center') {
+      return 'center';
+    }
+
+    return $vertical . '-' . $horizontal;
+  }
+
+  /**
+   * Splits a stored overlay position into x/y values for the admin picker.
+   */
+  private function splitTitlePosition(string $position): array {
+    if ($position === 'center') {
+      return ['x' => 'center', 'y' => 'center'];
+    }
+
+    [$vertical, $horizontal] = explode('-', $position) + ['center', 'center'];
+
+    return [
+      'x' => $horizontal,
+      'y' => $vertical,
+    ];
+  }
+
+  /**
+   * Builds the admin overlay-position picker markup.
+   */
+  private function buildTextPositionPickerMarkup(): string {
+    $positions = [
+      'top-left',
+      'top-center',
+      'top-right',
+      'center-left',
+      'center',
+      'center-right',
+      'bottom-left',
+      'bottom-center',
+      'bottom-right',
+    ];
+
+    $markup = '<span class="moody-scroll-reveal-media-position-picker__preview">'
+      . '<span class="moody-scroll-reveal-media-position-picker__sample" data-text-position-sample>'
+      . '<strong>' . $this->t('Title') . '</strong>'
+      . '<span>' . $this->t('Body') . '</span>'
+      . '</span>'
+      . '</span>'
+      . '<span class="moody-scroll-reveal-media-position-picker__options">';
+
+    foreach ($positions as $position) {
+      $markup .= '<button type="button" class="moody-scroll-reveal-media-position-picker__option" '
+        . 'data-text-position-option="' . $position . '" '
+        . 'id="moody-scroll-reveal-media-position-option-' . $position . '" '
+        . 'aria-label="' . $this->t('@position position', ['@position' => ucwords(str_replace('-', ' ', $position))]) . '"></button>';
+    }
+
+    return $markup . '</span>';
+  }
+
+  /**
    * Builds Vimeo embed data for a slide.
    */
   private function buildVideoSource(string $video_url, bool $autoplay, int $delta): array {
@@ -364,6 +466,17 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
       'src' => 'https://player.vimeo.com/video/' . $video_id . '?' . http_build_query($query),
       'title' => $this->t('Embedded Vimeo video for slide @number', ['@number' => $delta + 1]),
     ];
+  }
+
+  /**
+   * Determines whether the body markup includes custom presentation hooks.
+   */
+  private function bodyUsesCustomPresentation(string $body_value): bool {
+    if ($body_value === '') {
+      return FALSE;
+    }
+
+    return preg_match('/<(?:[^>]+\s(?:class|style)=|\/?(?:em|i|strong|b|u|mark|small|sup|sub|span|font)\b)/i', $body_value) === 1;
   }
 
   /**
