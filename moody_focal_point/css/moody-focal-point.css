@@ -70,6 +70,14 @@
   width: min(28rem, calc(100% - 2rem));
 }
 
+.moody-focal-point:not(.is-enhanced) .moody-focal-point__caption {
+  display: none;
+}
+
+.moody-focal-point:not(.is-enhanced) .moody-focal-point__caption:first-child {
+  display: grid;
+}
+
 /* Border variants */
 .moody-focal-point__caption--border-thin {
   border: 1px solid rgba(0, 0, 0, 0.12);
@@ -129,26 +137,32 @@
    Enhanced (JS) state – pinned scroll-through
    ============================================================ */
 
+.moody-focal-point.is-primed .moody-focal-point__image-wrapper,
 .moody-focal-point.is-enhanced .moody-focal-point__image-wrapper {
   min-height: 100svh;
   overflow: hidden;
 }
 
+.moody-focal-point.is-primed .moody-focal-point__figure,
 .moody-focal-point.is-enhanced .moody-focal-point__figure {
   position: absolute;
   will-change: transform, width, height, left, top;
 }
 
+.moody-focal-point.is-primed .moody-focal-point__figure img,
+.moody-focal-point.is-primed .moody-focal-point__figure .moody-focal-point__image,
 .moody-focal-point.is-enhanced .moody-focal-point__figure img,
 .moody-focal-point.is-enhanced .moody-focal-point__figure .moody-focal-point__image {
   object-fit: fill;
 }
 
+.moody-focal-point.is-primed .moody-focal-point__captions,
 .moody-focal-point.is-enhanced .moody-focal-point__captions {
   min-height: 100%;
 }
 
 .moody-focal-point.is-enhanced .moody-focal-point__caption {
+  display: grid;
   will-change: transform, opacity, left, top;
 }
 
