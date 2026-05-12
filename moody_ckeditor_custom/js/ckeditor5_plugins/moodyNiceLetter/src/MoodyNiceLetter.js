@@ -43,6 +43,13 @@ function normalizeColor(value) {
   return map[normalized] || 'burnt-orange';
 }
 
+function escapeShortcodeAttribute(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export default class MoodyNiceLetter extends Plugin {
   init() {
     const editor = this.editor;
@@ -78,7 +85,7 @@ export default class MoodyNiceLetter extends Plugin {
 
         lead = requestedLead.trim() || lead;
         const color = normalizeColor(requestedColor);
-        const shortcode = `[nice_letter lead="${lead}" color="${color}"]${content}[/nice_letter]`;
+        const shortcode = `[nice_letter lead="${escapeShortcodeAttribute(lead)}" color="${color}"]${content}[/nice_letter]`;
 
         editor.model.change((writer) => {
           if (selectedText) {

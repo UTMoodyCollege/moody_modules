@@ -57,7 +57,7 @@ class MoodyNiceLetterFilter extends FilterBase {
    */
   protected function buildNiceLetter(array $matches) {
     $attributes = $this->parseAttributes($matches[1] ?? '');
-    $lead = trim($attributes['lead'] ?? '');
+    $lead = trim(Html::decodeEntities($attributes['lead'] ?? ''));
     $content = trim($matches[2] ?? '');
 
     if ($lead === '' || $content === '') {
@@ -65,7 +65,7 @@ class MoodyNiceLetterFilter extends FilterBase {
     }
 
     $lead_classes = ['moody-nice-letter__lead'];
-    if (mb_strlen($lead) > 1 || !empty($attributes['word'])) {
+    if ($this->shouldRenderLeadAsWord($lead, $attributes)) {
       $lead_classes[] = 'moody-nice-letter__lead--word';
     }
 
@@ -145,13 +145,35 @@ class MoodyNiceLetterFilter extends FilterBase {
   protected function parseAttributes($attribute_string) {
     $attributes = [];
 
-    if (preg_match_all('/(\w+)="([^"]*)"/', $attribute_string, $matches, PREG_SET_ORDER)) {
+    if (preg_match_all('/(\w+)\s*=\s*(["\'])(.*?)\2/', $attribute_string, $matches, PREG_SET_ORDER)) {
       foreach ($matches as $match) {
-        $attributes[$match[1]] = $match[2];
+        $attributes[$match[1]] = Html::decodeEntities($match[3]);
       }
     }
 
     return $attributes;
+  }
+
+  /**
+   * Determines whether a lead should use word styling.
+   *
+   * Quoted single-letter leads such as "T should still render as a drop cap.
+   *
+   * @param string $lead
+   *   The decoded lead value.
+   * @param array<string, string> $attributes
+   *   Parsed shortcode attributes.
+   *
+   * @return bool
+   *   TRUE when the lead should render as a word.
+   */
+  protected function shouldRenderLeadAsWord($lead, array $attributes) {
+    if (!empty($attributes['word'])) {
+      return TRUE;
+    }
+
+    $normalized_lead = preg_replace('/[\s"\' . "“”‘’«»‚„‹›]+/u', '', $lead);
+    return mb_strlen($normalized_lead) > 1;
   }
 
 }
