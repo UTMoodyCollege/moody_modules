@@ -10,6 +10,15 @@ moody_nice_letter:
   dependencies:
     - ckeditor5/ckeditor5
 
+moody_readable_text:
+  css:
+    theme:
+      css/moody-readable-text.dialog.css: {}
+  js:
+    js/build/moodyReadableText.js: { preprocess: false, minified: true }
+  dependencies:
+    - ckeditor5/ckeditor5
+
 moody_editor_utility_styles:
   css:
     theme:

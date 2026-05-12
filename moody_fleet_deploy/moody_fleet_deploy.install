@@ -11,6 +11,7 @@
 function moody_fleet_deploy_install() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
+  _moody_fleet_deploy_enable_readable_text_toolbar_on_flex_html();
   _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
   _moody_fleet_deploy_enable_moody_block_publishing();
   _moody_fleet_deploy_enable_moody_media_image_helper();
@@ -24,6 +25,7 @@ function moody_fleet_deploy_install() {
 function moody_fleet_deploy_update_9001() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
+  _moody_fleet_deploy_enable_readable_text_toolbar_on_flex_html();
   _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
 }
 
@@ -33,6 +35,7 @@ function moody_fleet_deploy_update_9001() {
 function moody_fleet_deploy_update_9002() {
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
+  _moody_fleet_deploy_enable_readable_text_toolbar_on_flex_html();
   _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
 }
 
@@ -63,6 +66,13 @@ function moody_fleet_deploy_update_9005() {
  */
 function moody_fleet_deploy_update_9006() {
   _moody_fleet_deploy_enable_moody_block_publishing();
+}
+
+/**
+ * Adds the Readable Text Block toolbar button to Flex HTML CKEditor 5.
+ */
+function moody_fleet_deploy_update_9007() {
+  _moody_fleet_deploy_enable_readable_text_toolbar_on_flex_html();
 }
 
 /**
@@ -121,6 +131,46 @@ function _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html() {
     }
     else {
       $items[] = 'moodyNiceLetter';
+    }
+    $editor->set('settings.toolbar.items', $items)->save();
+  }
+  else {
+    $editor->save();
+  }
+}
+
+/**
+ * Adds the Readable Text Block toolbar button to Flex HTML CKEditor 5.
+ */
+function _moody_fleet_deploy_enable_readable_text_toolbar_on_flex_html() {
+  $config_factory = \Drupal::configFactory();
+  $editor = $config_factory->getEditable('editor.editor.flex_html');
+
+  if ($editor->isNew() || $editor->get('editor') !== 'ckeditor5') {
+    return;
+  }
+
+  $modules = $editor->get('dependencies.module') ?? [];
+  if (!in_array('moody_ckeditor_custom', $modules, TRUE)) {
+    $modules[] = 'moody_ckeditor_custom';
+    sort($modules);
+    $editor->set('dependencies.module', $modules);
+  }
+
+  $items = $editor->get('settings.toolbar.items') ?? [];
+  if (!in_array('moodyReadableText', $items, TRUE)) {
+    $insert_after = array_search('moodyNiceLetter', $items, TRUE);
+    if ($insert_after !== FALSE) {
+      array_splice($items, $insert_after + 1, 0, ['moodyReadableText']);
+    }
+    else {
+      $insert_after = array_search('style', $items, TRUE);
+      if ($insert_after !== FALSE) {
+        array_splice($items, $insert_after + 1, 0, ['moodyReadableText']);
+      }
+      else {
+        $items[] = 'moodyReadableText';
+      }
     }
     $editor->set('settings.toolbar.items', $items)->save();
   }

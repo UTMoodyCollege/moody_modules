@@ -157,3 +157,66 @@
 .moody-text-size-2xl {
   font-size: 1.75rem;
 }
+
+.ck-content .moody-readable-text,
+.moody-readable-text {
+  box-sizing: border-box;
+  margin: 1.5rem auto;
+  width: 100%;
+}
+
+.ck-content .moody-readable-text > :first-child,
+.moody-readable-text > :first-child {
+  margin-top: 0;
+}
+
+.ck-content .moody-readable-text > :last-child,
+.moody-readable-text > :last-child {
+  margin-bottom: 0;
+}
+
+@media (min-width: 992px) {
+  .ck-content .moody-readable-text,
+  .moody-readable-text {
+    margin: 2rem auto;
+  }
+
+  .ck-content .moody-readable-text--measure-narrow,
+  .moody-readable-text--measure-narrow {
+    max-width: 40rem;
+  }
+
+  .ck-content .moody-readable-text--measure-default,
+  .moody-readable-text--measure-default {
+    max-width: 48rem;
+  }
+
+  .ck-content .moody-readable-text--measure-wide,
+  .moody-readable-text--measure-wide {
+    max-width: 56rem;
+  }
+
+  .ck-content .moody-readable-text--pad-none,
+  .moody-readable-text--pad-none {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .ck-content .moody-readable-text--pad-small,
+  .moody-readable-text--pad-small {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .ck-content .moody-readable-text--pad-medium,
+  .moody-readable-text--pad-medium {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+
+  .ck-content .moody-readable-text--pad-large,
+  .moody-readable-text--pad-large {
+    padding-left: 6rem;
+    padding-right: 6rem;
+  }
+}

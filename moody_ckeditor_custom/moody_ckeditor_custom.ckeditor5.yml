@@ -29,3 +29,16 @@ moody_ckeditor_custom_moody_nice_letter:
       moodyNiceLetter:
         label: 'Moody Nice Letter'
     elements: false
+
+moody_ckeditor_custom_moody_readable_text:
+  ckeditor5:
+    plugins:
+      - moodyReadableText.MoodyReadableText
+
+  drupal:
+    label: 'Readable Text Block'
+    library: moody_ckeditor_custom/moody_readable_text
+    toolbar_items:
+      moodyReadableText:
+        label: 'Readable Text Block'
+    elements: false
