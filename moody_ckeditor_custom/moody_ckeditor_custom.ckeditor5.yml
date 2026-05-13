@@ -42,3 +42,16 @@ moody_ckeditor_custom_moody_readable_text:
       moodyReadableText:
         label: 'Readable Text Block'
     elements: false
+
+moody_ckeditor_custom_moody_image_caption:
+  ckeditor5:
+    plugins:
+      - moodyImageCaption.MoodyImageCaption
+
+  drupal:
+    label: 'Image Caption'
+    library: moody_ckeditor_custom/moody_image_caption
+    toolbar_items:
+      moodyImageCaption:
+        label: 'Image Caption'
+    elements: false

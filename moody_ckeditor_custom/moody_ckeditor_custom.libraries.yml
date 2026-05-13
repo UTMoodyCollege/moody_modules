@@ -19,6 +19,15 @@ moody_readable_text:
   dependencies:
     - ckeditor5/ckeditor5
 
+moody_image_caption:
+  css:
+    theme:
+      css/moody-image-caption.dialog.css: {}
+  js:
+    js/build/moodyImageCaption.js: { preprocess: false, minified: true }
+  dependencies:
+    - ckeditor5/ckeditor5
+
 moody_editor_utility_styles:
   css:
     theme:
