@@ -1,0 +1,10 @@
+name: Moody Mini Nav
+type: module
+description: Provides a configurable mini navigation block with Layout Builder anchor support.
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:block
+  - drupal:block_content
+  - drupal:layout_builder
+  - drupal:node

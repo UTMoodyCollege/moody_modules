@@ -1,0 +1,13 @@
+services:
+  moody_mini_nav.anchor_target_manager:
+    class: Drupal\moody_mini_nav\MiniNavAnchorTargetManager
+    arguments:
+      - '@current_route_match'
+      - '@entity_type.manager'
+      - '@plugin.manager.block'
+      - '@entity_type.bundle.info'
+
+  moody_mini_nav.section_component_subscriber:
+    class: Drupal\moody_mini_nav\EventSubscriber\SectionComponentAnchorSubscriber
+    tags:
+      - { name: event_subscriber }

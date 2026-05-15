@@ -1,0 +1,40 @@
+block.settings.moody_mini_nav:
+  type: block_settings
+  label: 'Moody Mini Nav block'
+  mapping:
+    instance_uuid:
+      type: string
+      label: Instance UUID
+    text_color:
+      type: string
+      label: Text color
+    background_color:
+      type: string
+      label: Background color
+    font_size:
+      type: string
+      label: Font size
+    font_weight:
+      type: string
+      label: Font weight
+    mobile_label:
+      type: label
+      label: Mobile label
+    items:
+      type: sequence
+      label: Navigation items
+      sequence:
+        type: mapping
+        mapping:
+          label:
+            type: label
+            label: Label
+          link_type:
+            type: string
+            label: Link type
+          url:
+            type: string
+            label: URL
+          anchor_target:
+            type: string
+            label: Anchor target

@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Primary hooks for Moody Mini Nav.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function moody_mini_nav_theme($existing, $type, $theme, $path): array {
+  return [
+    'moody_mini_nav' => [
+      'variables' => [
+        'instance_id' => '',
+        'items' => [],
+        'classes' => [],
+        'text_color' => 'burnt-orange',
+        'background_color' => 'white',
+        'font_size' => 'md',
+        'font_weight' => 'black',
+        'mobile_label' => 'Menu',
+      ],
+    ],
+  ];
+}

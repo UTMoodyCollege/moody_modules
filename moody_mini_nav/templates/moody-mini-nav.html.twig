@@ -1,0 +1,73 @@
+<div
+  id="{{ instance_id }}"
+  class="moody-mini-nav moody-mini-nav--text-{{ text_color }} moody-mini-nav--bg-{{ background_color }} moody-mini-nav--size-{{ font_size }} moody-mini-nav--weight-{{ font_weight }}"
+  data-moody-mini-nav
+>
+  <nav class="moody-mini-nav__desktop" aria-label="Mini navigation">
+    <ul class="moody-mini-nav__list">
+      {% for item in items %}
+        <li class="moody-mini-nav__item">
+          <a
+            href="{{ item.href }}"
+            class="moody-mini-nav__link"
+            {% if item.type == 'anchor' %}
+              data-moody-mini-nav-anchor
+              data-moody-mini-nav-target-id="{{ item.target_id }}"
+              data-moody-mini-nav-target-uuid="{{ item.target_uuid }}"
+            {% endif %}
+          >
+            {{ item.label }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+
+  <div class="moody-mini-nav__mobile">
+    <button
+      type="button"
+      class="moody-mini-nav__toggle"
+      aria-expanded="false"
+      aria-controls="{{ instance_id }}-panel"
+      data-moody-mini-nav-toggle
+    >
+      <span class="moody-mini-nav__toggle-icon" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+      <span class="moody-mini-nav__toggle-label">{{ mobile_label }}</span>
+    </button>
+
+    <div class="moody-mini-nav__overlay" hidden data-moody-mini-nav-overlay></div>
+    <div
+      id="{{ instance_id }}-panel"
+      class="moody-mini-nav__panel"
+      hidden
+      data-moody-mini-nav-panel
+    >
+      <button type="button" class="moody-mini-nav__close" aria-label="Close mini navigation" data-moody-mini-nav-close>
+        <span aria-hidden="true">×</span>
+      </button>
+      <nav aria-label="Mini navigation mobile">
+        <ul class="moody-mini-nav__panel-list">
+          {% for item in items %}
+            <li class="moody-mini-nav__panel-item">
+              <a
+                href="{{ item.href }}"
+                class="moody-mini-nav__panel-link"
+                {% if item.type == 'anchor' %}
+                  data-moody-mini-nav-anchor
+                  data-moody-mini-nav-target-id="{{ item.target_id }}"
+                  data-moody-mini-nav-target-uuid="{{ item.target_uuid }}"
+                {% endif %}
+              >
+                {{ item.label }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
