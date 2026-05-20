@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: photo_content_area
+block_id: 'inline_block:utexas_photo_content_area'
+category: moody_site_building
+label: 'Photo Content Area'
+image_path: /themes/custom/moody/moody_components_images/pca.jpg
+image_alt: 'Photo Content Area'
+weight: -6
