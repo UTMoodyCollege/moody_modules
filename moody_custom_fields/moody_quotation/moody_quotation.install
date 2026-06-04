@@ -28,3 +28,54 @@ function moody_quotation_update_8101() {
     $schema->addField($table_name, 'field_block_moody_quotation_media', $spec);
   }
 }
+
+/**
+ * Add attribution and link columns to moody_quotation block fields.
+ */
+function moody_quotation_update_8102() {
+  $fields = [
+    'field_block_moody_quotation_attribution' => [
+      'type' => 'text',
+      'size' => 'normal',
+      'binary' => FALSE,
+    ],
+    'field_block_moody_quotation_link_uri' => [
+      'type' => 'varchar',
+      'length' => 512,
+      'binary' => FALSE,
+    ],
+    'field_block_moody_quotation_link_text' => [
+      'type' => 'varchar',
+      'length' => 255,
+      'binary' => FALSE,
+    ],
+    'field_block_moody_quotation_link_options' => [
+      'description' => 'Serialized array of options for the link.',
+      'type' => 'blob',
+      'size' => 'big',
+      'serialize' => TRUE,
+    ],
+  ];
+
+  $database = Database::getConnection();
+  $query = $database->query(
+    "SELECT value FROM {key_value} WHERE name=:name",
+    [
+      ':name' => "block_content.field_schema_data.field_block_moody_quotation",
+    ]
+  );
+  $result = $query->fetchAssoc();
+  if (empty($result['value'])) {
+    return;
+  }
+
+  $tables = array_keys(unserialize($result['value']));
+  $schema = $database->schema();
+  foreach ($tables as $table_name) {
+    foreach ($fields as $field_name => $spec) {
+      if (!$schema->fieldExists($table_name, $field_name)) {
+        $schema->addField($table_name, $field_name, $spec);
+      }
+    }
+  }
+}

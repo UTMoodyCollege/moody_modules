@@ -1,0 +1,80 @@
+.quotation-wrapper.feature {
+  margin: 2rem auto;
+  max-width: 74rem;
+}
+
+.moody-quotation-feature {
+  margin: 0;
+}
+
+.moody-quotation-feature__media {
+  margin-bottom: 1.5rem;
+}
+
+.moody-quotation-feature__quote {
+  color: #bf5700;
+  font-size: 2.625rem;
+  font-weight: 700;
+  line-height: 1.14;
+  margin: 0;
+}
+
+.moody-quotation-feature__attribution {
+  color: #2d2a28;
+  font-size: 1.35rem;
+  line-height: 1.45;
+  margin-top: 1.75rem;
+}
+
+.moody-quotation-feature__attribution::before {
+  content: "-";
+}
+
+.moody-quotation-feature__author {
+  font-weight: 700;
+}
+
+.moody-quotation-feature__cta {
+  margin-top: 2rem;
+}
+
+.moody-quotation-feature__cta .moody-quotation__cta-link,
+.moody-quotation__cta .moody-quotation__cta-link {
+  color: #bf5700;
+  display: inline;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.moody-quotation-feature__cta .moody-quotation__cta-link:hover,
+.moody-quotation-feature__cta .moody-quotation__cta-link:focus,
+.moody-quotation__cta .moody-quotation__cta-link:hover,
+.moody-quotation__cta .moody-quotation__cta-link:focus {
+  color: #8f3f00;
+}
+
+@media (min-width: 768px) {
+  .moody-quotation-feature__quote {
+    font-size: 4rem;
+  }
+
+  .moody-quotation-feature__attribution {
+    font-size: 1.55rem;
+  }
+
+  .moody-quotation-feature__cta .moody-quotation__cta-link,
+  .moody-quotation__cta .moody-quotation__cta-link {
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .moody-quotation-feature__quote {
+    font-size: 4.5rem;
+  }
+}

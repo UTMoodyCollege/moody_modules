@@ -34,6 +34,12 @@ class MoodyQuotationWidget extends WidgetBase {
       '#type' => 'textfield',
       '#default_value' => $items[$delta]->author ?? NULL,
     ];
+    $element['attribution'] = [
+      '#title' => $this->t('Attribution details'),
+      '#type' => 'textarea',
+      '#default_value' => $items[$delta]->attribution ?? NULL,
+      '#description' => $this->t('Optional supporting text shown after the author.'),
+    ];
     $element['media'] = [
       '#type' => 'media_library',
       '#allowed_bundles' => ['utexas_image'],
@@ -50,8 +56,21 @@ class MoodyQuotationWidget extends WidgetBase {
         'default' => $this->t('Dark text with no background'),
         'orange' => $this->t('Orange background with white text'),
         'grey' => $this->t('Gray background with white text'),
+        'feature' => $this->t('Feature quote with large orange text'),
       ],
       '#default_value' => $items[$delta]->style ?? 'default',
+    ];
+    $element['cta_wrapper'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Link'),
+    ];
+    $element['cta_wrapper']['link'] = [
+      '#type' => 'utexas_link_options_element',
+      '#default_value' => [
+        'uri' => $items[$delta]->link_uri ?? NULL,
+        'title' => $items[$delta]->link_text ?? NULL,
+        'options' => $items[$delta]->link_options ?? [],
+      ],
     ];
     return $element;
   }
@@ -65,6 +84,11 @@ class MoodyQuotationWidget extends WidgetBase {
       if (empty($value['media'])) {
         // A null media value should be saved as 0.
         $value['media'] = 0;
+      }
+      if (isset($value['cta_wrapper']['link']['uri'])) {
+        $value['link_uri'] = $value['cta_wrapper']['link']['uri'];
+        $value['link_text'] = $value['cta_wrapper']['link']['title'] ?? '';
+        $value['link_options'] = $value['cta_wrapper']['link']['options'] ?? [];
       }
     }
     return $values;

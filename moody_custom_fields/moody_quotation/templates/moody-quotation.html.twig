@@ -1,16 +1,58 @@
-<!-- Add you custom twig html here -->
-<div class="quotation-wrapper {{ style }}">
-  <div class="quote-wrapper">
-    <div class="quote-contents">
+{% set style_class = style|default('default') %}
+<div class="quotation-wrapper {{ style_class }}">
+  {% if style_class == 'feature' %}
+    <figure class="moody-quotation-feature">
       {% if media %}
-        <div class="moody-card-media">
+        <div class="moody-quotation-feature__media">
           {{ media }}
         </div>
       {% endif %}
-      <p class="quote">
-        {{quote}}
-      </p>
+      <blockquote class="moody-quotation-feature__quote">
+        {{ quote }}
+      </blockquote>
+      {% if author or attribution %}
+        <figcaption class="moody-quotation-feature__attribution">
+          {% if author %}
+            <span class="moody-quotation-feature__author">{{ author }}</span>{% if attribution %}, {% endif %}
+          {% endif %}
+          {% if attribution %}
+            <span class="moody-quotation-feature__details">{{ attribution }}</span>
+          {% endif %}
+        </figcaption>
+      {% endif %}
+      {% if cta %}
+        <div class="moody-quotation-feature__cta">
+          {{ cta }}
+        </div>
+      {% endif %}
+    </figure>
+  {% else %}
+    <div class="quote-wrapper">
+      <div class="quote-contents">
+        {% if media %}
+          <div class="moody-card-media">
+            {{ media }}
+          </div>
+        {% endif %}
+        <p class="quote">
+          {{ quote }}
+        </p>
+      </div>
     </div>
-  </div>
-  <p class="author">{{author}}</p>
+    {% if author or attribution %}
+      <p class="author">
+        {% if author %}
+          <strong>{{ author }}</strong>{% if attribution %}, {% endif %}
+        {% endif %}
+        {% if attribution %}
+          {{ attribution }}
+        {% endif %}
+      </p>
+    {% endif %}
+    {% if cta %}
+      <div class="moody-quotation__cta">
+        {{ cta }}
+      </div>
+    {% endif %}
+  {% endif %}
 </div>

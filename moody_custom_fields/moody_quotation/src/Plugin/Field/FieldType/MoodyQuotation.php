@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\MapDataDefinition;
 
 /**
  * Plugin implementation of the 'moody_quotation' field type.
@@ -34,12 +35,23 @@ class MoodyQuotation extends FieldItemBase {
     $properties['author'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Author value'))
       ->setRequired(FALSE);
+    $properties['attribution'] = DataDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Attribution value'))
+      ->setRequired(FALSE);
     $properties['style'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Style value'))
       ->setRequired(FALSE);
     $properties['media'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Media'))
       ->setRequired(FALSE);
+    $properties['link_uri'] = DataDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Link URI'))
+      ->setRequired(FALSE);
+    $properties['link_text'] = DataDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Link Text'))
+      ->setRequired(FALSE);
+    $properties['link_options'] = MapDataDefinition::create()
+      ->setLabel(new TranslatableMarkup('Link Options'));
 
     return $properties;
   }
@@ -60,6 +72,11 @@ class MoodyQuotation extends FieldItemBase {
           'length' => 255,
           'binary' => FALSE,
         ],
+        'attribution' => [
+          'type' => 'text',
+          'size' => 'normal',
+          'binary' => FALSE,
+        ],
         'style' => [
           'type' => 'varchar',
           'length' => 255,
@@ -67,6 +84,22 @@ class MoodyQuotation extends FieldItemBase {
         ],
         'media' => [
           'type' => 'int',
+        ],
+        'link_uri' => [
+          'type' => 'varchar',
+          'length' => 512,
+          'binary' => FALSE,
+        ],
+        'link_text' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'binary' => FALSE,
+        ],
+        'link_options' => [
+          'description' => 'Serialized array of options for the link.',
+          'type' => 'blob',
+          'size' => 'big',
+          'serialize' => TRUE,
         ],
       ],
     ];
@@ -81,6 +114,7 @@ class MoodyQuotation extends FieldItemBase {
     $random = new Random();
     $values['quote'] = $random->word(mt_rand(10));
     $values['author'] = $random->word(mt_rand(10));
+    $values['attribution'] = $random->sentences(2);
     return $values;
   }
 

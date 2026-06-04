@@ -1,0 +1,4 @@
+moody_quotation:
+  css:
+    component:
+      css/moody-quotation.css: {}

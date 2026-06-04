@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\utexas_form_elements\UtexasLinkOptionsHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
@@ -72,8 +73,8 @@ class MoodyQuotationFormatter extends FormatterBase implements ContainerFactoryP
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $configuration,
       $plugin_id,
+      $plugin_definition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['label'],
@@ -102,6 +103,13 @@ class MoodyQuotationFormatter extends FormatterBase implements ContainerFactoryP
       $cache_tags = Cache::mergeTags($cache_tags, $image_style->getCacheTags());
     }
     foreach ($items as $item) {
+      $cta = [];
+      if (!empty($item->link_uri) && !empty($item->link_text)) {
+        $link_item['link']['uri'] = $item->link_uri;
+        $link_item['link']['title'] = $item->link_text;
+        $link_item['link']['options'] = $item->link_options ?? [];
+        $cta = UtexasLinkOptionsHelper::buildLink($link_item, ['moody-quotation__cta-link']);
+      }
       $image_render_array = [];
       if (!empty($item->media) && $media = $this->entityTypeManager->getStorage('media')->load($item->media)) {
         $media_attributes = $media->get('field_utexas_media_image')->getValue();
@@ -129,7 +137,14 @@ class MoodyQuotationFormatter extends FormatterBase implements ContainerFactoryP
         '#quote' => $item->quote,
         '#style' => $item->style,
         '#author' => $item->author,
+        '#attribution' => $item->attribution,
         '#media' => $image_render_array,
+        '#cta' => $cta,
+        '#attached' => [
+          'library' => [
+            'moody_quotation/moody_quotation',
+          ],
+        ],
       ];
     }
 
