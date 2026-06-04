@@ -5,6 +5,6 @@ id: moody_mini_nav
 block_id: moody_mini_nav
 category: specialty_blocks
 label: 'Moody Mini Nav'
-weight: -100
 image_path: /themes/custom/moody/moody_components_images/moody-mini-nav.png
 image_alt: ''
+weight: -100
