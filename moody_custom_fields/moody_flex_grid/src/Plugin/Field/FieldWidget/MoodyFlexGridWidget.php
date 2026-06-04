@@ -61,6 +61,10 @@ class MoodyFlexGridWidget extends WidgetBase {
     $items = !empty($items[$delta]->flex_grid_items) ? unserialize($items[$delta]->flex_grid_items) : [];
     // Ensure item keys are consecutive.
     $items = array_values($items);
+    $submitted_items = $this->getSubmittedItems($form_state, $field_name, $delta);
+    if ($submitted_items !== NULL) {
+      $items = $submitted_items;
+    }
     // Retrieve the form element that is using this widget.
     $parents = [$field_name, 'widget'];
     $widget_state = static::getWidgetState($parents, $field_name, $form_state);
@@ -78,8 +82,8 @@ class MoodyFlexGridWidget extends WidgetBase {
       static::setWidgetState($parents, $field_name, $form_state, $widget_state);
     }
 
-    $element['flex_grid_items'] = $this->buildDraggableItems($items, $item_count);
     $wrapper_id = Html::getUniqueId('ajax-wrapper');
+    $element['flex_grid_items'] = $this->buildDraggableItems($items, $item_count, $wrapper_id);
     $element['flex_grid_items']['#prefix'] = '<div id="' . $wrapper_id . '">';
     $element['flex_grid_items']['#suffix'] = '</div>';
     $element['flex_grid_items']['actions']['add'] = [
@@ -104,11 +108,13 @@ class MoodyFlexGridWidget extends WidgetBase {
    *   Any stored Flex Grid items.
    * @param int $item_count
    *   Items to be populated. Will change on ajax submit for add more.
+   * @param string $wrapper_id
+   *   The AJAX wrapper ID for this widget instance.
    *
    * @return array
    *   A render array of a draggable table of items.
    */
-  protected function buildDraggableItems(array $items, $item_count) {
+  protected function buildDraggableItems(array $items, $item_count, $wrapper_id) {
     $group_class = 'group-order-weight';
     // Build table.
     $form['items'] = [
@@ -116,6 +122,7 @@ class MoodyFlexGridWidget extends WidgetBase {
       '#header' => [
         $this->t('Flex Grid items'),
         $this->t('Weight'),
+        $this->t('Operations'),
       ],
       '#empty' => $this->t('No items.'),
       '#tableselect' => FALSE,
@@ -161,8 +168,76 @@ class MoodyFlexGridWidget extends WidgetBase {
         '#default_value' => $i,
         '#attributes' => ['class' => [$group_class]],
       ];
+      $form['items'][$i]['remove'] = [
+        '#type' => 'submit',
+        '#name' => 'moody-flex-grid-remove-' . $i . '-' . $wrapper_id,
+        '#value' => $this->t('Delete item'),
+        '#submit' => [[get_class($this), 'utexasRemoveItemSubmit']],
+        '#limit_validation_errors' => [],
+        '#ajax' => [
+          'callback' => [get_class($this), 'utexasAddMoreAjax'],
+          'wrapper' => $wrapper_id,
+        ],
+        '#attributes' => [
+          'class' => ['button', 'button--danger'],
+        ],
+      ];
     }
     return $form;
+  }
+
+  /**
+   * Gets submitted Flex Grid items in storage-like shape for AJAX rebuilds.
+   */
+  protected function getSubmittedItems(FormStateInterface $form_state, $field_name, $delta) {
+    $submitted_items = $form_state->getValue([
+      $field_name,
+      'widget',
+      $delta,
+      'flex_grid_items',
+      'items',
+    ]);
+
+    if (!is_array($submitted_items)) {
+      return NULL;
+    }
+
+    return static::normalizeSubmittedItems($submitted_items);
+  }
+
+  /**
+   * Normalizes submitted table rows into the stored Flex Grid item structure.
+   */
+  protected static function normalizeSubmittedItems(array $submitted_items) {
+    usort($submitted_items, function ($item1, $item2) {
+      return ($item1['weight'] ?? 0) <=> ($item2['weight'] ?? 0);
+    });
+
+    $items = [];
+    foreach ($submitted_items as $item) {
+      $items[] = [
+        'item' => $item['details']['item'] ?? [],
+      ];
+    }
+
+    return $items;
+  }
+
+  /**
+   * Converts storage-like Flex Grid items back into submitted table rows.
+   */
+  protected static function convertItemsToSubmittedRows(array $items) {
+    $submitted_rows = [];
+    foreach ($items as $weight => $item) {
+      $submitted_rows[$weight] = [
+        'details' => [
+          'item' => $item['item'] ?? [],
+        ],
+        'weight' => $weight,
+      ];
+    }
+
+    return $submitted_rows;
   }
 
   /**
@@ -187,11 +262,17 @@ class MoodyFlexGridWidget extends WidgetBase {
         $storage[$delta]['overlay_text'] = (int) !empty($field['overlay_text']);
       }
       if (isset($field['flex_grid_items'])) {
+        if (empty($field['flex_grid_items']['items']) || !is_array($field['flex_grid_items']['items'])) {
+          continue;
+        }
         // Re-sort by the order provided by tabledrag.
         usort($field['flex_grid_items']['items'], function ($item1, $item2) {
-          return $item1['weight'] <=> $item2['weight'];
+          return ($item1['weight'] ?? 0) <=> ($item2['weight'] ?? 0);
         });
         foreach ($field['flex_grid_items']['items'] as $weight => $item) {
+          if (!empty($item['remove'])) {
+            continue;
+          }
           $elements = $item['details']['item'];
           $storage[$delta]['flex_grid_items'][$weight]['item'] = [];
           if (!empty($elements['image'])) {
@@ -253,6 +334,15 @@ class MoodyFlexGridWidget extends WidgetBase {
   }
 
   /**
+   * Helper function to extract the item list parent element.
+   */
+  public static function retrieveItemListElement($form, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    $parents = array_slice($triggering_element['#array_parents'], 0, -3);
+    return NestedArray::getValue($form, $parents);
+  }
+
+  /**
    * Submission handler for the "Add another item" button.
    */
   public static function utexasAddMoreSubmit(array $form, FormStateInterface $form_state) {
@@ -273,11 +363,56 @@ class MoodyFlexGridWidget extends WidgetBase {
   }
 
   /**
+   * Submission handler for row-level "Delete item" buttons.
+   */
+  public static function utexasRemoveItemSubmit(array $form, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    $row_parents = array_slice($triggering_element['#array_parents'], 0, -1);
+    $remove_delta = (int) end($row_parents);
+    $element = self::retrieveItemListElement($form, $form_state);
+    array_pop($element['#parents']);
+    // The field_delta will be the last (nearest) element in the #parents array.
+    $field_delta = array_pop($element['#parents']);
+    // The field_name will be the penultimate element in the #parents array.
+    $field_name = array_pop($element['#parents']);
+    $parents = [$field_name, 'widget'];
+    $value_parents = [
+      $field_name,
+      'widget',
+      $field_delta,
+      'flex_grid_items',
+      'items',
+    ];
+    $submitted_items = $form_state->getValue($value_parents);
+
+    if (is_array($submitted_items)) {
+      unset($submitted_items[$remove_delta]);
+      $submitted_items = static::normalizeSubmittedItems($submitted_items);
+      $submitted_rows = static::convertItemsToSubmittedRows($submitted_items);
+      $form_state->setValue($value_parents, $submitted_rows);
+
+      $user_input = $form_state->getUserInput();
+      NestedArray::setValue($user_input, $value_parents, $submitted_rows);
+      $form_state->setUserInput($user_input);
+    }
+
+    $widget_state = static::getWidgetState($parents, $field_name, $form_state);
+    $widget_state[$field_name][$field_delta]["counter"] = max(1, isset($submitted_rows) ? count($submitted_rows) : 0);
+    static::setWidgetState($parents, $field_name, $form_state, $widget_state);
+    $form_state->setRebuild();
+  }
+
+  /**
    * Callback for ajax-enabled buttons.
    *
    * Selects and returns the fieldset with the items in it.
    */
   public static function utexasAddMoreAjax(array &$form, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    $array_parents = $triggering_element['#array_parents'];
+    if (end($array_parents) === 'remove') {
+      return self::retrieveItemListElement($form, $form_state);
+    }
     return self::retrieveAddMoreElement($form, $form_state);
   }
 
