@@ -83,9 +83,23 @@ class MoodyFlexGridWidget extends WidgetBase {
     }
 
     $wrapper_id = Html::getUniqueId('ajax-wrapper');
-    $element['flex_grid_items'] = $this->buildDraggableItems($items, $item_count, $wrapper_id);
+    $element['flex_grid_items'] = $this->buildDraggableItems($items, $item_count);
     $element['flex_grid_items']['#prefix'] = '<div id="' . $wrapper_id . '">';
     $element['flex_grid_items']['#suffix'] = '</div>';
+    $element['flex_grid_items']['actions']['remove_selected'] = [
+      '#type' => 'submit',
+      '#name' => $field_name . $delta . '_remove_selected',
+      '#value' => $this->t('Remove selected items'),
+      '#submit' => [[get_class($this), 'utexasRemoveSelectedSubmit']],
+      '#limit_validation_errors' => [],
+      '#ajax' => [
+        'callback' => [get_class($this), 'utexasAddMoreAjax'],
+        'wrapper' => $wrapper_id,
+      ],
+      '#attributes' => [
+        'class' => ['button', 'button--danger'],
+      ],
+    ];
     $element['flex_grid_items']['actions']['add'] = [
       '#type' => 'submit',
       '#name' => $field_name . $delta,
@@ -108,13 +122,10 @@ class MoodyFlexGridWidget extends WidgetBase {
    *   Any stored Flex Grid items.
    * @param int $item_count
    *   Items to be populated. Will change on ajax submit for add more.
-   * @param string $wrapper_id
-   *   The AJAX wrapper ID for this widget instance.
-   *
    * @return array
    *   A render array of a draggable table of items.
    */
-  protected function buildDraggableItems(array $items, $item_count, $wrapper_id) {
+  protected function buildDraggableItems(array $items, $item_count) {
     $group_class = 'group-order-weight';
     // Build table.
     $form['items'] = [
@@ -169,18 +180,9 @@ class MoodyFlexGridWidget extends WidgetBase {
         '#attributes' => ['class' => [$group_class]],
       ];
       $form['items'][$i]['remove'] = [
-        '#type' => 'submit',
-        '#name' => 'moody-flex-grid-remove-' . $i . '-' . $wrapper_id,
-        '#value' => $this->t('Delete item'),
-        '#submit' => [[get_class($this), 'utexasRemoveItemSubmit']],
-        '#limit_validation_errors' => [],
-        '#ajax' => [
-          'callback' => [get_class($this), 'utexasAddMoreAjax'],
-          'wrapper' => $wrapper_id,
-        ],
-        '#attributes' => [
-          'class' => ['button', 'button--danger'],
-        ],
+        '#type' => 'checkbox',
+        '#title' => $this->t('Delete item'),
+        '#default_value' => !empty($items[$i]['remove']),
       ];
     }
     return $form;
@@ -217,6 +219,7 @@ class MoodyFlexGridWidget extends WidgetBase {
     foreach ($submitted_items as $item) {
       $items[] = [
         'item' => $item['details']['item'] ?? [],
+        'remove' => !empty($item['remove']),
       ];
     }
 
@@ -234,6 +237,7 @@ class MoodyFlexGridWidget extends WidgetBase {
           'item' => $item['item'] ?? [],
         ],
         'weight' => $weight,
+        'remove' => !empty($item['remove']),
       ];
     }
 
@@ -334,15 +338,6 @@ class MoodyFlexGridWidget extends WidgetBase {
   }
 
   /**
-   * Helper function to extract the item list parent element.
-   */
-  public static function retrieveItemListElement($form, FormStateInterface $form_state) {
-    $triggering_element = $form_state->getTriggeringElement();
-    $parents = array_slice($triggering_element['#array_parents'], 0, -3);
-    return NestedArray::getValue($form, $parents);
-  }
-
-  /**
    * Submission handler for the "Add another item" button.
    */
   public static function utexasAddMoreSubmit(array $form, FormStateInterface $form_state) {
@@ -363,13 +358,10 @@ class MoodyFlexGridWidget extends WidgetBase {
   }
 
   /**
-   * Submission handler for row-level "Delete item" buttons.
+   * Submission handler for the "Remove selected items" button.
    */
-  public static function utexasRemoveItemSubmit(array $form, FormStateInterface $form_state) {
-    $triggering_element = $form_state->getTriggeringElement();
-    $row_parents = array_slice($triggering_element['#array_parents'], 0, -1);
-    $remove_delta = (int) end($row_parents);
-    $element = self::retrieveItemListElement($form, $form_state);
+  public static function utexasRemoveSelectedSubmit(array $form, FormStateInterface $form_state) {
+    $element = self::retrieveAddMoreElement($form, $form_state);
     array_pop($element['#parents']);
     // The field_delta will be the last (nearest) element in the #parents array.
     $field_delta = array_pop($element['#parents']);
@@ -386,7 +378,9 @@ class MoodyFlexGridWidget extends WidgetBase {
     $submitted_items = $form_state->getValue($value_parents);
 
     if (is_array($submitted_items)) {
-      unset($submitted_items[$remove_delta]);
+      $submitted_items = array_filter($submitted_items, function ($item) {
+        return empty($item['remove']);
+      });
       $submitted_items = static::normalizeSubmittedItems($submitted_items);
       $submitted_rows = static::convertItemsToSubmittedRows($submitted_items);
       $form_state->setValue($value_parents, $submitted_rows);
@@ -408,11 +402,6 @@ class MoodyFlexGridWidget extends WidgetBase {
    * Selects and returns the fieldset with the items in it.
    */
   public static function utexasAddMoreAjax(array &$form, FormStateInterface $form_state) {
-    $triggering_element = $form_state->getTriggeringElement();
-    $array_parents = $triggering_element['#array_parents'];
-    if (end($array_parents) === 'remove') {
-      return self::retrieveItemListElement($form, $form_state);
-    }
     return self::retrieveAddMoreElement($form, $form_state);
   }
 
