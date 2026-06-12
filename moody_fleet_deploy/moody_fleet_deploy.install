@@ -18,6 +18,7 @@ function moody_fleet_deploy_install() {
   _moody_fleet_deploy_enable_moody_media_image_helper();
   _moody_fleet_deploy_enable_moody_layout_builder_browser();
   _moody_fleet_deploy_revert_moody_layout_builder_browser();
+  _moody_fleet_deploy_install_speedway_theme();
 }
 
 /**
@@ -83,6 +84,13 @@ function moody_fleet_deploy_update_9007() {
  */
 function moody_fleet_deploy_update_9008() {
   _moody_fleet_deploy_enable_image_caption_toolbar_on_flex_html();
+}
+
+/**
+ * Ensures the Speedway theme is installed for Moody's base theme migration.
+ */
+function moody_fleet_deploy_update_9009() {
+  _moody_fleet_deploy_install_speedway_theme();
 }
 
 /**
@@ -311,6 +319,22 @@ function _moody_fleet_deploy_enable_moody_block_publishing() {
   }
 
   \Drupal::service('module_installer')->install(['moody_block_publishing'], TRUE);
+}
+
+/**
+ * Ensures the Speedway theme is installed when its code is available.
+ */
+function _moody_fleet_deploy_install_speedway_theme() {
+  if (\Drupal::service('theme_handler')->themeExists('speedway')) {
+    return;
+  }
+
+  $available_themes = \Drupal::service('extension.list.theme')->reset()->getList();
+  if (!isset($available_themes['speedway'])) {
+    return;
+  }
+
+  \Drupal::service('theme_installer')->install(['speedway'], TRUE);
 }
 
 /**
