@@ -19,6 +19,7 @@ function moody_fleet_deploy_install() {
   _moody_fleet_deploy_enable_moody_layout_builder_browser();
   _moody_fleet_deploy_revert_moody_layout_builder_browser();
   _moody_fleet_deploy_install_speedway_theme();
+  _moody_fleet_deploy_place_moody_required_links_block();
 }
 
 /**
@@ -91,6 +92,13 @@ function moody_fleet_deploy_update_9008() {
  */
 function moody_fleet_deploy_update_9009() {
   _moody_fleet_deploy_install_speedway_theme();
+}
+
+/**
+ * Ensures Moody's required links block is placed in the right footer region.
+ */
+function moody_fleet_deploy_update_9010() {
+  _moody_fleet_deploy_place_moody_required_links_block();
 }
 
 /**
@@ -335,6 +343,58 @@ function _moody_fleet_deploy_install_speedway_theme() {
   }
 
   \Drupal::service('theme_installer')->install(['speedway'], TRUE);
+}
+
+/**
+ * Ensures the Moody required links block exists in footer_right.
+ */
+function _moody_fleet_deploy_place_moody_required_links_block() {
+  if (!\Drupal::moduleHandler()->moduleExists('utexas_block_required_links')) {
+    return;
+  }
+
+  if (!\Drupal::service('theme_handler')->themeExists('moody')) {
+    return;
+  }
+
+  $block = \Drupal\block\Entity\Block::load('moody_required_links_block');
+  $uuid = '35f5a6a4-6bc8-466f-b478-799aa1d59d4e';
+  if ($block && $block->uuid() !== $uuid) {
+    $block->delete();
+    $block = NULL;
+  }
+
+  $settings = [
+    'id' => 'required_links_block',
+    'label' => 'Required Links Block',
+    'label_display' => '0',
+    'provider' => 'utexas_block_required_links',
+  ];
+
+  if (!$block) {
+    $block = \Drupal\block\Entity\Block::create([
+      'uuid' => $uuid,
+      'id' => 'moody_required_links_block',
+      'theme' => 'moody',
+      'region' => 'footer_right',
+      'weight' => 0,
+      'status' => TRUE,
+      'plugin' => 'required_links_block',
+      'settings' => $settings,
+      'visibility' => [],
+    ]);
+  }
+  else {
+    $block
+      ->set('theme', 'moody')
+      ->set('region', 'footer_right')
+      ->set('weight', 0)
+      ->set('status', TRUE)
+      ->set('plugin', 'required_links_block')
+      ->set('settings', $settings);
+  }
+
+  $block->save();
 }
 
 /**
