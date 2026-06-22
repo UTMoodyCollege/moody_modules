@@ -103,7 +103,7 @@ function faculty_bio_content_type_preprocess_views_view(&$variables)
 
       case 'School of Journalism and Media':
         $variables['custom_header'] = check_markup('<div class="button-list d-flex" role="group" aria-label="Filtered lists of faculty biographies">
-          <a class="ut-btn" href="/faculty">All Faculty</a>
+          <a class="ut-btn" href="/faculty">Active Faculty</a>
           <a class="ut-btn ml-2" href="/faculty-emeritus">Emeritus and Retired Faculty</a>
         </div>', 'flex_html');
         $variables['attributes']['class'][] = 'hide-department-selector';
@@ -111,7 +111,7 @@ function faculty_bio_content_type_preprocess_views_view(&$variables)
 
       case 'Radio, Television and Film':
         $variables['custom_header'] = check_markup('<div class="button-list d-flex" role="group" aria-label="Filtered lists of faculty biographies">
-          <a class="ut-btn" href="/faculty">All Faculty</a>
+          <a class="ut-btn" href="/faculty">Active Faculty</a>
           <a class="ut-btn ml-2" href="/faculty/media-studies">Media Studies</a>
           <a class="ut-btn ml-2" href="/faculty/production-screenwriting">Production and Screenwriting</a>
           <a class="ut-btn ml-2" href="/faculty-emeritus">Emeritus and Retired Faculty</a>
