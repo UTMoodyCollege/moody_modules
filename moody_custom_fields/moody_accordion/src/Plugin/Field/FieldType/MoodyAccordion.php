@@ -37,6 +37,12 @@ class MoodyAccordion extends FieldItemBase {
     $properties['copy_format'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Copy format'))
       ->setRequired(FALSE);
+    $properties['block_id'] = DataDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Block plugin ID'))
+      ->setRequired(FALSE);
+    $properties['block_config'] = DataDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Block configuration'))
+      ->setRequired(FALSE);
     return $properties;
   }
 
@@ -59,6 +65,16 @@ class MoodyAccordion extends FieldItemBase {
         'copy_format' => [
           'type' => 'varchar',
           'length' => 255,
+          'binary' => FALSE,
+        ],
+        'block_id' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'binary' => FALSE,
+        ],
+        'block_config' => [
+          'type' => 'text',
+          'size' => 'normal',
           'binary' => FALSE,
         ],
       ],
@@ -84,7 +100,8 @@ class MoodyAccordion extends FieldItemBase {
   public function isEmpty() {
     $title = $this->get('title')->getValue();
     $copy_value = $this->get('copy_value')->getValue();
-    return ($title === NULL || $title === '') && ($copy_value === NULL || $copy_value === '');
+    $block_id = $this->get('block_id')->getValue();
+    return ($title === NULL || $title === '') && ($copy_value === NULL || $copy_value === '') && ($block_id === NULL || $block_id === '');
   }
 
 }
