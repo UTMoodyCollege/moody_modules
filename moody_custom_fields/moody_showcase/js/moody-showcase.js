@@ -1,31 +1,58 @@
 (function (Drupal, once) {
+  'use strict';
+
+  var MIN_PINNED_HEIGHT = 320;
   var offsetListenersBound = false;
   var scrollRefreshScheduled = false;
 
+  function getViewportHeight() {
+    return window.innerHeight || document.documentElement.clientHeight || MIN_PINNED_HEIGHT;
+  }
+
   function getStickyOffset() {
-    var brandbar = document.getElementById('brandbar');
-    var header = document.querySelector('header');
+    var selectors = [
+      '#toolbar-administration',
+      '#toolbar-bar',
+      '.toolbar-tray-horizontal.is-active',
+      '#brandbar',
+      'body > header',
+      'header[role="banner"]'
+    ];
     var offset = 32;
 
-    if (brandbar) {
-      offset += brandbar.offsetHeight;
-    }
+    selectors.forEach(function (selector) {
+      var element = document.querySelector(selector);
+      var rect;
+      var styles;
 
-    if (header) {
-      offset += header.offsetHeight;
-    }
+      if (!element) {
+        return;
+      }
+
+      styles = window.getComputedStyle(element);
+      if (styles.position !== 'fixed' && styles.position !== 'sticky') {
+        return;
+      }
+
+      rect = element.getBoundingClientRect();
+      if (rect.height <= 0 || rect.bottom <= 0 || rect.top > getViewportHeight()) {
+        return;
+      }
+
+      offset = Math.max(offset, Math.round(rect.bottom + 32));
+    });
 
     return offset;
   }
 
-  function getPinnedTopOffset() {
-    return 0;
+  function getPinnedTopOffset(stickyOffset) {
+    return stickyOffset;
   }
 
   function updateStickyOffset() {
     var stickyOffset = getStickyOffset();
-    var pinnedTopOffset = getPinnedTopOffset();
-    var pinnedHeight = Math.max(window.innerHeight - pinnedTopOffset, 320);
+    var pinnedTopOffset = getPinnedTopOffset(stickyOffset);
+    var pinnedHeight = Math.max(getViewportHeight() - pinnedTopOffset, MIN_PINNED_HEIGHT);
 
     document.documentElement.style.setProperty('--moody-showcase-sticky-offset', stickyOffset + 'px');
     document.documentElement.style.setProperty('--moody-showcase-pinned-top-offset', pinnedTopOffset + 'px');

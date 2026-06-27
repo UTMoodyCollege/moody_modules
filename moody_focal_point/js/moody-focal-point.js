@@ -1,6 +1,8 @@
 (function (Drupal, once) {
   'use strict';
 
+  var MIN_STAGE_HEIGHT = 320;
+
   function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
   }
@@ -16,14 +18,74 @@
     window.setTimeout(callback, 16);
   }
 
-  function scheduleRefresh() {
-    raf(function () {
-      raf(function () {
-        if (window.ScrollTrigger && typeof window.ScrollTrigger.refresh === 'function') {
-          window.ScrollTrigger.refresh();
-        }
-      });
+  function getViewportHeight() {
+    return window.innerHeight || document.documentElement.clientHeight || MIN_STAGE_HEIGHT;
+  }
+
+  function getFixedTopOffset() {
+    var selectors = [
+      '#toolbar-administration',
+      '#toolbar-bar',
+      '.toolbar-tray-horizontal.is-active',
+      '#brandbar',
+      'body > header',
+      'header[role="banner"]'
+    ];
+    var offset = 0;
+
+    selectors.forEach(function (selector) {
+      var element = document.querySelector(selector);
+      var rect;
+      var styles;
+
+      if (!element) {
+        return;
+      }
+
+      styles = window.getComputedStyle(element);
+      if (styles.position !== 'fixed' && styles.position !== 'sticky') {
+        return;
+      }
+
+      rect = element.getBoundingClientRect();
+      if (rect.height <= 0 || rect.bottom <= 0 || rect.top > getViewportHeight()) {
+        return;
+      }
+
+      offset = Math.max(offset, rect.bottom);
     });
+
+    return Math.max(0, Math.round(offset));
+  }
+
+  function getStageHeight(stage) {
+    var availableHeight = Math.max(MIN_STAGE_HEIGHT, getViewportHeight() - getFixedTopOffset());
+    var rect = stage.getBoundingClientRect();
+    var measuredHeight = rect.height || stage.offsetHeight || availableHeight;
+
+    if (measuredHeight < MIN_STAGE_HEIGHT || measuredHeight > availableHeight * 1.25) {
+      return availableHeight;
+    }
+
+    return Math.min(measuredHeight, availableHeight);
+  }
+
+  function updateScrollFootprint(block, stage, count) {
+    var stageHeight = getStageHeight(stage);
+    var scrollDistance = Math.max(0, count * stageHeight);
+
+    block.style.setProperty('--moody-focal-point-stage-height', stageHeight + 'px');
+    block.style.setProperty('--moody-focal-point-sticky-top-offset', getFixedTopOffset() + 'px');
+    block.style.setProperty('--moody-focal-point-reserved-height', (stageHeight + scrollDistance) + 'px');
+    return scrollDistance;
+  }
+
+  function getScrollProgress(block, stage, count) {
+    var blockRect = block.getBoundingClientRect();
+    var start = window.scrollY + blockRect.top - getFixedTopOffset();
+    var distance = updateScrollFootprint(block, stage, count);
+
+    return distance > 0 ? clamp((window.scrollY - start) / distance, 0, 1) : 0;
   }
 
   function isDebugEnabled() {
@@ -50,171 +112,6 @@
 
     var blockId = block && block.id ? block.id : '(no-id)';
     window.console.info('[moody-focal-point][' + blockId + '] ' + eventName, payload || {});
-  }
-
-  function isReadyForViewportInit(element) {
-    var rect = element.getBoundingClientRect();
-    var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-    var tolerance = 16;
-
-    if (!rect.width || !rect.height) {
-      return false;
-    }
-
-    var horizontallyVisible = rect.right > tolerance && rect.left < viewportWidth - tolerance;
-    var fullyFitsViewport = rect.top >= -tolerance && rect.bottom <= viewportHeight + tolerance;
-    var fillsViewportFrame = rect.top <= tolerance && rect.bottom >= viewportHeight - tolerance;
-
-    return horizontallyVisible && (fullyFitsViewport || fillsViewportFrame);
-  }
-
-  function isPartiallyInViewport(element) {
-    var rect = element.getBoundingClientRect();
-    var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-
-    return rect.width > 0
-      && rect.height > 0
-      && rect.bottom > 0
-      && rect.top < viewportHeight
-      && rect.right > 0
-      && rect.left < viewportWidth;
-  }
-
-  function primeBlock(block) {
-    if (block.__moodyFocalPointPrimed) {
-      return;
-    }
-
-    var stage = block.querySelector('[data-focal-point-stage]');
-    var media = block.querySelector('[data-focal-point-media]');
-    var image = media && media.querySelector('img');
-    var captions = block.querySelectorAll('[data-focal-captions] [data-focal-index]');
-    var count = captions.length;
-    var focusPoints = Array.prototype.map.call(captions, readFocusPoint);
-
-    if (!stage || !media || !image || count < 1) {
-      return;
-    }
-
-    whenImagesReady(block, function () {
-      if (block.__moodyFocalPointPrimed) {
-        return;
-      }
-
-      block.__moodyFocalPointPrimed = true;
-      block.classList.add('is-primed');
-
-      positionCaption(stage, captions[0], focusPoints[0]);
-      activateFocalPoint(captions, 0);
-      applyFocus(stage, media, image, {
-        x: focusPoints[0].x,
-        y: focusPoints[0].y,
-        width: focusPoints[0].width,
-        height: focusPoints[0].height,
-      });
-
-      debugLog(block, 'prime:applied', {
-        scrollY: window.scrollY,
-        stageRect: stage.getBoundingClientRect(),
-        firstFocus: focusPoints[0],
-      });
-    });
-  }
-
-  function initWhenFullyVisible(block) {
-    if (block.__moodyFocalPointInitialized) {
-      return;
-    }
-
-    var stage = block.querySelector('[data-focal-point-stage]') || block;
-
-    function start() {
-      if (block.__moodyFocalPointInitialized) {
-        return;
-      }
-
-      stopWatching();
-
-      debugLog(block, 'init:start', {
-        scrollY: window.scrollY,
-        stageRect: stage.getBoundingClientRect(),
-      });
-      block.__moodyFocalPointInitialized = true;
-      initBlock(block);
-    }
-
-    function checkVisibility() {
-      var stageRect = stage.getBoundingClientRect();
-      var ready = isReadyForViewportInit(stage);
-      var partiallyVisible = isPartiallyInViewport(stage);
-
-      debugLog(block, 'visibility:check', {
-        ready: ready,
-        partiallyVisible: partiallyVisible,
-        scrollY: window.scrollY,
-        stageRect: stageRect,
-      });
-
-      if (partiallyVisible) {
-        primeBlock(block);
-      }
-
-      if (ready) {
-        start();
-        return true;
-      }
-
-      return false;
-    }
-
-    var observer = null;
-
-    function stopWatching() {
-      window.removeEventListener('scroll', onScrollOrResize, true);
-      window.removeEventListener('resize', onScrollOrResize);
-
-      if (observer) {
-        observer.unobserve(stage);
-        observer.disconnect();
-        observer = null;
-      }
-    }
-
-    function onScrollOrResize() {
-      checkVisibility();
-    }
-
-    window.addEventListener('scroll', onScrollOrResize, true);
-    window.addEventListener('resize', onScrollOrResize);
-
-    if (typeof window.IntersectionObserver === 'function') {
-      observer = new window.IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          debugLog(block, 'visibility:intersection', {
-            isIntersecting: entry.isIntersecting,
-            intersectionRatio: entry.intersectionRatio,
-            boundingClientRect: entry.boundingClientRect,
-          });
-
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          primeBlock(block);
-          checkVisibility();
-        });
-      }, {
-        threshold: [0, 0.25, 0.5, 0.75, 0.95],
-      });
-
-      observer.observe(stage);
-      checkVisibility();
-      return;
-    }
-
-    onScrollOrResize();
   }
 
   /**
@@ -361,6 +258,10 @@
    * Initializes a single focal-point block.
    */
   function initBlock(block) {
+    if (block.__moodyFocalPointInitialized) {
+      return;
+    }
+
     var stage = block.querySelector('[data-focal-point-stage]');
     var media = block.querySelector('[data-focal-point-media]');
     var image = media && media.querySelector('img');
@@ -369,14 +270,18 @@
     var count = captions.length;
     var focusPoints = Array.prototype.map.call(captions, readFocusPoint);
 
-    if (!stage || !media || !image || !captionsWrapper || count < 1 || !window.gsap || !window.ScrollTrigger) {
+    if (!stage || !media || !image || !captionsWrapper || count < 1 || !window.gsap) {
       return;
     }
 
-    window.gsap.registerPlugin(window.ScrollTrigger);
-
     whenImagesReady(block, function () {
+      if (block.__moodyFocalPointInitialized) {
+        return;
+      }
+
+      block.__moodyFocalPointInitialized = true;
       block.classList.add('is-enhanced');
+      updateScrollFootprint(block, stage, count > 1 ? count : 0);
 
       debugLog(block, 'init:images-ready', {
         count: count,
@@ -414,67 +319,21 @@
 
       if (count === 1) {
         // Single focal point – just show it, no scroll behaviour needed.
+        positionCaption(stage, captions[0], focusPoints[0]);
+        applyFocus(stage, media, image, focusPoints[0]);
         return;
       }
 
       var timeline = window.gsap.timeline({
+        paused: true,
         defaults: { duration: 1, ease: 'power1.inOut' },
-        scrollTrigger: {
-          trigger: block,
-          start: 'top top',
-          end: function () {
-            return '+=' + (scrollSegments * block.offsetHeight);
-          },
-          scrub: 0.5,
-          pin: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: function (self) {
-            var nextIndex = Math.min(
-              count - 1,
-              Math.floor(self.progress * scrollSegments)
-            );
-
-            debugLog(block, 'scroll:update', {
-              progress: self.progress,
-              nextIndex: nextIndex,
-              activeIndex: activeIndex,
-              start: self.start,
-              end: self.end,
-              scroll: self.scroll(),
-              isActive: self.isActive,
-            });
-
-            if (nextIndex !== activeIndex) {
-              activeIndex = nextIndex;
-              activateFocalPoint(captions, activeIndex);
-            }
-          },
-          onRefresh: function () {
-            var trigger = timeline.scrollTrigger;
-
-            applyFocus(stage, media, image, activeFocus);
-            Array.prototype.forEach.call(captions, function (caption, index) {
-              positionCaption(stage, caption, focusPoints[index]);
-            });
-
-            debugLog(block, 'scroll:refresh', {
-              progress: trigger ? trigger.progress : null,
-              start: trigger ? trigger.start : null,
-              end: trigger ? trigger.end : null,
-              scroll: trigger ? trigger.scroll() : null,
-              blockRect: block.getBoundingClientRect(),
-              stageRect: stage.getBoundingClientRect(),
-            });
-          }
-        },
       });
+      block.__moodyFocalPointTimeline = timeline;
 
       debugLog(block, 'scroll:timeline-created', {
-        progress: timeline.scrollTrigger ? timeline.scrollTrigger.progress : null,
-        start: timeline.scrollTrigger ? timeline.scrollTrigger.start : null,
-        end: timeline.scrollTrigger ? timeline.scrollTrigger.end : null,
-        scroll: timeline.scrollTrigger ? timeline.scrollTrigger.scroll() : null,
+        scrollY: window.scrollY,
+        blockRect: block.getBoundingClientRect(),
+        stageRect: stage.getBoundingClientRect(),
       });
 
       timeline.to(activeFocus, {
@@ -529,14 +388,143 @@
         }(focusPoints[i - 1], focusPoints[i]));
       }
 
-      scheduleRefresh();
+      var updatePending = false;
+
+      function enforceBoundaryState(progress) {
+        if (progress <= 0.001) {
+          window.gsap.set(captions, { autoAlpha: 0, yPercent: 8, pointerEvents: 'none' });
+          window.gsap.set(captions[0], { autoAlpha: 1, yPercent: 0, pointerEvents: 'auto' });
+          activeFocus.x = neutralFocus.x;
+          activeFocus.y = neutralFocus.y;
+          activeFocus.width = neutralFocus.width;
+          activeFocus.height = neutralFocus.height;
+          applyFocus(stage, media, image, activeFocus);
+          return 0;
+        }
+
+        if (progress >= 0.999) {
+          window.gsap.set(captions, { autoAlpha: 0, yPercent: -8, pointerEvents: 'none' });
+          window.gsap.set(captions[count - 1], { autoAlpha: 1, yPercent: 0, pointerEvents: 'auto' });
+          activeFocus.x = focusPoints[count - 1].x;
+          activeFocus.y = focusPoints[count - 1].y;
+          activeFocus.width = focusPoints[count - 1].width;
+          activeFocus.height = focusPoints[count - 1].height;
+          applyFocus(stage, media, image, activeFocus);
+          return count - 1;
+        }
+
+        return null;
+      }
+
+      function updateTimelineFromScroll() {
+        var progress = getScrollProgress(block, stage, count);
+        var nextIndex;
+        var boundaryIndex;
+
+        Array.prototype.forEach.call(captions, function (caption, index) {
+          positionCaption(stage, caption, focusPoints[index]);
+        });
+
+        timeline.progress(progress);
+        boundaryIndex = enforceBoundaryState(progress);
+        nextIndex = boundaryIndex !== null ? boundaryIndex : Math.min(
+          count - 1,
+          Math.floor(progress * scrollSegments)
+        );
+
+        debugLog(block, 'scroll:update', {
+          progress: progress,
+          nextIndex: nextIndex,
+          activeIndex: activeIndex,
+          scrollY: window.scrollY,
+          blockRect: block.getBoundingClientRect(),
+          stageRect: stage.getBoundingClientRect(),
+        });
+
+        if (nextIndex !== activeIndex) {
+          activeIndex = nextIndex;
+          activateFocalPoint(captions, activeIndex);
+        }
+      }
+
+      function requestTimelineUpdate() {
+        if (updatePending) {
+          return;
+        }
+
+        updatePending = true;
+        raf(function () {
+          updatePending = false;
+          updateTimelineFromScroll();
+        });
+      }
+
+      window.addEventListener('scroll', requestTimelineUpdate, { passive: true });
+      window.addEventListener('resize', requestTimelineUpdate);
+      window.addEventListener('load', requestTimelineUpdate);
+
+      block.__moodyFocalPointCleanup = function () {
+        window.removeEventListener('scroll', requestTimelineUpdate);
+        window.removeEventListener('resize', requestTimelineUpdate);
+        window.removeEventListener('load', requestTimelineUpdate);
+      };
+
+      raf(updateTimelineFromScroll);
+      window.setTimeout(requestTimelineUpdate, 120);
+      window.setTimeout(requestTimelineUpdate, 360);
     });
   }
 
   Drupal.behaviors.moodyFocalPoint = {
     attach: function (context) {
       var blocks = once('moody-focal-point', '.moody-focal-point', context);
-      blocks.forEach(initWhenFullyVisible);
+      blocks.forEach(initBlock);
+    },
+
+    detach: function (context, settings, trigger) {
+      if (trigger !== 'unload' && trigger !== 'move') {
+        return;
+      }
+
+      once.remove('moody-focal-point', '.moody-focal-point', context).forEach(function (block) {
+        var cleanup = block.__moodyFocalPointCleanup;
+        var timeline = block.__moodyFocalPointTimeline;
+        var stage = block.querySelector('[data-focal-point-stage]');
+        var media = block.querySelector('[data-focal-point-media]');
+        var captions = block.querySelectorAll('[data-focal-captions] [data-focal-index]');
+
+        if (typeof cleanup === 'function') {
+          cleanup();
+        }
+
+        if (timeline && typeof timeline.kill === 'function') {
+          timeline.kill();
+        }
+
+        block.__moodyFocalPointCleanup = null;
+        block.__moodyFocalPointTimeline = null;
+        block.__moodyFocalPointInitialized = false;
+        block.classList.remove('is-enhanced');
+        block.style.removeProperty('--moody-focal-point-stage-height');
+        block.style.removeProperty('--moody-focal-point-sticky-top-offset');
+        block.style.removeProperty('--moody-focal-point-reserved-height');
+
+        if (window.gsap) {
+          window.gsap.set(captions, { clearProps: 'all' });
+        }
+
+        if (media) {
+          media.style.removeProperty('height');
+          media.style.removeProperty('left');
+          media.style.removeProperty('top');
+          media.style.removeProperty('transform');
+          media.style.removeProperty('width');
+        }
+
+        if (stage) {
+          stage.style.removeProperty('height');
+        }
+      });
     },
   };
 

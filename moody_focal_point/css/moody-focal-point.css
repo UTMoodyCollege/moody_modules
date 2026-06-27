@@ -137,26 +137,32 @@
    Enhanced (JS) state – pinned scroll-through
    ============================================================ */
 
-.moody-focal-point.is-primed .moody-focal-point__image-wrapper,
 .moody-focal-point.is-enhanced .moody-focal-point__image-wrapper {
-  min-height: 100svh;
+  height: var(--moody-focal-point-stage-height, 100svh);
+  max-height: var(--moody-focal-point-stage-height, 100svh);
+  min-height: var(--moody-focal-point-stage-height, 100svh);
   overflow: hidden;
 }
 
-.moody-focal-point.is-primed .moody-focal-point__figure,
+.moody-focal-point.is-enhanced {
+  min-height: var(--moody-focal-point-reserved-height, auto);
+}
+
+.moody-focal-point.is-enhanced .moody-focal-point__image-wrapper {
+  position: sticky;
+  top: var(--moody-focal-point-sticky-top-offset, 0);
+}
+
 .moody-focal-point.is-enhanced .moody-focal-point__figure {
   position: absolute;
   will-change: transform, width, height, left, top;
 }
 
-.moody-focal-point.is-primed .moody-focal-point__figure img,
-.moody-focal-point.is-primed .moody-focal-point__figure .moody-focal-point__image,
 .moody-focal-point.is-enhanced .moody-focal-point__figure img,
 .moody-focal-point.is-enhanced .moody-focal-point__figure .moody-focal-point__image {
   object-fit: fill;
 }
 
-.moody-focal-point.is-primed .moody-focal-point__captions,
 .moody-focal-point.is-enhanced .moody-focal-point__captions {
   min-height: 100%;
 }

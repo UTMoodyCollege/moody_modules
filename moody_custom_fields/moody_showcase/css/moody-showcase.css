@@ -61,9 +61,12 @@
   }
 
   .field--type-moody-showcase .moody-showcase--full-media .showcase-image,
-  .field--type-moody-showcase .moody-showcase--full-media .showcase-video,
-  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-image {
+  .field--type-moody-showcase .moody-showcase--full-media .showcase-video {
     height: 100%;
+  }
+
+  .field--type-moody-showcase .moody-showcase--pinned-reveal .showcase-image {
+    min-height: var(--moody-showcase-pinned-height, calc(100vh - var(--moody-showcase-sticky-offset, 2rem)));
   }
 
   .field--type-moody-showcase .moody-showcase--full-media .showcase-media-frame,
