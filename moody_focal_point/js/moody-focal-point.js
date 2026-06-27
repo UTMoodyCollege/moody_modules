@@ -189,8 +189,8 @@
     var captionRect = caption.getBoundingClientRect();
     var halfWidth = captionRect.width / 2;
     var halfHeight = captionRect.height / 2;
-    var left = clamp(x, 12 + halfWidth, stageRect.width - 12 - halfWidth);
-    var top = clamp(y, 12 + halfHeight, stageRect.height - 12 - halfHeight);
+    var left = clamp(x, 12 + halfWidth, stageRect.width - 12 - halfWidth) - halfWidth;
+    var top = clamp(y, 12 + halfHeight, stageRect.height - 12 - halfHeight) - halfHeight;
 
     caption.style.left = left + 'px';
     caption.style.top = top + 'px';
