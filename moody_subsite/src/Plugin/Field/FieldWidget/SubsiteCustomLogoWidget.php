@@ -5,6 +5,7 @@ namespace Drupal\moody_subsite\Plugin\Field\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\file\Entity\File;
 
 /**
  * Plugin implementation of the 'subsite_custom_logo_widget' widget.
@@ -38,6 +39,17 @@ class SubsiteCustomLogoWidget extends WidgetBase {
       '#default_value' => isset($item->media) ? $item->media : 0,
       '#description' => $this->t('Image will be scaled to a width of 1000px.'),
     ];
+    $element['custom_logo']['svg_logo'] = [
+      '#type' => 'managed_file',
+      '#title' => $this->t('SVG Logo'),
+      '#upload_location' => 'public://subsite-logos/',
+      '#upload_validators' => [
+        'FileExtension' => ['extensions' => 'svg'],
+      ],
+      '#element_validate' => [[static::class, 'validateSvgLogo']],
+      '#default_value' => !empty($item->svg_logo) ? [$item->svg_logo] : [],
+      '#description' => $this->t('Optional SVG logo. If set, this is used instead of the image logo.'),
+    ];
     $element['custom_logo']['size'] = [
       '#type' => 'radios',
       '#title' => $this->t('Logo Height'),
@@ -57,13 +69,34 @@ class SubsiteCustomLogoWidget extends WidgetBase {
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     // This loop is through (potential) field instances.
     foreach ($values as &$value) {
+      $custom_logo = $value['custom_logo'] ?? $value;
       // A null media value should be saved as 0.
-      $value['media'] = !empty($value['custom_logo']['media']) ? $value['custom_logo']['media'] : 0;
-      if (!empty($value['custom_logo']['size'])) {
-        $value['size'] = $value['custom_logo']['size'];
+      $value['media'] = !empty($custom_logo['media']) ? $custom_logo['media'] : 0;
+      $svg_logo = $custom_logo['svg_logo'] ?? [];
+      $value['svg_logo'] = is_array($svg_logo) ? ($svg_logo['fids'][0] ?? $svg_logo[0] ?? 0) : $svg_logo;
+      if ($value['svg_logo'] && $file = File::load($value['svg_logo'])) {
+        $file->setPermanent();
+        $file->save();
+      }
+      if (!empty($custom_logo['size'])) {
+        $value['size'] = $custom_logo['size'];
       }
     }
     return $values;
+  }
+
+  /**
+   * Rejects SVG uploads with common executable payloads.
+   */
+  public static function validateSvgLogo(array &$element, FormStateInterface $form_state, array &$complete_form) {
+    foreach ((array) ($element['#value']['fids'] ?? []) as $fid) {
+      if ($file = File::load($fid)) {
+        $svg = file_get_contents($file->getFileUri());
+        if ($svg !== FALSE && preg_match('/<script\b|on[a-z]+\s*=|javascript:/i', $svg)) {
+          $form_state->setError($element, t('The SVG logo contains scripting and cannot be uploaded.'));
+        }
+      }
+    }
   }
 
 }

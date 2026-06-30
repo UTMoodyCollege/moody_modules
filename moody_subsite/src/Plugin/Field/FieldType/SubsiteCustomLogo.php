@@ -34,6 +34,9 @@ class SubsiteCustomLogo extends FieldItemBase {
     $properties['size'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Logo size'))
       ->setRequired(FALSE);
+    $properties['svg_logo'] = DataDefinition::create('integer')
+      ->setLabel(new TranslatableMarkup('SVG logo'))
+      ->setRequired(FALSE);
 
     return $properties;
   }
@@ -53,6 +56,11 @@ class SubsiteCustomLogo extends FieldItemBase {
           'type' => 'varchar',
           'length' => 512,
           'binary' => FALSE,
+        ],
+        'svg_logo' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
         ],
       ],
     ];
@@ -74,7 +82,8 @@ class SubsiteCustomLogo extends FieldItemBase {
    */
   public function isEmpty() {
     $media = $this->get('media')->getValue();
-    return $media === NULL || $media === '';
+    $svg_logo = $this->get('svg_logo')->getValue();
+    return ($media === NULL || $media === '') && empty($svg_logo);
   }
 
 }

@@ -22,3 +22,34 @@ function moody_subsite_update_9001() {
       ->setDefaultValue(FALSE)
   );
 }
+
+/**
+ * Adds optional SVG logo storage to the custom logo base field.
+ */
+function moody_subsite_update_9002() {
+  $schema = \Drupal::database()->schema();
+  if (!$schema->fieldExists('moody_subsite_field_data', 'custom_logo__svg_logo')) {
+    $schema->addField('moody_subsite_field_data', 'custom_logo__svg_logo', [
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => FALSE,
+    ]);
+  }
+  _moody_subsite_update_custom_logo_storage_definition();
+}
+
+/**
+ * Refreshes installed storage mapping for custom_logo SVG data.
+ */
+function moody_subsite_update_9003() {
+  _moody_subsite_update_custom_logo_storage_definition();
+}
+
+/**
+ * Stores the current custom_logo field definition as installed.
+ */
+function _moody_subsite_update_custom_logo_storage_definition() {
+  $definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('moody_subsite');
+  \Drupal::service('entity.last_installed_schema.repository')->setLastInstalledFieldStorageDefinition($definitions['custom_logo']);
+  \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+}
