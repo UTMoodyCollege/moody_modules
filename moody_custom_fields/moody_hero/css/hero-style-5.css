@@ -11,7 +11,8 @@
 }
 
 .moody-hero.hero--half-n-half .hero-img {
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
   height: 300px;
 }
 .moody-hero.hero--half-n-half .hero-img.center {

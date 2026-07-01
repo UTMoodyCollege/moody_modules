@@ -26,7 +26,7 @@ class MoodyHeroStyle5Formatter extends MoodyHeroFormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $cache_tags = [];
     $elements = [];
-    $large_image_style_name = 'utexas_image_style_2250w_900h';
+    $large_image_style_name = 'utexas_image_style_1200w';
     $medium_image_style_name = 'utexas_image_style_1200w';
     $small_image_style_name = 'utexas_image_style_1200w';
 
