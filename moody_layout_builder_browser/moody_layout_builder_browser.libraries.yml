@@ -1,0 +1,10 @@
+block_type_labels:
+  css:
+    theme:
+      css/block-type-labels.css: {}
+  js:
+    js/block-type-labels.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.announce
+    - core/once

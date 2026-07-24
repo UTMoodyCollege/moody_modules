@@ -1,0 +1,37 @@
+.layout-builder .moody-layout-builder-block-type {
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 0.5rem;
+  padding: 0.25rem 0.5rem;
+  color: #333f48;
+  border-inline-start: 3px solid #bf5700;
+  border-radius: 0 2px 2px 0;
+  background: #f1f3f5;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  pointer-events: none;
+}
+
+.layout-builder .moody-layout-builder-block-type__prefix {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.layout-builder .moody-layout-builder-block-type__label {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.layout-builder:not(.layout-builder--block-type-labels-disabled) .moody-layout-builder-block-type {
+  display: flex !important;
+}
+
+.layout-builder--block-type-labels-disabled .moody-layout-builder-block-type {
+  display: none !important;
+}

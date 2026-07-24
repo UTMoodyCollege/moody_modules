@@ -1,0 +1,5 @@
+services:
+  moody_layout_builder_browser.block_type_label_subscriber:
+    class: Drupal\moody_layout_builder_browser\EventSubscriber\BlockTypeLabelSubscriber
+    tags:
+      - { name: event_subscriber }

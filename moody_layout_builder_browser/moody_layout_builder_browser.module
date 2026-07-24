@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Adds block type controls to Layout Builder forms.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+/**
+ * Implements hook_form_alter().
+ */
+function moody_layout_builder_browser_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  if (!isset($form['actions']['preview_toggle'])) {
+    return;
+  }
+
+  $form['actions']['preview_toggle']['#weight'] = 10;
+  $form['actions']['block_type_labels_toggle'] = [
+    '#type' => 'container',
+    '#attributes' => [
+      'class' => ['js-show'],
+    ],
+    '#weight' => 11,
+    'toggle_block_type_labels' => [
+      '#title' => new TranslatableMarkup('Show block type labels'),
+      '#type' => 'checkbox',
+      '#value' => TRUE,
+      '#attributes' => [
+        'data-block-type-labels-id' => 'Drupal.layout_builder.block_type_labels.' . \Drupal::currentUser()->id(),
+      ],
+      '#id' => 'moody-layout-builder-block-type-labels',
+    ],
+  ];
+  if (isset($form['actions']['revert'])) {
+    $form['actions']['revert']['#weight'] = 20;
+  }
+  $form['#attached']['library'][] = 'moody_layout_builder_browser/block_type_labels';
+}
