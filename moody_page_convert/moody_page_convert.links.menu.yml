@@ -1,0 +1,6 @@
+moody_page_convert.form:
+  title: 'Convert a Moody page'
+  description: 'Change a Moody Layout Builder page to another supported page type.'
+  route_name: moody_page_convert.form
+  parent: system.admin_content
+  weight: 30
