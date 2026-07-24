@@ -1,0 +1,8 @@
+name: 'Moody Page Convert'
+type: module
+description: 'Converts Moody Layout Builder pages between supported page types.'
+core_version_requirement: ^10 || ^11
+package: Moody
+dependencies:
+  - drupal:layout_builder
+  - drupal:node

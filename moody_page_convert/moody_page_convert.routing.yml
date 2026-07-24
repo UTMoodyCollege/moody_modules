@@ -1,0 +1,9 @@
+moody_page_convert.form:
+  path: '/admin/content/moody-page-convert'
+  defaults:
+    _form: '\Drupal\moody_page_convert\Form\PageConvertForm'
+    _title: 'Convert a Moody page'
+  requirements:
+    _permission: 'convert moody page types'
+  options:
+    _admin_route: true

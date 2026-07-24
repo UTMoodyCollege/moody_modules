@@ -1,0 +1,4 @@
+convert moody page types:
+  title: 'Convert Moody page types'
+  description: 'Convert Standard, Landing, Subsite, and Feature pages between content types.'
+  restrict access: true
