@@ -62,6 +62,7 @@ dependencies:
   - 'smart_date:smart_date_recur'
   - 'url_embed:url_embed'
   - 'utexas:utexas'
+  - 'utexas_block_library_access:utexas_block_library_access'
   - 'utexas_block_social_links:utexas_block_social_links'
   - 'utexas_content_type_flex_page:utexas_content_type_flex_page'
   - 'utexas_image_styles:utexas_image_styles'

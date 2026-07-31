@@ -9,6 +9,7 @@
  * Implements hook_install().
  */
 function moody_fleet_deploy_install() {
+  _moody_fleet_deploy_enable_inner_rail_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
   _moody_fleet_deploy_enable_readable_text_toolbar_on_flex_html();
@@ -99,6 +100,46 @@ function moody_fleet_deploy_update_9009() {
  */
 function moody_fleet_deploy_update_9010() {
   _moody_fleet_deploy_place_moody_required_links_block();
+}
+
+/**
+ * Restores the Inner Rail filter on the Flex HTML text format.
+ */
+function moody_fleet_deploy_update_9011() {
+  _moody_fleet_deploy_enable_inner_rail_on_flex_html();
+}
+
+/**
+ * Adds the Inner Rail filter to the Flex HTML text format.
+ */
+function _moody_fleet_deploy_enable_inner_rail_on_flex_html() {
+  $format = \Drupal::configFactory()->getEditable('filter.format.flex_html');
+
+  if ($format->isNew()) {
+    return;
+  }
+
+  if (!\Drupal::moduleHandler()->moduleExists('utexas_inner_rail_filter')) {
+    \Drupal::service('module_installer')->install(['utexas_inner_rail_filter'], TRUE);
+  }
+
+  $modules = $format->get('dependencies.module') ?? [];
+  if (!in_array('utexas_inner_rail_filter', $modules, TRUE)) {
+    $modules[] = 'utexas_inner_rail_filter';
+    sort($modules);
+    $format->set('dependencies.module', $modules);
+  }
+
+  $filters = $format->get('filters') ?? [];
+  $filters['utexas_inner_rail_filter'] = [
+    'id' => 'utexas_inner_rail_filter',
+    'provider' => 'utexas_inner_rail_filter',
+    'status' => TRUE,
+    'weight' => 0,
+    'settings' => [],
+  ];
+
+  $format->set('filters', $filters)->save();
 }
 
 /**
