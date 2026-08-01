@@ -1,0 +1,5 @@
+name: 'Moody AI'
+type: module
+description: 'LLM-facing documentation for building Moody pages with supported components.'
+core_version_requirement: ^10 || ^11
+package: Moody
