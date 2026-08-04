@@ -33,7 +33,7 @@ function moody_ambient_video_help($route_name, RouteMatchInterface $route_match)
 function moody_ambient_video_preprocess_block(&$variables)
 {
   if ($variables['base_plugin_id'] == 'block_content' || $variables['derivative_plugin_id'] == 'ambient_video') {
-    if (!empty($variables['elements']['content']['#block_content']->bundle()) && $variables['elements']['content']['#block_content']->bundle() == 'ambient_video') {
+    if (isset($variables['elements']['content']['#block_content']) && $variables['elements']['content']['#block_content']->bundle() == 'ambient_video') {
       $block_content = $variables['content']['#block_content'];
 
       // Variables to pass to Twig. //
