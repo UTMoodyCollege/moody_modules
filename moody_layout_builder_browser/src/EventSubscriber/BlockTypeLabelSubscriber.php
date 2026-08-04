@@ -66,10 +66,7 @@ class BlockTypeLabelSubscriber implements EventSubscriberInterface {
 
     $build = $event->getBuild();
     if (isset($build['content'])) {
-      $build['content'] = [
-        'moody_block_type_label' => $label,
-        'block_content' => $build['content'],
-      ];
+      $build['content']['moody_block_type_label'] = $label;
     }
     else {
       $build['moody_block_type_label'] = $label;

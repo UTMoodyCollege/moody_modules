@@ -56,7 +56,7 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * Tests that a block type label wraps preview content.
+   * Tests that a block type label preserves preview content metadata.
    */
   public function testAddsLabelToPreviewOnly(): void {
     $plugin = $this->createMock(BlockPluginInterface::class);
@@ -68,13 +68,17 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
     $event->method('inPreview')->willReturn(TRUE);
     $event->method('getPlugin')->willReturn($plugin);
     $event->method('getBuild')->willReturn([
-      'content' => ['#markup' => 'Block content'],
+      'content' => [
+        '#block_content' => 'Block metadata',
+        'field' => ['#markup' => 'Block content'],
+      ],
     ]);
     $event->expects($this->once())
       ->method('setBuild')
       ->with($this->callback(function (array $build): bool {
         return $build['content']['moody_block_type_label']['label']['#value'] === 'Basic block'
-          && $build['content']['block_content']['#markup'] === 'Block content'
+          && $build['content']['#block_content'] === 'Block metadata'
+          && $build['content']['field']['#markup'] === 'Block content'
           && $build['#attached']['library'] === [
             'moody_layout_builder_browser/block_type_labels',
           ];
