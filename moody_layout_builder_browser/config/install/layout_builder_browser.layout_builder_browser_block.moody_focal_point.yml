@@ -7,4 +7,4 @@ category: moody_site_building
 label: 'Moody Focal Point'
 image_path: /themes/custom/moody/moody_components_images/moody-focal-point.jpeg
 image_alt: 'The moody focal point component'
-weight: -1
+weight: 0

@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: news_and_announcements
+block_id: moody_feature_page_news_and_announcements
+category: specialty_blocks
+label: 'News And Announcements'
+image_path: ''
+image_alt: ''
+weight: -100

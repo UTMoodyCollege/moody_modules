@@ -23,7 +23,7 @@
   margin-bottom: 1.5rem;
   border-radius: 0.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: all 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .media-mention-item:hover {
@@ -62,6 +62,20 @@
   font-weight: 600;
 }
 
+.news-and-announcements .mention-body {
+  color: var(--ut-charcoal, #333f48);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.news-and-announcements .mention-body > :first-child {
+  margin-top: 0;
+}
+
+.news-and-announcements .mention-body > :last-child {
+  margin-bottom: 0;
+}
+
 .btn {
   background-color: var(--ut-burntorange, #bf5700);
   color: #ffffff;
@@ -69,11 +83,11 @@
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
   text-decoration: none;
-  transition: all 0.2s ease-in-out;
   border: none;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .btn:hover,
@@ -84,9 +98,37 @@
   transform: translateY(-1px);
 }
 
+.news-and-announcements .btn {
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.news-and-announcements .btn:focus-visible {
+  outline: 3px solid var(--ut-bluebonnet, #005f86);
+  outline-offset: 3px;
+  transform: none;
+}
+
+.news-and-announcements .btn:active {
+  background-color: var(--ut-burntorange-dark, #a04400);
+  transform: translateY(0);
+}
+
 .btn i {
   margin-left: 0.5rem;
   font-size: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-mention-item,
+  .media-mention-item:hover,
+  .btn,
+  .btn:hover,
+  .btn:focus,
+  .news-and-announcements .btn:active {
+    transition: none;
+    transform: none;
+  }
 }
 
 /* Responsive adjustments */

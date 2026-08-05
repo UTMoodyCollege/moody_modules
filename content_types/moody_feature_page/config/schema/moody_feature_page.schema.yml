@@ -11,3 +11,32 @@ block.settings.moody_feature_page_feature_pages_editors_picks:
     image_style:
       type: string
       label: 'Image style override'
+
+block.settings.moody_feature_page_news_and_announcements:
+  type: block_settings
+  label: 'News and Announcements block'
+  mapping:
+    items:
+      type: sequence
+      label: 'News and announcement items'
+      sequence:
+        type: mapping
+        mapping:
+          category:
+            type: string
+            label: 'Category'
+          date:
+            type: string
+            label: 'Date'
+          date_format:
+            type: string
+            label: 'Date display format'
+          body:
+            type: text_format
+            label: 'Body'
+          link:
+            type: string
+            label: 'Link'
+          link_text:
+            type: string
+            label: 'Link text'

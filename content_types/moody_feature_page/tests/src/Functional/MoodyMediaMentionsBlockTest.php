@@ -66,4 +66,56 @@ class MoodyMediaMentionsBlockTest extends BrowserTestBase {
     $this->assertTrue(TRUE, 'Default configuration test completed');
   }
 
+  /**
+   * Tests the News and Announcements block output and options.
+   */
+  public function testNewsAndAnnouncementsBlock() {
+    $block = $this->container->get('plugin.manager.block')->createInstance(
+      'moody_feature_page_news_and_announcements',
+      [
+        'items' => [
+          [
+            'category' => 'Press release',
+            'date' => '2026-06-17',
+            'date_format' => 'month_year',
+            'body' => [
+              'value' => '<p><strong>Formatted announcement</strong></p>',
+              'format' => 'flex_html',
+            ],
+            'link' => 'https://example.com/release',
+            'link_text' => 'View release',
+          ],
+          [
+            'category' => 'Announcement',
+            'date' => '2026-07-13',
+            'date_format' => 'full_date',
+            'body' => 'Legacy body value.',
+            'link' => 'https://example.com/announcement',
+            'link_text' => '',
+          ],
+        ],
+      ],
+    );
+
+    $build = $block->build();
+    $this->assertSame('moody_news_and_announcements', $build['#theme']);
+    $this->assertSame(
+      ['moody_feature_page/moody_media_mentions'],
+      $build['#attached']['library'],
+    );
+    $this->assertSame('processed_text', $build['#items'][0]['body_rendered']['#type']);
+    $this->assertSame('flex_html', $build['#items'][0]['body_rendered']['#format']);
+    $this->assertSame('Legacy body value.', $build['#items'][1]['body_rendered']['#text']);
+
+    $markup = (string) $this->container->get('renderer')->renderRoot($build);
+    $this->assertStringContainsString('News and Announcements', $markup);
+    $this->assertStringContainsString('June 2026', $markup);
+    $this->assertStringNotContainsString('June 17, 2026', $markup);
+    $this->assertStringContainsString('July 13, 2026', $markup);
+    $this->assertStringContainsString('View release', $markup);
+    $this->assertStringContainsString('Read More', $markup);
+    $this->assertStringContainsString('<strong>Formatted announcement</strong>', $markup);
+    $this->assertStringContainsString('Legacy body value.', $markup);
+  }
+
 }

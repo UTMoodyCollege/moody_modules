@@ -1,0 +1,57 @@
+{#
+/**
+ * @file
+ * Template for the News and Announcements block.
+ *
+ * Available variables:
+ * - items: News or announcement items containing category, date,
+ *   body_rendered, link, and link_text values.
+ */
+#}
+
+<section class="moody-media-mentions news-and-announcements bg-ut-limestone ut-py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h2 class="text-ut-charcoal ut-font-weight-black ut-text-3xl text-center ut-mb-5">{{ 'News and Announcements'|t }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="media-mentions-list">
+          {% for item in items %}
+            <article class="media-mention-item bg-white ut-p-4 ut-mb-4 ut-border-radius-sm ut-shadow-sm">
+              <div class="row align-items-center">
+                <div class="col-lg-3">
+                  {% if item.category %}
+                    <div class="media-source text-ut-bluebonnet ut-font-weight-bold ut-text-lg">
+                      {{ item.category }}
+                    </div>
+                  {% endif %}
+                  {% if item.date %}
+                    <time class="mention-date text-ut-charcoal ut-text-sm ut-mt-1" datetime="{{ item.date }}">
+                      {{ item.date|date(item.date_format == 'month_year' ? 'F Y' : 'F j, Y') }}
+                    </time>
+                  {% endif %}
+                </div>
+                <div class="col-lg-6">
+                  {% if item.body_rendered %}
+                    <div class="mention-body text-ut-charcoal">{{ item.body_rendered }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-lg-3 text-lg-end">
+                  {% if item.link %}
+                    <a href="{{ item.link }}" class="btn bg-ut-burntorange text-white ut-text-sm ut-px-4 ut-py-2 ut-border-radius-sm hover:bg-ut-burntorange-dark text-decoration-none" target="_blank" rel="noopener">
+                      {{ item.link_text|default('Read More'|t) }}
+                      <i class="fas fa-external-link-alt ut-ml-2" aria-hidden="true"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

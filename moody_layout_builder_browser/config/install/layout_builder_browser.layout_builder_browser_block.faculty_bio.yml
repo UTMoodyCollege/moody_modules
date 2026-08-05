@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: faculty_bio
+block_id: 'views_block:faculty_bio_view-block_1'
+category: specialty_blocks
+label: 'Faculty Bio'
+image_path: ''
+image_alt: ''
+weight: -100

@@ -41,6 +41,12 @@ function moody_feature_page_theme($existing, $type, $theme, $path)
       ],
       'template' => 'moody-media-mentions',
     ],
+    'moody_news_and_announcements' => [
+      'variables' => [
+        'items' => NULL,
+      ],
+      'template' => 'moody-news-and-announcements',
+    ],
   ];
 }
 
