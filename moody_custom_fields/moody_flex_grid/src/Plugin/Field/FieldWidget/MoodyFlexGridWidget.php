@@ -61,7 +61,12 @@ class MoodyFlexGridWidget extends WidgetBase {
     $items = !empty($items[$delta]->flex_grid_items) ? unserialize($items[$delta]->flex_grid_items) : [];
     // Ensure item keys are consecutive.
     $items = array_values($items);
-    $submitted_items = $this->getSubmittedItems($form_state, $field_name, $delta);
+    $submitted_items = $this->getSubmittedItems(
+      $form_state,
+      $element['#field_parents'],
+      $field_name,
+      $delta
+    );
     if ($submitted_items !== NULL) {
       $items = $submitted_items;
     }
@@ -191,14 +196,18 @@ class MoodyFlexGridWidget extends WidgetBase {
   /**
    * Gets submitted Flex Grid items in storage-like shape for AJAX rebuilds.
    */
-  protected function getSubmittedItems(FormStateInterface $form_state, $field_name, $delta) {
-    $submitted_items = $form_state->getValue([
+  protected function getSubmittedItems(
+    FormStateInterface $form_state,
+    array $field_parents,
+    $field_name,
+    $delta
+  ) {
+    $submitted_items = $form_state->getValue(array_merge($field_parents, [
       $field_name,
-      'widget',
       $delta,
       'flex_grid_items',
       'items',
-    ]);
+    ]));
 
     if (!is_array($submitted_items)) {
       return NULL;
@@ -362,20 +371,17 @@ class MoodyFlexGridWidget extends WidgetBase {
    */
   public static function utexasRemoveSelectedSubmit(array $form, FormStateInterface $form_state) {
     $element = self::retrieveAddMoreElement($form, $form_state);
+    $value_parents = array_merge($element['#parents'], ['items']);
     array_pop($element['#parents']);
     // The field_delta will be the last (nearest) element in the #parents array.
     $field_delta = array_pop($element['#parents']);
     // The field_name will be the penultimate element in the #parents array.
     $field_name = array_pop($element['#parents']);
     $parents = [$field_name, 'widget'];
-    $value_parents = [
-      $field_name,
-      'widget',
-      $field_delta,
-      'flex_grid_items',
-      'items',
-    ];
-    $submitted_items = $form_state->getValue($value_parents);
+    $submitted_items = NestedArray::getValue(
+      $form_state->getUserInput(),
+      $value_parents
+    );
 
     if (is_array($submitted_items)) {
       $submitted_items = array_filter($submitted_items, function ($item) {
