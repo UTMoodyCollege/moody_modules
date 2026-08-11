@@ -1,3 +1,11 @@
+/* Hallmark · component: news cards · genre: editorial · theme: Moody/UT brand · contrast: pass (40–41) · mobile: pass (34, 49, 50–57) */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 */
+div.news-view.latest-news-block {
+  --news-card-accent: #bf5700;
+  --news-card-accent-text: #a04400;
+  --news-card-accent-hover: #9d4700;
+}
+
 #editors-picks-block {
   /* No underline links */
   text-decoration: none;
@@ -47,34 +55,84 @@
   color: #333f48; /* gray color */
 }
 
-/* Stylish category tags for news-categories links */
+/* Place the category between the image and the story details. */
+.latest-news-block .latest-news-block-text-fields {
+  min-width: 0;
+}
+
+div.news-view.latest-news-block .latest-news-block-image-link,
+div.news-view.latest-news-block .latest-news-block-story-link {
+  display: block;
+}
+
+div.news-view.latest-news-block .latest-news-block-image-link {
+  margin-bottom: 0;
+}
+
 .latest-news-block .news-categories {
-  margin-top: 0.5em;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5em;
-  width: 100%; /* Ensures tags wrap to new lines if needed */
+  gap: 0.4rem 0.75rem;
+  width: auto;
+  margin: 0.75rem 0 0.35rem;
 }
 
-.latest-news-block .news-categories a {
-  background-color: #bf5700; /* UT Burnt Orange */
-  color: #fff !important;
-  font-size: 0.85em;
-  font-weight: 600;
-  padding: 0.2em 0.7em;
-  border-radius: 1em;
+div.news-view.latest-news-block .news-categories a {
   display: inline-block;
-  letter-spacing: 0.03em;
+  margin-bottom: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--news-card-accent-text) !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: normal;
   text-decoration: none !important;
-  white-space: nowrap;
-  transition: background 0.2s;
 }
 
-.latest-news-block .news-categories a:hover,
-.latest-news-block .news-categories a:focus {
-  background-color: #a94400;
-  color: #fff !important;
-  text-decoration: none !important;
+div.news-view.latest-news-block .news-categories a:hover,
+div.news-view.latest-news-block .news-categories a:focus,
+div.news-view.latest-news-block .news-categories a:active {
+  background: transparent;
+  color: var(--news-card-accent-hover) !important;
+  text-decoration: underline !important;
+}
+
+div.news-view.latest-news-block .news-categories a:focus-visible {
+  outline: 2px solid var(--news-card-accent);
+  outline-offset: 3px;
+}
+
+div.news-view.latest-news-block .latest-news-block-image-link:focus-visible {
+  outline: none;
+}
+
+div.news-view.latest-news-block .latest-news-block-image-link:focus-visible .latest-news-block-image-field {
+  outline: 3px solid var(--news-card-accent);
+  outline-offset: 3px;
+}
+
+div.news-view.latest-news-block .latest-news-block-story-link:focus-visible {
+  outline: 3px solid var(--news-card-accent);
+  outline-offset: 3px;
+}
+
+div.news-view.latest-news-block .latest-news-block-image-field {
+  position: relative;
+}
+
+div.news-view.latest-news-block .latest-news-block-image-field::before {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: var(--news-card-accent);
+  content: "";
+  pointer-events: none;
 }
 
 div.news-view.latest-news-block > .views-row a img {
@@ -106,7 +164,7 @@ div.news-view.latest-news-block .latest-news-block-image-field video {
 }
 
 @media screen and (max-width: 900px) {
-    div.news-view.latest-news-block > .views-row a {
-        flex-direction:column;
-    }
+  div.news-view.latest-news-block > .views-row a {
+    flex-direction: column;
   }
+}
