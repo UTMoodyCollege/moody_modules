@@ -81,7 +81,7 @@ display:
           click_sort_column: target_id
           type: media_thumbnail
           settings:
-            image_link: content
+            image_link: ''
             image_style: moody_image_style_363w_x_190h
             image_loading:
               attribute: lazy
@@ -149,7 +149,7 @@ display:
           click_sort_column: value
           type: string
           settings:
-            link_to_entity: true
+            link_to_entity: false
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -426,7 +426,7 @@ display:
           exclude: false
           alter:
             alter_text: true
-            text: "<div class=\"latest-news-block\">\r\n  <div class=\"latest-news-block-text-fields\">\r\n    <a href=\"{{ view_node }}\">\r\n      <div class=\"latest-news-block-image-field\">\r\n        {{ field_thumbnail_image_for_summar }}\r\n      </div>\r\n      <div class=\"views-field-created\">{{ created }}</div>\r\n      <h3 class=\"views-field-title\">{{ title }}</h3>\r\n      <h4 class=\"views-field-field-moody-subtitle\">\r\n        {{ field_moody_subtitle }}\r\n      </h4>\r\n    </a>\r\n    <div class=\"news-categories\">{{ field_news_categories }}</div>\r\n  </div>\r\n</div>\r\n"
+            text: "<div class=\"latest-news-block\">\r\n  <div class=\"latest-news-block-text-fields\">\r\n    <a class=\"latest-news-block-image-link\" href=\"{{ view_node }}\">\r\n      <div class=\"latest-news-block-image-field\">\r\n        {{ field_thumbnail_image_for_summar }}\r\n      </div>\r\n    </a>\r\n    <div class=\"news-categories\">{{ field_news_categories }}</div>\r\n    <a class=\"latest-news-block-story-link\" href=\"{{ view_node }}\">\r\n      <div class=\"views-field-created\">{{ created }}</div>\r\n      <h3 class=\"views-field-title\">{{ title }}</h3>\r\n      <h4 class=\"views-field-field-moody-subtitle\">\r\n        {{ field_moody_subtitle }}\r\n      </h4>\r\n    </a>\r\n  </div>\r\n</div>\r\n"
             make_link: false
             path: ''
             absolute: false
@@ -638,7 +638,7 @@ display:
           replica: false
           query_tags: {  }
       relationships: {  }
-      css_class: 'news-view row'
+      css_class: 'news-view row latest-news-block'
       header: {  }
       footer: {  }
       display_extenders: {  }
