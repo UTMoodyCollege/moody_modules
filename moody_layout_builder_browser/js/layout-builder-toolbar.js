@@ -17,6 +17,23 @@
     });
   };
 
+  const enhanceEditorActions = (context) => {
+    once(
+      'moody-layout-editor-actions',
+      '.block-local-tasks-block ul.tabs.primary',
+      context,
+    ).forEach((tabs) => {
+      const heading = tabs.previousElementSibling;
+      if (!heading || heading.tagName !== 'H2') {
+        return;
+      }
+
+      heading.classList.remove('visually-hidden');
+      heading.classList.add('moody-layout-editor-actions__title');
+      heading.textContent = Drupal.t('Editor actions');
+    });
+  };
+
   const updateToolbar = (toolbar) => {
     const status = toolbar.querySelector(
       '[data-layout-builder-unsaved-status]',
@@ -37,6 +54,8 @@
 
   Drupal.behaviors.moodyLayoutBuilderToolbar = {
     attach(context) {
+      enhanceEditorActions(context);
+
       const toolbar = document.querySelector(
         '[data-moody-layout-builder-toolbar]',
       );
@@ -60,6 +79,12 @@
       if (trigger !== 'unload') {
         return;
       }
+
+      once.remove(
+        'moody-layout-editor-actions',
+        '.block-local-tasks-block ul.tabs.primary',
+        context,
+      );
 
       once
         .remove(
