@@ -8,6 +8,31 @@
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\moody_layout_builder_browser\EventSubscriber\LayoutBuilderStateSubscriber;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_page_attachments().
+ */
+function moody_layout_builder_browser_page_attachments(array &$attachments): void {
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if (!$node instanceof NodeInterface || !$node->hasField('layout_builder__layout')) {
+    return;
+  }
+
+  $account = \Drupal::currentUser();
+  $permissions = [
+    'configure any layout',
+    "configure all {$node->bundle()} node layout overrides",
+    "configure editable {$node->bundle()} node layout overrides",
+  ];
+  $attachments['#cache']['contexts'][] = 'user.permissions';
+  foreach ($permissions as $permission) {
+    if ($account->hasPermission($permission)) {
+      $attachments['#attached']['library'][] = 'moody_layout_builder_browser/editor_toolbar';
+      return;
+    }
+  }
+}
 
 /**
  * Implements hook_form_alter().
