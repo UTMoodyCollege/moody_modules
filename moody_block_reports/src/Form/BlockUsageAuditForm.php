@@ -56,7 +56,7 @@ class BlockUsageAuditForm extends FormBase {
     $form['#attached']['library'][] = 'moody_block_reports/admin';
 
     $form['description'] = [
-      '#markup' => '<p>Run a batch audit of Layout Builder block usage across Basic Pages, Moody Standard Pages, Landing Pages, and Feature Pages.</p>',
+      '#markup' => '<p>Run a batch audit of Layout Builder block usage across Basic Pages, Moody Standard Pages, Landing Pages, Feature Pages, and Subsite Pages.</p>',
     ];
 
     $form['bundles'] = [
@@ -67,12 +67,14 @@ class BlockUsageAuditForm extends FormBase {
         'moody_standard_page' => $this->t('Standard Page'),
         'moody_landing_page' => $this->t('Landing Page'),
         'moody_feature_page' => $this->t('Feature Page'),
+        'moody_subsite_page' => $this->t('Subsite Page'),
       ],
       '#default_value' => [
         'page',
         'moody_standard_page',
         'moody_landing_page',
         'moody_feature_page',
+        'moody_subsite_page',
       ],
       '#required' => TRUE,
     ];
@@ -298,6 +300,7 @@ class BlockUsageAuditForm extends FormBase {
         'moody_standard_page' => 'Standard Page',
         'moody_landing_page' => 'Landing Page',
         'moody_feature_page' => 'Feature Page',
+        'moody_subsite_page' => 'Subsite Page',
         default => $bundle,
       };
     }
