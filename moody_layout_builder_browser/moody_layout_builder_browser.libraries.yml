@@ -8,3 +8,14 @@ block_type_labels:
     - core/drupal
     - core/drupal.announce
     - core/once
+
+editor_toolbar:
+  version: 1.0.0
+  css:
+    theme:
+      css/layout-builder-toolbar.css: {}
+  js:
+    js/layout-builder-toolbar.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

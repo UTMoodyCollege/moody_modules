@@ -30,8 +30,13 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
 
     $form = [
       'actions' => [
-        'preview_toggle' => [],
+        'preview_toggle' => [
+          '#attributes' => [],
+        ],
         'revert' => [],
+        'submit' => [],
+        'discard_changes' => [],
+        'rebuild-layout' => [],
       ],
     ];
     moody_layout_builder_browser_form_alter(
@@ -49,8 +54,27 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
     $this->assertSame(10, $form['actions']['preview_toggle']['#weight']);
     $this->assertSame(11, $toggle['#weight']);
     $this->assertSame(20, $form['actions']['revert']['#weight']);
+    $this->assertSame(21, $form['actions']['submit']['#weight']);
+    $this->assertSame(22, $form['actions']['discard_changes']['#weight']);
+    $this->assertSame(23, $form['actions']['rebuild-layout']['#weight']);
+    $this->assertContains(
+      'moody-layout-builder-toolbar',
+      $form['actions']['#attributes']['class'],
+    );
+    $this->assertTrue($form['actions']['unsaved_changes']['#attributes']['hidden']);
     $this->assertSame(
-      ['moody_layout_builder_browser/block_type_labels'],
+      'status',
+      $form['actions']['unsaved_changes']['#attributes']['role'],
+    );
+    $this->assertContains(
+      'moody-layout-builder-toolbar__button--danger',
+      $form['actions']['discard_changes']['#attributes']['class'],
+    );
+    $this->assertSame(
+      [
+        'moody_layout_builder_browser/block_type_labels',
+        'moody_layout_builder_browser/editor_toolbar',
+      ],
       $form['#attached']['library'],
     );
   }

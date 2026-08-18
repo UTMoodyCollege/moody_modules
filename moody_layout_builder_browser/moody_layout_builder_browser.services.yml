@@ -3,3 +3,10 @@ services:
     class: Drupal\moody_layout_builder_browser\EventSubscriber\BlockTypeLabelSubscriber
     tags:
       - { name: event_subscriber }
+  moody_layout_builder_browser.layout_builder_state_subscriber:
+    class: Drupal\moody_layout_builder_browser\EventSubscriber\LayoutBuilderStateSubscriber
+    arguments:
+      - '@entity_type.manager'
+      - '@request_stack'
+    tags:
+      - { name: event_subscriber }

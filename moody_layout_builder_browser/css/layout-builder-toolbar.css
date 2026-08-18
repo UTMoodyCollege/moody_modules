@@ -1,0 +1,278 @@
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 · component: Layout Builder toolbar · macrostructure: fixed-bottom editor control rail · genre: modern-minimal · tone: compact/utilitarian · theme: UT brand · contrast: pass (40–41) · responsive toolbar: pass (49, 50–57) */
+form.layout-builder-form .moody-layout-builder-toolbar {
+  --mlbt-burnt-orange: #bf5700;
+  --mlbt-burnt-orange-hover: #9d4500;
+  --mlbt-charcoal: #333f48;
+  --mlbt-charcoal-hover: #1f262b;
+  --mlbt-danger: #b42318;
+  --mlbt-danger-hover: #8f1d14;
+  --mlbt-paper: #f7f6f2;
+  --mlbt-white: #fff;
+  --mlbt-border: #d6d2ca;
+  --mlbt-muted: #5f666b;
+  --mlbt-status-bg: #fff3e6;
+  --mlbt-status-ink: #622d00;
+  --mlbt-disabled: #e9e7e2;
+  --mlbt-shadow: rgba(31, 38, 43, 0.2);
+  --mlbt-status-halo: rgba(191, 87, 0, 0.16);
+  --mlbt-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --mlbt-z-index: 500;
+
+  position: fixed;
+  z-index: var(--mlbt-z-index);
+  inset-inline: max(0.5rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-right));
+  inset-block-end: max(0.5rem, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  box-sizing: border-box;
+  width: auto;
+  max-width: 78rem;
+  max-height: calc(100dvh - 1rem);
+  margin: 0 auto;
+  padding: 0.75rem;
+  overflow-y: auto;
+  color: var(--mlbt-charcoal);
+  border: 1px solid var(--mlbt-border);
+  border-block-start: 4px solid var(--mlbt-burnt-orange);
+  border-radius: 0.25rem;
+  background: var(--mlbt-paper);
+  box-shadow: 0 0.5rem 1.5rem var(--mlbt-shadow);
+  font-family: inherit;
+}
+
+.layout-builder {
+  padding-block-end: calc(var(--moody-layout-builder-toolbar-height, 18rem) + 2rem);
+}
+
+.moody-layout-builder-toolbar__status {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  color: var(--mlbt-status-ink);
+  border: 1px solid var(--mlbt-burnt-orange);
+  border-inline-start-width: 4px;
+  border-radius: 0.25rem;
+  background: var(--mlbt-status-bg);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.moody-layout-builder-toolbar__status[hidden] {
+  display: none;
+}
+
+.moody-layout-builder-toolbar__status::before {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-inline-end: 0.5rem;
+  content: '';
+  border-radius: 50%;
+  background: var(--mlbt-burnt-orange);
+  box-shadow: 0 0 0 3px var(--mlbt-status-halo);
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__option {
+  min-width: 0;
+  margin: 0;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar > #edit-preview-toggle,
+form.layout-builder-form .moody-layout-builder-toolbar > #edit-block-type-labels-toggle,
+form.layout-builder-form .moody-layout-builder-toolbar#edit-actions > .button {
+  margin: 0;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar > #edit-preview-toggle,
+form.layout-builder-form .moody-layout-builder-toolbar > #edit-block-type-labels-toggle {
+  grid-column: 1 / -1;
+  order: 0;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar > #edit-revert {
+  grid-column: 1 / -1;
+  order: 1;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar > #edit-submit {
+  order: 2;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar > #edit-discard-changes {
+  order: 3;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar > #edit-rebuild-layout {
+  order: 4;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__option > .form-item {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--mlbt-border);
+  border-radius: 0.25rem;
+  background: var(--mlbt-white);
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__option .form-checkbox {
+  flex: 0 0 auto;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+  margin-inline-end: 0.5rem;
+  accent-color: var(--mlbt-burnt-orange);
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__option label {
+  margin: 0;
+  color: var(--mlbt-charcoal);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__option .form-checkbox:focus-visible {
+  outline: 3px solid var(--mlbt-charcoal);
+  outline-offset: 3px;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__button.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.5rem;
+  color: var(--mlbt-white);
+  border: 2px solid transparent;
+  border-radius: 0.25rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 180ms var(--mlbt-ease-out),
+    border-color 180ms var(--mlbt-ease-out),
+    transform 100ms var(--mlbt-ease-out);
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__button--primary.button {
+  border-color: var(--mlbt-burnt-orange);
+  background: var(--mlbt-burnt-orange);
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__button--secondary.button {
+  border-color: var(--mlbt-charcoal);
+  background: var(--mlbt-charcoal);
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar > #edit-discard-changes.moody-layout-builder-toolbar__button--danger.button {
+  border-color: var(--mlbt-danger);
+  background: var(--mlbt-danger);
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__button.button:focus-visible {
+  outline: 3px solid var(--mlbt-white);
+  outline-offset: 0;
+  box-shadow: 0 0 0 5px var(--mlbt-charcoal);
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__button.button:active {
+  transform: translateY(1px);
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__button.button:disabled,
+form.layout-builder-form .moody-layout-builder-toolbar__button.button.is-disabled,
+form.layout-builder-form .moody-layout-builder-toolbar__button.button[aria-disabled='true'] {
+  color: var(--mlbt-muted);
+  border-color: var(--mlbt-border);
+  background: var(--mlbt-disabled);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+  transform: none;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__button.button[aria-busy='true'],
+form.layout-builder-form .moody-layout-builder-toolbar__button.button.is-loading {
+  cursor: wait;
+}
+
+form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  form.layout-builder-form .moody-layout-builder-toolbar__button--primary.button:hover {
+    border-color: var(--mlbt-burnt-orange-hover);
+    background: var(--mlbt-burnt-orange-hover);
+    transform: translateY(-1px);
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar__button--secondary.button:hover {
+    border-color: var(--mlbt-charcoal-hover);
+    background: var(--mlbt-charcoal-hover);
+    transform: translateY(-1px);
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar > #edit-discard-changes.moody-layout-builder-toolbar__button--danger.button:hover {
+    border-color: var(--mlbt-danger-hover);
+    background: var(--mlbt-danger-hover);
+    transform: translateY(-1px);
+  }
+}
+
+@media (min-width: 40rem) {
+  form.layout-builder-form .moody-layout-builder-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .moody-layout-builder-toolbar__status {
+    margin-inline-end: auto;
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar > #edit-preview-toggle,
+  form.layout-builder-form .moody-layout-builder-toolbar > #edit-block-type-labels-toggle {
+    flex: 0 1 auto;
+    width: auto;
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar__button.button {
+    padding-inline: 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .moody-layout-builder-toolbar__status,
+  form.layout-builder-form .moody-layout-builder-toolbar__option > .form-item,
+  form.layout-builder-form .moody-layout-builder-toolbar__button.button {
+    min-height: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  form.layout-builder-form .moody-layout-builder-toolbar__button.button {
+    transition-duration: 0.01ms;
+  }
+}
