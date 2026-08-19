@@ -278,9 +278,51 @@ function _moody_layout_builder_browser_build_live_preview_body(array $result): a
  * Wraps rendered preview content so it cannot affect the editing form.
  */
 function _moody_layout_builder_browser_build_protected_preview(array $content): array {
+  $devices = [
+    'mobile' => new TranslatableMarkup('Mobile'),
+    'tablet' => new TranslatableMarkup('Tablet'),
+    'desktop' => new TranslatableMarkup('Desktop'),
+  ];
+  $device_buttons = [];
+  foreach ($devices as $device => $label) {
+    $device_buttons[$device] = [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#value' => $label,
+      '#attributes' => [
+        'type' => 'button',
+        'class' => ['moody-block-live-preview__device'],
+        'data-moody-block-preview-device' => $device,
+        'aria-pressed' => $device === 'desktop' ? 'true' : 'false',
+      ],
+    ];
+  }
+
   return [
     '#type' => 'container',
     '#attributes' => ['class' => ['moody-block-live-preview__protected']],
+    'device_toolbar' => [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['moody-block-live-preview__device-toolbar'],
+        'data-moody-block-preview-device-controls' => TRUE,
+        'role' => 'group',
+        'aria-labelledby' => 'moody-block-live-preview-device-label',
+      ],
+      'label' => [
+        '#type' => 'html_tag',
+        '#tag' => 'span',
+        '#value' => new TranslatableMarkup('Preview width'),
+        '#attributes' => [
+          'id' => 'moody-block-live-preview-device-label',
+          'class' => ['moody-block-live-preview__device-label'],
+        ],
+      ],
+      'devices' => [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['moody-block-live-preview__devices']],
+      ] + $device_buttons,
+    ],
     'notice' => [
       '#type' => 'html_tag',
       '#tag' => 'p',

@@ -4,6 +4,11 @@
     'Drupal.moodyLayoutBuilder.blockLivePreview';
   const mobilePreviewQuery = window.matchMedia('(max-width: 39.999rem)');
   const floatingPreviewQuery = window.matchMedia('(min-width: 64rem)');
+  const blockPreviewDevices = {
+    mobile: { width: 390, height: 844, label: Drupal.t('Mobile') },
+    tablet: { width: 768, height: 1024, label: Drupal.t('Tablet') },
+    desktop: { width: 1440, height: 900, label: Drupal.t('Desktop') },
+  };
 
   const blockPreviewIsEnabled = () => {
     try {
@@ -352,6 +357,187 @@
     });
   };
 
+  const buildBlockPreviewDocument = (markup) => {
+    const previewDocument = document.implementation.createHTMLDocument('');
+    const base = previewDocument.createElement('base');
+    const viewport = previewDocument.createElement('meta');
+    const guard = previewDocument.createElement('style');
+
+    previewDocument.documentElement.lang =
+      document.documentElement.lang || 'en';
+    previewDocument.documentElement.className =
+      document.documentElement.className;
+    previewDocument.body.className = document.body.className;
+    base.href = document.baseURI;
+    viewport.name = 'viewport';
+    viewport.content = 'width=device-width, initial-scale=1';
+    guard.textContent =
+      'html, body { min-width: 0 !important; } body { margin: 0 !important; }';
+    previewDocument.head.append(base, viewport);
+    document.head
+      .querySelectorAll('link[rel="stylesheet"], style')
+      .forEach((asset) => {
+        previewDocument.head.append(asset.cloneNode(true));
+      });
+    previewDocument.head.append(guard);
+    previewDocument.body.innerHTML = markup;
+    previewDocument.body.querySelectorAll('script').forEach((script) => {
+      script.remove();
+    });
+
+    return `<!doctype html>${previewDocument.documentElement.outerHTML}`;
+  };
+
+  const enhanceBlockPreviewDevices = (context) => {
+    const selector = '[data-moody-block-preview-device-controls]';
+    const controls = [
+      ...(context instanceof Element && context.matches(selector)
+        ? [context]
+        : []),
+      ...(context.querySelectorAll?.(selector) || []),
+    ];
+
+    once('moody-block-preview-devices', controls).forEach((control) => {
+      const protectedPreview = control.closest(
+        '.moody-block-live-preview__protected',
+      );
+      const preview = control.closest('[data-moody-block-live-preview]');
+      const form = preview?.closest(
+        'form.layout-builder-add-block, form.layout-builder-configure-block',
+      );
+      const source = protectedPreview?.querySelector(
+        '.moody-block-live-preview__viewport',
+      );
+      const buttons = [
+        ...control.querySelectorAll('[data-moody-block-preview-device]'),
+      ];
+      if (!preview || !form || !source || buttons.length === 0) {
+        return;
+      }
+
+      const stage = document.createElement('div');
+      const canvas = document.createElement('div');
+      const frame = document.createElement('iframe');
+      const resizeObserver = new ResizeObserver(() => updateScale());
+      const sourceDocument = buildBlockPreviewDocument(source.innerHTML);
+      let selected = blockPreviewDevices[
+        form.dataset.moodyBlockPreviewSelectedDevice
+      ]
+        ? form.dataset.moodyBlockPreviewSelectedDevice
+        : 'desktop';
+
+      stage.className = 'moody-block-live-preview__device-stage';
+      canvas.className = 'moody-block-live-preview__device-canvas';
+      frame.className = 'moody-block-live-preview__device-frame';
+      frame.setAttribute('sandbox', '');
+      frame.setAttribute('tabindex', '-1');
+      frame.setAttribute('aria-hidden', 'true');
+      frame.srcdoc = sourceDocument;
+      canvas.append(frame);
+      stage.append(canvas);
+      source.replaceChildren(stage);
+
+      function updateScale() {
+        const device = blockPreviewDevices[selected];
+        const scale = Math.min(1, stage.clientWidth / device.width || 1);
+        canvas.style.setProperty(
+          '--moody-block-preview-display-width',
+          `${device.width * scale}px`,
+        );
+        canvas.style.setProperty(
+          '--moody-block-preview-display-height',
+          `${device.height * scale}px`,
+        );
+        frame.style.setProperty(
+          '--moody-block-preview-device-width',
+          `${device.width}px`,
+        );
+        frame.style.setProperty(
+          '--moody-block-preview-device-height',
+          `${device.height}px`,
+        );
+        frame.style.setProperty('--moody-block-preview-device-scale', scale);
+      }
+
+      const selectDevice = (deviceName, announce = false) => {
+        const device = blockPreviewDevices[deviceName];
+        if (!device) {
+          return;
+        }
+        selected = deviceName;
+        form.dataset.moodyBlockPreviewSelectedDevice = deviceName;
+        buttons.forEach((button) => {
+          const active = button.dataset.moodyBlockPreviewDevice === deviceName;
+          button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        frame.title = Drupal.t(
+          '@device block preview, @width by @height pixels',
+          {
+            '@device': device.label,
+            '@width': device.width,
+            '@height': device.height,
+          },
+        );
+        updateScale();
+        preview.moodyBlockPreviewPanel?.syncPosition();
+        if (announce) {
+          Drupal.announce(
+            Drupal.t('@device preview selected.', {
+              '@device': device.label,
+            }),
+          );
+        }
+      };
+
+      const onClick = (event) => {
+        selectDevice(event.currentTarget.dataset.moodyBlockPreviewDevice, true);
+      };
+      const onKeydown = (event) => {
+        const current = buttons.indexOf(event.currentTarget);
+        const destinations = {
+          ArrowLeft: (current - 1 + buttons.length) % buttons.length,
+          ArrowRight: (current + 1) % buttons.length,
+          Home: 0,
+          End: buttons.length - 1,
+        };
+        if (destinations[event.key] === undefined) {
+          return;
+        }
+        event.preventDefault();
+        buttons[destinations[event.key]].focus();
+        buttons[destinations[event.key]].click();
+      };
+
+      buttons.forEach((button) => {
+        const device = blockPreviewDevices[
+          button.dataset.moodyBlockPreviewDevice
+        ];
+        button.setAttribute(
+          'aria-label',
+          Drupal.t('@device preview, @width by @height pixels', {
+            '@device': device.label,
+            '@width': device.width,
+            '@height': device.height,
+          }),
+        );
+        button.addEventListener('click', onClick);
+        button.addEventListener('keydown', onKeydown);
+      });
+      resizeObserver.observe(stage);
+      selectDevice(selected);
+      window.requestAnimationFrame(updateScale);
+      control.moodyBlockPreviewDevices = {
+        destroy() {
+          resizeObserver.disconnect();
+          buttons.forEach((button) => {
+            button.removeEventListener('click', onClick);
+            button.removeEventListener('keydown', onKeydown);
+          });
+        },
+      };
+    });
+  };
+
   const syncBlockPreviewStickyOffset = (form) => {
     const preview = form.querySelector('[data-moody-block-live-preview]');
     if (!preview) {
@@ -570,6 +756,7 @@
       enhanceEditorActions(context);
       enhanceBlockPreviewPanel(context);
       syncBlockPreviewResponse(context);
+      enhanceBlockPreviewDevices(context);
       enhanceBlockLivePreview(context);
 
       const toolbar = document.querySelector(
@@ -611,6 +798,17 @@
         .forEach((preview) => {
           preview.moodyBlockPreviewPanel?.destroy();
           delete preview.moodyBlockPreviewPanel;
+        });
+
+      once
+        .remove(
+          'moody-block-preview-devices',
+          '[data-moody-block-preview-device-controls]',
+          context,
+        )
+        .forEach((control) => {
+          control.moodyBlockPreviewDevices?.destroy();
+          delete control.moodyBlockPreviewDevices;
         });
 
       once
