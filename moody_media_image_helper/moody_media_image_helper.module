@@ -120,6 +120,10 @@ function _moody_media_image_helper_alter_selection_widget(array &$element, array
   $widget_hash = substr(hash('sha256', implode(':', $parents)), 0, 10);
   $widget_root_id = $element['#attributes']['id'] ?? Html::getId('moody-media-image-helper-widget-' . $widget_hash);
   $element['#attributes']['id'] = $widget_root_id;
+  $element['#attributes']['class'] = array_values(array_unique([
+    ...($element['#attributes']['class'] ?? []),
+    'moody-media-image-helper__widget',
+  ]));
 
   $selection_input_id = NULL;
   if (isset($element['media_library_selection']['#attributes']) && is_array($element['media_library_selection']['#attributes'])) {
