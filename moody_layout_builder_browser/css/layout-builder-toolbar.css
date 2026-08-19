@@ -1,6 +1,7 @@
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 · components: Layout Builder toolbar + labelled editor actions rail · macrostructure: fixed-bottom controls / responsive task grid · genre: modern-minimal · tone: prominent/utilitarian · theme: UT brand · contrast: pass (40–41) · responsive controls: pass (49, 50–57) */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 · components: Layout Builder toolbar + editor actions + block chooser · macrostructure: fixed-bottom controls / responsive task grid / compact media list · genre: modern-minimal · tone: prominent/utilitarian · theme: UT brand · contrast: pass (40–41) · responsive controls: pass (49, 50–57) */
 .block-local-tasks-block,
-form.layout-builder-form .moody-layout-builder-toolbar {
+form.layout-builder-form .moody-layout-builder-toolbar,
+#drupal-off-canvas-wrapper {
   --mlbt-burnt-orange: #bf5700;
   --mlbt-burnt-orange-hover: #9d4500;
   --mlbt-accent-ink: #fff;
@@ -129,6 +130,134 @@ form.layout-builder-form .moody-layout-builder-toolbar {
   box-shadow: none;
   cursor: not-allowed;
   transform: none;
+}
+
+#drupal-off-canvas-wrapper .ui-dialog-titlebar {
+  border-block-start: 4px solid var(--mlbt-burnt-orange);
+}
+
+#drupal-off-canvas-wrapper .js-layout-builder-filter {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--mlbt-charcoal);
+  border: 2px solid var(--mlbt-border);
+  border-radius: 0.25rem;
+  outline: 3px solid transparent;
+  outline-offset: 2px;
+  background: var(--mlbt-paper);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+#drupal-off-canvas-wrapper .js-layout-builder-filter::placeholder {
+  color: var(--mlbt-muted);
+  opacity: 1;
+}
+
+#drupal-off-canvas-wrapper .js-layout-builder-filter:focus-visible {
+  border-color: var(--mlbt-burnt-orange);
+  outline-color: var(--mlbt-white);
+  box-shadow: 0 0 0 5px var(--mlbt-burnt-orange);
+}
+
+#drupal-off-canvas-wrapper .js-layout-builder-filter:disabled {
+  color: var(--mlbt-muted);
+  border-color: var(--mlbt-border);
+  background: var(--mlbt-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+#drupal-off-canvas-wrapper details > summary {
+  display: list-item;
+  box-sizing: border-box;
+  min-height: 2.75rem;
+  padding-block: 0.75rem;
+  color: var(--mlbt-white);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+#drupal-off-canvas-wrapper details > summary::marker {
+  color: var(--mlbt-burnt-orange);
+}
+
+#drupal-off-canvas-wrapper details[open] > summary {
+  box-shadow: inset 0 -2px 0 var(--mlbt-burnt-orange);
+}
+
+#drupal-off-canvas-wrapper details > summary:focus-visible {
+  outline: 3px solid var(--mlbt-white);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--mlbt-burnt-orange);
+}
+
+#drupal-off-canvas-wrapper .layout-builder-browser-block-item {
+  margin: 0.75rem 0 !important;
+}
+
+#drupal-off-canvas-wrapper .layout-builder-browser-block-item > a.js-layout-builder-block-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 5rem;
+  padding: 0.5rem;
+  overflow-wrap: anywhere;
+  color: var(--mlbt-charcoal);
+  border: 2px solid var(--mlbt-border);
+  border-radius: 0.25rem;
+  background: var(--mlbt-paper);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+  transition: border-color 180ms var(--mlbt-ease-out),
+    transform 100ms var(--mlbt-ease-out);
+}
+
+#drupal-off-canvas-wrapper .layout-builder-browser-block-item > a.js-layout-builder-block-link img {
+  flex: 0 0 clamp(5.5rem, 34%, 7rem);
+  width: clamp(5.5rem, 34%, 7rem);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--mlbt-border);
+  border-radius: 0.125rem;
+  background: var(--mlbt-white);
+}
+
+#drupal-off-canvas-wrapper .layout-builder-browser-block-item > a.js-layout-builder-block-link:focus-visible {
+  border-color: var(--mlbt-burnt-orange);
+  outline: 3px solid var(--mlbt-white);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--mlbt-burnt-orange);
+}
+
+#drupal-off-canvas-wrapper .layout-builder-browser-block-item > a.js-layout-builder-block-link:active {
+  transform: translateY(1px);
+}
+
+#drupal-off-canvas-wrapper .layout-builder-browser-block-item > a.js-layout-builder-block-link.is-disabled,
+#drupal-off-canvas-wrapper .layout-builder-browser-block-item > a.js-layout-builder-block-link[aria-disabled='true'] {
+  color: var(--mlbt-muted);
+  border-color: var(--mlbt-border);
+  background: var(--mlbt-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+}
+
+#drupal-off-canvas-wrapper .layout-builder-browser-block-item > a.js-layout-builder-block-link:has(.ajax-progress) {
+  cursor: progress;
+  opacity: 0.7;
 }
 
 form.layout-builder-form .moody-layout-builder-toolbar {
@@ -334,6 +463,10 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
 }
 
 @media (hover: hover) and (pointer: fine) {
+  #drupal-off-canvas-wrapper .js-layout-builder-filter:hover:not(:disabled) {
+    border-color: var(--mlbt-muted);
+  }
+
   .block-local-tasks-block ul.tabs.primary.tabs.primary li a:hover {
     color: var(--mlbt-accent-ink);
     border-color: var(--mlbt-burnt-orange);
@@ -343,6 +476,11 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
   .block-local-tasks-block ul.tabs.primary.tabs.primary li a.is-active:hover {
     border-color: var(--mlbt-burnt-orange-hover);
     background: var(--mlbt-burnt-orange-hover);
+  }
+
+  #drupal-off-canvas-wrapper .layout-builder-browser-block-item > a.js-layout-builder-block-link:hover {
+    color: var(--mlbt-charcoal);
+    border-color: var(--mlbt-burnt-orange);
   }
 
   form.layout-builder-form .moody-layout-builder-toolbar__button--primary.button:hover {
@@ -421,6 +559,7 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
 
 @media (prefers-reduced-motion: reduce) {
   .block-local-tasks-block ul.tabs.primary.tabs.primary li a,
+  #drupal-off-canvas-wrapper .layout-builder-browser-block-item > a.js-layout-builder-block-link,
   form.layout-builder-form .moody-layout-builder-toolbar__button.button {
     transition-duration: 0.01ms;
   }
