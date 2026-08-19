@@ -6,6 +6,9 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformState;
+use Drupal\Core\Plugin\ContextAwarePluginInterface;
+use Drupal\Core\Plugin\PluginWithFormsInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\moody_layout_builder_browser\EventSubscriber\LayoutBuilderStateSubscriber;
 use Drupal\node\NodeInterface;
@@ -38,6 +41,20 @@ function moody_layout_builder_browser_page_attachments(array &$attachments): voi
  * Implements hook_form_alter().
  */
 function moody_layout_builder_browser_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  if (in_array($form_id, [
+    'layout_builder_add_block',
+    'layout_builder_update_block',
+  ], TRUE)) {
+    $form['#attached']['library'][] = 'moody_layout_builder_browser/editor_toolbar';
+    $form['settings']['label']['#description'] = new TranslatableMarkup(
+      'Use this title to identify the block while editing. It is not shown to site visitors unless “Display title” is selected.',
+    );
+    $form['settings']['label_display']['#description'] = new TranslatableMarkup(
+      'Optional. Select this to show the title to site visitors as part of the block.',
+    );
+    _moody_layout_builder_browser_add_live_preview($form, $form_state, $form_id);
+  }
+
   if (!isset($form['actions']['preview_toggle'])) {
     return;
   }
@@ -99,6 +116,387 @@ function moody_layout_builder_browser_form_alter(array &$form, FormStateInterfac
 
   $form['#attached']['library'][] = 'moody_layout_builder_browser/block_type_labels';
   $form['#attached']['library'][] = 'moody_layout_builder_browser/editor_toolbar';
+}
+
+/**
+ * Adds a non-persistent, themed preview to a block configuration form.
+ */
+function _moody_layout_builder_browser_add_live_preview(array &$form, FormStateInterface $form_state, string $form_id): void {
+  $default_theme = \Drupal::config('system.theme')->get('default');
+  $theme = \Drupal::service('theme.initialization')->getActiveThemeByName($default_theme);
+  foreach ($theme->getLibraries() as $library) {
+    $form['#attached']['library'][] = $library;
+  }
+
+  foreach (['admin_label' => -100, 'label' => -90, 'label_display' => -80] as $key => $weight) {
+    if (isset($form['settings'][$key])) {
+      $form['settings'][$key]['#weight'] = $weight;
+    }
+  }
+
+  $result = [
+    'state' => 'waiting',
+    'message' => new TranslatableMarkup('Preview will appear when the required fields are complete.'),
+    'content' => [],
+  ];
+
+  if ($form_id === 'layout_builder_update_block') {
+    $result = _moody_layout_builder_browser_build_live_preview($form, $form_state, FALSE);
+  }
+
+  $form['settings']['moody_live_preview'] =
+    _moody_layout_builder_browser_build_live_preview_panel($result);
+}
+
+/**
+ * Builds the stable preview shell used by the editing form.
+ */
+function _moody_layout_builder_browser_build_live_preview_panel(array $result): array {
+  $preview = [
+    '#type' => 'container',
+    '#weight' => -70,
+    '#attributes' => [
+      'id' => 'moody-block-live-preview',
+      'class' => ['moody-block-live-preview'],
+      'data-moody-block-live-preview' => TRUE,
+      'data-state' => $result['state'],
+      'aria-labelledby' => 'moody-block-live-preview-title',
+    ],
+    'header' => [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['moody-block-live-preview__header']],
+      'title' => [
+        '#type' => 'html_tag',
+        '#tag' => 'h2',
+        '#value' => new TranslatableMarkup('Block live preview'),
+        '#attributes' => [
+          'id' => 'moody-block-live-preview-title',
+          'class' => ['moody-block-live-preview__title'],
+        ],
+      ],
+      'updated' => [
+        '#type' => 'html_tag',
+        '#tag' => 'span',
+        '#value' => new TranslatableMarkup('Updated'),
+        '#attributes' => [
+          'class' => ['moody-block-live-preview__updated'],
+          'data-moody-block-preview-updated' => TRUE,
+          'role' => 'status',
+          'aria-live' => 'polite',
+          'aria-atomic' => 'true',
+          'hidden' => TRUE,
+        ],
+      ],
+      'actions' => [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['moody-block-live-preview__actions']],
+        'move' => [
+          '#type' => 'html_tag',
+          '#tag' => 'button',
+          '#value' => new TranslatableMarkup('Move'),
+          '#attributes' => [
+            'type' => 'button',
+            'class' => ['button', 'moody-block-live-preview__move'],
+            'data-moody-block-preview-move' => TRUE,
+            'aria-label' => new TranslatableMarkup('Move preview. Drag or use the arrow keys to reposition it.'),
+          ],
+        ],
+        'toggle' => [
+          '#type' => 'html_tag',
+          '#tag' => 'button',
+          '#value' => new TranslatableMarkup('Collapse preview'),
+          '#attributes' => [
+            'type' => 'button',
+            'class' => ['button', 'moody-block-live-preview__toggle'],
+            'data-moody-block-preview-toggle' => TRUE,
+            'aria-controls' => 'moody-block-live-preview-body',
+            'aria-expanded' => 'true',
+          ],
+        ],
+        'refresh' => [
+          '#type' => 'button',
+          '#value' => new TranslatableMarkup('Refresh preview'),
+          '#name' => 'moody_block_live_preview_refresh',
+          '#limit_validation_errors' => [['settings']],
+          '#ajax' => [
+            'callback' => 'moody_layout_builder_browser_live_preview_ajax',
+            'wrapper' => 'moody-block-live-preview-body',
+            'disable-refocus' => TRUE,
+            'progress' => [
+              'type' => 'throbber',
+              'message' => new TranslatableMarkup('Updating preview…'),
+            ],
+          ],
+          '#attributes' => [
+            'class' => ['moody-block-live-preview__refresh'],
+            'data-moody-block-preview-refresh' => TRUE,
+          ],
+        ],
+      ],
+    ],
+    'body' => _moody_layout_builder_browser_build_live_preview_body($result),
+  ];
+
+  return $preview;
+}
+
+/**
+ * Builds the portion of the preview replaced by AJAX.
+ */
+function _moody_layout_builder_browser_build_live_preview_body(array $result): array {
+  $body = [
+    '#type' => 'container',
+    '#attributes' => [
+      'id' => 'moody-block-live-preview-body',
+      'class' => ['moody-block-live-preview__body'],
+      'data-moody-block-preview-body' => TRUE,
+      'data-state' => $result['state'],
+    ],
+    'status' => [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => $result['message'],
+      '#attributes' => [
+        'class' => ['moody-block-live-preview__status'],
+        'data-moody-block-preview-status' => TRUE,
+        'role' => 'status',
+        'aria-live' => 'polite',
+        'aria-atomic' => 'true',
+      ],
+    ],
+  ];
+
+  if ($result['content']) {
+    $body['protected_preview'] =
+      _moody_layout_builder_browser_build_protected_preview($result['content']);
+  }
+
+  return $body;
+}
+
+/**
+ * Wraps rendered preview content so it cannot affect the editing form.
+ */
+function _moody_layout_builder_browser_build_protected_preview(array $content): array {
+  return [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['moody-block-live-preview__protected']],
+    'notice' => [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => new TranslatableMarkup('Preview only — interactions are disabled to protect your unsaved changes.'),
+      '#attributes' => [
+        'class' => ['moody-block-live-preview__interaction-notice'],
+        'role' => 'note',
+      ],
+    ],
+    'viewport' => [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['moody-block-live-preview__viewport'],
+        'inert' => TRUE,
+        'aria-hidden' => 'true',
+      ],
+      'content' => $content,
+    ],
+  ];
+}
+
+/**
+ * Checks required preview fields without adding errors to the editing form.
+ */
+function _moody_layout_builder_browser_required_preview_values_complete(array $elements, FormStateInterface $form_state): bool {
+  foreach ($elements as $key => $element) {
+    if (!is_array($element) || (is_string($key) && str_starts_with($key, '#'))) {
+      continue;
+    }
+    if (($element['#access'] ?? TRUE) !== FALSE && !($element['#disabled'] ?? FALSE) && !empty($element['#required'])) {
+      $value = isset($element['#parents'])
+        ? $form_state->getValue($element['#parents'])
+        : NULL;
+      $is_empty = ($element['#type'] ?? NULL) === 'checkbox'
+        ? !$value
+        : _moody_layout_builder_browser_preview_value_is_empty($value);
+      if ($is_empty) {
+        return FALSE;
+      }
+    }
+    if (!_moody_layout_builder_browser_required_preview_values_complete($element, $form_state)) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+/**
+ * Determines whether a submitted preview value contains usable data.
+ */
+function _moody_layout_builder_browser_preview_value_is_empty(mixed $value): bool {
+  if (is_array($value)) {
+    if (array_key_exists('value', $value)) {
+      return _moody_layout_builder_browser_preview_value_is_empty($value['value']);
+    }
+    foreach ($value as $item) {
+      if (!_moody_layout_builder_browser_preview_value_is_empty($item)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+  return $value === NULL || $value === '' || $value === FALSE;
+}
+
+/**
+ * Normalizes composite values that are not flattened during preview AJAX.
+ */
+function _moody_layout_builder_browser_normalize_preview_values(array $elements, FormStateInterface $form_state): void {
+  foreach ($elements as $key => $element) {
+    if (!is_array($element) || (is_string($key) && str_starts_with($key, '#'))) {
+      continue;
+    }
+    if (($element['#type'] ?? NULL) === 'media_library' && isset($element['#parents'])) {
+      $value = $form_state->getValue($element['#parents']);
+      if (is_array($value)) {
+        $form_state->setValue(
+          $element['#parents'],
+          $value['media_library_selection'] ?? '',
+        );
+      }
+    }
+    _moody_layout_builder_browser_normalize_preview_values($element, $form_state);
+  }
+}
+
+/**
+ * Builds a preview from either saved configuration or current form values.
+ */
+function _moody_layout_builder_browser_build_live_preview(array $form, FormStateInterface $form_state, bool $use_form_values): array {
+  $form_object = $form_state->getFormObject();
+  if (!is_object($form_object) || !method_exists($form_object, 'getCurrentComponent')) {
+    return _moody_layout_builder_browser_live_preview_unavailable();
+  }
+
+  $plugin_id = 'unknown';
+  $preview_form_state = NULL;
+  try {
+    $contexts = $form_state->getTemporaryValue('gathered_contexts') ?? [];
+    $component = clone $form_object->getCurrentComponent();
+    $plugin_id = $component->getPluginId();
+
+    if ($use_form_values) {
+      $plugin = $component->getPlugin($contexts);
+      if ($plugin_id === 'moody_shorthand_zip_shorthand_zip_story') {
+        return [
+          'state' => 'waiting',
+          'message' => new TranslatableMarkup('This upload-based block can be previewed after it is added to the layout.'),
+          'content' => [],
+        ];
+      }
+      if ($form_state->getErrors() || !_moody_layout_builder_browser_required_preview_values_complete($form['settings'], $form_state)) {
+        return [
+          'state' => 'incomplete',
+          'message' => new TranslatableMarkup('Complete the required fields or correct invalid entries to preview this block.'),
+          'content' => [],
+        ];
+      }
+
+      $plugin_form = $plugin instanceof PluginWithFormsInterface
+        ? \Drupal::service('plugin_form.factory')->createInstance($plugin, 'configure')
+        : $plugin;
+      $preview_form = $form;
+      unset($preview_form['settings']['moody_live_preview']);
+      $preview_form_state = clone $form_state;
+      $preview_form_state->setValidationComplete(FALSE);
+      $preview_form_state->setLimitValidationErrors(NULL);
+      $preview_form_state->clearErrors();
+      _moody_layout_builder_browser_normalize_preview_values(
+        $preview_form['settings'],
+        $preview_form_state,
+      );
+      $subform_state = SubformState::createForSubform(
+        $preview_form['settings'],
+        $preview_form,
+        $preview_form_state,
+      );
+      $plugin_form->validateConfigurationForm($preview_form['settings'], $subform_state);
+      if ($preview_form_state->getErrors()) {
+        return [
+          'state' => 'incomplete',
+          'message' => new TranslatableMarkup('Complete the required fields or correct invalid entries to preview this block.'),
+          'content' => [],
+        ];
+      }
+
+      $plugin_form->submitConfigurationForm($preview_form, $subform_state);
+      if ($plugin instanceof ContextAwarePluginInterface) {
+        $plugin->setContextMapping($subform_state->getValue('context_mapping', []));
+      }
+      $component->setConfiguration($plugin->getConfiguration());
+    }
+
+    $content = $component->toRenderArray($contexts, TRUE);
+    unset(
+      $content['content']['moody_block_type_label'],
+      $content['moody_block_type_label'],
+    );
+    $preview_check = $content;
+    $preview_html = (string) \Drupal::service('renderer')->renderInIsolation($preview_check);
+    $preview_text = trim(html_entity_decode(strip_tags($preview_html), ENT_QUOTES | ENT_HTML5));
+    $has_visual = preg_match('/<(?:audio|canvas|embed|hr|iframe|img|object|picture|svg|video)\b/i', $preview_html);
+    if ($preview_text === '' && !$has_visual) {
+      return [
+        'state' => 'incomplete',
+        'message' => new TranslatableMarkup('This block does not have enough content to render a preview yet.'),
+        'content' => [],
+      ];
+    }
+
+    return [
+      'state' => 'ready',
+      'message' => $use_form_values
+        ? new TranslatableMarkup('Preview updated from unsaved changes.')
+        : new TranslatableMarkup('Current block preview. Changes update automatically as you edit.'),
+      'content' => $content,
+    ];
+  }
+  catch (\Throwable $exception) {
+    if (!$use_form_values) {
+      \Drupal::logger('moody_layout_builder_browser')->warning(
+        'Could not build a live preview for @plugin: @message',
+        [
+          '@plugin' => $plugin_id,
+          '@message' => $exception->getMessage(),
+        ],
+      );
+    }
+    return _moody_layout_builder_browser_live_preview_unavailable();
+  }
+  finally {
+    $preview_form_state?->clearErrors();
+  }
+}
+
+/**
+ * Returns the safe fallback used when a block cannot yet be rendered.
+ */
+function _moody_layout_builder_browser_live_preview_unavailable(): array {
+  return [
+    'state' => 'incomplete',
+    'message' => new TranslatableMarkup('Preview is not ready yet. Complete the block fields, then refresh the preview.'),
+    'content' => [],
+  ];
+}
+
+/**
+ * AJAX callback for the block live preview.
+ */
+function moody_layout_builder_browser_live_preview_ajax(array &$form, FormStateInterface $form_state): array {
+  if (!isset($form['settings']['moody_live_preview'])) {
+    return [];
+  }
+
+  $result = _moody_layout_builder_browser_build_live_preview($form, $form_state, TRUE);
+  return _moody_layout_builder_browser_build_live_preview_body($result);
 }
 
 /**

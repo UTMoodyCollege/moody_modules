@@ -80,6 +80,106 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
   }
 
   /**
+   * Tests the accessible live preview added to new block forms.
+   */
+  public function testAddsBlockLivePreview(): void {
+    require_once dirname(__DIR__, 3) . '/moody_layout_builder_browser.module';
+
+    $form = [
+      'settings' => [
+        'admin_label' => [],
+        'label' => [],
+        'label_display' => [],
+      ],
+    ];
+    $form_state = $this->createMock(FormStateInterface::class);
+    $form_state->method('getTriggeringElement')->willReturn(NULL);
+
+    moody_layout_builder_browser_form_alter(
+      $form,
+      $form_state,
+      'layout_builder_add_block',
+    );
+
+    $preview = $form['settings']['moody_live_preview'];
+    $this->assertSame('moody-block-live-preview', $preview['#attributes']['id']);
+    $this->assertSame('waiting', $preview['#attributes']['data-state']);
+    $this->assertSame('status', $preview['body']['status']['#attributes']['role']);
+    $this->assertSame(
+      'moody-block-live-preview-body',
+      $preview['body']['#attributes']['id'],
+    );
+    $this->assertSame(
+      'moody-block-live-preview-body',
+      $preview['header']['actions']['toggle']['#attributes']['aria-controls'],
+    );
+    $this->assertSame(
+      'true',
+      $preview['header']['actions']['toggle']['#attributes']['aria-expanded'],
+    );
+    $this->assertSame(
+      'moody_layout_builder_browser_live_preview_ajax',
+      $preview['header']['actions']['refresh']['#ajax']['callback'],
+    );
+    $this->assertSame(
+      [['settings']],
+      $preview['header']['actions']['refresh']['#limit_validation_errors'],
+    );
+    $this->assertSame(-90, $form['settings']['label']['#weight']);
+    $this->assertSame(-80, $form['settings']['label_display']['#weight']);
+    $this->assertSame(-70, $preview['#weight']);
+    $this->assertContains(
+      'moody_layout_builder_browser/editor_toolbar',
+      $form['#attached']['library'],
+    );
+  }
+
+  /**
+   * Tests rendered preview content cannot receive user interaction.
+   */
+  public function testBuildsProtectedBlockPreview(): void {
+    require_once dirname(__DIR__, 3) . '/moody_layout_builder_browser.module';
+
+    $preview = _moody_layout_builder_browser_build_protected_preview([
+      '#markup' => '<a href="/leave">Leave</a>',
+    ]);
+
+    $this->assertTrue($preview['viewport']['#attributes']['inert']);
+    $this->assertSame(
+      'true',
+      $preview['viewport']['#attributes']['aria-hidden'],
+    );
+    $this->assertSame(
+      'note',
+      $preview['notice']['#attributes']['role'],
+    );
+  }
+
+  /**
+   * Tests preview normalization for the composite Media Library form element.
+   */
+  public function testNormalizesMediaLibraryPreviewValue(): void {
+    require_once dirname(__DIR__, 3) . '/moody_layout_builder_browser.module';
+
+    $form_state = new \Drupal\Core\Form\FormState();
+    $parents = ['settings', 'block_form', 'image'];
+    $form_state->setValue($parents, [
+      'media_library_selection' => '42',
+      'media_library_open_button' => 'Add media',
+    ]);
+    $elements = [
+      'image' => [
+        '#type' => 'media_library',
+        '#parents' => $parents,
+      ],
+    ];
+
+    _moody_layout_builder_browser_normalize_preview_values($elements, $form_state);
+
+    $this->assertSame('42', $form_state->getValue($parents));
+  }
+
+  /**
    * Tests that a block type label preserves preview content metadata.
    */
   public function testAddsLabelToPreviewOnly(): void {

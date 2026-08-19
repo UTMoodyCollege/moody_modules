@@ -10,7 +10,7 @@ block_type_labels:
     - core/once
 
 editor_toolbar:
-  version: 1.0.0
+  version: 1.4.0
   css:
     theme:
       css/layout-builder-toolbar.css: {}
@@ -18,4 +18,5 @@ editor_toolbar:
     js/layout-builder-toolbar.js: {}
   dependencies:
     - core/drupal
+    - core/drupal.announce
     - core/once
