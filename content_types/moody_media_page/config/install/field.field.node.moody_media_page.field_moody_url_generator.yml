@@ -9,8 +9,8 @@ id: node.moody_media_page.field_moody_url_generator
 field_name: field_moody_url_generator
 entity_type: node
 bundle: moody_media_page
-label: 'Moody URL Generator'
-description: ''
+label: 'Page group'
+description: 'Choose the group this page belongs to. This keeps related pages organized and helps determine the recommended URL for the page. The available groups may be limited based on your access. If the group you need is not listed, contact <a href="mailto:comm-webmaster@austin.utexas.edu">comm-webmaster@austin.utexas.edu</a>.'
 required: true
 translatable: true
 default_value: {  }
