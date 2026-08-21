@@ -7,7 +7,6 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Cache\Cache;
-use Drupal\utexas_form_elements\UtexasLinkOptionsHelper;
 
 /**
  * Plugin implementation of the 'moody_card_formatter' formatter.
@@ -42,10 +41,7 @@ class MoodyCardFormatter3 extends MoodyCardFormatterBase {
     }
 
     foreach ($items as $delta => $item) {
-      $cta_item['link']['uri'] = $item->link_uri;
-      $cta_item['link']['title'] = $item->link_title ?? NULL;
-      $cta_item['link']['options'] = $item->link_options ?? [];
-      $cta = UtexasLinkOptionsHelper::buildLink($cta_item, ['anchor-btn']);
+      $cta = static::buildCta($item->link_uri, $item->link_title, $item->link_options, ['anchor-btn']);
       $image_render_array = [];
       if ($media = $this->entityTypeManager->getStorage('media')->load($item->media)) {
         $media_attributes = $media->get('field_utexas_media_image')->getValue();

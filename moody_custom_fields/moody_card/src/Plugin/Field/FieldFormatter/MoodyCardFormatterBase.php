@@ -2,11 +2,13 @@
 
 namespace Drupal\moody_card\Plugin\Field\FieldFormatter;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\utexas_form_elements\UtexasLinkOptionsHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -71,6 +73,38 @@ abstract class MoodyCardFormatterBase extends FormatterBase implements Container
       $container->get('entity_type.manager'),
       $container->get('renderer')
     );
+  }
+
+  /**
+   * Builds a card link without allowing malformed stored data to break pages.
+   */
+  protected static function buildCta($uri, $title, $options, array $classes) {
+    $uri = trim((string) $uri);
+    if (preg_match('/^([a-z][a-z0-9+.-]*):/i', $uri, $matches)) {
+      $allowed_schemes = array_merge(UrlHelper::getAllowedProtocols(), ['internal', 'entity', 'route', 'base']);
+      if (!in_array(strtolower($matches[1]), $allowed_schemes, TRUE)) {
+        return NULL;
+      }
+    }
+    if ($uri !== '' && !parse_url($uri, PHP_URL_SCHEME) && !str_starts_with($uri, '//')) {
+      if (!in_array($uri[0], ['/', '?', '#'], TRUE)) {
+        $uri = '/' . $uri;
+      }
+      $uri = 'internal:' . $uri;
+    }
+
+    try {
+      return UtexasLinkOptionsHelper::buildLink([
+        'link' => [
+          'uri' => $uri,
+          'title' => $title,
+          'options' => is_array($options) ? $options : [],
+        ],
+      ], $classes);
+    }
+    catch (\InvalidArgumentException $exception) {
+      return NULL;
+    }
   }
 
 }
