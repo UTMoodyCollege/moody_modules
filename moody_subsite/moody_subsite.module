@@ -7,6 +7,10 @@
 
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_help().
@@ -36,6 +40,7 @@ function moody_subsite_theme() {
       'variables' => [
         'title' => NULL,
         'link' => NULL,
+        'children' => [],
       ],
       'template' => 'moody-subsite-menu',
     ],
@@ -55,6 +60,230 @@ function moody_subsite_theme() {
       'template' => 'field--moody-subsite-menu',
     ],
   ];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view().
+ */
+function moody_subsite_moody_subsite_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  $term_ids = array_column($entity->get('directory_structure')->getValue(), 'target_id');
+  $rows = [];
+  $editor_ids = [];
+  $editor_role_ids = [];
+  $field_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('node');
+  $date_formatter = \Drupal::service('date.formatter');
+  $cacheability = (new CacheableMetadata())
+    ->addCacheContexts(['user.permissions', 'user.node_grants:view', 'timezone'])
+    ->addCacheTags(['node_list', 'node_type_list', 'user_list']);
+
+  $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadMultiple($term_ids);
+  $term_labels = [];
+  foreach ($term_ids as $term_id) {
+    if (isset($terms[$term_id])) {
+      $term_labels[] = $terms[$term_id]->label();
+      $cacheability->addCacheableDependency($terms[$term_id]);
+    }
+  }
+
+  if ($term_ids && \Drupal::moduleHandler()->moduleExists('workbench_access')) {
+    $scheme = \Drupal::entityTypeManager()->getStorage('access_scheme')->load('directory_structure');
+    if ($scheme) {
+      $user_section_storage = \Drupal::service('workbench_access.user_section_storage');
+      $role_section_storage = \Drupal::service('workbench_access.role_section_storage');
+      foreach ($term_ids as $term_id) {
+        $editor_ids = array_merge($editor_ids, array_keys($user_section_storage->getEditors($scheme, $term_id)));
+        $editor_role_ids = array_merge($editor_role_ids, $role_section_storage->getRoles($scheme, $term_id));
+      }
+      $cacheability
+        ->addCacheableDependency($scheme)
+        ->addCacheTags(['workbench_access_view']);
+    }
+  }
+
+  $editor_role_ids = array_values(array_unique(array_filter($editor_role_ids)));
+  $editor_roles = \Drupal::entityTypeManager()->getStorage('user_role')->loadMultiple($editor_role_ids);
+  $editor_role_labels = [];
+  foreach ($editor_roles as $role) {
+    $editor_role_labels[] = $role->label();
+    $cacheability->addCacheableDependency($role);
+  }
+
+  $user_storage = \Drupal::entityTypeManager()->getStorage('user');
+  if ($editor_role_ids) {
+    $editor_ids = array_merge($editor_ids, $user_storage->getQuery()
+      ->condition('roles', $editor_role_ids, 'IN')
+      ->accessCheck(FALSE)
+      ->execute());
+  }
+  $editors = $user_storage->loadMultiple(array_unique(array_filter($editor_ids)));
+  $editor_names = [];
+  $active_editor_count = 0;
+  foreach ($editors as $editor) {
+    if ($editor->isActive()) {
+      $active_editor_count++;
+    }
+    $editor_names[] = $editor->isActive()
+      ? $editor->label()
+      : t('@name (blocked)', ['@name' => $editor->label()]);
+    $cacheability->addCacheableDependency($editor);
+  }
+  natcasesort($editor_names);
+  natcasesort($editor_role_labels);
+
+  $logo = ['#plain_text' => t('No custom logo.')];
+  if ($logo_item = $entity->get('custom_logo')->first()) {
+    $logo_value = $logo_item->getValue();
+    $svg_logo_id = $logo_value['svg_logo'] ?? 0;
+    $media_id = preg_replace('/^0,/', '', (string) ($logo_value['media'] ?? 0));
+    $media_id = rtrim($media_id, ',');
+    $logo = ['#plain_text' => t('The configured logo file is unavailable.')];
+    if ($svg_logo_id && ($file = \Drupal::entityTypeManager()->getStorage('file')->load($svg_logo_id)) && file_exists($file->getFileUri())) {
+      $logo = [
+        '#theme' => 'image',
+        '#uri' => $file->getFileUri(),
+        '#alt' => $entity->label(),
+      ];
+      $cacheability->addCacheableDependency($file);
+    }
+    elseif ($media_id && $media = \Drupal::entityTypeManager()->getStorage('media')->load($media_id)) {
+      if ($media->hasField('field_utexas_media_image') && $image_item = $media->get('field_utexas_media_image')->first()) {
+        if (($file = $image_item->entity) && file_exists($file->getFileUri())) {
+          $logo = [
+            '#theme' => 'image_style',
+            '#style_name' => 'utexas_image_style_1000w',
+            '#uri' => $file->getFileUri(),
+            '#alt' => $image_item->alt ?: $entity->label(),
+          ];
+          $cacheability
+            ->addCacheableDependency($media)
+            ->addCacheableDependency($file);
+        }
+      }
+    }
+  }
+
+  if ($term_ids && isset($field_definitions['field_moody_url_generator'])) {
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+    $node_ids = $node_storage->getQuery()
+      ->condition('field_moody_url_generator.target_id', $term_ids, 'IN')
+      ->sort('changed', 'DESC')
+      ->accessCheck(TRUE)
+      ->execute();
+    $nodes = $node_storage->loadMultiple($node_ids);
+    $bundle_info = \Drupal::service('entity_type.bundle.info')->getBundleInfo('node');
+    foreach ($node_ids as $node_id) {
+      $node = $nodes[$node_id];
+      $update_access = $node->access('update', NULL, TRUE);
+      $operations = [
+        'view' => [
+          'title' => t('View'),
+          'url' => $node->toUrl(),
+        ],
+      ];
+      if ($update_access->isAllowed()) {
+        $operations['edit'] = [
+          'title' => t('Edit'),
+          'url' => $node->toUrl('edit-form'),
+        ];
+      }
+
+      $rows[] = [
+        ['data' => $node->toLink()->toRenderable()],
+        ['data' => ['#plain_text' => $bundle_info[$node->bundle()]['label'] ?? $node->bundle()]],
+        ['data' => ['#plain_text' => $node->isPublished() ? t('Published') : t('Unpublished')]],
+        ['data' => ['#plain_text' => $date_formatter->format($node->getChangedTime(), 'short')]],
+        ['data' => ['#type' => 'operations', '#links' => $operations]],
+      ];
+
+      $cacheability
+        ->addCacheableDependency($node)
+        ->addCacheableDependency($update_access);
+    }
+  }
+
+  $base_url = $entity->get('base_url')->value;
+  $details = [
+    'status' => [t('Status'), ['#plain_text' => $entity->isPublished() ? t('Published') : t('Unpublished')]],
+    'homepage' => [t('Homepage'), $base_url ? [
+      '#type' => 'link',
+      '#title' => $base_url,
+      '#url' => Url::fromUserInput($base_url),
+    ] : ['#plain_text' => t('Not set')]],
+    'sections' => [t('Directory sections'), ['#plain_text' => $term_labels ? implode(', ', $term_labels) : t('None')]],
+    'created' => [t('Created'), ['#plain_text' => $date_formatter->format($entity->getCreatedTime(), 'short')]],
+    'updated' => [t('Last updated'), ['#plain_text' => $date_formatter->format($entity->getChangedTime(), 'short')]],
+    'owner' => [t('Owner'), ['#plain_text' => $entity->getOwner() ? $entity->getOwner()->label() : t('None')]],
+    'content_count' => [t('Related content'), ['#plain_text' => count($rows)]],
+    'editors' => [t('Editors'), ['#plain_text' => $editor_names ? t('@total total (@active active) — @names', [
+      '@total' => count($editor_names),
+      '@active' => $active_editor_count,
+      '@names' => implode(', ', $editor_names),
+    ]) : t('0 assigned')]],
+    'editor_roles' => [t('Editor roles'), ['#plain_text' => $editor_role_labels ? implode(', ', $editor_role_labels) : t('None')]],
+  ];
+  $detail_list = [
+    '#type' => 'html_tag',
+    '#tag' => 'dl',
+    '#attributes' => ['class' => ['moody-subsite-details']],
+  ];
+  foreach ($details as $key => [$label, $value]) {
+    $detail_list[$key . '_label'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'dt',
+      '#value' => $label,
+    ];
+    $detail_list[$key . '_value'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'dd',
+      'value' => $value,
+    ];
+  }
+
+  $build['overview'] = [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['moody-subsite-overview']],
+    '#attached' => ['library' => ['moody_subsite/subsite-admin']],
+    'heading' => [
+      '#type' => 'html_tag',
+      '#tag' => 'h2',
+      '#value' => t('Subsite overview'),
+    ],
+    'grid' => [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['moody-subsite-overview__grid']],
+      'logo' => [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['moody-subsite-overview__logo']],
+        'content' => $logo,
+      ],
+      'details' => $detail_list,
+    ],
+  ];
+  $cacheability->applyTo($build['overview']);
+
+  $build['related_content'] = [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['moody-subsite-related-content']],
+    'heading' => [
+      '#type' => 'html_tag',
+      '#tag' => 'h2',
+      '#value' => t('Related content'),
+    ],
+    'table' => [
+      '#type' => 'table',
+      '#header' => [
+        t('Title'),
+        t('Content type'),
+        t('Status'),
+        t('Last updated'),
+        t('Operations'),
+      ],
+      '#rows' => $rows,
+      '#empty' => t('No related content found.'),
+      '#attributes' => ['class' => ['responsive-enabled']],
+    ],
+  ];
+  $cacheability->applyTo($build['related_content']);
 }
 
 /**

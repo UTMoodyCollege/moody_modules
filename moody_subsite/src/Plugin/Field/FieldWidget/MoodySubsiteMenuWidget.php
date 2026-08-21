@@ -36,6 +36,12 @@ class MoodySubsiteMenuWidget extends WidgetBase {
       '#title' => $this->t('Title'),
       '#default_value' => isset($items[$delta]->title) ? $items[$delta]->title : NULL,
     ];
+    $element['is_child'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Display as a submenu item'),
+      '#description' => $this->t('Nests this link under the nearest preceding top-level item.'),
+      '#default_value' => !empty($items[$delta]->is_child),
+    ];
     return $element;
   }
 

@@ -31,4 +31,7 @@ class SubsiteMenuValidation extends Constraint
     // The message that will be shown if an internal link does not start with a slash.
     public $noSlashOnRelativeLink = 'This item contains an internal link but does not have a slash at the beginning';
 
+    // The message that will be shown if a child has no preceding parent item.
+    public $childWithoutParent = 'A submenu item must follow a top-level item';
+
 }

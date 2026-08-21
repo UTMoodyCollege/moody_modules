@@ -2,11 +2,8 @@
 
 namespace Drupal\moody_subsite\Plugin\Field\FieldFormatter;
 
-use Drupal\Component\Utility\Html;
-use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
-use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Plugin implementation of the 'moody_subsite_menu_formatter' formatter.
@@ -26,16 +23,45 @@ class MoodySubsiteMenuFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    $menu_items = [];
 
-    foreach ($items as $delta => $item) {
+    foreach ($items as $item) {
+      $menu_items[] = [
+        'title' => $item->title,
+        'link' => $item->link,
+        'is_child' => (bool) $item->is_child,
+      ];
+    }
+
+    foreach (static::buildMenuTree($menu_items) as $delta => $item) {
       $elements[$delta] = [
         '#theme' => 'moody_subsite_menu',
-        '#title' => $item->title,
-        '#link' => $item->link,
+        '#title' => $item['title'],
+        '#link' => $item['link'],
+        '#children' => $item['children'],
       ];
     }
 
     return $elements;
+  }
+
+  /**
+   * Groups child items beneath the nearest preceding top-level item.
+   */
+  protected static function buildMenuTree(array $items) {
+    $tree = [];
+
+    foreach ($items as $item) {
+      if (!empty($item['is_child']) && $tree) {
+        $tree[count($tree) - 1]['children'][] = $item;
+        continue;
+      }
+
+      $item['children'] = [];
+      $tree[] = $item;
+    }
+
+    return $tree;
   }
 
 }

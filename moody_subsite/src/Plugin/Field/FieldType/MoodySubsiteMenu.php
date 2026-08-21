@@ -6,7 +6,6 @@ use Drupal\Component\Utility\Random;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 
@@ -34,9 +33,8 @@ class MoodySubsiteMenu extends FieldItemBase {
     $properties['title'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Parent'))
       ->setRequired(TRUE);
-    // $properties['parent'] = DataDefinition::create('string')
-    //   ->setLabel(new TranslatableMarkup('Weight'))
-    //   ->setRequired(TRUE);
+    $properties['is_child'] = DataDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('Submenu item'));
     return $properties;
   }
 
@@ -56,6 +54,13 @@ class MoodySubsiteMenu extends FieldItemBase {
           'length' => 255,
           'binary' => FALSE,
         ],
+        'is_child' => [
+          'type' => 'int',
+          'size' => 'tiny',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
       ],
     ];
 
@@ -69,6 +74,7 @@ class MoodySubsiteMenu extends FieldItemBase {
     $random = new Random();
     $values['link'] = 'https://utexas.edu';
     $values['title'] = $random->word(mt_rand(1, $field_definition->getSetting('max_length')));
+    $values['is_child'] = FALSE;
     return $values;
   }
 

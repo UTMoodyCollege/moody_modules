@@ -46,6 +46,26 @@ function moody_subsite_update_9003() {
 }
 
 /**
+ * Adds submenu nesting storage to the subsite navigation field.
+ */
+function moody_subsite_update_9004() {
+  $schema = \Drupal::database()->schema();
+  if (!$schema->fieldExists('moody_subsite__subsite_nav', 'subsite_nav_is_child')) {
+    $schema->addField('moody_subsite__subsite_nav', 'subsite_nav_is_child', [
+      'type' => 'int',
+      'size' => 'tiny',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    ]);
+  }
+
+  $definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('moody_subsite');
+  \Drupal::service('entity.last_installed_schema.repository')->setLastInstalledFieldStorageDefinition($definitions['subsite_nav']);
+  \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+}
+
+/**
  * Stores the current custom_logo field definition as installed.
  */
 function _moody_subsite_update_custom_logo_storage_definition() {

@@ -16,6 +16,8 @@ class SubsiteMenuValidationValidator extends ConstraintValidator
      * {@inheritdoc}
      */
     public function validate($items, Constraint $constraint) {
+        $has_parent = FALSE;
+
         foreach ($items as $delta => $item) {
             $values = $item->getValue();
             $link = $values['link'];
@@ -62,6 +64,18 @@ class SubsiteMenuValidationValidator extends ConstraintValidator
                     ->buildViolation($constraint->notRelativePath)
                     ->atPath($delta)
                     ->addViolation();
+            }
+
+            // Check that submenu items have a preceding top-level item.
+            if (!empty($values['is_child']) && !$has_parent) {
+                $this->context
+                    ->buildViolation($constraint->childWithoutParent)
+                    ->atPath($delta)
+                    ->addViolation();
+            }
+
+            if (empty($values['is_child'])) {
+                $has_parent = TRUE;
             }
         }
     }

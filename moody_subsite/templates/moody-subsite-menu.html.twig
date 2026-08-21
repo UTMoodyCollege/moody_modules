@@ -1,3 +1,17 @@
-<li class="subsite-nav-item main-menu__list-item">
+<li class="subsite-nav-item main-menu__list-item{{ children ? ' menu-item-has-children' }}">
   <a class="main-menu__link" href="{{ link }}">{{ title }}</a>
+  {% if children %}
+    <div class="icon moody-subnav-trigger" tabindex="0">
+      <svg class="svg angle-down"><use xlink:href="#ut-angle-down"></use></svg>
+    </div>
+    <div class="sub-nav-wrapper sub-nav">
+      <ul class="main-menu__list--subnav">
+        {% for child in children %}
+          <li class="main-menu__list-item--subnav">
+            <a class="main-menu__link--subnav" href="{{ child.link }}">{{ child.title }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
 </li>
