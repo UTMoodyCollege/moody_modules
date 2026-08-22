@@ -18,9 +18,10 @@ body {
 }
 
 .ai-moody-assistant {
-  --ai-moody-assistant-panel-width: min(32rem, calc(100% - var(--space-md)));
+  --ai-moody-assistant-panel-width: min(52rem, calc(100% - var(--space-xl)));
   --ai-moody-assistant-panel-height: calc(100dvh - var(--space-md));
-  --ai-moody-assistant-history-height: 20rem;
+  --ai-moody-assistant-history-height: 12.5rem;
+  container-type: inline-size;
   position: fixed;
   inset-inline: var(--space-xs);
   inset-block-end: var(--space-xs);
@@ -28,7 +29,7 @@ body {
   display: flex;
   flex-direction: column;
   width: auto;
-  max-height: calc(100dvh - var(--space-md));
+  max-height: var(--ai-moody-assistant-panel-height);
   color: var(--color-ink);
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -178,8 +179,8 @@ body {
   display: flex;
   flex-direction: column;
   height: var(--ai-moody-assistant-panel-height);
-  min-height: 28rem;
-  max-height: calc(100dvh - var(--space-md));
+  min-height: min(28rem, var(--ai-moody-assistant-panel-height));
+  max-height: var(--ai-moody-assistant-panel-height);
   border: var(--rule-hairline) solid var(--color-rule);
   border-radius: var(--radius-panel);
   background: var(--color-paper);
@@ -689,7 +690,7 @@ body {
 
 .ai-moody-assistant__form {
   flex: 0 1 auto;
-  max-height: 62%;
+  max-height: 58%;
   min-height: 13rem;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -1183,7 +1184,7 @@ body {
 }
 
 .ai-moody-assistant__composer-files {
-  order: 70;
+  order: 52;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
@@ -1385,9 +1386,6 @@ body {
 
 .ai-moody-assistant__composer-actions {
   order: 60;
-  position: sticky;
-  z-index: var(--z-sticky);
-  inset-block-end: calc(var(--space-md) * -1);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -1465,6 +1463,57 @@ body {
   outline-color: transparent;
 }
 
+@container (min-width: 44rem) {
+  .ai-moody-assistant__form {
+    max-height: 50%;
+    padding-block: var(--space-sm);
+  }
+
+  .ai-moody-assistant__form form {
+    display: grid;
+    grid-template-columns: auto minmax(16rem, 1fr) minmax(8rem, 10rem);
+    align-items: center;
+    gap: var(--space-xs) var(--space-sm);
+  }
+
+  .ai-moody-assistant__usage-budget,
+  .ai-moody-assistant__utility-links,
+  .ai-moody-assistant__composer-surface {
+    grid-column: 1 / -1;
+    margin-block-end: 0;
+  }
+
+  .ai-moody-assistant__composer-controls {
+    grid-column: 1;
+    justify-content: flex-start;
+    margin-block-end: 0;
+  }
+
+  .ai-moody-assistant__composer-files {
+    grid-column: 2 / -1;
+    border-block-start: 0;
+    padding-block-start: 0;
+  }
+
+  .ai-moody-assistant__privacy-notice {
+    grid-column: 1 / 3;
+    align-self: stretch;
+    margin: 0;
+  }
+
+  .ai-moody-assistant__composer-actions {
+    grid-column: 3;
+    align-self: stretch;
+    padding-block: 0;
+  }
+
+  .ai-moody-assistant__composer-actions .button--primary,
+  .ai-moody-assistant__composer-actions input[type="submit"] {
+    height: 100%;
+    min-height: 2.75rem;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .ai-moody-assistant__toggle:hover,
   .ai-moody-assistant__minimize:hover,
@@ -1522,18 +1571,20 @@ body {
 
 @media (min-width: 48rem) {
   .ai-moody-assistant {
+    --ai-moody-assistant-panel-height: calc(100dvh - var(--space-2xl));
+    --ai-moody-assistant-history-height: 20rem;
     inset-inline-start: auto;
     inset-inline-end: var(--space-md);
     inset-block-end: var(--space-md);
     width: var(--ai-moody-assistant-panel-width);
     min-width: 22.5rem;
-    max-width: min(45rem, calc(100% - var(--space-xl)));
-    max-height: calc(100dvh - var(--space-xl));
+    max-width: min(70rem, calc(100% - (var(--space-md) * 2)));
+    max-height: var(--ai-moody-assistant-panel-height);
   }
 
   .ai-moody-assistant__panel {
-    height: min(46rem, calc(100dvh - var(--space-xl)));
-    max-height: calc(100dvh - var(--space-xl));
+    height: var(--ai-moody-assistant-panel-height);
+    max-height: var(--ai-moody-assistant-panel-height);
   }
 
   .ai-moody-assistant__resize-handle--width {

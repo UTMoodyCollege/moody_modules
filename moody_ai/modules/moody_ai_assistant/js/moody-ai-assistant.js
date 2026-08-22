@@ -3,9 +3,9 @@
   const assistantAssetMarker = 'ai-blocks-chat-assistant asset loaded 2026-07-14';
   const assistantStatePrefix = 'aiBlocksAssistant:';
   const assistantPreferencePrefix = 'aiBlocksAssistantPrefs:';
-  const desktopMediaQuery = '(min-width: 768px)';
+  const desktopMediaQuery = '(min-width: 48rem)';
   const panelWidthMin = 360;
-  const panelWidthMax = 720;
+  const panelWidthMax = 1120;
   const historyHeightMin = 200;
   const formHeightMin = 208;
   const streamInactivityWarningMs = 120000;
@@ -133,14 +133,19 @@
     const preferences = readAssistantPreferences(wrapper);
     const isDesktop = window.matchMedia(desktopMediaQuery).matches;
 
-    if (isDesktop && Number.isFinite(preferences.width)) {
-      applyAssistantWidth(wrapper, preferences.width);
-    }
-    else if (!isDesktop) {
-      wrapper.style.removeProperty('--ai-moody-assistant-panel-width');
-    }
+    if (isDesktop) {
+      if (Number.isFinite(preferences.width)) {
+        applyAssistantWidth(wrapper, preferences.width);
+      }
 
-    applyHistoryHeight(wrapper, Number.isFinite(preferences.historyHeight) ? preferences.historyHeight : null);
+      if (Number.isFinite(preferences.historyHeight)) {
+        applyHistoryHeight(wrapper, preferences.historyHeight);
+      }
+    }
+    else {
+      wrapper.style.removeProperty('--ai-moody-assistant-panel-width');
+      wrapper.style.removeProperty('--ai-moody-assistant-history-height');
+    }
   }
 
   function bindPanelResizeControls(wrapper) {
@@ -527,13 +532,7 @@
     });
 
     composer.editor.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' && event.metaKey) {
-        event.preventDefault();
-        composer.editor.closest('form')?.requestSubmit();
-        return;
-      }
-
-      if (event.key === 'Enter' && !event.shiftKey) {
+      if (event.key === 'Enter' && !event.shiftKey && !event.metaKey && !event.ctrlKey) {
         event.preventDefault();
         document.execCommand('insertLineBreak');
       }
@@ -1627,6 +1626,17 @@
         isSubmitting = false;
       }
     };
+
+    form.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' || (!event.metaKey && !event.ctrlKey) || event.isComposing) {
+        return;
+      }
+
+      event.preventDefault();
+      if (!submit.disabled) {
+        form.requestSubmit(submit);
+      }
+    });
 
     form.addEventListener('submit', async (event) => {
       // Media Library submits this form programmatically without a submitter.
