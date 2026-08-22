@@ -26,6 +26,17 @@ field styling. Each keeps the workflow-specific controls it needs: CKEditor
 previews sanitized HTML before insertion, while the page assistant retains its
 conversation, page context, block tools, and action approval flows.
 
+Both experiences also consume one shared context catalog from
+`moody_ai_base`. Security, accuracy, accessibility, editorial, and Moody
+design-system knowledge ships in code and appears read-only on the
+configuration dashboard. A site can add its own context in three organized
+configuration fields: site identity and audiences; names, terminology, and
+factual defaults; and editorial and design guidance. These values live in
+`moody_ai_base.settings`, so they can travel through the normal Drupal
+configuration workflow. Site context can narrow the task but cannot override
+the built-in guardrails. Keep changing facts out unless the site will actively
+maintain them, and never store secrets in context.
+
 Administrators control the entire service from the **Moody AI configuration**
 dashboard at `/admin/config/services/moody-ai`. Its global switch is enforced
 by the base provider gateway and by each editor endpoint, so disabling it stops

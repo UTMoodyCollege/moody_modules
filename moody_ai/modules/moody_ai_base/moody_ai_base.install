@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for Moody AI Base.
+ */
+
+/**
+ * Migrates the original free-form context into the organized context config.
+ */
+function moody_ai_base_update_10001() {
+  $config = \Drupal::configFactory()->getEditable('moody_ai_base.settings');
+  $legacy = trim((string) $config->get('additional_context'));
+  $editorial_design = trim((string) $config->get('context.editorial_design'));
+
+  if ($legacy !== '' && $editorial_design === '') {
+    $config->set('context.editorial_design', $legacy);
+  }
+  foreach (['site_identity', 'terminology', 'editorial_design'] as $key) {
+    if ($config->get('context.' . $key) === NULL) {
+      $config->set('context.' . $key, '');
+    }
+  }
+  $config->clear('additional_context')->save(TRUE);
+
+  return t('Migrated Moody AI site context to the organized shared context settings.');
+}

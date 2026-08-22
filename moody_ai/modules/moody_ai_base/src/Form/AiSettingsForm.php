@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\moody_ai_base\Form;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
@@ -136,13 +137,53 @@ final class AiSettingsForm extends ConfigFormBase {
       '#description' => $this->t('Used only when a feature explicitly requests a generated image.'),
     ];
 
-    $form['additional_context'] = [
+    $form['context'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Shared AI context'),
+      '#description' => $this->t('Every Moody AI tool uses the built-in knowledge and the site-specific guidance below. Built-in context ships with moody_modules and is read-only. Site-specific context is stored in Drupal configuration so it can be reviewed and deployed with the site. Do not enter secrets.'),
+    ];
+    $form['context']['built_in'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Built-in Moody context (read only)'),
+      '#open' => FALSE,
+    ];
+    foreach ($this->generator->builtInContextSections() as $key => $section) {
+      $form['context']['built_in'][$key] = [
+        '#type' => 'details',
+        '#title' => $section['label'],
+        '#description' => $section['summary'],
+        '#open' => FALSE,
+      ];
+      $form['context']['built_in'][$key]['content'] = [
+        '#markup' => '<p>' . nl2br(Html::escape($section['content'])) . '</p>',
+      ];
+    }
+
+    $legacy_context = trim((string) $config->get('additional_context'));
+    $editorial_design = trim((string) $config->get('context.editorial_design'));
+    $form['context']['site_identity'] = [
       '#type' => 'textarea',
-      '#title' => $this->t('Additional editorial context'),
-      '#default_value' => $config->get('additional_context'),
-      '#rows' => 6,
+      '#title' => $this->t('Site identity and audiences'),
+      '#default_value' => $config->get('context.site_identity'),
+      '#rows' => 4,
+      '#maxlength' => 2000,
+      '#description' => $this->t('Describe the site, its purpose, primary audiences, and the voice editors should use.'),
+    ];
+    $form['context']['terminology'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Names, terminology, and factual defaults'),
+      '#default_value' => $config->get('context.terminology'),
+      '#rows' => 4,
+      '#maxlength' => 2000,
+      '#description' => $this->t('Add approved names, capitalization, recurring terminology, and stable facts. Keep time-sensitive facts out unless they will be actively maintained.'),
+    ];
+    $form['context']['editorial_design'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Editorial and design guidance'),
+      '#default_value' => $editorial_design !== '' ? $editorial_design : $legacy_context,
+      '#rows' => 4,
       '#maxlength' => 5000,
-      '#description' => $this->t('Optional organization-specific guidance. Do not enter secrets. Built-in security, accuracy, accessibility, and design-system rules cannot be relaxed here.'),
+      '#description' => $this->t('Add site-specific writing, accessibility, layout, or visual guidance. This can narrow but cannot override the built-in rules.'),
     ];
 
     $form['limits'] = [
@@ -232,7 +273,10 @@ final class AiSettingsForm extends ConfigFormBase {
       ->set('openai.models', $model_records)
       ->set('openai.default_model', trim((string) $form_state->getValue('default_model')))
       ->set('openai.image_model', trim((string) $form_state->getValue('image_model')))
-      ->set('additional_context', trim((string) $form_state->getValue('additional_context')))
+      ->set('context.site_identity', trim((string) $form_state->getValue('site_identity')))
+      ->set('context.terminology', trim((string) $form_state->getValue('terminology')))
+      ->set('context.editorial_design', trim((string) $form_state->getValue('editorial_design')))
+      ->clear('additional_context')
       ->set('max_prompt_characters', (int) $form_state->getValue('max_prompt_characters'))
       ->set('max_output_tokens', (int) $form_state->getValue('max_output_tokens'))
       ->set('hourly_request_limit', (int) $form_state->getValue('hourly_request_limit'))

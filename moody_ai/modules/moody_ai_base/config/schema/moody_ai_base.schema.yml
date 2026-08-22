@@ -37,9 +37,22 @@ moody_ai_base.settings:
               label:
                 type: label
                 label: 'Editor label'
+    context:
+      type: mapping
+      label: 'Site-specific AI context'
+      mapping:
+        site_identity:
+          type: text
+          label: 'Site identity and audiences'
+        terminology:
+          type: text
+          label: 'Names, terminology, and factual defaults'
+        editorial_design:
+          type: text
+          label: 'Editorial and design guidance'
     additional_context:
       type: text
-      label: 'Additional editorial context'
+      label: 'Legacy additional editorial context'
     max_prompt_characters:
       type: integer
       label: 'Maximum prompt characters'

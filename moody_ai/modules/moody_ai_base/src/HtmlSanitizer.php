@@ -220,11 +220,15 @@ final class HtmlSanitizer {
    */
   private function isAllowedClass(string $class): bool {
     $patterns = [
-      '/^ut-text-(?:xs|sm|base|lg|xl|2xl|3xl|4xl|5xl)$/',
-      '/^ut-font-weight-(?:light|normal|medium|semibold|bold|black)$/',
-      '/^(?:text|bg)-ut-' . self::COLORS . '$/',
+      '/^(?:(?:md|lg|xl):)?ut-text-(?:xs|sm|base|lg|xl|2xl|3xl|4xl|5xl)$/',
+      '/^(?:(?:md|lg|xl):)?ut-font-weight-(?:light|normal|medium|semibold|bold|black)$/',
+      '/^(?:text|bg|border)-ut-' . self::COLORS . '$/',
       '/^utexas-bg-' . self::LEGACY_BACKGROUNDS . '$/',
       '/^(?:(?:md|lg|xl):)?ut-(?:p|pt|pb|pl|pr|m|mt|mb|ml|mr)-(?:1|2|4|8|16)$/',
+      '/^(?:(?:md|lg|xl):)?ut-border-width-(?:none|thin|medium|thick)$/',
+      '/^(?:(?:md|lg|xl):)?ut-border-radius-(?:none|sm|md|lg|xl|2xl|full)$/',
+      '/^ut-(?:headline(?:--(?:underline|poster))?|copy|(?:cta-)?link(?:--darker)?)$/',
+      '/^(?:text-center|dont-break-out|ut-fit-table|ut-50-50-table)$/',
     ];
 
     foreach ($patterns as $pattern) {

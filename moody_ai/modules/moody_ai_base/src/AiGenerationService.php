@@ -16,6 +16,21 @@ use Psr\Log\LoggerInterface;
  */
 final class AiGenerationService {
 
+  private const SITE_CONTEXT_FIELDS = [
+    'site_identity' => [
+      'label' => 'Site identity and audiences',
+      'max' => 2000,
+    ],
+    'terminology' => [
+      'label' => 'Names, terminology, and factual defaults',
+      'max' => 2000,
+    ],
+    'editorial_design' => [
+      'label' => 'Editorial and design guidance',
+      'max' => 5000,
+    ],
+  ];
+
   public const ALLOWED_ATTACHMENT_EXTENSIONS = 'pdf txt md csv json html xml doc docx rtf odt ppt pptx xls xlsx png jpg jpeg gif webp';
 
   public const MAX_ATTACHMENTS = 3;
@@ -146,6 +161,41 @@ final class AiGenerationService {
   }
 
   /**
+   * Returns the non-overridable context shown read-only to administrators.
+   */
+  public function builtInContextSections(): array {
+    return $this->promptContext->builtInSections();
+  }
+
+  /**
+   * Returns the organized site context shared by every Moody AI feature.
+   */
+  public function siteContext(): string {
+    $config = $this->configFactory->get('moody_ai_base.settings');
+    $sections = [];
+    foreach (self::SITE_CONTEXT_FIELDS as $key => $definition) {
+      $value = trim(mb_substr(
+        (string) $config->get('context.' . $key),
+        0,
+        $definition['max'],
+      ));
+      if ($value !== '') {
+        $sections[] = '## ' . $definition['label'] . "\n" . $value;
+      }
+    }
+
+    // Preserve context saved before the organized fields were introduced.
+    if ($sections === []) {
+      $legacy = trim(mb_substr((string) $config->get('additional_context'), 0, 5000));
+      if ($legacy !== '') {
+        $sections[] = '## Editorial and design guidance' . "\n" . $legacy;
+      }
+    }
+
+    return implode("\n\n", $sections);
+  }
+
+  /**
    * Extracts unique entity IDs from Drupal Media Library form values.
    */
   public static function normalizeMediaIds(mixed $value): array {
@@ -202,8 +252,7 @@ final class AiGenerationService {
       throw new \RuntimeException('The AI provider is not configured.');
     }
 
-    $additional_context = mb_substr((string) $config->get('additional_context'), 0, 5000);
-    $instructions = [$this->promptContext->assistantInstructions($additional_context)];
+    $instructions = [$this->promptContext->assistantInstructions($this->siteContext())];
     $input = [];
     $text_characters = 0;
 
@@ -439,8 +488,6 @@ final class AiGenerationService {
     }
 
     $max_tokens = max(200, min((int) $config->get('max_output_tokens') ?: 1800, 4000));
-    $additional_context = mb_substr((string) $config->get('additional_context'), 0, 5000);
-
     $content = [['type' => 'input_text', 'text' => $prompt]];
     foreach ($attachments as $index => $attachment) {
       $content[] = [
@@ -495,7 +542,7 @@ final class AiGenerationService {
         ],
         'json' => [
           'model' => $model,
-          'instructions' => $this->promptContext->htmlInstructions($additional_context, $prefer_ai_images),
+          'instructions' => $this->promptContext->htmlInstructions($this->siteContext(), $prefer_ai_images),
           'input' => [
             [
               'role' => 'user',
