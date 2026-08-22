@@ -95,6 +95,26 @@ final class AiGenerationService {
   }
 
   /**
+   * Returns TRUE when administrators have enabled Moody AI.
+   *
+   * A missing value keeps existing installations operational until the new
+   * setting is explicitly saved. New installations start disabled.
+   */
+  public function isEnabled(): bool {
+    return $this->configFactory->get('moody_ai_base.settings')->get('enabled') !== FALSE;
+  }
+
+  /**
+   * Returns the administrator-configured message shown while AI is offline.
+   */
+  public function offlineMessage(): string {
+    $message = trim((string) $this->configFactory->get('moody_ai_base.settings')->get('offline_message'));
+    return $message !== ''
+      ? $message
+      : 'Moody AI is temporarily offline. Please try again later or contact a site administrator.';
+  }
+
+  /**
    * Returns TRUE when the configured provider secret is available.
    */
   public function isConfigured(): bool {
@@ -107,6 +127,8 @@ final class AiGenerationService {
    */
   public function uiSettings(): array {
     return [
+      'enabled' => $this->isEnabled(),
+      'offlineMessage' => $this->offlineMessage(),
       'providerOptions' => $this->providerOptions(),
       'modelOptions' => $this->modelOptions(),
       'defaultProvider' => 'openai',
@@ -162,6 +184,8 @@ final class AiGenerationService {
    * `data` before using it in Drupal.
    */
   public function generateStructured(array $messages, ?string $model = NULL): array {
+    $this->assertEnabled();
+
     if ($messages === [] || count($messages) > 16) {
       throw new \InvalidArgumentException('The structured request has an invalid message count.');
     }
@@ -270,6 +294,8 @@ final class AiGenerationService {
    * Generates one image through the provider owned by the base module.
    */
   public function generateImage(string $prompt): array {
+    $this->assertEnabled();
+
     $prompt = trim($prompt);
     if ($prompt === '' || mb_strlen($prompt) > $this->maxPromptCharacters()) {
       throw new \InvalidArgumentException('The image prompt is empty or exceeds the configured limit.');
@@ -334,6 +360,8 @@ final class AiGenerationService {
    *   When the provider is unavailable or returns no safe HTML.
    */
   public function generateHtml(string $prompt, string $provider, string $model, array $attachments = [], array $media = [], bool $prefer_ai_images = FALSE): string {
+    $this->assertEnabled();
+
     $prompt = trim($prompt);
     if ($prompt === '' || mb_strlen($prompt) > $this->maxPromptCharacters()) {
       throw new \InvalidArgumentException('The prompt is empty or exceeds the configured limit.');
@@ -513,6 +541,15 @@ final class AiGenerationService {
       }
     }
     return implode("\n", $parts);
+  }
+
+  /**
+   * Stops every provider request while the global switch is off.
+   */
+  private function assertEnabled(): void {
+    if (!$this->isEnabled()) {
+      throw new \RuntimeException($this->offlineMessage());
+    }
   }
 
   /**

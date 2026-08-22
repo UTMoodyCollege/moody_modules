@@ -6,3 +6,4 @@ services:
       - '@file_system'
       - '@file.repository'
       - '@image.factory'
+      - '@current_user'

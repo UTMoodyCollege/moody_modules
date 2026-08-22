@@ -37,6 +37,8 @@ function moody_ai_ckeditor_editor_js_settings_alter(array &$settings): void {
     'maxAttachmentBytes' => $ui['maxAttachmentBytes'],
     'maxTotalAttachmentBytes' => $ui['maxTotalAttachmentBytes'],
     'privacyNotice' => $ui['privacyNotice'],
+    'enabled' => $ui['enabled'],
+    'offlineMessage' => $ui['offlineMessage'],
     'configured' => $generator->isConfigured(),
   ];
 

@@ -26,6 +26,26 @@ field styling. Each keeps the workflow-specific controls it needs: CKEditor
 previews sanitized HTML before insertion, while the page assistant retains its
 conversation, page context, block tools, and action approval flows.
 
+Administrators control the entire service from the **Moody AI configuration**
+dashboard at `/admin/config/services/moody-ai`. Its global switch is enforced
+by the base provider gateway and by each editor endpoint, so disabling it stops
+provider requests, new reference uploads, and generated-content insertion.
+Both editor experiences show the dashboard's configurable offline message.
+New installations start offline; an existing installation without the new
+setting retains its current behavior until an administrator saves the form.
+
+For an emergency command-line change, run the matching command and clear
+caches. The dashboard remains the normal interface:
+
+```bash
+drush config:set moody_ai_base.settings enabled 0 -y
+drush cache:rebuild
+
+# Re-enable after the pause has been approved.
+drush config:set moody_ai_base.settings enabled 1 -y
+drush cache:rebuild
+```
+
 ## Security defaults
 
 No API key is stored in Drupal configuration or sent to the browser. The base
@@ -86,6 +106,7 @@ Enable the feature and grant its permission only to the pilot role:
 
 ```bash
 ddev drush en -y moody_ai_base moody_ai_ckeditor
+ddev drush config:set moody_ai_base.settings enabled 1 -y
 ddev drush role:perm:add ROLE_ID 'use moody ai ckeditor'
 ddev drush cr
 ```

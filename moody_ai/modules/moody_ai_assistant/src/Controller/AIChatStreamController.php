@@ -95,6 +95,13 @@ class AIChatStreamController extends ControllerBase {
     if (!$this->csrfToken->validate($token, 'moody_ai_assistant.chat_stream')) {
       return new Response('Invalid CSRF token.', 403);
     }
+    if (!$this->generator->isEnabled()) {
+      return new Response($this->generator->offlineMessage(), 503, [
+        'Cache-Control' => 'no-store, private',
+        'Content-Type' => 'text/plain; charset=UTF-8',
+        'X-Content-Type-Options' => 'nosniff',
+      ]);
+    }
 
     $entity_type = trim((string) $request->request->get('entity_type'));
     $entity_id = trim((string) $request->request->get('entity_id'));

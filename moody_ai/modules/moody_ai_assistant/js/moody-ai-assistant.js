@@ -1577,7 +1577,8 @@
         });
 
         if (!response.ok) {
-          throw new Error('AI chat request failed with HTTP ' + response.status + '.');
+          const message = (await response.text()).trim();
+          throw new Error(message || 'AI chat request failed with HTTP ' + response.status + '.');
         }
 
         setComposerText(wrapper, '');
@@ -1695,7 +1696,8 @@
       });
 
       if (!response.ok) {
-        throw new Error('AI resume request failed with HTTP ' + response.status + '.');
+        const message = (await response.text()).trim();
+        throw new Error(message || 'AI resume request failed with HTTP ' + response.status + '.');
       }
 
       const watchdog = createStreamWatchdog(wrapper, () => {

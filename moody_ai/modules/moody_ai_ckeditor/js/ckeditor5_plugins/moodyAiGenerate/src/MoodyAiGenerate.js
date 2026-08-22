@@ -28,6 +28,21 @@ function formatBytes(bytes) {
     : `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
+function showEditorStatus(editor, message, isError = false) {
+  const parent = editor.ui.view.element.parentElement;
+  const existing = parent && parent.querySelector('[data-moody-ai-editor-status]');
+  if (existing) existing.remove();
+
+  const status = document.createElement('p');
+  status.dataset.moodyAiEditorStatus = 'true';
+  status.className = isError
+    ? 'moody-ai-dialog__status moody-ai-dialog__status--error'
+    : 'moody-ai-ui__offline';
+  status.setAttribute('role', isError ? 'alert' : 'status');
+  status.textContent = message;
+  editor.ui.view.element.after(status);
+}
+
 function openDialog(settings, mediaLibrary) {
   return new Promise(resolve => {
     const dialog = document.createElement('dialog');
@@ -561,20 +576,30 @@ export default class MoodyAiGenerate extends Plugin {
   init() {
     const editor = this.editor;
     const settings = editor.config.get('moodyAi');
+    const enabled = Boolean(settings && settings.enabled);
+    const configured = Boolean(settings && settings.configured);
 
     editor.ui.componentFactory.add('moodyAiGenerate', () => {
       const button = new ButtonView();
       button.set({
-        label: settings && settings.configured
-          ? 'Generate with Moody AI'
-          : 'Moody AI is not configured',
+        label: !settings
+          ? 'Moody AI is unavailable'
+          : !enabled
+            ? settings.offlineMessage
+            : configured
+              ? 'Generate with Moody AI'
+              : 'Moody AI is not configured',
         icon,
         tooltip: true,
         isVisible: Boolean(settings),
       });
-      button.bind('isEnabled').to(editor, 'isReadOnly', isReadOnly => Boolean(settings && settings.configured) && !isReadOnly);
+      button.bind('isEnabled').to(editor, 'isReadOnly', isReadOnly => Boolean(settings && (configured || !enabled)) && !isReadOnly);
 
       button.on('execute', async () => {
+        if (!enabled) {
+          showEditorStatus(editor, settings.offlineMessage);
+          return;
+        }
         try {
           const insertionSelection = selectionSnapshot(editor);
           const html = await openDialog(settings, editor.config.get('drupalMedia'));
@@ -587,11 +612,7 @@ export default class MoodyAiGenerate extends Plugin {
           editor.editing.view.focus();
         }
         catch (error) {
-          const message = document.createElement('p');
-          message.className = 'moody-ai-dialog__status moody-ai-dialog__status--error';
-          message.setAttribute('role', 'alert');
-          message.textContent = 'Moody AI could not open. Reload the page and try again.';
-          editor.ui.view.element.after(message);
+          showEditorStatus(editor, 'Moody AI could not open. Reload the page and try again.', true);
         }
       });
 

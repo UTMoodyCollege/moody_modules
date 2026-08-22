@@ -13,6 +13,7 @@ use Drupal\moody_ai_base\PromptContext;
 use Drupal\moody_ai_base\SecretResolver;
 use Drupal\Tests\UnitTestCase;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -25,6 +26,40 @@ use Psr\Log\NullLogger;
  * @group moody_ai_base
  */
 final class AiGenerationServiceTest extends UnitTestCase {
+
+  /**
+   * Tests that the global switch stops requests before provider access.
+   */
+  public function testGlobalSwitchStopsProviderRequests(): void {
+    $config = $this->createMock(ImmutableConfig::class);
+    $config->method('get')->willReturnMap([
+      ['enabled', FALSE],
+      ['offline_message', 'Moody AI is offline for a budget pause.'],
+    ]);
+    $config_factory = $this->createMock(ConfigFactoryInterface::class);
+    $config_factory->method('get')->with('moody_ai_base.settings')->willReturn($config);
+    $http_client = $this->createMock(ClientInterface::class);
+    $http_client->expects($this->never())->method('request');
+    $logger_factory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $logger_factory->method('get')->willReturn(new NullLogger());
+
+    $service = new AiGenerationService(
+      $config_factory,
+      $http_client,
+      new SecretResolver(),
+      new PromptContext(),
+      new HtmlSanitizer(),
+      $logger_factory,
+    );
+
+    $this->assertFalse($service->isEnabled());
+    $this->assertSame('Moody AI is offline for a budget pause.', $service->offlineMessage());
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage('Moody AI is offline for a budget pause.');
+    $service->generateStructured([
+      ['role' => 'user', 'content' => 'Create a page.'],
+    ]);
+  }
 
   /**
    * Tests Media Library values without accepting numeric widget metadata.

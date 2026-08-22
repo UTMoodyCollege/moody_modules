@@ -227,6 +227,7 @@ function &_moody_media_image_helper_get_item_rendered_entity(array &$item): arra
 function moody_media_image_helper_build_crop_action(MediaInterface $media, array $context = []): array {
   $crop_manager = \Drupal::service('moody_media_image_helper.crop_manager');
   $file_url_generator = \Drupal::service('file_url_generator');
+  $can_update = $media->access('update');
   $source_fid = isset($context['source_fid']) ? (int) $context['source_fid'] : NULL;
   $source_field = $crop_manager->getSourceFieldName($media);
   $image_item = $source_field ? $media->get($source_field)->first() : NULL;
@@ -255,6 +256,7 @@ function moody_media_image_helper_build_crop_action(MediaInterface $media, array
     'link' => [
       '#type' => 'link',
       '#title' => t('Crop / Edit Image'),
+      '#access' => $can_update,
       '#url' => Url::fromRoute('moody_media_image_helper.crop_form', ['media' => $media->id()], ['query' => $query]),
       '#attributes' => [
         'class' => ['use-ajax', 'button', 'button--small', 'button--extrasmall'],
@@ -265,6 +267,7 @@ function moody_media_image_helper_build_crop_action(MediaInterface $media, array
     'edit_original' => [
       '#type' => 'link',
       '#title' => t('Edit original media'),
+      '#access' => $can_update,
       '#url' => $media->toUrl('edit-form'),
       '#attributes' => [
         'class' => ['button', 'button--small', 'button--extrasmall', 'button--secondary'],

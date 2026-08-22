@@ -128,16 +128,31 @@ class AIChatBlockForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?ContentEntityInterface $entity = NULL) {
     $upload_input_id = 'ai-chat-block-attachments-' . ($entity ? $entity->id() : '0');
+    $ui = $this->generator->uiSettings();
+    $form['#attributes']['enctype'] = 'multipart/form-data';
+
+    if (!$ui['enabled']) {
+      $form['offline'] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['messages', 'messages--warning', 'moody-ai-ui__offline'],
+          'role' => 'status',
+          'aria-live' => 'polite',
+        ],
+        'message' => [
+          '#markup' => '<p>' . Html::escape($ui['offlineMessage']) . '</p>',
+        ],
+      ];
+      return $form;
+    }
+
     $starter_prompts = $this->getStarterPrompts();
     $is_layout_builder_context = $entity ? $this->layoutContextCollector->isLayoutBuilderContext($entity) : FALSE;
     $picker_context = ['is_layout_builder_context' => $is_layout_builder_context];
     $block_reference_groups = $entity ? $this->blockReferenceCatalog->getGroupedReferences($entity, $picker_context) : [];
     $existing_block_reference_groups = $entity ? $this->blockReferenceCatalog->getGroupedExistingReferences($entity, $picker_context) : [];
     $budget_summary = $this->usageTracker->getUserBudgetSummary($this->currentUser->id());
-    $ui = $this->generator->uiSettings();
     $media_bundle_ids = array_keys($this->entityTypeManager->getStorage('media_type')->loadMultiple());
-
-    $form['#attributes']['enctype'] = 'multipart/form-data';
 
     $form['utility_links'] = [
       '#type' => 'container',
@@ -701,6 +716,11 @@ class AIChatBlockForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    if (!$this->generator->isEnabled()) {
+      $this->messenger()->addWarning($this->generator->offlineMessage());
+      return;
+    }
+
     $entity_type = $form_state->getValue('entity_type');
     $entity_id = $form_state->getValue('entity_id');
     $message = trim((string) $form_state->getValue('message'));

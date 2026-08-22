@@ -2,6 +2,12 @@ moody_ai_base.settings:
   type: config_object
   label: 'Moody AI settings'
   mapping:
+    enabled:
+      type: boolean
+      label: 'Moody AI enabled'
+    offline_message:
+      type: label
+      label: 'Offline message'
     provider:
       type: string
       label: 'Provider'

@@ -83,6 +83,9 @@ final class AiCkeditorController implements ContainerInjectionInterface {
     if (!$this->validToken($request)) {
       return $this->response(['message' => 'Your session token is no longer valid. Reload the page and try again.'], 403);
     }
+    if ($offline = $this->offlineResponse()) {
+      return $offline;
+    }
 
     $uid = (int) $this->currentUser->id();
     $upload = $request->files->get('upload');
@@ -137,6 +140,9 @@ final class AiCkeditorController implements ContainerInjectionInterface {
   public function generate(Request $request): JsonResponse {
     if (!$this->validToken($request)) {
       return $this->response(['message' => 'Your session token is no longer valid. Reload the page and try again.'], 403);
+    }
+    if ($offline = $this->offlineResponse()) {
+      return $offline;
     }
 
     $payload = json_decode($request->getContent(), TRUE);
@@ -197,6 +203,9 @@ final class AiCkeditorController implements ContainerInjectionInterface {
     if (!$this->validToken($request)) {
       return $this->response(['message' => 'Your session token is no longer valid. Reload the page and try again.'], 403);
     }
+    if ($offline = $this->offlineResponse()) {
+      return $offline;
+    }
 
     $payload = json_decode($request->getContent(), TRUE);
     try {
@@ -224,6 +233,9 @@ final class AiCkeditorController implements ContainerInjectionInterface {
   public function finalize(Request $request): JsonResponse {
     if (!$this->validToken($request)) {
       return $this->response(['message' => 'Your session token is no longer valid. Reload the page and try again.'], 403);
+    }
+    if ($offline = $this->offlineResponse()) {
+      return $offline;
     }
 
     $payload = json_decode($request->getContent(), TRUE);
@@ -598,6 +610,15 @@ final class AiCkeditorController implements ContainerInjectionInterface {
     }
     $media->save();
     return $media;
+  }
+
+  /**
+   * Returns a consistent response while the global AI switch is off.
+   */
+  private function offlineResponse(): ?JsonResponse {
+    return $this->generator->isEnabled()
+      ? NULL
+      : $this->response(['message' => $this->generator->offlineMessage()], 503);
   }
 
   /**

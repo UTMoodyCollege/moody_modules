@@ -1,3 +1,5 @@
+enabled: false
+offline_message: 'Moody AI is temporarily offline. Please try again later or contact a site administrator.'
 provider: openai
 openai:
   secret_name: moody_ai_openai_api_key

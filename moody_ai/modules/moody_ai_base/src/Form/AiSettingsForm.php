@@ -63,6 +63,32 @@ final class AiSettingsForm extends ConfigFormBase {
       $model_lines[] = $id . '|' . $label;
     }
 
+    $form['availability'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Service availability'),
+      '#description' => $this->t('Use this switch to stop all Moody AI features immediately, including provider requests, uploads, and content insertion.'),
+    ];
+    $form['availability']['enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable Moody AI'),
+      '#default_value' => $this->generator->isEnabled(),
+      '#description' => $this->t('When disabled, editors see the offline message below and no AI requests are sent.'),
+    ];
+    $form['availability']['offline_message'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Offline message'),
+      '#default_value' => $this->generator->offlineMessage(),
+      '#required' => TRUE,
+      '#maxlength' => 255,
+      '#description' => $this->t('Shown consistently in Moody AI editor tools while the service is disabled.'),
+    ];
+    $form['availability']['summary'] = [
+      '#type' => 'item',
+      '#markup' => $this->generator->isEnabled()
+        ? '<p class="messages messages--status">' . $this->t('Moody AI is enabled for permitted editors.') . '</p>'
+        : '<p class="messages messages--warning">' . $this->t('Moody AI is offline for all editors.') . '</p>',
+    ];
+
     $form['security'] = [
       '#type' => 'item',
       '#markup' => $this->t('<p>API keys are never stored in Drupal configuration. The configured name is resolved from a Pantheon runtime secret or an uppercase local environment variable.</p>'),
@@ -164,6 +190,10 @@ final class AiSettingsForm extends ConfigFormBase {
   public function validateForm(array &$form, FormStateInterface $form_state): void {
     parent::validateForm($form, $form_state);
 
+    if (trim((string) $form_state->getValue('offline_message')) === '') {
+      $form_state->setErrorByName('offline_message', $this->t('Enter the message editors should see while Moody AI is offline.'));
+    }
+
     $secret_name = trim((string) $form_state->getValue('secret_name'));
     if (!preg_match('/^[a-z][a-z0-9_]{1,63}$/', $secret_name)) {
       $form_state->setErrorByName('secret_name', $this->t('Use 2–64 lowercase letters, numbers, or underscores, beginning with a letter.'));
@@ -195,6 +225,8 @@ final class AiSettingsForm extends ConfigFormBase {
       $model_records[] = ['id' => $id, 'label' => $label];
     }
     $this->config('moody_ai_base.settings')
+      ->set('enabled', (bool) $form_state->getValue('enabled'))
+      ->set('offline_message', trim((string) $form_state->getValue('offline_message')))
       ->set('provider', 'openai')
       ->set('openai.secret_name', trim((string) $form_state->getValue('secret_name')))
       ->set('openai.models', $model_records)

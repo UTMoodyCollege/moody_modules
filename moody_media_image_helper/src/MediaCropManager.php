@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Image\ImageFactory;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\file\FileInterface;
 use Drupal\file\FileRepositoryInterface;
 use Drupal\media\MediaInterface;
@@ -23,6 +24,7 @@ class MediaCropManager {
     protected FileSystemInterface $fileSystem,
     protected FileRepositoryInterface $fileRepository,
     protected ImageFactory $imageFactory,
+    protected AccountProxyInterface $currentUser,
   ) {}
 
   /**
@@ -111,6 +113,8 @@ class MediaCropManager {
     $destination_uri = $this->buildDestinationUri($source_file->getFileUri());
 
     $new_file = $this->fileRepository->copy($source_file, $destination_uri, FileExists::Error);
+    $new_file->setOwnerId((int) $this->currentUser->id());
+    $new_file->save();
     $image = $this->imageFactory->get($new_file->getFileUri());
     if (!$image->isValid()) {
       throw new \RuntimeException('The copied image file could not be loaded for cropping.');
@@ -145,7 +149,7 @@ class MediaCropManager {
     $new_media = $this->entityTypeManager->getStorage('media')->create([
       'bundle' => $media->bundle(),
       'name' => $this->buildDerivedMediaName($media->label()),
-      'uid' => $media->getOwnerId(),
+      'uid' => (int) $this->currentUser->id(),
       'status' => $media->isPublished(),
       'langcode' => $media->language()->getId(),
     ]);

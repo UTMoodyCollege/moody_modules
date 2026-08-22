@@ -1,5 +1,5 @@
 moody_ai_base.settings:
   title: 'Moody AI'
-  description: 'Configure AI providers, models, limits, and editorial context.'
+  description: 'Control service availability, providers, models, limits, and editorial context.'
   route_name: moody_ai_base.settings
   parent: system.admin_config_services
