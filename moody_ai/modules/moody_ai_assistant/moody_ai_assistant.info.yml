@@ -1,0 +1,13 @@
+name: 'Moody AI Assistant'
+type: module
+description: 'Provides a page-aware assistant for permitted Drupal and Layout Builder tasks.'
+package: 'Moody AI'
+core_version_requirement: ^10 || ^11
+dependencies:
+  - moody_ai:moody_ai_base
+  - drupal:block_content
+  - drupal:file
+  - drupal:layout_builder
+  - drupal:media
+  - media_library_form_element:media_library_form_element
+  - drupal:user

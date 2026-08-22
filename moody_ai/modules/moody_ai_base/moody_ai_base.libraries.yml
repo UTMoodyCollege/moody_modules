@@ -1,0 +1,4 @@
+ui:
+  css:
+    theme:
+      css/moody-ai-ui.css: {}

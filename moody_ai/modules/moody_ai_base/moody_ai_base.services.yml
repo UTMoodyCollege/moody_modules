@@ -1,0 +1,19 @@
+services:
+  moody_ai_base.secret_resolver:
+    class: Drupal\moody_ai_base\SecretResolver
+
+  moody_ai_base.prompt_context:
+    class: Drupal\moody_ai_base\PromptContext
+
+  moody_ai_base.html_sanitizer:
+    class: Drupal\moody_ai_base\HtmlSanitizer
+
+  moody_ai_base.generator:
+    class: Drupal\moody_ai_base\AiGenerationService
+    arguments:
+      - '@config.factory'
+      - '@http_client'
+      - '@moody_ai_base.secret_resolver'
+      - '@moody_ai_base.prompt_context'
+      - '@moody_ai_base.html_sanitizer'
+      - '@logger.factory'

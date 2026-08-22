@@ -1,0 +1,45 @@
+moody_ai_base.settings:
+  type: config_object
+  label: 'Moody AI settings'
+  mapping:
+    provider:
+      type: string
+      label: 'Provider'
+    openai:
+      type: mapping
+      label: 'OpenAI settings'
+      mapping:
+        secret_name:
+          type: string
+          label: 'Runtime secret name'
+        default_model:
+          type: string
+          label: 'Default model'
+        image_model:
+          type: string
+          label: 'Image model'
+        models:
+          type: sequence
+          label: 'Allowed models'
+          sequence:
+            type: mapping
+            label: 'Allowed model'
+            mapping:
+              id:
+                type: string
+                label: 'Model ID'
+              label:
+                type: label
+                label: 'Editor label'
+    additional_context:
+      type: text
+      label: 'Additional editorial context'
+    max_prompt_characters:
+      type: integer
+      label: 'Maximum prompt characters'
+    max_output_tokens:
+      type: integer
+      label: 'Maximum output tokens'
+    hourly_request_limit:
+      type: integer
+      label: 'Requests allowed per user per hour'

@@ -1,0 +1,8 @@
+use moody ai assistant:
+  title: 'Use Moody AI Assistant'
+  description: 'Use the page-aware AI assistant for actions the user can otherwise perform.'
+
+administer moody ai chat threads:
+  title: 'Administer Moody AI chat threads'
+  description: 'Administer persisted Moody AI Assistant conversations.'
+  restrict access: true

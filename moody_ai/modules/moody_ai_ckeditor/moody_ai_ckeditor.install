@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall hooks for Moody AI CKEditor.
+ */
+
+declare(strict_types=1);
+
+use Drupal\editor\Entity\Editor;
+
+/**
+ * Implements hook_install().
+ */
+function moody_ai_ckeditor_install(bool $is_syncing): void {
+  _moody_ai_ckeditor_update_toolbar(TRUE);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function moody_ai_ckeditor_uninstall(bool $is_syncing): void {
+  _moody_ai_ckeditor_update_toolbar(FALSE);
+}
+
+/**
+ * Adds or removes the opt-in toolbar item from the Moody flex editor.
+ */
+function _moody_ai_ckeditor_update_toolbar(bool $enable): void {
+  $editor = Editor::load('flex_html');
+  if (!$editor || $editor->getEditor() !== 'ckeditor5') {
+    return;
+  }
+
+  $settings = $editor->getSettings();
+  $items = $settings['toolbar']['items'] ?? [];
+  $position = array_search('moodyAiGenerate', $items, TRUE);
+  if ($enable && $position === FALSE) {
+    $separator = array_search('-', $items, TRUE);
+    $position = $separator === FALSE ? count($items) : $separator;
+    array_splice($items, $position, 0, ['moodyAiGenerate']);
+  }
+  elseif (!$enable && $position !== FALSE) {
+    array_splice($items, $position, 1);
+  }
+  else {
+    return;
+  }
+
+  $settings['toolbar']['items'] = $items;
+  $editor->setSettings($settings)->save();
+}

@@ -1,0 +1,6 @@
+name: 'Moody AI Base'
+type: module
+description: 'Provides secure, reusable AI generation services and guardrails for Moody modules.'
+core_version_requirement: ^10 || ^11
+package: 'Moody AI'
+configure: moody_ai_base.settings

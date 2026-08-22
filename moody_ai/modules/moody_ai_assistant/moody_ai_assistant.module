@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Theme hooks for the Moody AI Assistant module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function moody_ai_assistant_theme($existing, $type, $theme, $path): array {
+  return [
+    'moody_ai_assistant' => [
+      'variables' => [
+        'thread_id' => NULL,
+        'messages' => [],
+        'conversation_threads' => [],
+        'form' => NULL,
+        'entity_label' => NULL,
+        'entity_type' => NULL,
+        'entity_id' => NULL,
+        'is_layout_builder_context' => FALSE,
+        'widget_title_text' => 'Moody AI Assistant',
+        'widget_bg_color' => '#bf5700',
+        'widget_hover_color' => '#8f3d00',
+      ],
+      'template' => 'moody-ai-assistant',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_page_bottom().
+ */
+function moody_ai_assistant_page_bottom(array &$page_bottom): void {
+  $account = \Drupal::currentUser();
+  if (!$account->isAuthenticated() || !$account->hasPermission('use moody ai assistant')) {
+    return;
+  }
+
+  /** @var \Drupal\Core\Block\BlockPluginInterface $assistant */
+  $assistant = \Drupal::service('plugin.manager.block')->createInstance('moody_ai_assistant_block');
+  if (!$assistant->access($account)) {
+    return;
+  }
+
+  $page_bottom['moody_ai_assistant'] = $assistant->build();
+}

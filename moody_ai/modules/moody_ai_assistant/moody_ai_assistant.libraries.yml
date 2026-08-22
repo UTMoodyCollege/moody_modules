@@ -1,0 +1,12 @@
+assistant:
+  css:
+    theme:
+      css/moody-ai-assistant.tokens.css: {}
+      css/moody-ai-assistant.css: {}
+  js:
+    js/moody-ai-assistant.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+    - moody_ai_base/ui

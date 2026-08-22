@@ -1,0 +1,33 @@
+moody_ai_assistant.chat_thread_reset:
+  path: '/moody-ai/assistant/thread/{moody_ai_chat_thread}/reset'
+  defaults:
+    _form: '\Drupal\moody_ai_assistant\Form\AIChatThreadResetForm'
+    _title: 'Reset conversation'
+  requirements:
+    _permission: 'use moody ai assistant'
+  options:
+    parameters:
+      moody_ai_chat_thread:
+        type: entity:moody_ai_chat_thread
+
+moody_ai_assistant.chat_thread_action:
+  path: '/moody-ai/assistant/thread/{moody_ai_chat_thread}/action/{action_id}/{decision}'
+  defaults:
+    _controller: '\Drupal\moody_ai_assistant\Controller\AIChatThreadActionController::handle'
+  requirements:
+    _permission: 'use moody ai assistant'
+    _csrf_token: 'TRUE'
+    decision: 'approve|reject'
+    action_id: '[a-f0-9]{16}'
+  options:
+    parameters:
+      moody_ai_chat_thread:
+        type: entity:moody_ai_chat_thread
+
+moody_ai_assistant.chat_stream:
+  path: '/moody-ai/assistant/stream'
+  defaults:
+    _controller: '\Drupal\moody_ai_assistant\Controller\AIChatStreamController::stream'
+  requirements:
+    _permission: 'use moody ai assistant'
+  methods: [POST]

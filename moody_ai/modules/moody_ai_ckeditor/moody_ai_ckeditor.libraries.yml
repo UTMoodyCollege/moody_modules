@@ -1,0 +1,9 @@
+generate:
+  css:
+    theme:
+      css/moody-ai-ckeditor.dialog.css: {}
+  js:
+    js/build/moodyAiGenerate.js: { preprocess: false, minified: true }
+  dependencies:
+    - ckeditor5/ckeditor5
+    - moody_ai_base/ui

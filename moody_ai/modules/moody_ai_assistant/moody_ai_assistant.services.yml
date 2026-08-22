@@ -1,0 +1,44 @@
+services:
+  moody_ai_assistant.block_data_collector:
+    class: Drupal\moody_ai_assistant\Service\BlockDataCollectorService
+    arguments: ['@entity_type.manager', '@plugin.manager.block', '@state', '@entity_field.manager', '@logger.factory']
+
+  moody_ai_assistant.instruction_generator:
+    class: Drupal\moody_ai_assistant\Service\AIInstructionGenerator
+    arguments: ['@state', '@plugin.manager.core.layout', '@moody_ai_assistant.block_data_collector', '@moody_ai_assistant.planner']
+
+  moody_ai_assistant.block_parser:
+    class: Drupal\moody_ai_assistant\Service\BlockParser
+    arguments: ['@entity_type.manager', '@logger.factory', '@messenger', '@moody_ai_assistant.asset_creator', '@current_user']
+
+  moody_ai_assistant.asset_creator:
+    class: Drupal\moody_ai_assistant\Service\AIAssetCreator
+    arguments: ['@entity_type.manager', '@file.repository', '@file_system', '@logger.factory', '@moody_ai_assistant.planner', '@database', '@current_user']
+
+  moody_ai_assistant.layout_context_collector:
+    class: Drupal\moody_ai_assistant\Service\LayoutContextCollector
+    arguments: ['@current_route_match', '@entity_type.manager', '@plugin.manager.layout_builder.section_storage', '@layout_builder.tempstore_repository']
+
+  moody_ai_assistant.block_reference_catalog:
+    class: Drupal\moody_ai_assistant\Service\BlockReferenceCatalog
+    arguments: ['@entity_type.manager', '@plugin.manager.block', '@moody_ai_assistant.layout_context_collector', '@module_handler']
+
+  moody_ai_assistant.layout_placement_manager:
+    class: Drupal\moody_ai_assistant\Service\LayoutPlacementManager
+    arguments: ['@uuid', '@logger.factory', '@plugin.manager.layout_builder.section_storage', '@layout_builder.tempstore_repository', '@moody_ai_assistant.layout_context_collector', '@inline_block.usage']
+
+  moody_ai_assistant.block_inspector:
+    class: Drupal\moody_ai_assistant\Service\AIBlockInspector
+    arguments: ['@entity_type.manager', '@moody_ai_assistant.layout_context_collector', '@moody_ai_assistant.block_parser']
+
+  moody_ai_assistant.chat_manager:
+    class: Drupal\moody_ai_assistant\Service\AIChatManager
+    arguments: ['@entity_type.manager', '@logger.factory', '@moody_ai_assistant.instruction_generator', '@moody_ai_assistant.block_parser', '@moody_ai_assistant.layout_context_collector', '@moody_ai_assistant.layout_placement_manager', '@moody_ai_assistant.planner', '@language_manager', '@moody_ai_assistant.asset_creator', '@moody_ai_assistant.usage_tracker', '@moody_ai_assistant.block_inspector', '@csrf_token']
+
+  moody_ai_assistant.planner:
+    class: Drupal\moody_ai_assistant\Service\AssistantPlanner
+    arguments: ['@moody_ai_base.generator', '@logger.factory']
+
+  moody_ai_assistant.usage_tracker:
+    class: Drupal\moody_ai_assistant\Service\AIUsageTracker
+    arguments: ['@database']

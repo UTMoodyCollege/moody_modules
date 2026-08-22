@@ -1,0 +1,4 @@
+use moody ai ckeditor:
+  title: 'Use Moody AI in CKEditor'
+  description: 'Generate HTML through the configured AI provider and insert it into CKEditor.'
+  restrict access: true

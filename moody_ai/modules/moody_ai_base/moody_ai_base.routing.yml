@@ -1,0 +1,7 @@
+moody_ai_base.settings:
+  path: '/admin/config/services/moody-ai'
+  defaults:
+    _form: '\Drupal\moody_ai_base\Form\AiSettingsForm'
+    _title: 'Moody AI settings'
+  requirements:
+    _permission: 'administer moody ai'

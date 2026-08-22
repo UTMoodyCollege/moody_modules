@@ -1,0 +1,11 @@
+moody_ai_ckeditor_generate:
+  ckeditor5:
+    plugins:
+      - moodyAiGenerate.MoodyAiGenerate
+  drupal:
+    label: 'Generate with Moody AI'
+    library: moody_ai_ckeditor/generate
+    toolbar_items:
+      moodyAiGenerate:
+        label: 'Generate with Moody AI'
+    elements: false

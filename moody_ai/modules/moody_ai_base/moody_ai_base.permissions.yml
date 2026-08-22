@@ -1,0 +1,4 @@
+administer moody ai:
+  title: 'Administer Moody AI'
+  description: 'Configure AI providers, models, limits, and editorial context.'
+  restrict access: true

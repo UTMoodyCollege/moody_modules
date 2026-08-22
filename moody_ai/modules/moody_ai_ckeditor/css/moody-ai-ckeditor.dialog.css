@@ -1,0 +1,285 @@
+.moody-ai-dialog {
+  border: 0;
+  border-radius: 0.25rem;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.3);
+  color: #333f48;
+  max-height: calc(100vh - 2rem);
+  max-width: min(46rem, calc(100vw - 2rem));
+  overflow: auto;
+  padding: 0;
+  width: 100%;
+}
+
+.moody-ai-dialog::backdrop {
+  background: rgba(31, 38, 43, 0.72);
+}
+
+.moody-ai-dialog__form {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+}
+
+.moody-ai-dialog__title {
+  color: #333f48;
+  font-size: 1.5rem;
+  margin: 0 0 0.35rem;
+}
+
+.moody-ai-dialog__description,
+.moody-ai-dialog__privacy,
+.moody-ai-dialog__status {
+  margin: 0;
+}
+
+.moody-ai-dialog__privacy {
+  background: #f2f1ed;
+  border-left: 0.25rem solid #bf5700;
+  padding: 0.75rem;
+}
+
+.moody-ai-dialog__field {
+  display: grid;
+  font-weight: 700;
+  gap: 0.4rem;
+}
+
+.moody-ai-dialog__existing-media {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.moody-ai-dialog__ideas {
+  border: 1px solid #c4cdd4;
+  border-radius: 0.25rem;
+}
+
+.moody-ai-dialog__ideas > summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.65rem;
+}
+
+.moody-ai-dialog__idea-list {
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0 0.65rem 0.65rem;
+}
+
+.moody-ai-dialog__idea {
+  background: #f9fafb;
+  border: 1px solid #c4cdd4;
+  color: #333f48;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.55rem;
+  text-align: left;
+}
+
+.moody-ai-dialog__prompt-options {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.moody-ai-dialog__image-preference {
+  align-items: center;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 0.4rem;
+}
+
+.moody-ai-dialog__token-estimate {
+  color: #5e686e;
+  font-size: 0.875rem;
+}
+
+.moody-ai-dialog__media-heading {
+  align-items: center;
+  display: flex;
+  font-weight: 700;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.moody-ai-dialog__button--compact {
+  padding: 0.35rem 0.65rem;
+}
+
+.moody-ai-dialog__media-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.moody-ai-dialog__media-list[hidden] {
+  display: none;
+}
+
+.moody-ai-dialog__media-item {
+  align-items: center;
+  background: #f9fafb;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, auto) auto;
+  padding: 0.65rem;
+}
+
+.moody-ai-dialog__media-intent {
+  padding: 0.4rem;
+}
+
+.moody-ai-dialog__choices {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.moody-ai-dialog__select,
+.moody-ai-dialog__textarea,
+.moody-ai-dialog__file {
+  border: 1px solid #7d8a92;
+  border-radius: 0.15rem;
+  box-sizing: border-box;
+  color: #1f262b;
+  font: inherit;
+  padding: 0.65rem;
+  width: 100%;
+}
+
+.moody-ai-dialog__textarea {
+  height: 6rem;
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.moody-ai-dialog__select:focus,
+.moody-ai-dialog__textarea:focus,
+.moody-ai-dialog__file:focus,
+.moody-ai-dialog__clear:focus-visible,
+.moody-ai-dialog__idea:focus-visible,
+.moody-ai-dialog__button:focus-visible {
+  outline: 3px solid #00a9b7;
+  outline-offset: 2px;
+}
+
+.moody-ai-dialog__attachment-summary {
+  align-items: start;
+  background: #f9fafb;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  overflow-wrap: anywhere;
+  padding: 0.65rem;
+}
+
+.moody-ai-dialog__attachment-summary[hidden],
+.moody-ai-dialog__preview-wrap[hidden] {
+  display: none;
+}
+
+.moody-ai-dialog__clear {
+  background: transparent;
+  border: 0;
+  color: #9d4700;
+  cursor: pointer;
+  flex: 0 0 auto;
+  font: inherit;
+  font-weight: 700;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.moody-ai-dialog__status {
+  min-height: 1.5rem;
+}
+
+.moody-ai-dialog__status--error {
+  color: #b1080f;
+  font-weight: 700;
+}
+
+.moody-ai-dialog__preview-wrap {
+  border-top: 1px solid #c4cdd4;
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 1rem;
+}
+
+.moody-ai-dialog__preview-label {
+  font-weight: 700;
+}
+
+.moody-ai-dialog__preview {
+  background: #fff;
+  border: 1px solid #c4cdd4;
+  max-height: 18rem;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.moody-ai-dialog__media-preview {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+.moody-ai-dialog__existing-media-preview {
+  background: #f2f1ed;
+  border-left: 0.25rem solid #bf5700;
+  font-weight: 700;
+  padding: 0.75rem;
+}
+
+.moody-ai-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.moody-ai-dialog__button {
+  background: #fff;
+  border: 2px solid #bf5700;
+  color: #9d4700;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.55rem 1rem;
+}
+
+.moody-ai-dialog__button--primary {
+  background: #bf5700;
+  color: #fff;
+}
+
+.moody-ai-dialog__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 40rem) {
+  .moody-ai-dialog__form {
+    padding: 1rem;
+  }
+
+  .moody-ai-dialog__actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .moody-ai-dialog__choices {
+    grid-template-columns: 1fr;
+  }
+
+  .moody-ai-dialog__media-item {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .moody-ai-dialog__idea-list {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,70 @@
+/* Hallmark · theme: Coral · anchor hue: Moody burnt orange · token source for the AI assistant */
+.ai-moody-assistant {
+  --color-paper: oklch(98% 0.006 55);
+  --color-paper-2: oklch(95% 0.009 55);
+  --color-paper-3: oklch(91% 0.012 55);
+  --color-surface: oklch(99% 0.004 55);
+  --color-ink: oklch(20% 0.012 50);
+  --color-ink-2: oklch(30% 0.014 50);
+  --color-neutral: oklch(43% 0.014 50);
+  --color-muted: oklch(38% 0.012 50);
+  --color-rule: oklch(84% 0.014 55);
+  --color-rule-strong: oklch(58% 0.018 55);
+  --color-accent: oklch(52% 0.155 52);
+  --color-accent-hover: oklch(43% 0.14 50);
+  --color-accent-ink: oklch(98% 0.006 55);
+  --color-accent-soft: oklch(94% 0.035 55);
+  --color-focus: oklch(20% 0.012 50);
+  --color-success: oklch(40% 0.105 145);
+  --color-success-soft: oklch(94% 0.028 145);
+  --color-warning: oklch(42% 0.105 75);
+  --color-warning-soft: oklch(95% 0.036 75);
+  --color-error: oklch(42% 0.145 28);
+  --color-error-soft: oklch(95% 0.03 28);
+
+  --font-display: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+
+  --rule-hairline: 1px;
+  --rule-focus: 2px;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-panel: 1rem;
+  --radius-pill: 999px;
+
+  --shadow-panel: 0 1.5rem 4rem oklch(16% 0.012 50 / 0.2);
+  --shadow-raised: 0 0.75rem 2rem oklch(16% 0.012 50 / 0.12);
+
+  --z-base: 1;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 1300;
+  --z-toast: 1400;
+  --z-tooltip: 1500;
+}

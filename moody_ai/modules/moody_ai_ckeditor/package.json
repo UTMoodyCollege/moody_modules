@@ -1,0 +1,16 @@
+{
+  "name": "moody_ai_ckeditor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Builds the Moody AI CKEditor 5 plugin.",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "ckeditor5": "~47.6.2",
+    "terser-webpack-plugin": "^5.3.3",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.4.0"
+  }
+}

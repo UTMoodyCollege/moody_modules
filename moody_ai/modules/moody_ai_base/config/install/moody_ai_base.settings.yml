@@ -1,0 +1,16 @@
+provider: openai
+openai:
+  secret_name: moody_ai_openai_api_key
+  default_model: gpt-5.6-luna
+  image_model: gpt-image-2
+  models:
+    -
+      id: gpt-5.6-luna
+      label: 'GPT-5.6 Luna (fast)'
+    -
+      id: gpt-5.6-terra
+      label: 'GPT-5.6 Terra (balanced)'
+additional_context: ''
+max_prompt_characters: 2000
+max_output_tokens: 1800
+hourly_request_limit: 20

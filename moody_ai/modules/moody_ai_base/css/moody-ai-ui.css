@@ -1,0 +1,52 @@
+.moody-ai-ui__choices {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.moody-ai-ui__field {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.moody-ai-ui__field > label,
+.moody-ai-ui__field > span:first-child {
+  font-weight: 700;
+}
+
+.moody-ai-ui__control {
+  border: 1px solid #7d8a92;
+  border-radius: 0.25rem;
+  box-sizing: border-box;
+  color: #1f262b;
+  font: inherit;
+  max-width: 100%;
+  padding: 0.65rem;
+  width: 100%;
+}
+
+.moody-ai-ui__control:focus {
+  outline: 3px solid #00a9b7;
+  outline-offset: 2px;
+}
+
+.moody-ai-ui__privacy {
+  background: #f2f1ed;
+  border-left: 0.25rem solid #bf5700;
+  color: #333f48;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.moody-ai-ui__help {
+  color: #5e686e;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 40rem) {
+  .moody-ai-ui__choices {
+    grid-template-columns: 1fr;
+  }
+}

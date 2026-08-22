@@ -1,0 +1,271 @@
+<div class="ai-moody-assistant" data-ai-assistant-key="{{ entity_type }}-{{ entity_id }}" style="--color-accent: {{ widget_bg_color }}; --color-accent-hover: {{ widget_hover_color }};">
+  <div class="ai-moody-assistant__launcher">
+    <button type="button" class="ai-moody-assistant__toggle" aria-expanded="false" aria-controls="ai-moody-assistant-panel-{{ entity_id }}">
+      <span class="ai-moody-assistant__toggle-label">{{ widget_title_text }}</span>
+    </button>
+    <button
+      type="button"
+      class="ai-moody-assistant__minimize"
+      aria-label="Minimize {{ widget_title_text }}"
+      aria-pressed="false"
+      data-ai-assistant-minimize
+      data-ai-assistant-minimize-label="Minimize {{ widget_title_text }}"
+      data-ai-assistant-restore-label="Restore {{ widget_title_text }}"
+    >
+      <span class="ai-moody-assistant__minimize-mark" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <div class="ai-moody-assistant__panel" id="ai-moody-assistant-panel-{{ entity_id }}" role="dialog" aria-labelledby="moody-ai-assistant-title-{{ entity_id }}" hidden>
+    <div
+      class="ai-moody-assistant__resize-handle ai-moody-assistant__resize-handle--width"
+      data-ai-assistant-width-resizer
+      role="separator"
+      aria-label="Resize assistant width"
+      aria-orientation="vertical"
+      tabindex="0"
+    ></div>
+
+    <div class="ai-moody-assistant__header">
+      <div>
+        <h3 id="moody-ai-assistant-title-{{ entity_id }}" tabindex="-1">{{ widget_title_text }}</h3>
+        {% if entity_label %}
+          <p><span>Editing</span> {{ entity_label }}</p>
+        {% endif %}
+      </div>
+      <button type="button" class="ai-moody-assistant__close" aria-label="Close {{ widget_title_text }}">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+
+    {% if conversation_threads %}
+      <div class="ai-moody-assistant__conversations">
+        <details class="ai-moody-assistant__conversation-switcher">
+          <summary>
+            <span class="ai-moody-assistant__conversation-summary-label">Threads</span>
+            <span class="ai-moody-assistant__conversation-count">{{ conversation_threads|length }}</span>
+          </summary>
+          <div class="ai-moody-assistant__conversation-tools">
+            <label class="visually-hidden" for="ai-moody-assistant-conversation-search-{{ entity_id }}">Search conversations</label>
+            <input
+              id="ai-moody-assistant-conversation-search-{{ entity_id }}"
+              class="ai-moody-assistant__conversation-search"
+              type="search"
+              placeholder="Filter conversations"
+              aria-label="Filter conversations"
+            >
+          </div>
+          <div class="ai-moody-assistant__conversation-list">
+            {% for thread in conversation_threads %}
+              <div class="ai-moody-assistant__conversation-card{{ thread.is_active ? ' is-active' : '' }}" data-conversation-text="{{ (thread.label ~ ' ' ~ thread.last_message_role ~ ' ' ~ thread.last_message)|lower|trim }}">
+                <a
+                  class="ai-moody-assistant__conversation-link"
+                  href="{{ thread.url }}"
+                  {% if thread.is_active %}aria-current="page"{% endif %}
+                >
+                  <span class="ai-moody-assistant__conversation-title">{{ thread.label }}</span>
+                  <span class="ai-moody-assistant__conversation-meta">
+                    {{ thread.message_count }} message{{ thread.message_count == 1 ? '' : 's' }}
+                    {% if thread.is_active %} • Current page{% else %} • Open page{% endif %}
+                  </span>
+                  {% if thread.last_message %}
+                    <span class="ai-moody-assistant__conversation-preview">
+                      {{ thread.last_message_role|capitalize }}: {{ thread.last_message }}
+                    </span>
+                  {% endif %}
+                </a>
+                <a
+                  class="ai-moody-assistant__conversation-reset"
+                  href="{{ thread.reset_url }}"
+                >
+                  Reset
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        </details>
+      </div>
+    {% endif %}
+
+    <div class="ai-moody-assistant__history">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="ai-moody-assistant__message ai-moody-assistant__message--{{ message.role|default('assistant') }}">
+            <strong>{{ message.role|default('assistant') == 'user' ? 'You' : 'Moody' }}</strong>
+            <div>{{ message.content }}</div>
+            {% set pending_action = message.metadata.pending_action|default(null) %}
+            {% set layout_builder_required = message.metadata.layout_builder_required|default(null) %}
+            {% set page_creation_guide = message.metadata.page_creation_guide|default(null) %}
+            {% set site_function_guide = message.metadata.site_function_guide|default(null) %}
+            {% set action_resolution = message.metadata.action_resolution|default(null) %}
+            {% set uploaded_assets = message.metadata.uploaded_assets|default([]) %}
+            {% set selected_block_references = message.metadata.selected_block_references|default([]) %}
+            {% set prefer_ai_images = message.metadata.prefer_ai_images|default(false) %}
+            {% if uploaded_assets %}
+              <div class="ai-moody-assistant__preview">
+                <div class="ai-moody-assistant__preview-title">Attached files</div>
+                <ul class="ai-moody-assistant__preview-list">
+                  {% for asset in uploaded_assets %}
+                    <li>
+                      {{ asset.title|default(asset.file_name|default('Uploaded asset')) }}
+                      {% if asset.asset_type %} ({{ asset.asset_type }}){% endif %}
+                      {% if asset.alt %} - alt: {{ asset.alt }}{% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            {% if selected_block_references %}
+              <div class="ai-moody-assistant__preview">
+                <div class="ai-moody-assistant__preview-title">Selected components</div>
+                <div class="ai-moody-assistant__selected-block-preview-list">
+                  {% for reference in selected_block_references %}
+                    <span class="ai-moody-assistant__selected-block-preview-chip ai-moody-assistant__selected-block-preview-chip--{{ reference.selection_mode|default('new') == 'edit' ? 'edit' : 'new' }}">
+                      {{ reference.label|default('Selected block') }}
+                    </span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+            {% if prefer_ai_images %}
+              <div class="ai-moody-assistant__preview">
+                <div class="ai-moody-assistant__preview-title">Image preference</div>
+                <span class="ai-moody-assistant__preference-badge">AI image</span>
+              </div>
+            {% endif %}
+            {% if pending_action %}
+              <div class="ai-moody-assistant__preview">
+                {% if pending_action.title %}
+                  <div class="ai-moody-assistant__preview-title">{{ pending_action.title }}</div>
+                {% endif %}
+                {% if pending_action.target_component.block_label %}
+                  <div class="ai-moody-assistant__preview-target">Target: {{ pending_action.target_component.block_label }}</div>
+                {% endif %}
+                {% if pending_action.changes %}
+                  <div class="ai-moody-assistant__preview-list ai-moody-assistant__preview-list--changes">
+                    {% for change in pending_action.changes %}
+                      {% if change.summary is defined %}
+                        <details class="ai-moody-assistant__change-card">
+                          <summary class="ai-moody-assistant__change-summary">
+                            <span class="ai-moody-assistant__change-title">{{ change.field_label|default('Change') }}</span>
+                            <span class="ai-moody-assistant__change-copy">{{ change.summary }}</span>
+                          </summary>
+                          <div class="ai-moody-assistant__change-details">
+                            {% if change.before is defined %}
+                              <div class="ai-moody-assistant__change-pane">
+                                <div class="ai-moody-assistant__change-pane-label">Before</div>
+                                <div class="ai-moody-assistant__change-pane-value">{{ change.before }}</div>
+                              </div>
+                            {% endif %}
+                            {% if change.after is defined %}
+                              <div class="ai-moody-assistant__change-pane">
+                                <div class="ai-moody-assistant__change-pane-label">After</div>
+                                <div class="ai-moody-assistant__change-pane-value">{{ change.after }}</div>
+                              </div>
+                            {% endif %}
+                          </div>
+                        </details>
+                      {% else %}
+                        <div class="ai-moody-assistant__preview-list-item">{{ change }}</div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                <div class="ai-moody-assistant__preview-status ai-moody-assistant__preview-status--{{ pending_action.status|default('pending') }}">
+                  {{ pending_action.status|default('pending')|capitalize }}
+                </div>
+                {% if pending_action.status|default('pending') == 'pending' %}
+                  <div class="ai-moody-assistant__preview-actions">
+                    {% if pending_action.type == 'place_existing_blocks' %}
+                      {% if pending_action.layout_builder_url and not is_layout_builder_context %}
+                        <a class="ai-moody-assistant__preview-button ai-moody-assistant__preview-button--approve" href="{{ pending_action.layout_builder_url }}">{{ pending_action.layout_builder_label|default('Open Layout Builder') }}</a>
+                      {% endif %}
+                      {% if pending_action.resume_in_layout_url and is_layout_builder_context %}
+                        <a class="ai-moody-assistant__preview-button ai-moody-assistant__preview-button--approve" href="{{ pending_action.resume_in_layout_url }}">{{ pending_action.approve_label|default('Resume build') }}</a>
+                      {% endif %}
+                    {% elseif pending_action.approve_url %}
+                      <a class="ai-moody-assistant__preview-button ai-moody-assistant__preview-button--approve" href="{{ pending_action.approve_url }}">{{ pending_action.approve_label|default('Yes, apply') }}</a>
+                    {% endif %}
+                    <a class="ai-moody-assistant__preview-button ai-moody-assistant__preview-button--reject" href="{{ pending_action.reject_url }}">{{ pending_action.reject_label|default('No, dismiss') }}</a>
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+            {% if layout_builder_required %}
+              <div class="ai-moody-assistant__preview">
+                <div class="ai-moody-assistant__preview-title">Layout Builder Required</div>
+                <div class="ai-moody-assistant__preview-target">Open the page layout editor before previewing or applying block edits.</div>
+                <div class="ai-moody-assistant__preview-actions">
+                  <a class="ai-moody-assistant__preview-button ai-moody-assistant__preview-button--approve" href="{{ layout_builder_required.url }}">{{ layout_builder_required.label|default('Open Layout Builder') }}</a>
+                </div>
+              </div>
+            {% endif %}
+            {% if page_creation_guide %}
+              <div class="ai-moody-assistant__preview">
+                {% if page_creation_guide.title %}
+                  <div class="ai-moody-assistant__preview-title">{{ page_creation_guide.title }}</div>
+                {% endif %}
+                {% if page_creation_guide.summary %}
+                  <div class="ai-moody-assistant__preview-target">{{ page_creation_guide.summary }}</div>
+                {% endif %}
+                {% if page_creation_guide.sections %}
+                  <ul class="ai-moody-assistant__preview-list">
+                    {% for section in page_creation_guide.sections %}
+                      <li>
+                        {{ section.label|default('Section') }}: {{ section.purpose|default('Planned content section') }}
+                        {% if section.suggested_block_type %} ({{ section.suggested_block_type }}){% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                {% if page_creation_guide.options %}
+                  <div class="ai-moody-assistant__preview-actions">
+                    {% for option in page_creation_guide.options %}
+                      <a class="ai-moody-assistant__preview-button ai-moody-assistant__preview-button--approve" href="{{ option.url }}">Create {{ option.label }}</a>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+            {% if site_function_guide %}
+              <div class="ai-moody-assistant__preview">
+                <div class="ai-moody-assistant__preview-title">{{ site_function_guide.title|default('Site administration') }}</div>
+                <div class="ai-moody-assistant__preview-target">{{ site_function_guide.summary }}</div>
+                {% if site_function_guide.options %}
+                  <div class="ai-moody-assistant__preview-actions">
+                    {% for option in site_function_guide.options %}
+                      <a class="ai-moody-assistant__preview-button ai-moody-assistant__preview-button--approve" href="{{ option.url }}">{{ option.label }}</a>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+            {% if action_resolution.result_link %}
+              <div class="ai-moody-assistant__preview-actions">
+                <a class="ai-moody-assistant__preview-button ai-moody-assistant__preview-button--approve" href="{{ action_resolution.result_link.url }}">{{ action_resolution.result_link.label|default('View result') }}</a>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="ai-moody-assistant__message ai-moody-assistant__message--assistant">
+          <strong>Moody</strong>
+          <div>Describe a new block to add, or choose an existing one to revise. New-block requests run when sent; existing-block edits show a preview for approval.</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div
+      class="ai-moody-assistant__resize-handle ai-moody-assistant__resize-handle--history"
+      data-ai-assistant-history-resizer
+      role="separator"
+      aria-label="Resize assistant conversation area"
+      aria-orientation="horizontal"
+      tabindex="0"
+    ></div>
+
+    <div class="ai-moody-assistant__form">
+      {{ form }}
+    </div>
+  </div>
+</div>

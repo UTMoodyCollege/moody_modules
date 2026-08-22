@@ -1,0 +1,13 @@
+moody_ai_assistant.settings:
+  type: config_object
+  label: 'Moody AI Assistant settings'
+  mapping:
+    widget_title_text:
+      type: label
+      label: 'Widget title'
+    widget_bg_color:
+      type: string
+      label: 'Accent color'
+    widget_hover_color:
+      type: string
+      label: 'Accent hover color'

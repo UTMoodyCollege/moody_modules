@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Hooks for the Moody AI CKEditor integration.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Url;
+/**
+ * Implements hook_editor_js_settings_alter().
+ */
+function moody_ai_ckeditor_editor_js_settings_alter(array &$settings): void {
+  if (!\Drupal::currentUser()->hasPermission('use moody ai ckeditor')) {
+    return;
+  }
+
+  /** @var \Drupal\moody_ai_base\AiGenerationService $generator */
+  $generator = \Drupal::service('moody_ai_base.generator');
+  $ui = $generator->uiSettings();
+  $plugin_settings = [
+    'endpoint' => Url::fromRoute('moody_ai_ckeditor.generate')->toString(),
+    'uploadEndpoint' => Url::fromRoute('moody_ai_ckeditor.upload')->toString(),
+    'finalizeEndpoint' => Url::fromRoute('moody_ai_ckeditor.finalize')->toString(),
+    'mediaInfoEndpoint' => Url::fromRoute('moody_ai_ckeditor.media_info')->toString(),
+    'csrfToken' => \Drupal::service('csrf_token')->get('moody_ai_ckeditor.generate'),
+    // CKEditor recursively treats arrays as nested Config objects. JSON keeps
+    // this small, server-generated option list as plain editor-facing data.
+    'providersJson' => json_encode(array_map(NULL, array_keys($ui['providerOptions']), array_values($ui['providerOptions'])), JSON_THROW_ON_ERROR),
+    'modelsJson' => json_encode(array_map(NULL, array_keys($ui['modelOptions']), array_values($ui['modelOptions'])), JSON_THROW_ON_ERROR),
+    'defaultProvider' => $ui['defaultProvider'],
+    'defaultModel' => $ui['defaultModel'],
+    'maxPromptCharacters' => $ui['maxPromptCharacters'],
+    'attachmentAccept' => $ui['attachmentAccept'],
+    'maxAttachments' => $ui['maxAttachments'],
+    'maxAttachmentBytes' => $ui['maxAttachmentBytes'],
+    'maxTotalAttachmentBytes' => $ui['maxTotalAttachmentBytes'],
+    'privacyNotice' => $ui['privacyNotice'],
+    'configured' => $generator->isConfigured(),
+  ];
+
+  if (empty($settings['editor']['formats'])) {
+    return;
+  }
+  foreach ($settings['editor']['formats'] as &$format) {
+    if (($format['editor'] ?? '') === 'ckeditor5') {
+      $format['editorSettings']['config']['moodyAi'] = $plugin_settings;
+    }
+  }
+}

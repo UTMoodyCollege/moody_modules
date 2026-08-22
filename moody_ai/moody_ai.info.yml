@@ -1,5 +1,5 @@
 name: 'Moody AI'
 type: module
-description: 'LLM-facing documentation for building Moody pages with supported components.'
+description: 'Umbrella module and authoring context for Moody AI features.'
 core_version_requirement: ^10 || ^11
-package: Moody
+package: 'Moody AI'

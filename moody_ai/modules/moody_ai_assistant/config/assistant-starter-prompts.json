@@ -1,0 +1,62 @@
+[
+  {
+    "label": "Create a new standard page",
+    "prompt": "Create a new standard page"
+  },
+  {
+    "label": "Create a page about Moody College benefits",
+    "prompt": "Create a page of blocks that describe the benefits of Moody College in [current year]"
+  },
+  {
+    "label": "Create a showcase from uploaded images",
+    "prompt": "Create a Showcase block using the uploaded images and write strong, accessible alt text and captions for each item"
+  },
+  {
+    "label": "Create a hero for this page",
+    "prompt": "Create a Moody Hero block for this page with a strong headline, supporting copy, and a call to action that fits the page topic"
+  },
+  {
+    "label": "Create a standard page plan",
+    "prompt": "Plan a new standard page for this topic and suggest the best sequence of blocks to build it clearly and persuasively"
+  },
+  {
+    "label": "Create a student recruitment page",
+    "prompt": "Create a page of blocks aimed at prospective students explaining why they should choose Moody College in [current year]"
+  },
+  {
+    "label": "Summarize attached files into blocks",
+    "prompt": "Use the attached files to create a page structure and draft blocks that summarize the most important information clearly for web readers"
+  },
+  {
+    "label": "Revise the existing hero",
+    "prompt": "Revise the existing hero on this page to make the headline sharper, the supporting copy more concise, and the call to action more compelling"
+  },
+  {
+    "label": "Improve the tone of this page",
+    "prompt": "Review the blocks on this page and suggest edits that make the tone clearer, more confident, and more engaging for prospective students"
+  },
+  {
+    "label": "Turn this into a news-style page",
+    "prompt": "Create a page of blocks that presents this topic in a news-style format with a strong lead, supporting sections, and clear calls to action"
+  },
+  {
+    "label": "Make a faculty-focused page",
+    "prompt": "Create a page of blocks highlighting faculty expertise, research strengths, and student opportunities related to this topic"
+  },
+  {
+    "label": "Refresh an existing block",
+    "prompt": "Edit an existing block on this page to improve clarity, tighten the copy, and make the content feel more modern and editorial"
+  },
+  {
+    "label": "Build a promo unit section",
+    "prompt": "Create a Promo Unit section with strong, valid content items that highlight key opportunities, resources, or reasons to engage with Moody College"
+  },
+  {
+    "label": "Create a page for parents and families",
+    "prompt": "Create a page of blocks for parents and families that explains the value of Moody College, student support, and career outcomes in [current year]"
+  },
+  {
+    "label": "Create a page from this topic",
+    "prompt": "Using the current page context, create a well-structured page of blocks that explains this topic clearly from introduction through next steps"
+  }
+]

@@ -1,0 +1,31 @@
+moody_ai_ckeditor.generate:
+  path: '/moody-ai/ckeditor/generate'
+  defaults:
+    _controller: '\Drupal\moody_ai_ckeditor\Controller\AiCkeditorController::generate'
+  methods: [POST]
+  requirements:
+    _permission: 'use moody ai ckeditor'
+
+moody_ai_ckeditor.upload:
+  path: '/moody-ai/ckeditor/upload'
+  defaults:
+    _controller: '\Drupal\moody_ai_ckeditor\Controller\AiCkeditorController::upload'
+  methods: [POST]
+  requirements:
+    _permission: 'use moody ai ckeditor'
+
+moody_ai_ckeditor.finalize:
+  path: '/moody-ai/ckeditor/finalize'
+  defaults:
+    _controller: '\Drupal\moody_ai_ckeditor\Controller\AiCkeditorController::finalize'
+  methods: [POST]
+  requirements:
+    _permission: 'use moody ai ckeditor'
+
+moody_ai_ckeditor.media_info:
+  path: '/moody-ai/ckeditor/media-info'
+  defaults:
+    _controller: '\Drupal\moody_ai_ckeditor\Controller\AiCkeditorController::mediaInfo'
+  methods: [POST]
+  requirements:
+    _permission: 'use moody ai ckeditor'

@@ -1,0 +1,167 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Moody AI Assistant module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function moody_ai_assistant_schema() {
+  $schema['moody_ai_assistant_user_budget'] = [
+    'description' => 'Stores per-user AI token budgets.',
+    'fields' => [
+      'uid' => [
+        'description' => 'The user ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'token_budget' => [
+        'description' => 'The maximum number of AI usage tokens available to the user.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'tokens_used' => [
+        'description' => 'The number of tracked AI usage tokens spent by the user.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'Unix timestamp when the budget was created.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'description' => 'Unix timestamp when the budget was last changed.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['uid'],
+    'indexes' => [
+      'changed' => ['changed'],
+    ],
+  ];
+
+  $schema['moody_ai_assistant_usage_log'] = [
+    'description' => 'Stores AI widget usage events.',
+    'fields' => [
+      'id' => [
+        'description' => 'Primary key.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'description' => 'The user ID that made the request.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'thread_id' => [
+        'description' => 'The AI chat thread ID, when available.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ],
+      'target_entity_type' => [
+        'description' => 'The target page entity type.',
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'target_entity_id' => [
+        'description' => 'The target page entity ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'target_entity_label' => [
+        'description' => 'The target page label at request time.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'prompt' => [
+        'description' => 'The user prompt.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+      ],
+      'tokens_used' => [
+        'description' => 'The number of tracked AI usage tokens used by the request.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'status' => [
+        'description' => 'The usage event status.',
+        'type' => 'varchar_ascii',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => 'success',
+      ],
+      'source' => [
+        'description' => 'The module interface that initiated the request.',
+        'type' => 'varchar_ascii',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => 'widget',
+      ],
+      'request_count_hour' => [
+        'description' => 'The user request count in the preceding hour, including this request.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ],
+      'needs_review' => [
+        'description' => 'Whether automated signals marked the request for administrator review.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'review_flags' => [
+        'description' => 'Comma-separated automated review signal identifiers.',
+        'type' => 'varchar_ascii',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'created' => [
+        'description' => 'Unix timestamp when the usage event was recorded.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'user_created' => ['uid', 'created'],
+      'created' => ['created'],
+      'entity' => ['target_entity_type', 'target_entity_id'],
+      'status' => ['status'],
+      'source_created' => ['source', 'created'],
+      'review_created' => ['needs_review', 'created'],
+    ],
+  ];
+
+  return $schema;
+}
