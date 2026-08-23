@@ -5,3 +5,18 @@ moody_ai_base.settings:
     _title: 'Moody AI configuration'
   requirements:
     _permission: 'administer moody ai'
+
+moody_ai_base.usage_report:
+  path: '/admin/reports/moody-ai'
+  defaults:
+    _controller: '\Drupal\moody_ai_base\Controller\UsageDashboardController::dashboard'
+    _title: 'Moody AI usage and value'
+  requirements:
+    _permission: 'view moody ai usage reports'
+
+moody_ai_base.usage_export:
+  path: '/admin/reports/moody-ai/export'
+  defaults:
+    _controller: '\Drupal\moody_ai_base\Controller\UsageDashboardController::export'
+  requirements:
+    _permission: 'view moody ai usage reports'

@@ -16,6 +16,13 @@ use Psr\Log\LoggerInterface;
  */
 final class AiGenerationService {
 
+  /** Usage returned by the latest HTML request. */
+  private array $lastUsage = [
+    'input_tokens' => 0,
+    'output_tokens' => 0,
+    'total_tokens' => 0,
+  ];
+
   private const SITE_CONTEXT_FIELDS = [
     'site_identity' => [
       'label' => 'Site identity and audiences',
@@ -417,6 +424,7 @@ final class AiGenerationService {
    *   When the provider is unavailable or returns no safe HTML.
    */
   public function generateHtml(string $prompt, string $provider, string $model, array $attachments = [], array $media = [], bool $prefer_ai_images = FALSE): string {
+    $this->lastUsage = ['input_tokens' => 0, 'output_tokens' => 0, 'total_tokens' => 0];
     $this->assertEnabled();
 
     $prompt = trim($prompt);
@@ -482,6 +490,15 @@ final class AiGenerationService {
       throw new \RuntimeException('The provider returned no safe content.');
     }
     return $html;
+  }
+
+  /**
+   * Returns and clears token usage from the latest HTML request.
+   */
+  public function consumeLastUsage(): array {
+    $usage = $this->lastUsage;
+    $this->lastUsage = ['input_tokens' => 0, 'output_tokens' => 0, 'total_tokens' => 0];
+    return $usage;
   }
 
   /**
@@ -580,6 +597,12 @@ final class AiGenerationService {
     if (!is_array($data)) {
       throw new \RuntimeException('The AI provider returned an invalid response.');
     }
+    $usage = is_array($data['usage'] ?? NULL) ? $data['usage'] : [];
+    $this->lastUsage = [
+      'input_tokens' => (int) ($usage['input_tokens'] ?? 0),
+      'output_tokens' => (int) ($usage['output_tokens'] ?? 0),
+      'total_tokens' => (int) ($usage['total_tokens'] ?? 0),
+    ];
     if (isset($data['output_text']) && is_string($data['output_text'])) {
       return $data['output_text'];
     }

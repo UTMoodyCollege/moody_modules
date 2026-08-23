@@ -22,6 +22,7 @@ use Drupal\file\Upload\FileUploadHandlerInterface;
 use Drupal\file\Upload\FormUploadedFile;
 use Drupal\moody_ai_base\AiGenerationService;
 use Drupal\moody_ai_base\HtmlSanitizer;
+use Drupal\moody_ai_base\UsageTracker;
 use Drupal\media\MediaInterface;
 use Drupal\media\MediaTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -53,6 +54,7 @@ final class AiCkeditorController implements ContainerInjectionInterface {
     private readonly Connection $database,
     private readonly ImageFactory $imageFactory,
     private readonly FileRepositoryInterface $fileRepository,
+    private readonly UsageTracker $usageTracker,
   ) {}
 
   /**
@@ -73,6 +75,7 @@ final class AiCkeditorController implements ContainerInjectionInterface {
       $container->get('database'),
       $container->get('image.factory'),
       $container->get('file.repository'),
+      $container->get('moody_ai_base.usage_tracker'),
     );
   }
 
@@ -177,21 +180,28 @@ final class AiCkeditorController implements ContainerInjectionInterface {
     }
     $this->flood->register('moody_ai_ckeditor.generate', 3600, $identifier);
 
+    $prompt = (string) ($payload['prompt'] ?? '');
     try {
       $html = $this->generator->generateHtml(
-        (string) ($payload['prompt'] ?? ''),
+        $prompt,
         (string) ($payload['provider'] ?? ''),
         (string) ($payload['model'] ?? ''),
         $attachments,
         $media,
         !empty($payload['preferAiImages']),
       );
+      $usage = $this->generator->consumeLastUsage();
+      $this->usageTracker->recordUsage($this->currentUser, NULL, $prompt, $usage['total_tokens'] ?? 0, 'success', NULL, 'ckeditor', 'generate_html', 1);
       return $this->response(['html' => $html]);
     }
     catch (\InvalidArgumentException) {
+      $usage = $this->generator->consumeLastUsage();
+      $this->usageTracker->recordUsage($this->currentUser, NULL, $prompt, $usage['total_tokens'] ?? 0, 'error', NULL, 'ckeditor', 'generate_html');
       return $this->response(['message' => 'Check the prompt, reference sources, and selected model, then try again.'], 400);
     }
     catch (\RuntimeException) {
+      $usage = $this->generator->consumeLastUsage();
+      $this->usageTracker->recordUsage($this->currentUser, NULL, $prompt, $usage['total_tokens'] ?? 0, 'error', NULL, 'ckeditor', 'generate_html');
       return $this->response(['message' => 'Moody AI could not generate content right now. Try again or contact a site administrator.'], 502);
     }
   }

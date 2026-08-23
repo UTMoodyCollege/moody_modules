@@ -8,6 +8,10 @@ services:
   moody_ai_base.html_sanitizer:
     class: Drupal\moody_ai_base\HtmlSanitizer
 
+  moody_ai_base.usage_tracker:
+    class: Drupal\moody_ai_base\UsageTracker
+    arguments: ['@database']
+
   moody_ai_base.generator:
     class: Drupal\moody_ai_base\AiGenerationService
     arguments:

@@ -45,6 +45,15 @@ Both editor experiences show the dashboard's configurable offline message.
 New installations start offline; an existing installation without the new
 setting retains its current behavior until an administrator saves the form.
 
+The site-local **Moody AI usage and value** dashboard at
+`/admin/reports/moody-ai` reports people supported, request volume, successful
+requests, AI outcomes delivered, content items reached, tracked tokens, and review
+signals. It breaks results down by AI tool and user, including role names, and
+offers separate user-statistics and request-outcome CSV exports. Grant the
+restricted `view moody ai usage reports` permission only to approved reporting
+administrators. Prompts and generated content are intentionally excluded from
+the dashboard and both exports.
+
 For an emergency command-line change, run the matching command and clear
 caches. The dashboard remains the normal interface:
 
@@ -248,6 +257,7 @@ creation/editing, component UUID preservation, and Layout Builder AJAX output:
 ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/block_payload_smoke.php
 ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/planner_constraints_smoke.php
 ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/layout_streaming_smoke.php
+ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_base/tests/usage_dashboard_smoke.php
 ```
 
 For a representative pilot pass, use separate unpublished pages for: a 10–12

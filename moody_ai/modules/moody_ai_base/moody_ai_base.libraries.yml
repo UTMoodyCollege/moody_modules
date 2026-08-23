@@ -2,3 +2,8 @@ ui:
   css:
     theme:
       css/moody-ai-ui.css: {}
+
+dashboard:
+  css:
+    theme:
+      css/moody-ai-dashboard.css: {}

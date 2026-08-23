@@ -2,38 +2,15 @@
 
 namespace Drupal\moody_ai_assistant\Service;
 
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\moody_ai_base\UsageTracker;
 use Drupal\moody_ai_assistant\Exception\InsufficientUsageTokensException;
 
 /**
  * Tracks per-user AI usage and token budgets.
  */
-class AIUsageTracker {
-
-  /** Token usage at or above this value warrants administrator review. */
-  const HIGH_TOKEN_THRESHOLD = 100000;
-
-  /** Prompt length at or above this value warrants administrator review. */
-  const LONG_PROMPT_THRESHOLD = 4000;
-
-  /** Requests per user per rolling hour that warrant administrator review. */
-  const HIGH_FREQUENCY_THRESHOLD = 20;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * Constructs the usage tracker.
-   */
-  public function __construct(Connection $database) {
-    $this->database = $database;
-  }
+class AIUsageTracker extends UsageTracker {
 
   /**
    * Gets a user's token budget summary.
@@ -137,58 +114,13 @@ class AIUsageTracker {
   }
 
   /**
-   * Records one AI request usage event.
+   * Records shared usage and applies any Assistant-specific user budget.
    */
-  public function recordUsage(AccountInterface $account, ?ContentEntityInterface $entity, $prompt, $tokens_used, $status = 'success', $thread_id = NULL, $source = 'widget') {
-    if (!$this->tableExists('moody_ai_assistant_usage_log')) {
-      return;
-    }
-
+  public function recordUsage(AccountInterface $account, ?ContentEntityInterface $entity, $prompt, $tokens_used, $status = 'success', $thread_id = NULL, $source = 'assistant', $operation = '', $items_affected = 0) {
+    parent::recordUsage($account, $entity, $prompt, $tokens_used, $status, $thread_id, $source, $operation, $items_affected);
     $uid = (int) $account->id();
     $tokens_used = max(0, (int) $tokens_used);
     $now = time();
-    $status = mb_substr((string) $status, 0, 32);
-    $source = preg_replace('/[^a-z0-9_]+/', '_', mb_strtolower((string) $source));
-    $source = mb_substr(trim($source, '_') ?: 'widget', 0, 32);
-    $request_count_hour = 1 + (int) $this->database->select('moody_ai_assistant_usage_log', 'l')
-      ->condition('uid', $uid)
-      ->condition('created', $now - 3600, '>=')
-      ->countQuery()
-      ->execute()
-      ->fetchField();
-
-    $review_flags = [];
-    if ($status !== 'success') {
-      $review_flags[] = 'error';
-    }
-    if ($tokens_used >= static::HIGH_TOKEN_THRESHOLD) {
-      $review_flags[] = 'high_tokens';
-    }
-    if (mb_strlen((string) $prompt) >= static::LONG_PROMPT_THRESHOLD) {
-      $review_flags[] = 'long_prompt';
-    }
-    if ($request_count_hour >= static::HIGH_FREQUENCY_THRESHOLD) {
-      $review_flags[] = 'high_frequency';
-    }
-
-    $this->database->insert('moody_ai_assistant_usage_log')
-      ->fields([
-        'uid' => $uid,
-        'thread_id' => $thread_id ? (int) $thread_id : NULL,
-        'target_entity_type' => $entity ? $entity->getEntityTypeId() : '',
-        'target_entity_id' => $entity ? (int) $entity->id() : 0,
-        'target_entity_label' => $entity ? mb_substr((string) $entity->label(), 0, 255) : '',
-        'prompt' => (string) $prompt,
-        'tokens_used' => $tokens_used,
-        'status' => $status,
-        'source' => $source,
-        'request_count_hour' => $request_count_hour,
-        'needs_review' => $review_flags ? 1 : 0,
-        'review_flags' => implode(',', $review_flags),
-        'created' => $now,
-      ])
-      ->execute();
-
     if ($tokens_used > 0 && $this->userHasBudget($uid)) {
       $this->database->update('moody_ai_assistant_user_budget')
         ->expression('tokens_used', 'tokens_used + :tokens_used', [':tokens_used' => $tokens_used])

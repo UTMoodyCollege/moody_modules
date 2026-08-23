@@ -906,7 +906,43 @@ class AIChatManager {
   protected function recordWidgetUsage(AccountInterface $account, ContentEntityInterface $entity, $message, AIChatThread $thread, $status) {
     $usage_events = $this->planner->consumeUsageEvents();
     $tokens_used = $this->planner->sumUsageTokens($usage_events);
-    $this->usageTracker->recordUsage($account, $entity, $message, $tokens_used, $status, $thread->id(), 'widget');
+    [$operation, $items_affected] = $this->summarizeUsageOutcome($thread);
+    $this->usageTracker->recordUsage($account, $entity, $message, $tokens_used, $status, $thread->id(), 'assistant', $operation, $items_affected);
+  }
+
+  /**
+   * Summarizes the latest assistant outcome without storing generated content.
+   */
+  protected function summarizeUsageOutcome(AIChatThread $thread) {
+    foreach (array_reverse($thread->getMessages()) as $message) {
+      if (($message['role'] ?? '') !== 'assistant') {
+        continue;
+      }
+      $metadata = is_array($message['metadata'] ?? NULL) ? $message['metadata'] : [];
+      $created = count($metadata['created_blocks'] ?? []);
+      $edited = count($metadata['edited_blocks'] ?? []);
+      if ($created && $edited) {
+        return ['create_and_edit_blocks', $created + $edited];
+      }
+      if ($created) {
+        return ['create_blocks', $created];
+      }
+      if ($edited) {
+        return ['edit_blocks', $edited];
+      }
+      if (!empty($metadata['page_creation_guide'])) {
+        return ['guide_page_creation', 1];
+      }
+      if (!empty($metadata['site_function_guide'])) {
+        return ['guide_site_task', 1];
+      }
+      if (!empty($metadata['pending_action']['type'])) {
+        return ['preview_' . $metadata['pending_action']['type'], 1];
+      }
+      return ['assistant_response', 0];
+    }
+
+    return ['assistant_response', 0];
   }
 
   /**

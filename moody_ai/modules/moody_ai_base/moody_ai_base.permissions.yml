@@ -2,3 +2,8 @@ administer moody ai:
   title: 'Administer Moody AI'
   description: 'Control AI service availability, providers, models, limits, and editorial context.'
   restrict access: true
+
+view moody ai usage reports:
+  title: 'View Moody AI usage reports'
+  description: 'View and export site-local Moody AI adoption and outcome statistics.'
+  restrict access: true
