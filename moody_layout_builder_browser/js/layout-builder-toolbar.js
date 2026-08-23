@@ -51,6 +51,38 @@
     });
   };
 
+  const enhanceBlockEditControls = (context) => {
+    once(
+      'moody-layout-builder-block-edit-control',
+      '.layout-builder-block > .contextual > .trigger',
+      context,
+    ).forEach((trigger) => {
+      const editLink = trigger.parentElement?.querySelector(
+        '.contextual-links a[href*="/layout_builder/update/block/"]',
+      );
+      if (!editLink) {
+        return;
+      }
+
+      const title = trigger
+        .closest('.layout-builder-block')
+        ?.querySelector('h2')
+        ?.textContent.trim();
+      const accessibleLabel = title
+        ? Drupal.t('Edit @title block options', { '@title': title })
+        : Drupal.t('Edit block options');
+
+      trigger.classList.remove('visually-hidden', 'focusable');
+      trigger.classList.add('moody-layout-builder-block__edit-trigger');
+      trigger.dataset.moodyEditLabel = Drupal.t('Edit');
+      trigger.setAttribute('aria-label', accessibleLabel);
+    });
+  };
+
+  window.addEventListener('contextual-instances-added', () => {
+    enhanceBlockEditControls(document);
+  });
+
   const syncBlockPreviewPanel = (preview) => {
     const form = preview.closest(
       'form.layout-builder-add-block, form.layout-builder-configure-block',
@@ -754,6 +786,7 @@
   Drupal.behaviors.moodyLayoutBuilderToolbar = {
     attach(context) {
       enhanceEditorActions(context);
+      enhanceBlockEditControls(context);
       enhanceBlockPreviewPanel(context);
       syncBlockPreviewResponse(context);
       enhanceBlockPreviewDevices(context);
@@ -786,6 +819,12 @@
       once.remove(
         'moody-layout-editor-actions',
         '.block-local-tasks-block ul.tabs.primary',
+        context,
+      );
+
+      once.remove(
+        'moody-layout-builder-block-edit-control',
+        '.layout-builder-block > .contextual > .trigger',
         context,
       );
 
