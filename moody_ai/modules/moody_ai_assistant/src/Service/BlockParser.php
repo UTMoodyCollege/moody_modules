@@ -3,8 +3,11 @@
 namespace Drupal\moody_ai_assistant\Service;
 
 use Drupal\block_content\BlockContentInterface;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -61,7 +64,7 @@ class BlockParser {
         $blocks[] = $this->applyInstructionToBlock($block, $instruction, $instructions, TRUE);
       }
     }
-    catch (\Exception $e) {
+    catch (\Throwable $e) {
       $this->logger->error('Error creating blocks: @error', ['@error' => $e->getMessage()]);
       $this->messenger->addError(t('Error creating block: @error', ['@error' => $e->getMessage()]));
       throw $e;
@@ -81,12 +84,15 @@ class BlockParser {
    * @return \Drupal\block_content\BlockContentInterface
    *   The saved block revision.
    */
-  public function updateBlockFromInstructions(BlockContentInterface $block, array $instructions) {
+  public function updateBlockFromInstructions(BlockContentInterface $block, array $instructions, ?EntityInterface $access_dependency = NULL) {
     if (empty($instructions['instructions'][0])) {
       throw new \Exception('No instructions provided for block update.');
     }
 
     $this->assertInstructionPayloads($instructions);
+    if ($access_dependency && method_exists($block, 'setAccessDependency')) {
+      $block->setAccessDependency($access_dependency);
+    }
     if (!$block->access('update', $this->currentUser)) {
       throw new \Exception('You do not have permission to update the selected block.');
     }
@@ -164,27 +170,31 @@ class BlockParser {
       $raw_value = $field_item_list->getValue();
       $field_type = $field_item_list->getFieldDefinition()->getType();
 
-      if (in_array($field_type, self::TEXT_WITH_FORMAT_FIELD_TYPES, TRUE) && !empty($raw_value[0])) {
+      $single_value = count($raw_value) === 1 && is_array($raw_value[0] ?? NULL)
+        ? $raw_value[0]
+        : NULL;
+
+      if (in_array($field_type, self::TEXT_WITH_FORMAT_FIELD_TYPES, TRUE) && $single_value !== NULL) {
         $field_info[$field_name] = [
           'type' => $field_type,
-          'value' => $raw_value[0]['value'] ?? '',
-          'format' => $raw_value[0]['format'] ?? 'full_html',
+          'value' => $single_value['value'] ?? '',
+          'format' => $single_value['format'] ?? 'full_html',
         ];
         continue;
       }
 
-      if (count($raw_value) === 1 && array_key_exists('value', $raw_value[0])) {
+      if ($single_value !== NULL && array_key_exists('value', $single_value)) {
         $field_info[$field_name] = [
           'type' => $field_type,
-          'value' => $raw_value[0]['value'],
+          'value' => $single_value['value'],
         ];
         continue;
       }
 
-      if (count($raw_value) === 1 && count($raw_value[0]) === 1 && array_key_exists('target_id', $raw_value[0])) {
+      if ($single_value !== NULL && count($single_value) === 1 && array_key_exists('target_id', $single_value)) {
         $field_info[$field_name] = [
           'type' => $field_type,
-          'target_id' => $raw_value[0]['target_id'],
+          'target_id' => $single_value['target_id'],
         ];
         continue;
       }
@@ -232,6 +242,7 @@ class BlockParser {
   protected function applyInstructionToBlock(BlockContentInterface $block, array $instruction, array $instructions, $is_new) {
     $field_info = $instruction['field_info'] ?? [];
     foreach ($field_info as $field_name => $field_data) {
+      $field_data = is_array($field_data) ? $field_data : ['value' => $field_data];
       if (!$block->hasField($field_name)) {
         $this->logger->warning('Field @field does not exist on block type @type', [
           '@field' => $field_name,
@@ -325,6 +336,49 @@ class BlockParser {
         throw new \Exception(sprintf('Promo Unit field "%s" must include at least one non-empty item with visible content.', $field_name));
       }
 
+      if ($field_type === 'utexas_promo_list') {
+        $normalized = $this->normalizePromoListFieldValue($field_name, $field_data, $instructions);
+        if (!empty($normalized['promo_list_items'])) {
+          $block->set($field_name, [$normalized]);
+          continue;
+        }
+
+        throw new \Exception(sprintf('Promo List field "%s" must include at least one non-empty item with visible content.', $field_name));
+      }
+
+      if ($field_type === 'utexas_resources') {
+        $normalized = $this->normalizeResourcesFieldValue($field_name, $field_data, $instructions);
+        if (!empty($normalized['resource_items'])) {
+          $block->set($field_name, [$normalized]);
+          continue;
+        }
+
+        throw new \Exception(sprintf('Resources field "%s" must include at least one non-empty item with visible content.', $field_name));
+      }
+
+      if ($field_type === 'moody_focus_areas') {
+        $normalized = $this->normalizeFocusAreasFieldValue($field_name, $field_data, $instructions);
+        if (!empty($normalized['focus_areas_items'])) {
+          $block->set($field_name, [$normalized]);
+          continue;
+        }
+
+        throw new \Exception(sprintf('Focus Areas field "%s" must include at least one non-empty item with visible content.', $field_name));
+      }
+
+      if ($field_type === 'utexas_flex_content_area') {
+        $normalized = $this->normalizeFlexContentAreaFieldValue($field_name, $field_data, $instructions);
+        if ($normalized) {
+          $block->set($field_name, [$normalized]);
+          continue;
+        }
+
+        if ($is_required) {
+          throw new \Exception(sprintf('Flex Content Area field "%s" did not receive usable content.', $field_name));
+        }
+        continue;
+      }
+
       if (in_array($field_type, self::TEXT_WITH_FORMAT_FIELD_TYPES, TRUE)) {
         $block->set($field_name, $this->normalizeTextFieldValue((array) $field_data));
       }
@@ -335,6 +389,10 @@ class BlockParser {
         }
         if ($value === NULL && array_key_exists('target_id', $field_data)) {
           $value = ['target_id' => $field_data['target_id']];
+        }
+
+        if ($field_type === 'entity_reference' && $target_type === 'entity_view_mode') {
+          $value = $this->normalizeEntityViewModeReference($value);
         }
 
         if ($value === NULL || $value === '') {
@@ -567,6 +625,330 @@ class BlockParser {
     ], function ($item_value) {
       return $item_value !== NULL && $item_value !== '';
     });
+  }
+
+  /**
+   * Normalizes Promo List payloads and protects its serialized storage format.
+   */
+  protected function normalizePromoListFieldValue($field_name, array $field_data, array $instructions) {
+    $value = $field_data['value'] ?? $field_data;
+    if (!is_array($value)) {
+      $value = [];
+    }
+
+    $raw_items = $value['items'] ?? $value['promo_list_items'] ?? $field_data['items'] ?? $field_data['promo_list_items'] ?? [];
+    if (is_string($raw_items) && !$this->decodeStructuredItemCollection($raw_items)) {
+      $raw_items = $this->extractPromoListItemsFromHtml($raw_items);
+    }
+
+    $value['items'] = $raw_items;
+    $normalized = $this->normalizePromoUnitFieldValue($field_name, ['value' => $value], $instructions);
+
+    return array_filter([
+      'headline' => $normalized['headline'] ?? '',
+      'promo_list_items' => $normalized['promo_unit_items'] ?? NULL,
+    ], function ($item_value) {
+      return $item_value !== NULL && $item_value !== '';
+    });
+  }
+
+  /**
+   * Converts a generated HTML list into Promo List item data.
+   */
+  protected function extractPromoListItemsFromHtml($html) {
+    $html = trim((string) $html);
+    if ($html === '') {
+      return [];
+    }
+
+    $document = Html::load($html);
+    $items = [];
+    foreach ($document->getElementsByTagName('li') as $list_item) {
+      $link = $list_item->getElementsByTagName('a')->item(0);
+      $headline = trim($link ? $link->textContent : $list_item->textContent);
+      $copy = trim($list_item->textContent);
+      if ($headline !== '' && str_starts_with($copy, $headline)) {
+        $copy = ltrim(mb_substr($copy, mb_strlen($headline)), " \t\n\r\0\x0B—–:-");
+      }
+
+      $item = array_filter([
+        'headline' => $headline,
+        'copy_value' => $copy,
+        'copy_format' => $copy !== '' ? 'flex_html' : '',
+        'link_uri' => $link ? trim($link->getAttribute('href')) : '',
+        'link_title' => $link ? $headline : '',
+      ], function ($value) {
+        return $value !== '';
+      });
+      if ($item) {
+        $items[] = $item;
+      }
+    }
+
+    return $items;
+  }
+
+  /**
+   * Normalizes Resources payloads and protects its serialized storage format.
+   */
+  protected function normalizeResourcesFieldValue($field_name, array $field_data, array $instructions) {
+    $value = $field_data['value'] ?? $field_data;
+    if (!is_array($value)) {
+      $value = [];
+    }
+
+    $raw_items = $value['items'] ?? $value['resource_items'] ?? $field_data['items'] ?? $field_data['resource_items'] ?? [];
+    if (is_string($raw_items) && !$this->decodeStructuredItemCollection($raw_items)) {
+      $raw_items = $this->extractResourceItemsFromHtml($raw_items);
+    }
+    else {
+      $raw_items = $this->decodeStructuredItemCollection($raw_items);
+    }
+    if ($this->isAssociativeArray($raw_items)) {
+      $raw_items = [$raw_items];
+    }
+
+    $planned_asset = $this->getPlannedAssetForField($field_name, $instructions);
+    $normalized_items = [];
+    foreach ($raw_items as $delta => $raw_item) {
+      if (!is_array($raw_item)) {
+        continue;
+      }
+
+      $item_values = isset($raw_item['item']) && is_array($raw_item['item']) ? $raw_item['item'] : $raw_item;
+      $links = $item_values['links'] ?? [];
+      if (!$links && (!empty($item_values['link_uri']) || !empty($item_values['link']))) {
+        $links = [$item_values['link'] ?? [
+          'uri' => $item_values['link_uri'] ?? '',
+          'title' => $item_values['link_title'] ?? '',
+        ]];
+      }
+      if ($this->isAssociativeArray($links)) {
+        $links = [$links];
+      }
+
+      $normalized_links = [];
+      foreach ($links as $link) {
+        if (!is_array($link)) {
+          continue;
+        }
+        $uri = $this->normalizeLinkUri($link['uri'] ?? '');
+        if ($uri === '') {
+          continue;
+        }
+        $normalized_links[] = [
+          'uri' => $uri,
+          'title' => $this->normalizeScalarString($link['title'] ?? ''),
+          'options' => is_array($link['options'] ?? NULL) ? $link['options'] : [],
+        ];
+      }
+
+      $image = $this->resolveCompoundMediaValue('image', $item_values['image'] ?? NULL, $field_data, $planned_asset, (int) $delta, $instructions);
+      $item = array_filter([
+        'headline' => $this->normalizeScalarString($item_values['headline'] ?? ''),
+        'image' => $image ?: NULL,
+        'links' => $normalized_links,
+      ], function ($item_value) {
+        return $item_value !== NULL && $item_value !== '' && $item_value !== [];
+      });
+      if ($item) {
+        $normalized_items[] = ['item' => $item];
+      }
+    }
+
+    return array_filter([
+      'headline' => $this->normalizeScalarString($value['headline'] ?? $field_data['headline'] ?? ''),
+      'resource_items' => $normalized_items ? serialize(array_values($normalized_items)) : NULL,
+    ], function ($item_value) {
+      return $item_value !== NULL && $item_value !== '';
+    });
+  }
+
+  /**
+   * Converts a generated HTML link list into Resources item data.
+   */
+  protected function extractResourceItemsFromHtml($html) {
+    $document = Html::load(trim((string) $html));
+    $items = [];
+    foreach ($document->getElementsByTagName('li') as $list_item) {
+      $link = $list_item->getElementsByTagName('a')->item(0);
+      if (!$link || trim($link->getAttribute('href')) === '') {
+        continue;
+      }
+
+      $headline = trim($link->textContent);
+      $items[] = [
+        'headline' => $headline,
+        'links' => [[
+          'uri' => trim($link->getAttribute('href')),
+          'title' => $headline,
+        ]],
+      ];
+    }
+
+    return $items;
+  }
+
+  /**
+   * Normalizes Moody Focus Areas payloads and serialized nested items.
+   */
+  protected function normalizeFocusAreasFieldValue($field_name, array $field_data, array $instructions) {
+    $value = $field_data['value'] ?? $field_data;
+    if (!is_array($value)) {
+      $value = [];
+    }
+
+    $raw_items = $value['items'] ?? $value['focus_areas_items'] ?? $field_data['items'] ?? $field_data['focus_areas_items'] ?? [];
+    if (is_string($raw_items) && !$this->decodeStructuredItemCollection($raw_items)) {
+      $raw_items = $this->extractFocusAreaItemsFromHtml($raw_items);
+    }
+    else {
+      $raw_items = $this->decodeStructuredItemCollection($raw_items);
+    }
+    if ($this->isAssociativeArray($raw_items)) {
+      $raw_items = [$raw_items];
+    }
+
+    $planned_asset = $this->getPlannedAssetForField($field_name, $instructions);
+    $normalized_items = [];
+    foreach ($raw_items as $delta => $raw_item) {
+      if (!is_array($raw_item)) {
+        continue;
+      }
+      $item_values = isset($raw_item['item']) && is_array($raw_item['item']) ? $raw_item['item'] : $raw_item;
+      $copy_value = $this->normalizeScalarString($item_values['copy_value'] ?? ($item_values['copy']['value'] ?? ''));
+      $link_uri = $this->normalizeLinkUri($item_values['link_uri'] ?? ($item_values['link']['uri'] ?? ''));
+      $image = $this->resolveCompoundMediaValue('image', $item_values['image'] ?? NULL, $field_data, $planned_asset, (int) $delta, $instructions);
+      $item = array_filter([
+        'headline' => $this->normalizeScalarString($item_values['headline'] ?? ''),
+        'image' => $image ?: NULL,
+        'copy' => $copy_value !== '' ? [
+          'value' => $copy_value,
+          'format' => $this->normalizeScalarString($item_values['copy_format'] ?? ($item_values['copy']['format'] ?? 'flex_html')) ?: 'flex_html',
+        ] : NULL,
+        'link' => $link_uri !== '' ? [
+          'uri' => $link_uri,
+          'title' => $this->normalizeScalarString($item_values['link_title'] ?? ($item_values['link']['title'] ?? '')),
+          'options' => is_array($item_values['link_options'] ?? ($item_values['link']['options'] ?? NULL)) ? ($item_values['link_options'] ?? $item_values['link']['options']) : [],
+        ] : NULL,
+      ], function ($item_value) {
+        return $item_value !== NULL && $item_value !== '' && $item_value !== [];
+      });
+      if ($item) {
+        $normalized_items[] = ['item' => $item];
+      }
+    }
+
+    return array_filter([
+      'link_uri' => $this->normalizeLinkUri($value['link_uri'] ?? ''),
+      'link_title' => $this->normalizeScalarString($value['link_title'] ?? ''),
+      'link_options' => is_array($value['link_options'] ?? NULL) ? $value['link_options'] : [],
+      'items_style' => $this->normalizeScalarString($value['items_style'] ?? '') ?: 'default',
+      'items_gap' => isset($value['items_gap']) ? max(0, (int) $value['items_gap']) : 3,
+      'items_row_gap' => isset($value['items_row_gap']) ? max(0, (int) $value['items_row_gap']) : 3,
+      'items_title' => $this->normalizeScalarString($value['items_title'] ?? $value['headline'] ?? ''),
+      'focus_areas_items' => $normalized_items ? serialize(array_values($normalized_items)) : NULL,
+    ], function ($item_value) {
+      return $item_value !== NULL && $item_value !== '';
+    });
+  }
+
+  /**
+   * Converts generated heading/copy groups into Focus Areas item data.
+   */
+  protected function extractFocusAreaItemsFromHtml($html) {
+    $document = Html::load(trim((string) $html));
+    $items = [];
+    foreach ($document->getElementsByTagName('div') as $group) {
+      $heading = NULL;
+      foreach (['h2', 'h3', 'h4'] as $tag) {
+        $heading = $group->getElementsByTagName($tag)->item(0);
+        if ($heading) {
+          break;
+        }
+      }
+      if (!$heading) {
+        continue;
+      }
+      $paragraph = $group->getElementsByTagName('p')->item(0);
+      $items[] = [
+        'headline' => trim($heading->textContent),
+        'copy_value' => $paragraph ? trim($paragraph->textContent) : '',
+        'copy_format' => 'flex_html',
+      ];
+    }
+
+    return $items;
+  }
+
+  /**
+   * Normalizes Flex Content Area links before they reach serialized storage.
+   */
+  protected function normalizeFlexContentAreaFieldValue($field_name, array $field_data, array $instructions) {
+    $value = $field_data['value'] ?? $field_data;
+    if (!is_array($value)) {
+      $value = [];
+    }
+
+    $raw_links = $value['links'] ?? $field_data['links'] ?? [];
+    $raw_links = $this->decodeStructuredItemCollection($raw_links);
+    if ($this->isAssociativeArray($raw_links)) {
+      $raw_links = [$raw_links];
+    }
+    $links = [];
+    foreach ($raw_links as $link) {
+      if (!is_array($link)) {
+        continue;
+      }
+      $uri = $this->normalizeLinkUri($link['uri'] ?? $link['link_uri'] ?? '');
+      if ($uri === '') {
+        continue;
+      }
+      $links[] = [
+        'uri' => $uri,
+        'title' => $this->normalizeScalarString($link['title'] ?? $link['link_title'] ?? ''),
+        'options' => is_array($link['options'] ?? NULL) ? $link['options'] : [],
+      ];
+    }
+
+    $planned_asset = $this->getPlannedAssetForField($field_name, $instructions);
+    $image = $this->resolveCompoundMediaValue('image', $value['image'] ?? NULL, $field_data, $planned_asset, 0, $instructions);
+    $copy_value = $this->normalizeScalarString($value['copy_value'] ?? ($value['copy']['value'] ?? ''));
+    $link_uri = $this->normalizeLinkUri($value['link_uri'] ?? '');
+
+    return [
+      'image' => $image ?: 0,
+      'headline' => $this->normalizeScalarString($value['headline'] ?? ''),
+      'copy_value' => $copy_value,
+      'copy_format' => $copy_value !== '' ? ($this->normalizeScalarString($value['copy_format'] ?? ($value['copy']['format'] ?? 'flex_html')) ?: 'flex_html') : '',
+      'links' => serialize(array_values($links)),
+      'link_uri' => $link_uri,
+      'link_text' => $link_uri !== '' ? $this->normalizeScalarString($value['link_text'] ?? $value['link_title'] ?? '') : '',
+      'link_options' => is_array($value['link_options'] ?? NULL) ? $value['link_options'] : [],
+    ];
+  }
+
+  /**
+   * Resolves generated entity view mode aliases to an installed view mode.
+   */
+  protected function normalizeEntityViewModeReference($value) {
+    $target_id = is_array($value)
+      ? $this->normalizeScalarString($value['target_id'] ?? $value['value'] ?? '')
+      : $this->normalizeScalarString($value);
+    $storage = $this->entityTypeManager->getStorage('entity_view_mode');
+    $candidates = [$target_id];
+    if ($target_id !== '' && !str_contains($target_id, '.')) {
+      $candidates[] = 'node.' . $target_id;
+    }
+    $candidates[] = 'node.full';
+
+    foreach (array_unique(array_filter($candidates)) as $candidate) {
+      if ($storage->load($candidate)) {
+        return ['target_id' => $candidate];
+      }
+    }
+
+    throw new \Exception('No usable content view mode is configured for this block.');
   }
 
   /**
@@ -1184,6 +1566,7 @@ class BlockParser {
     }
 
     $property_definitions = $field_definition->getFieldStorageDefinition()->getPropertyDefinitions();
+    $cardinality = $field_definition->getFieldStorageDefinition()->getCardinality();
     $planned_asset = $this->getPlannedAssetForField($field_name, $instructions);
     $items = [];
 
@@ -1202,6 +1585,9 @@ class BlockParser {
       }
 
       $items[] = $item;
+      if ($cardinality !== FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && count($items) >= $cardinality) {
+        break;
+      }
     }
 
     return $items;
@@ -1260,7 +1646,7 @@ class BlockParser {
       return ($candidate === NULL || $candidate === '') ? 0 : (int) $candidate;
     }
 
-    return (string) ($candidate ?? '');
+    return $this->normalizeScalarString($candidate);
   }
 
   /**
@@ -1432,6 +1818,10 @@ class BlockParser {
       'moody_flex_grid',
       'moody_hero',
       'utexas_promo_unit',
+      'utexas_promo_list',
+      'utexas_resources',
+      'moody_focus_areas',
+      'utexas_flex_content_area',
     ];
     if (in_array($field_type, $dedicated_or_simple_types, TRUE)) {
       return FALSE;

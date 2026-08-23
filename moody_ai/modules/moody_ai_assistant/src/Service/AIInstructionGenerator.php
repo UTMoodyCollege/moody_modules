@@ -49,12 +49,15 @@ class AIInstructionGenerator {
       ];
     }
 
-    return $this->planner->createBlockPayload($prompt, $current_plan, $blockData, [
+    $payload = $this->planner->createBlockPayload($prompt, $current_plan, $blockData, [
       'revision_prompt' => $revision_prompt,
       'current_instructions' => $current_instructions,
       'uploaded_assets' => $context['uploaded_assets'] ?? [],
       'prefer_ai_images' => !empty($context['prefer_ai_images']),
     ], $stream_callback);
+    return $this->messageSuppressesMedia($prompt)
+      ? $this->suppressMediaInstructions($payload, $blockData)
+      : $payload;
   }
 
   /**
@@ -84,7 +87,7 @@ class AIInstructionGenerator {
       'notes' => ['This payload updates an existing block instead of creating a new one.'],
     ];
 
-    return $this->planner->createBlockPayload($prompt, $plan, $blockData, [
+    $payload = $this->planner->createBlockPayload($prompt, $plan, $blockData, [
       'revision_prompt' => $prompt,
       'current_instructions' => [
         'instructions' => [$existing_instruction],
@@ -93,6 +96,9 @@ class AIInstructionGenerator {
       'prefer_ai_images' => !empty($context['prefer_ai_images']),
       'block_tools' => $context['block_tools'] ?? [],
     ], $stream_callback);
+    return $this->messageSuppressesMedia($prompt)
+      ? $this->suppressMediaInstructions($payload, $blockData)
+      : $payload;
   }
 
   /**
@@ -140,7 +146,73 @@ class AIInstructionGenerator {
       ];
     }
 
-    return $this->planner->createBlockPayload($prompt, $current_plan, $blockData, $context, $stream_callback);
+    $payload = $this->planner->createBlockPayload($prompt, $current_plan, $blockData, $context, $stream_callback);
+    $instructions = array_values(array_filter($payload['instructions'] ?? [], 'is_array'));
+    $payload['instructions'] = $instructions ? [reset($instructions)] : [];
+    if ($payload['instructions'] && $selected_type) {
+      $payload['instructions'][0]['block_type'] = $selected_type;
+    }
+
+    return $this->messageSuppressesMedia($prompt)
+      ? $this->suppressMediaInstructions($payload, $blockData)
+      : $payload;
+  }
+
+  /**
+   * Detects an explicit instruction to avoid all imagery and Media.
+   */
+  protected function messageSuppressesMedia($prompt) {
+    return (bool) preg_match('/\b(?:text[- ]only|no (?:images?|imagery|photos?|media)|without (?:any )?(?:images?|imagery|photos?|media))\b/i', (string) $prompt);
+  }
+
+  /**
+   * Removes model-supplied media data when the editor explicitly forbids it.
+   */
+  protected function suppressMediaInstructions(array $payload, array $blockData) {
+    $payload['plan']['asset_requirements'] = [];
+    if (empty($payload['instructions']) || !is_array($payload['instructions'])) {
+      return $payload;
+    }
+
+    foreach ($payload['instructions'] as &$instruction) {
+      $block_type = (string) ($instruction['block_type'] ?? '');
+      $field_definitions = $blockData['content_blocks'][$block_type]['fields'] ?? [];
+      if (empty($instruction['field_info']) || !is_array($instruction['field_info'])) {
+        continue;
+      }
+      foreach ($instruction['field_info'] as $field_name => &$field_data) {
+        $definition = $field_definitions[$field_name] ?? [];
+        if (($definition['type'] ?? '') === 'entity_reference' && ($definition['target_type'] ?? '') === 'media') {
+          unset($instruction['field_info'][$field_name]);
+          continue;
+        }
+        if (isset($definition['properties']['image']) || isset($definition['properties']['media'])) {
+          $field_data = $this->removeMediaKeys($field_data);
+        }
+      }
+      unset($field_data);
+    }
+    unset($instruction);
+
+    return $payload;
+  }
+
+  /**
+   * Recursively removes media-specific keys from compound field payloads.
+   */
+  protected function removeMediaKeys($value) {
+    if (!is_array($value)) {
+      return $value;
+    }
+
+    foreach ($value as $key => $child) {
+      if (in_array((string) $key, ['image', 'media', 'image_url', 'image_prompt', 'asset_type'], TRUE)) {
+        unset($value[$key]);
+        continue;
+      }
+      $value[$key] = $this->removeMediaKeys($child);
+    }
+    return $value;
   }
 
   /**

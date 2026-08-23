@@ -103,13 +103,15 @@
             {% set prefer_ai_images = message.metadata.prefer_ai_images|default(false) %}
             {% if uploaded_assets %}
               <div class="ai-moody-assistant__preview">
-                <div class="ai-moody-assistant__preview-title">Attached files</div>
-                <ul class="ai-moody-assistant__preview-list">
+                <div class="ai-moody-assistant__preview-title">Attached files sent with this request</div>
+                <ul class="ai-moody-assistant__attachment-preview-list">
                   {% for asset in uploaded_assets %}
-                    <li>
-                      {{ asset.title|default(asset.file_name|default('Uploaded asset')) }}
-                      {% if asset.asset_type %} ({{ asset.asset_type }}){% endif %}
-                      {% if asset.alt %} - alt: {{ asset.alt }}{% endif %}
+                    <li class="ai-moody-assistant__file-chip ai-moody-assistant__file-chip--sent">
+                      <span class="ai-moody-assistant__file-chip-meta">
+                        <span class="ai-moody-assistant__file-chip-badge">{{ asset.asset_type|default('File')|capitalize }}</span>
+                        <span class="ai-moody-assistant__file-chip-name">{{ asset.file_name|default(asset.title|default('Uploaded asset')) }}</span>
+                        {% if asset.alt %}<span class="ai-moody-assistant__file-chip-size">Alt: {{ asset.alt }}</span>{% endif %}
+                      </span>
                     </li>
                   {% endfor %}
                 </ul>

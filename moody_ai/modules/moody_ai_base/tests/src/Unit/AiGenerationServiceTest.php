@@ -189,7 +189,9 @@ final class AiGenerationServiceTest extends UnitTestCase {
     $this->assertStringContainsString('prospective graduate students', $payload['instructions']);
     $this->assertStringContainsString('Use official program names.', $payload['instructions']);
     $this->assertStringContainsString('Use a direct and welcoming voice.', $payload['instructions']);
-    $this->assertSame('Where do I edit menus?', $payload['input'][0]['content'][0]['text']);
+    $this->assertSame('developer', $payload['input'][0]['role']);
+    $this->assertSame('Return the response as a JSON object.', $payload['input'][0]['content'][0]['text']);
+    $this->assertSame('Where do I edit menus?', $payload['input'][1]['content'][0]['text']);
   }
 
   /**

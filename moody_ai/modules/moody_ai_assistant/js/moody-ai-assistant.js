@@ -148,6 +148,19 @@
     }
   }
 
+  function applyLayoutBuilderToolbarClearance(wrapper) {
+    const toolbar = document.querySelector('.moody-layout-builder-toolbar');
+    if (!toolbar || window.getComputedStyle(toolbar).position !== 'fixed') {
+      wrapper.style.setProperty('--ai-moody-assistant-bottom-clearance', '0px');
+      return;
+    }
+
+    const rect = toolbar.getBoundingClientRect();
+    const reachesViewportBottom = rect.height > 0 && rect.bottom >= window.innerHeight - 16;
+    const clearance = reachesViewportBottom ? Math.max(0, Math.ceil(window.innerHeight - rect.top)) : 0;
+    wrapper.style.setProperty('--ai-moody-assistant-bottom-clearance', clearance + 'px');
+  }
+
   function bindPanelResizeControls(wrapper) {
     const panel = wrapper.querySelector('.ai-moody-assistant__panel');
     const widthHandle = wrapper.querySelector('[data-ai-assistant-width-resizer]');
@@ -298,10 +311,12 @@
     }
 
     window.addEventListener('resize', () => {
+      applyLayoutBuilderToolbarClearance(wrapper);
       applyAssistantPreferences(wrapper);
     });
 
     window.requestAnimationFrame(() => {
+      applyLayoutBuilderToolbarClearance(wrapper);
       applyAssistantPreferences(wrapper);
     });
   }
@@ -642,6 +657,98 @@
     }
   }
 
+  function finishThinkingMessage(wrapper, content) {
+    updateThinkingMessage(wrapper, content || 'Done.');
+    stopThinkingStatus(wrapper, false);
+    const message = wrapper.querySelector('.ai-moody-assistant__message--thinking');
+    if (message) {
+      message.classList.remove('ai-moody-assistant__message--thinking');
+      message.removeAttribute('aria-live');
+      const meta = message.querySelector('[data-ai-assistant-thinking-meta]');
+      if (meta) {
+        meta.textContent = 'Completed in the working layout draft';
+      }
+    }
+  }
+
+  function renderWorkQueue(wrapper, payload) {
+    const message = wrapper.querySelector('.ai-moody-assistant__message--thinking');
+    if (!message) {
+      return;
+    }
+
+    let queue = message.querySelector('[data-ai-assistant-work-queue]');
+    if (!queue) {
+      queue = document.createElement('ol');
+      queue.className = 'ai-moody-assistant__work-queue';
+      queue.setAttribute('data-ai-assistant-work-queue', 'true');
+      queue.setAttribute('aria-label', 'AI block work queue');
+      const meta = message.querySelector('[data-ai-assistant-thinking-meta]');
+      message.insertBefore(queue, meta || null);
+    }
+
+    const items = Array.isArray(payload.items) ? payload.items : [payload];
+    items.forEach((item) => {
+      const id = String(item.id || 'component');
+      let row = Array.from(queue.children).find(candidate => candidate.dataset.queueId === id);
+      if (!row) {
+        row = document.createElement('li');
+        row.className = 'ai-moody-assistant__work-item';
+        row.dataset.queueId = id;
+        row.innerHTML = '<span class="ai-moody-assistant__work-indicator" aria-hidden="true"></span><span class="ai-moody-assistant__work-copy"><strong></strong><small></small></span><span class="ai-moody-assistant__work-status"></span>';
+        queue.appendChild(row);
+      }
+
+      const status = String(item.status || 'queued');
+      const operation = item.operation === 'edit' ? 'Editing' : 'Creating';
+      row.dataset.status = status;
+      row.querySelector('strong').textContent = item.label || 'Page component';
+      row.querySelector('small').textContent = [operation, item.block_type ? String(item.block_type).replaceAll('_', ' ') : 'block'].join(' · ');
+      row.querySelector('.ai-moody-assistant__work-status').textContent = status === 'working'
+        ? 'Working'
+        : status === 'complete'
+          ? item.operation === 'edit' ? 'Updated draft' : 'Added to draft'
+          : status === 'failed'
+            ? 'Needs attention'
+            : 'Queued';
+      if (item.message && status === 'failed') {
+        row.querySelector('small').textContent = item.message;
+      }
+    });
+    scrollHistoryToBottom(wrapper);
+  }
+
+  async function applyLayoutCommands(wrapper, payload) {
+    const commands = Array.isArray(payload.layout_commands) ? payload.layout_commands : [];
+    if (!commands.length || typeof Drupal.ajax !== 'function') {
+      return;
+    }
+
+    const ajax = Drupal.ajax({
+      url: window.location.href,
+      progress: false
+    });
+    try {
+      await ajax.commandExecutionQueue(commands, 200);
+    }
+    finally {
+      if (ajax.instanceIndex !== false) {
+        Drupal.ajax.instances[ajax.instanceIndex] = null;
+      }
+    }
+
+    const componentUuid = payload.placement && payload.placement.component_uuid;
+    if (componentUuid) {
+      const component = document.querySelector('[data-layout-block-uuid="' + CSS.escape(componentUuid) + '"]');
+      if (component) {
+        component.classList.add('ai-moody-assistant-layout-update');
+        window.setTimeout(() => component.classList.remove('ai-moody-assistant-layout-update'), 1800);
+      }
+    }
+    Drupal.announce((payload.operation === 'edit' ? 'Updated ' : 'Added ') + (payload.label || 'block') + ' in the working layout draft.');
+    applyLayoutBuilderToolbarClearance(wrapper);
+  }
+
   function appendThinkingMessage(wrapper) {
     const history = wrapper.querySelector('.ai-moody-assistant__history');
     if (!history) {
@@ -762,6 +869,54 @@
     badge.textContent = 'AI image';
     preview.appendChild(badge);
 
+    messageElement.appendChild(preview);
+  }
+
+  function appendAttachmentPreview(messageElement, files) {
+    if (!messageElement || !Array.isArray(files) || !files.length) {
+      return;
+    }
+
+    const preview = document.createElement('div');
+    preview.className = 'ai-moody-assistant__preview';
+
+    const title = document.createElement('div');
+    title.className = 'ai-moody-assistant__preview-title';
+    title.textContent = 'Attached files sent with this request';
+    preview.appendChild(title);
+
+    const list = document.createElement('ul');
+    list.className = 'ai-moody-assistant__attachment-preview-list';
+
+    files.forEach((file) => {
+      const item = document.createElement('li');
+      item.className = 'ai-moody-assistant__file-chip ai-moody-assistant__file-chip--sent';
+
+      const meta = document.createElement('div');
+      meta.className = 'ai-moody-assistant__file-chip-meta';
+
+      const badge = document.createElement('span');
+      badge.className = 'ai-moody-assistant__file-chip-badge';
+      badge.textContent = getFileBadgeLabel(file);
+
+      const name = document.createElement('span');
+      name.className = 'ai-moody-assistant__file-chip-name';
+      name.textContent = file.name || 'Attached file';
+
+      const details = document.createElement('span');
+      details.className = 'ai-moody-assistant__file-chip-size';
+      details.textContent = formatFileSize(file.size);
+
+      meta.appendChild(badge);
+      meta.appendChild(name);
+      if (details.textContent) {
+        meta.appendChild(details);
+      }
+      item.appendChild(meta);
+      list.appendChild(item);
+    });
+
+    preview.appendChild(list);
     messageElement.appendChild(preview);
   }
 
@@ -1109,6 +1264,18 @@
     });
   }
 
+  function getSelectedPreviousUploads(wrapper) {
+    const settings = (drupalSettings.moodyAiAssistant || {}).privateUploads || {};
+    return Array.from(wrapper.querySelectorAll('[data-ai-assistant-previous-uploads] input[type="checkbox"]:checked')).map((input) => {
+      const upload = settings[String(input.value)] || {};
+      return {
+        name: upload.name || ('Private upload ' + input.value),
+        size: Number(upload.size || 0),
+        type: upload.type || ''
+      };
+    });
+  }
+
   function bindFileUploader(wrapper) {
     const form = wrapper.querySelector('.ai-moody-assistant__form form');
     const fileInput = wrapper.querySelector('.ai-moody-assistant__composer-file-input');
@@ -1141,10 +1308,11 @@
     const maxTotalBytes = Number.parseInt(fileInput.dataset.maxTotalBytes || '10485760', 10);
     const allowedExtensions = new Set(String(fileInput.accept || '').split(',').map(value => value.trim().replace(/^\./, '').toLowerCase()).filter(Boolean));
 
-    const existingMediaCount = () => wrapper.querySelectorAll('input[name*="existing_media"][name$="[target_id]"]').length;
+    const existingReferenceCount = () => wrapper.querySelectorAll('input[name*="existing_media"][name$="[target_id]"]').length
+      + getSelectedPreviousUploads(wrapper).length;
 
     const validateFiles = (files) => {
-      if (files.length + existingMediaCount() > maxFiles) {
+      if (files.length + existingReferenceCount() > maxFiles) {
         throw new Error('Select no more than ' + maxFiles + ' total files and Media items.');
       }
       const oversized = files.find((file) => file.size > maxFileBytes);
@@ -1354,7 +1522,8 @@
     const decoder = new TextDecoder();
     let buffer = '';
 
-    const handleEventBlock = (block) => {
+    let completionPayload = null;
+    const handleEventBlock = async (block) => {
       const lines = block.split('\n');
       let eventName = 'message';
       const dataLines = [];
@@ -1379,14 +1548,37 @@
       if (eventName === 'status') {
         updateThinkingMessage(wrapper, payload.message || 'Thinking...');
       }
+      else if (eventName === 'queue') {
+        renderWorkQueue(wrapper, payload);
+      }
+      else if (eventName === 'block') {
+        renderWorkQueue(wrapper, payload);
+        if (payload.status === 'complete') {
+          await applyLayoutCommands(wrapper, payload);
+        }
+      }
       else if (eventName === 'complete') {
-        updateThinkingMessage(wrapper, payload.status_message || 'Done.');
-        stopThinkingStatus(wrapper, false);
-        window.setTimeout(() => {
-          window.location.href = payload.redirect_url || payload.reload_url || window.location.href;
-        }, 250);
+        completionPayload = payload;
+        if (payload.preserve_page) {
+          finishThinkingMessage(wrapper, payload.status_message || 'Done.');
+        }
+        else {
+          updateThinkingMessage(wrapper, payload.status_message || 'Done.');
+          stopThinkingStatus(wrapper, false);
+          window.setTimeout(() => {
+            window.location.href = payload.redirect_url || payload.reload_url || window.location.href;
+          }, 250);
+        }
       }
       else if (eventName === 'error') {
+        const pendingItems = Array.from(wrapper.querySelectorAll('[data-ai-assistant-work-queue] [data-status="queued"], [data-ai-assistant-work-queue] [data-status="working"]')).map(row => ({
+          id: row.dataset.queueId,
+          status: 'failed',
+          message: payload.message || 'The AI request failed.'
+        }));
+        if (pendingItems.length) {
+          renderWorkQueue(wrapper, { items: pendingItems });
+        }
         throw new Error(payload.message || 'The AI request failed.');
       }
     };
@@ -1403,11 +1595,12 @@
         const block = buffer.slice(0, separatorIndex).trim();
         buffer = buffer.slice(separatorIndex + 2);
         if (block !== '') {
-          handleEventBlock(block);
+          await handleEventBlock(block);
         }
         separatorIndex = buffer.indexOf('\n\n');
       }
     }
+    return completionPayload;
   }
 
   function bindFormSubmission(wrapper) {
@@ -1427,7 +1620,7 @@
       tokenCounter.update({
         message: getComposerText(wrapper),
         selectedBlocks: blockReferences ? blockReferences.getSelected() : [],
-        files: uploader ? uploader.getFiles() : [],
+        files: (uploader ? uploader.getFiles() : []).concat(getSelectedPreviousUploads(wrapper)),
         preferAiImages: imagePreference ? imagePreference.isPreferred() : false
       });
     };
@@ -1498,11 +1691,10 @@
       if (imagePreference && imagePreference.isPreferred()) {
         appendPreferencePreview(userMessageElement, true);
       }
-      const fileInput = wrapper.querySelector('.ai-moody-assistant__composer-file-input');
       if (uploader && uploader.hasFiles()) {
-        const fileCount = uploader.getFiles().length;
-        appendUserMessage(wrapper, 'Attached ' + fileCount + ' file' + (fileCount === 1 ? '' : 's') + ' for this request.');
+        appendAttachmentPreview(userMessageElement, uploader.getFiles());
       }
+      appendAttachmentPreview(userMessageElement, getSelectedPreviousUploads(wrapper));
       appendThinkingMessage(wrapper);
       if (composer && composer.editor) {
         composer.editor.setAttribute('aria-busy', 'true');
@@ -1520,6 +1712,12 @@
       }
 
       const payload = new FormData(form);
+      const ajaxPageState = drupalSettings.ajaxPageState || {};
+      ['theme', 'theme_token', 'libraries'].forEach((key) => {
+        if (ajaxPageState[key]) {
+          payload.set('ajax_page_state[' + key + ']', ajaxPageState[key]);
+        }
+      });
       if (uploader) {
         payload.delete('attachments[]');
         const files = uploader.getFiles();
@@ -1584,6 +1782,9 @@
         if (uploader) {
           uploader.clear();
         }
+        wrapper.querySelectorAll('[data-ai-assistant-previous-uploads] input[type="checkbox"]:checked').forEach((checkbox) => {
+          checkbox.checked = false;
+        });
         if (blockReferences) {
           blockReferences.clear();
         }
@@ -1591,12 +1792,29 @@
           imagePreference.clear();
         }
         refreshTokenCounter();
-        await consumeStream(response, wrapper, {
+        const completion = await consumeStream(response, wrapper, {
           onActivity() {
             watchdog.markActivity();
           }
         });
         watchdog.stop();
+        if (completion && completion.preserve_page) {
+          if (composer && composer.editor) {
+            composer.editor.setAttribute('contenteditable', 'true');
+            composer.editor.removeAttribute('aria-busy');
+          }
+          input.readOnly = false;
+          submit.disabled = false;
+          submit.classList.remove('is-disabled', 'is-loading');
+          if ('value' in submit) {
+            submit.value = submit.dataset.idleLabel || 'Send';
+          }
+          else {
+            submit.textContent = submit.dataset.idleLabel || 'Send';
+          }
+          refreshTokenCounter();
+          focusComposer(wrapper);
+        }
       }
       catch (error) {
         watchdog.stop();
@@ -1674,6 +1892,12 @@
 
     const form = wrapper.querySelector('.ai-moody-assistant__form form');
     const payload = new FormData();
+    const ajaxPageState = drupalSettings.ajaxPageState || {};
+    ['theme', 'theme_token', 'libraries'].forEach((key) => {
+      if (ajaxPageState[key]) {
+        payload.set('ajax_page_state[' + key + ']', ajaxPageState[key]);
+      }
+    });
     if (form) {
       const entityType = form.querySelector('input[name="entity_type"]');
       const entityId = form.querySelector('input[name="entity_id"]');

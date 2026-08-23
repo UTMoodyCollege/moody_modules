@@ -19,12 +19,13 @@ body {
 
 .ai-moody-assistant {
   --ai-moody-assistant-panel-width: min(52rem, calc(100% - var(--space-xl)));
-  --ai-moody-assistant-panel-height: calc(100dvh - var(--space-md));
+  --ai-moody-assistant-bottom-clearance: 0px;
+  --ai-moody-assistant-panel-height: calc(100dvh - var(--space-md) - var(--ai-moody-assistant-bottom-clearance));
   --ai-moody-assistant-history-height: 12.5rem;
   container-type: inline-size;
   position: fixed;
   inset-inline: var(--space-xs);
-  inset-block-end: var(--space-xs);
+  inset-block-end: calc(var(--space-xs) + var(--ai-moody-assistant-bottom-clearance));
   z-index: var(--z-modal);
   display: flex;
   flex-direction: column;
@@ -35,6 +36,12 @@ body {
   font-size: var(--text-base);
   font-style: normal;
   line-height: 1.55;
+  pointer-events: none;
+}
+
+.ai-moody-assistant__launcher,
+.ai-moody-assistant__panel {
+  pointer-events: auto;
 }
 
 .ai-moody-assistant.is-minimized {
@@ -521,6 +528,92 @@ body {
 
 .ai-moody-assistant__thinking-meta.is-stale {
   color: var(--color-warning);
+}
+
+.ai-moody-assistant__work-queue {
+  display: grid;
+  gap: var(--space-2xs);
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ai-moody-assistant__work-item {
+  display: grid;
+  grid-template-columns: 0.75rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-xs);
+  border-block-start: var(--rule-hairline) solid var(--color-rule);
+  padding-block: var(--space-xs);
+}
+
+.ai-moody-assistant__work-indicator {
+  width: 0.625rem;
+  height: 0.625rem;
+  border: var(--rule-hairline) solid var(--color-rule-strong);
+  border-radius: 50%;
+  background: var(--color-paper);
+}
+
+.ai-moody-assistant__work-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.ai-moody-assistant__work-copy strong,
+.ai-moody-assistant__work-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-moody-assistant__work-copy small,
+.ai-moody-assistant__work-status {
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+}
+
+.ai-moody-assistant__work-status {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ai-moody-assistant__work-item[data-status="working"] .ai-moody-assistant__work-indicator {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  animation: ai-moody-assistant-work-pulse 1s var(--ease-in-out) infinite;
+}
+
+.ai-moody-assistant__work-item[data-status="complete"] .ai-moody-assistant__work-indicator {
+  border-color: var(--color-success);
+  background: var(--color-success);
+}
+
+.ai-moody-assistant__work-item[data-status="failed"] .ai-moody-assistant__work-indicator {
+  border-color: var(--color-error);
+  background: var(--color-error);
+}
+
+.layout-builder-block.ai-moody-assistant-layout-update {
+  animation: ai-moody-assistant-layout-update 1.8s var(--ease-out);
+}
+
+@keyframes ai-moody-assistant-work-pulse {
+  50% {
+    opacity: 0.35;
+    transform: scale(0.75);
+  }
+}
+
+@keyframes ai-moody-assistant-layout-update {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+
+  30% {
+    box-shadow: 0 0 0 0.375rem rgb(191 87 0 / 28%);
+  }
 }
 
 @keyframes ai-moody-assistant-thinking {
@@ -1302,6 +1395,46 @@ body {
   margin-block-start: var(--space-xs);
 }
 
+.ai-moody-assistant__attachment-preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ai-moody-assistant__file-chip--sent {
+  min-height: 2.25rem;
+  padding-inline-end: var(--space-sm);
+}
+
+.ai-moody-assistant__previous-uploads {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.ai-moody-assistant__previous-uploads > summary {
+  color: var(--color-accent-hover);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.ai-moody-assistant__previous-uploads .form-checkboxes {
+  display: grid;
+  gap: var(--space-2xs);
+  margin-block: var(--space-xs);
+}
+
+.ai-moody-assistant__manage-uploads {
+  display: inline-block;
+  margin-block-start: var(--space-xs);
+  color: var(--color-accent-hover);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
 .ai-moody-assistant__file-chip {
   display: inline-flex;
   align-items: center;
@@ -1571,11 +1704,11 @@ body {
 
 @media (min-width: 48rem) {
   .ai-moody-assistant {
-    --ai-moody-assistant-panel-height: calc(100dvh - var(--space-2xl));
+    --ai-moody-assistant-panel-height: calc(100dvh - var(--space-2xl) - var(--ai-moody-assistant-bottom-clearance));
     --ai-moody-assistant-history-height: 20rem;
     inset-inline-start: auto;
     inset-inline-end: var(--space-md);
-    inset-block-end: var(--space-md);
+    inset-block-end: calc(var(--space-md) + var(--ai-moody-assistant-bottom-clearance));
     width: var(--ai-moody-assistant-panel-width);
     min-width: 22.5rem;
     max-width: min(70rem, calc(100% - (var(--space-md) * 2)));
@@ -1653,7 +1786,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ai-moody-assistant *,
   .ai-moody-assistant *::before,
-  .ai-moody-assistant *::after {
+  .ai-moody-assistant *::after,
+  .layout-builder-block.ai-moody-assistant-layout-update {
     animation-duration: 150ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;

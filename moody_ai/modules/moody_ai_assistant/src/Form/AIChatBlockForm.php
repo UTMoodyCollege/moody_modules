@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Url;
 use Drupal\moody_ai_assistant\Service\AIChatManager;
 use Drupal\moody_ai_assistant\Service\AIAssetCreator;
 use Drupal\moody_ai_assistant\Service\AIUsageTracker;
@@ -153,6 +154,7 @@ class AIChatBlockForm extends FormBase {
     $existing_block_reference_groups = $entity ? $this->blockReferenceCatalog->getGroupedExistingReferences($entity, $picker_context) : [];
     $budget_summary = $this->usageTracker->getUserBudgetSummary($this->currentUser->id());
     $media_bundle_ids = array_keys($this->entityTypeManager->getStorage('media_type')->loadMultiple());
+    $previous_uploads = $this->getPreviousUploads();
 
     $form['utility_links'] = [
       '#type' => 'container',
@@ -686,6 +688,38 @@ class AIChatBlockForm extends FormBase {
       ],
     ];
 
+    if ($previous_uploads) {
+      $form['attachments']['previous_uploads'] = [
+        '#type' => 'details',
+        '#title' => $this->t('Use a previous upload (@count)', ['@count' => count($previous_uploads)]),
+        '#open' => FALSE,
+        '#attributes' => [
+          'class' => ['ai-moody-assistant__previous-uploads'],
+        ],
+      ];
+      $form['attachments']['previous_uploads']['files'] = [
+        '#type' => 'checkboxes',
+        '#parents' => ['previous_uploads'],
+        '#title' => $this->t('Previous private uploads'),
+        '#title_display' => 'invisible',
+        '#options' => array_map(static fn(array $upload): string => $upload['label'], $previous_uploads),
+        '#attributes' => [
+          'data-ai-assistant-previous-uploads' => TRUE,
+        ],
+      ];
+      $form['attachments']['previous_uploads']['manage'] = [
+        '#type' => 'link',
+        '#title' => $this->t('Manage all private uploads'),
+        '#url' => Url::fromRoute('moody_ai_assistant.private_uploads'),
+        '#attributes' => [
+          'class' => ['ai-moody-assistant__manage-uploads'],
+          'target' => '_blank',
+          'rel' => 'noopener',
+        ],
+      ];
+      $form['#attached']['drupalSettings']['moodyAiAssistant']['privateUploads'] = $previous_uploads;
+    }
+
     $form['privacy_notice'] = [
       '#type' => 'html_tag',
       '#tag' => 'p',
@@ -710,6 +744,52 @@ class AIChatBlockForm extends FormBase {
     ];
 
     return $form;
+  }
+
+  /**
+   * Returns recent Moody AI private uploads owned by the current user.
+   */
+  protected function getPreviousUploads() {
+    $uid = (int) $this->currentUser->id();
+    if ($uid < 1) {
+      return [];
+    }
+
+    $storage = $this->entityTypeManager->getStorage('file');
+    $ids = $storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('uid', $uid)
+      ->condition('uri', 'private://' . $uid . '/', 'STARTS_WITH')
+      ->sort('created', 'DESC')
+      ->range(0, 20)
+      ->execute();
+
+    $uploads = [];
+    foreach ($storage->loadMultiple($ids) as $file) {
+      if (!$file instanceof \Drupal\file\FileInterface || !preg_match('#^private://' . $uid . '/\d{4}-\d{2}-\d{2}/moody-ai-ckeditor-uploads/[^/]+$#D', $file->getFileUri())) {
+        continue;
+      }
+
+      $size = (int) $file->getSize();
+      $uploads[(int) $file->id()] = [
+        'id' => (int) $file->id(),
+        'name' => $file->getFilename(),
+        'size' => $size,
+        'type' => $file->getMimeType() ?: 'application/octet-stream',
+        'label' => sprintf('%s · %s · %s', $file->getFilename(), gmdate('M j, Y', (int) $file->getCreatedTime()), $this->formatFileSize($size)),
+      ];
+    }
+
+    return $uploads;
+  }
+
+  /**
+   * Formats a compact file size for upload choices.
+   */
+  protected function formatFileSize($bytes) {
+    return $bytes >= 1048576
+      ? rtrim(rtrim(number_format($bytes / 1048576, 1), '0'), '.') . ' MB'
+      : max(1, (int) round($bytes / 1024)) . ' KB';
   }
 
   /**

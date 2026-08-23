@@ -119,6 +119,106 @@ class BlockDataCollectorService {
               $field_record['guidance'] = 'Return value as an object with an optional headline and an items array. Each item may include headline, image, copy_value, copy_format, link_uri, link_title, and link_options.';
             }
 
+            if ($field->getType() === 'utexas_promo_list') {
+              $field_record['properties'] = [
+                'headline' => [
+                  'data_type' => 'string',
+                  'required' => FALSE,
+                  'label' => 'Promo List Group Headline',
+                ],
+                'items' => [
+                  'data_type' => 'sequence',
+                  'required' => FALSE,
+                  'label' => 'Promo List Items',
+                ],
+                'image' => [
+                  'data_type' => 'media',
+                  'required' => FALSE,
+                  'label' => 'Item Image',
+                ],
+                'copy_value' => [
+                  'data_type' => 'string',
+                  'required' => FALSE,
+                  'label' => 'Item Copy',
+                ],
+                'copy_format' => [
+                  'data_type' => 'string',
+                  'required' => FALSE,
+                  'label' => 'Item Copy Format',
+                ],
+                'link_uri' => [
+                  'data_type' => 'string',
+                  'required' => FALSE,
+                  'label' => 'Item Link URL',
+                ],
+                'link_title' => [
+                  'data_type' => 'string',
+                  'required' => FALSE,
+                  'label' => 'Item Link Label',
+                ],
+              ];
+              $field_record['guidance'] = 'Return value as an object with an optional headline and an items array. Each item may include headline, image, copy_value, copy_format, link_uri, and link_title. Never return HTML or a raw serialized promo_list_items value.';
+            }
+
+            if ($field->getType() === 'utexas_resources') {
+              $field_record['properties'] = [
+                'headline' => [
+                  'data_type' => 'string',
+                  'required' => FALSE,
+                  'label' => 'Resources Group Headline',
+                ],
+                'items' => [
+                  'data_type' => 'sequence',
+                  'required' => FALSE,
+                  'label' => 'Resource Items',
+                ],
+                'image' => [
+                  'data_type' => 'media',
+                  'required' => FALSE,
+                  'label' => 'Item Image',
+                ],
+                'links' => [
+                  'data_type' => 'sequence',
+                  'required' => FALSE,
+                  'label' => 'Item Links',
+                ],
+              ];
+              $field_record['guidance'] = 'Return value as an object with an optional headline and an items array. Each item may include headline, image, and links. Each link must include uri and title. Never return HTML or a raw serialized resource_items value.';
+            }
+
+            if ($field->getType() === 'moody_focus_areas') {
+              $field_record['properties']['items'] = [
+                'data_type' => 'sequence',
+                'required' => FALSE,
+                'label' => 'Focus Area Items',
+              ];
+              $field_record['properties']['headline'] = [
+                'data_type' => 'string',
+                'required' => FALSE,
+                'label' => 'Item Headline',
+              ];
+              $field_record['properties']['image'] = [
+                'data_type' => 'media',
+                'required' => FALSE,
+                'label' => 'Item Image',
+              ];
+              $field_record['properties']['copy_value'] = [
+                'data_type' => 'string',
+                'required' => FALSE,
+                'label' => 'Item Copy',
+              ];
+              $field_record['properties']['copy_format'] = [
+                'data_type' => 'string',
+                'required' => FALSE,
+                'label' => 'Item Copy Format',
+              ];
+              $field_record['guidance'] = 'Return value as an object with items_title, optional link settings, and an items array. Each item may include headline, image, copy_value, copy_format, link_uri, and link_title. Never return HTML or a raw serialized focus_areas_items value.';
+            }
+
+            if ($field->getType() === 'utexas_flex_content_area') {
+              $field_record['guidance'] = 'Return value as an object with optional image, headline, copy_value, copy_format, links, link_uri, link_text, and link_options. The links value must be an array of objects with uri and title; never return a delimited string or raw serialized value.';
+            }
+
             if ($field->getType() === 'moody_hero') {
               $field_record['guidance'] = 'Use media, heading, subheading, caption, credit, link_uri, link_title, link_options, disable_image_styles, and these exact option tokens when needed: text_position=centered|top-left|top-right|bottom-left|bottom-right, text_color=white-text|orange-text|charcoal-text, overlay=no-overlay|orange-overlay|charcoal-overlay|heavy-orange-overlay|heavy-charcoal-overlay.';
             }
@@ -163,6 +263,9 @@ class BlockDataCollectorService {
               $handler_settings = $field->getSetting('handler_settings') ?: [];
               $field_record['target_type'] = $storage_definition->getSetting('target_type');
               $field_record['target_bundles'] = array_keys($handler_settings['target_bundles'] ?? []);
+              if ($field_record['target_type'] === 'entity_view_mode') {
+                $field_record['allowed_values'] = array_keys($this->entityTypeManager->getStorage('entity_view_mode')->loadMultiple());
+              }
             }
 
             $allowed_values = $field->getSetting('allowed_values');

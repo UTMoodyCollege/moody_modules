@@ -177,6 +177,51 @@ class AIAssetCreator {
   }
 
   /**
+   * Prepares previously uploaded private files owned by the current user.
+   */
+  public function prepareStoredUploadAssets(array $file_ids) {
+    $file_ids = array_values(array_unique(array_filter(array_map('intval', $file_ids))));
+    if (count($file_ids) > AiGenerationService::MAX_ATTACHMENTS) {
+      throw new \InvalidArgumentException('Too many private uploads were selected.');
+    }
+
+    $uid = (int) $this->currentUser->id();
+    $files = $this->entityTypeManager->getStorage('file')->loadMultiple($file_ids);
+    $assets = [];
+    $total_bytes = 0;
+
+    foreach ($file_ids as $file_id) {
+      $file = $files[$file_id] ?? NULL;
+      $uri = $file instanceof FileInterface ? $file->getFileUri() : '';
+      $extension = strtolower(pathinfo($file instanceof FileInterface ? $file->getFilename() : '', PATHINFO_EXTENSION));
+      $size = $file instanceof FileInterface ? (int) $file->getSize() : 0;
+      $total_bytes += $size;
+
+      if (
+        !$file instanceof FileInterface
+        || $uid < 1
+        || (int) $file->getOwnerId() !== $uid
+        || !preg_match('#^private://' . $uid . '/\d{4}-\d{2}-\d{2}/moody-ai-ckeditor-uploads/[^/]+$#D', $uri)
+        || !in_array($extension, self::ALLOWED_UPLOAD_EXTENSIONS, TRUE)
+        || $size < 1
+        || $size > self::MAX_UPLOAD_BYTES
+        || $total_bytes > AiGenerationService::MAX_TOTAL_ATTACHMENT_BYTES
+      ) {
+        throw new \InvalidArgumentException('One or more private uploads are unavailable.');
+      }
+
+      $path = $this->fileSystem->realpath($uri);
+      if (!is_string($path) || !is_readable($path)) {
+        throw new \InvalidArgumentException('One or more private uploads could not be read.');
+      }
+
+      $assets[] = $this->createMediaFromStoredFile($file, $file->getFilename());
+    }
+
+    return $assets;
+  }
+
+  /**
    * Builds prompt-ready metadata for accessible existing Media selections.
    */
   public function prepareExistingMediaAssets(array $media_ids, string $intent = 'inspiration') {
@@ -254,10 +299,12 @@ class AIAssetCreator {
     $this->assertValidUploadedFile($uploaded_file);
 
     $original_name = $uploaded_file->getClientOriginalName() ?: $uploaded_file->getFilename();
-    $mime_type = strtolower((string) ($uploaded_file->getMimeType() ?: 'application/octet-stream'));
     $extension = $this->determineUploadedFileExtension($uploaded_file, $original_name);
-    $asset_type = $this->determineUploadedAssetType($uploaded_file, $original_name, $mime_type, $extension);
-    $directory = $asset_type === 'image' ? 'public://moody_ai_assistant/uploads/images' : 'public://moody_ai_assistant/uploads/files';
+    $directory = sprintf(
+      'private://%d/%s/moody-ai-ckeditor-uploads',
+      (int) $this->currentUser->id(),
+      gmdate('Y-m-d'),
+    );
 
     $this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
 
@@ -266,7 +313,11 @@ class AIAssetCreator {
       throw new \Exception(sprintf('Failed to read uploaded file "%s".', $original_name));
     }
 
-    $filename = 'ai-upload-' . date('Ymd-His') . '-' . substr(hash('sha256', $original_name . microtime(TRUE)), 0, 12) . '.' . $extension;
+    $filename = preg_replace('/[^A-Za-z0-9._-]+/', '-', basename(str_replace('\\', '/', $original_name)));
+    $filename = trim((string) $filename, '.-');
+    if ($filename === '' || strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== $extension) {
+      $filename = 'attachment-' . substr(hash('sha256', $original_name . microtime(TRUE)), 0, 12) . '.' . $extension;
+    }
     $destination = $directory . '/' . $filename;
     $file = $this->fileRepository->writeData($binary, $destination, FileSystemInterface::EXISTS_RENAME);
 
@@ -274,8 +325,21 @@ class AIAssetCreator {
       throw new \Exception(sprintf('Failed to save uploaded file "%s".', $original_name));
     }
 
-    $file->setPermanent();
+    $file->setOwnerId((int) $this->currentUser->id());
     $file->save();
+
+    return $this->createMediaFromStoredFile($file, $original_name);
+  }
+
+  /**
+   * Creates or reuses Media for a validated private upload.
+   */
+  protected function createMediaFromStoredFile(FileInterface $file, $original_name) {
+    $mime_type = strtolower((string) ($file->getMimeType() ?: 'application/octet-stream'));
+    $extension = strtolower((string) pathinfo($file->getFilename(), PATHINFO_EXTENSION));
+    $asset_type = in_array($extension, ['png', 'gif', 'jpg', 'jpeg', 'webp'], TRUE) || str_starts_with($mime_type, 'image/')
+      ? 'image'
+      : 'document';
 
     $media_bundle = $this->resolveUploadedMediaBundle($asset_type);
     $existing_media_id = $this->findExistingMediaIdForFile($file, $media_bundle);
@@ -293,6 +357,11 @@ class AIAssetCreator {
     if ($asset_type === 'image') {
       $field_data['alt'] = $field_data['title'];
       try {
+        $path = $this->fileSystem->realpath($file->getFileUri());
+        $binary = is_string($path) && is_readable($path) ? file_get_contents($path) : FALSE;
+        if (!is_string($binary) || $binary === '') {
+          throw new \Exception('The uploaded image could not be read.');
+        }
         $metadata = $this->planner->generateImageMetadata($binary, $mime_type, $original_name);
         if (!empty($metadata['alt'])) {
           $field_data['alt'] = $metadata['alt'];
@@ -309,9 +378,10 @@ class AIAssetCreator {
       }
     }
 
+    $file->setPermanent();
+    $file->save();
     $media = $this->createMediaFromFileEntity($file, $media_bundle, $field_data);
     return $this->buildUploadedAssetSummary($media, $asset_type, $mime_type, $original_name, $field_data);
-
   }
 
   /**

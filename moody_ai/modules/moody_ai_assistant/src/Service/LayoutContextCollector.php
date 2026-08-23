@@ -282,7 +282,7 @@ class LayoutContextCollector {
    * @return \Drupal\layout_builder\SectionStorageInterface|null
    *   The current section storage.
    */
-  protected function getResolvedSectionStorage(ContentEntityInterface $entity, array $runtime_context = []) {
+  public function getResolvedSectionStorage(ContentEntityInterface $entity, array $runtime_context = []) {
     $section_storage = $this->getPreferredSectionStorage($entity, $runtime_context);
     if (!$section_storage) {
       return NULL;

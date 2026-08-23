@@ -9,6 +9,11 @@ use Drupal\moody_ai_base\AiGenerationService;
  * Translates assistant workflows into provider-neutral base service calls.
  */
 class AssistantPlanner {
+
+  /**
+   * Keeps one Assistant request useful without allowing unbounded page builds.
+   */
+  const MAX_STRUCTURED_BLOCKS = 12;
   protected $generator;
   protected $logger;
   protected $usageEvents = [];
@@ -52,6 +57,10 @@ class AssistantPlanner {
     if (empty($plan['selected_block_type'])) {
       throw new \Exception('Identifier agent did not return a selected block type.');
     }
+    $plan['selected_block_type'] = $this->resolveAllowedBlockType(
+      (string) $plan['selected_block_type'],
+      array_keys($blockData['content_blocks'] ?? [])
+    );
 
     $plan = $this->mergeInferredAssetRequirements($plan, $prompt, $blockData);
 
@@ -165,6 +174,7 @@ class AssistantPlanner {
           . "- working with page blocks on the current page\n"
           . "- creating a redirect\n"
           . "- creating a brand new page\n"
+          . "- changing or explaining publication status\n"
           . "- finding a Drupal administration page for a site-management task\n\n"
           . "Return valid JSON only with this structure:\n"
           . "{\n"
@@ -181,7 +191,7 @@ class AssistantPlanner {
           . "    \"suggested_bundles\": [\"machine_name\", \"machine_name\"]\n"
           . "  },\n"
           . "  \"guide\": {\n"
-          . "    \"topic\": \"menus|redirects|content|media|users|taxonomy|configuration\",\n"
+          . "    \"topic\": \"menus|redirects|content|publishing|media|users|taxonomy|configuration\",\n"
           . "    \"summary\": \"one sentence explaining where the user can continue\"\n"
           . "  }\n"
           . "}\n\n"
@@ -190,7 +200,12 @@ class AssistantPlanner {
           . "- When page_context has an entity_id, page-building requests apply to that existing current page by default.\n"
           . "- Phrases such as \"make a page\", \"build a page\", or \"create a page\" do not by themselves request a new page; use \"block\" so the current page is composed with blocks.\n"
           . "- Choose \"create_page\" only when the user explicitly distinguishes a new target with language such as new, another, separate, additional, fresh, or different page/node.\n"
+          . "- Choose \"guide\" with topic=publishing when the user asks to publish, unpublish, archive, draft, or explain the publication state of the current content.\n"
           . "- Choose \"guide\" for how-to or navigation requests about menus, redirects without enough details to create one, content, media, users, taxonomy, or configuration.\n"
+          . "- user_access is a Drupal-calculated snapshot for this request. Never claim or plan access beyond it. False values and omitted content types are unavailable.\n"
+          . "- Choose redirect only when user_access.site_tools.create_redirect is true. Otherwise use guide with topic=redirects and explain that the account cannot create redirects.\n"
+          . "- For publishing guidance, use only user_access.current_content.publication and its available_transitions. Do not invent a transition or imply that a role grants broader access.\n"
+          . "- Content type edit_scope is only a broad permission scope; individual content items always require their own access check.\n"
           . "- Otherwise choose \"block\".\n"
           . "- For redirects, use 301 unless the user clearly asks for a temporary redirect.\n"
           . "- For create_page, suggested_bundles must come from available_page_types.\n"
@@ -216,6 +231,15 @@ class AssistantPlanner {
     $plan['page']['suggested_bundles'] = !empty($plan['page']['suggested_bundles']) && is_array($plan['page']['suggested_bundles']) ? array_values($plan['page']['suggested_bundles']) : [];
     $plan['guide'] = !empty($plan['guide']) && is_array($plan['guide']) ? $plan['guide'] : [];
 
+    if ($plan['action'] === 'redirect' && isset($page_context['user_access']['site_tools']['create_redirect']) && empty($page_context['user_access']['site_tools']['create_redirect'])) {
+      $plan['action'] = 'guide';
+      $plan['redirect'] = [];
+      $plan['guide'] = [
+        'topic' => 'redirects',
+        'summary' => 'Your current Drupal access does not allow you to create redirects on this site.',
+      ];
+    }
+
     return $plan;
   }
 
@@ -224,6 +248,7 @@ class AssistantPlanner {
    */
   public function planStructuredBuild($message, array $page_context, array $recent_messages, array $page_options, array $blockData, ?callable $stream_callback = NULL) {
     $build_on_current_page = $this->shouldBuildOnCurrentPage($message, $page_context);
+    $available_block_types = $this->getStructuredPlanBlockTypes($message, $page_context, $blockData);
     $messages = [
       [
         'role' => 'system',
@@ -237,7 +262,9 @@ class AssistantPlanner {
           . "    {\n"
           . "      \"label\": \"short component label\",\n"
           . "      \"goal\": \"what this component should do\",\n"
-          . "      \"placement_hint\": \"top|middle|bottom\",\n"
+          . "      \"placement_hint\": \"short human placement note\",\n"
+          . "      \"section_delta\": 0,\n"
+          . "      \"region\": \"existing region machine name or empty string\",\n"
           . "      \"selected_block_type\": \"machine_name or empty string\",\n"
           . "      \"reasoning\": \"short explanation\"\n"
           . "    }\n"
@@ -259,13 +286,16 @@ class AssistantPlanner {
           . "- Requests to make, build, or create a page use mode=multi when page_context identifies an existing page.\n"
           . "- Use mode=page_blueprint only when the user explicitly requests a new, another, separate, additional, fresh, or different page.\n"
           . "- Use mode=single when one block is enough.\n"
+          . "- A multi-block plan may contain at most " . static::MAX_STRUCTURED_BLOCKS . " blocks. Prioritize a complete, coherent page flow within that limit.\n"
+          . "- Do not use a dynamic profile listing, feed, or other record-driven block unless the user explicitly selected that block type and supplied the existing records or filters it needs. Use a generated-content block instead.\n"
           . "- Block type values must come from available_block_types when present.\n"
+          . "- Place each block in an existing page_context section and region. section_delta is zero-based; never invent a section or region. Use section 0 and an empty region when unsure.\n"
           . "- Page type values must come from available_page_types.\n"
           . "- Never wrap JSON in markdown fences.\n\n"
           . "Page context JSON:\n" . json_encode($page_context, JSON_PRETTY_PRINT)
           . "\n\nRecent messages JSON:\n" . json_encode($recent_messages, JSON_PRETTY_PRINT)
           . "\n\nAvailable page types JSON:\n" . json_encode($page_options, JSON_PRETTY_PRINT)
-          . "\n\nAvailable block types JSON:\n" . json_encode(array_keys($blockData['content_blocks'] ?? []), JSON_PRETTY_PRINT)
+          . "\n\nAvailable block types JSON:\n" . json_encode($available_block_types, JSON_PRETTY_PRINT)
           . $this->getConfiguredContextPrompt(),
       ],
       [
@@ -277,7 +307,10 @@ class AssistantPlanner {
     $response = $this->requestChatCompletion($messages, 0.2, $stream_callback);
     $plan = $this->parseJsonMessage($response);
     $plan['mode'] = in_array(($plan['mode'] ?? 'single'), ['single', 'multi', 'page_blueprint'], TRUE) ? $plan['mode'] : 'single';
-    $plan['blocks'] = !empty($plan['blocks']) && is_array($plan['blocks']) ? array_values($plan['blocks']) : [];
+    $plan['blocks'] = !empty($plan['blocks']) && is_array($plan['blocks'])
+      ? array_values(array_filter($plan['blocks'], 'is_array'))
+      : [];
+    $plan['blocks'] = array_slice($plan['blocks'], 0, static::MAX_STRUCTURED_BLOCKS);
     $plan['page_blueprint'] = !empty($plan['page_blueprint']) && is_array($plan['page_blueprint']) ? $plan['page_blueprint'] : [];
     $plan['page_blueprint']['sections'] = !empty($plan['page_blueprint']['sections']) && is_array($plan['page_blueprint']['sections']) ? array_values($plan['page_blueprint']['sections']) : [];
     $plan['page_blueprint']['suggested_bundles'] = !empty($plan['page_blueprint']['suggested_bundles']) && is_array($plan['page_blueprint']['suggested_bundles']) ? array_values($plan['page_blueprint']['suggested_bundles']) : [];
@@ -298,7 +331,71 @@ class AssistantPlanner {
       }
     }
 
+    foreach ($plan['blocks'] as &$block) {
+      $selected_type = (string) ($block['selected_block_type'] ?? '');
+      if ($selected_type !== '') {
+        $block['selected_block_type'] = $this->resolveAllowedBlockType($selected_type, $available_block_types);
+      }
+    }
+    unset($block);
+
     return $plan;
+  }
+
+  /**
+   * Resolves a model-selected block type to an installed, allowed bundle.
+   */
+  protected function resolveAllowedBlockType($selected_type, array $allowed_types) {
+    $selected_type = trim((string) $selected_type);
+    $allowed = array_fill_keys($allowed_types, TRUE);
+    if (isset($allowed[$selected_type])) {
+      return $selected_type;
+    }
+
+    $suffix = preg_replace('/^(?:moody|utexas)_/', '', $selected_type);
+    $matches = array_values(array_filter($allowed_types, static function ($candidate) use ($suffix) {
+      return preg_replace('/^(?:moody|utexas)_/', '', (string) $candidate) === $suffix;
+    }));
+    if (count($matches) === 1) {
+      return $matches[0];
+    }
+
+    return isset($allowed['basic']) ? 'basic' : (string) reset($allowed_types);
+  }
+
+  /**
+   * Removes block types that cannot produce useful standalone generated data.
+   */
+  protected function getStructuredPlanBlockTypes($message, array $page_context, array $blockData) {
+    $types = array_keys($blockData['content_blocks'] ?? []);
+    $explicit_types = [];
+    foreach ($page_context['selected_block_references'] ?? [] as $reference) {
+      foreach (['block_type', 'reference_id', 'plugin_id'] as $key) {
+        if (!empty($reference[$key])) {
+          $explicit_types[] = str_replace('inline_block:', '', (string) $reference[$key]);
+        }
+      }
+    }
+
+    $dynamic_types = ['feed_block', 'utprof_profile_listing'];
+    $text_only = preg_match('/\b(?:text[- ]only|no (?:images?|imagery|photos?|media)|without (?:any )?(?:images?|imagery|photos?|media))\b/i', (string) $message);
+    return array_values(array_filter($types, function ($type) use ($message, $blockData, $explicit_types, $dynamic_types, $text_only) {
+      $explicit = in_array($type, $explicit_types, TRUE) || str_contains((string) $message, $type);
+      if (in_array($type, $dynamic_types, TRUE) && !$explicit) {
+        return FALSE;
+      }
+      if ($text_only && !$explicit) {
+        foreach ($blockData['content_blocks'][$type]['fields'] ?? [] as $field) {
+          if (
+            !empty($field['required'])
+            && (($field['target_type'] ?? '') === 'media' || isset($field['properties']['image']) || isset($field['properties']['media']))
+          ) {
+            return FALSE;
+          }
+        }
+      }
+      return TRUE;
+    }));
   }
 
   /**
@@ -336,6 +433,15 @@ class AssistantPlanner {
 
     $plan = $this->mergeInferredAssetRequirements($plan, $prompt, $blockData);
     $payload = $this->normalizeAssetRequirements($payload, $plan, $blockData, $context);
+    $selected_type = (string) ($plan['selected_block_type'] ?? '');
+    if ($selected_type !== '' && isset($blockData['content_blocks'][$selected_type])) {
+      foreach ($payload['instructions'] as &$instruction) {
+        if (is_array($instruction)) {
+          $instruction['block_type'] = $selected_type;
+        }
+      }
+      unset($instruction);
+    }
     $payload['plan'] = $plan;
     $payload['prefer_ai_images'] = !empty($context['prefer_ai_images']);
     return $payload;
@@ -466,7 +572,34 @@ class AssistantPlanner {
       . "- If the user provides a direct image URL, include it in asset_requirements as image_url and prefer using that source instead of generating a new image.\n"
       . "- Never wrap the JSON in markdown fences.\n\n"
       . "Available block types JSON:\n"
-      . json_encode($blockData['content_blocks'] ?? [], JSON_PRETTY_PRINT);
+      . json_encode($this->buildIdentifierCatalog($blockData), JSON_PRETTY_PRINT);
+  }
+
+  /**
+   * Builds the smallest schema needed to select a block type.
+   */
+  protected function buildIdentifierCatalog(array $blockData) {
+    $catalog = [];
+    foreach ($blockData['content_blocks'] ?? [] as $block_type => $definition) {
+      $fields = [];
+      foreach ($definition['fields'] ?? [] as $field_name => $field) {
+        if ($field_name !== 'body' && !str_starts_with($field_name, 'field_')) {
+          continue;
+        }
+        $fields[$field_name] = array_filter([
+          'label' => (string) ($field['label'] ?? $field_name),
+          'type' => (string) ($field['type'] ?? ''),
+          'required' => !empty($field['required']),
+          'target_type' => (string) ($field['target_type'] ?? ''),
+          'properties' => array_keys($field['properties'] ?? []),
+        ], static fn ($value): bool => $value !== '' && $value !== [] && $value !== FALSE);
+      }
+      $catalog[$block_type] = [
+        'label' => (string) ($definition['label'] ?? $block_type),
+        'fields' => $fields,
+      ];
+    }
+    return $catalog;
   }
 
   protected function getCreatorPrompt(array $plan, array $blockData, array $context) {
@@ -515,8 +648,6 @@ class AssistantPlanner {
       . ($custom_field_guidance !== '' ? "Field-specific guidance:\n" . $custom_field_guidance . "\n\n" : '')
       . "Identifier plan JSON:\n"
       . json_encode($plan, JSON_PRETTY_PRINT)
-      . "\n\nSelected block schema JSON:\n"
-      . json_encode($selected_definition, JSON_PRETTY_PRINT)
       . (!empty($context['block_tools']) ? "\n\nBlock inspection tool JSON:\n" . json_encode($context['block_tools'], JSON_PRETTY_PRINT) : '')
       . "\n\nExisting instructions JSON for revision context:\n"
       . json_encode($context['current_instructions']['instructions'] ?? [], JSON_PRETTY_PRINT)
@@ -553,7 +684,17 @@ class AssistantPlanner {
   }
 
   protected function requestChatCompletion(array $messages, $temperature = 0.7, ?callable $stream_callback = NULL) {
-    $response = $this->generator->generateStructured($messages, $this->selectedModel ?: NULL);
+    try {
+      $response = $this->generator->generateStructured($messages, $this->selectedModel ?: NULL);
+    }
+    catch (\InvalidArgumentException $exception) {
+      $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? 'unknown';
+      $this->logger->warning('Rejected assistant planner request during @operation: @message', [
+        '@operation' => $caller,
+        '@message' => $exception->getMessage(),
+      ]);
+      throw $exception;
+    }
     $usage = $response['usage'] ?? [];
     if (is_array($usage)) {
       $this->usageEvents[] = [
@@ -883,6 +1024,28 @@ class AssistantPlanner {
         $guidance[] = '  Include at least one non-empty item whenever you choose a Promo Unit block. Each item should have meaningful visible content, typically a headline plus copy, link, image, or a combination of those.';
       }
 
+      if (($field_definition['type'] ?? '') === 'utexas_promo_list') {
+        $guidance[] = '  For Promo List fields, do not return HTML or the raw serialized promo_list_items storage blob.';
+        $guidance[] = '  Use this shape instead: value = { headline: "Group heading", items: [{ headline: "Item heading", image: { target_id or asset_type/image_url/image_prompt }, copy_value: "Short supporting copy", copy_format: "flex_html", link_uri: "/path-or-url", link_title: "Call to action" }] }.';
+        $guidance[] = '  Include at least one non-empty item whenever you choose a Promo List block.';
+      }
+
+      if (($field_definition['type'] ?? '') === 'utexas_resources') {
+        $guidance[] = '  For Resources fields, do not return HTML or the raw serialized resource_items storage blob.';
+        $guidance[] = '  Use this shape instead: value = { headline: "Group heading", items: [{ headline: "Resource heading", image: { target_id or asset_type/image_url/image_prompt }, links: [{ uri: "/path-or-url", title: "Descriptive link" }] }] }.';
+        $guidance[] = '  Include at least one non-empty resource item with a headline or link.';
+      }
+
+      if (($field_definition['type'] ?? '') === 'moody_focus_areas') {
+        $guidance[] = '  For Moody Focus Areas fields, do not return HTML or the raw serialized focus_areas_items storage blob.';
+        $guidance[] = '  Use this shape instead: value = { items_title: "Group heading", items_style: "default", items_gap: 3, items_row_gap: 3, items: [{ headline: "Area heading", copy_value: "Short supporting copy", copy_format: "flex_html", image: { optional media data }, link_uri: "/optional-path", link_title: "Optional link" }] }.';
+        $guidance[] = '  Include at least one non-empty focus area item.';
+      }
+
+      if (($field_definition['type'] ?? '') === 'utexas_flex_content_area') {
+        $guidance[] = '  For Flex Content Area fields, return links as an array such as [{ uri: "/path", title: "Descriptive link" }]. Do not return a delimited string or raw serialized links value.';
+      }
+
       if (($field_definition['type'] ?? '') === 'moody_impact_facts') {
         $guidance[] = '  For Moody Impact Facts fields, do not return the raw serialized impact_items storage blob.';
         $guidance[] = '  Use this shape instead: value = { headline: "Group heading", style: "orange-headline|grey-headline", col_number: "two-per-row|three-per-row|four-per-row", items: [{ headline: "Large statistic or fact", subheadline: "Short supporting context" }] }.';
@@ -922,6 +1085,10 @@ class AssistantPlanner {
       $type = $field_definition['type'] ?? 'unknown';
       $required = !empty($field_definition['required']) ? 'required' : 'optional';
       $line = '- ' . $field_name . ' (' . $label . ', ' . $type . ', ' . $required . ')';
+
+      if (!empty($field_definition['allowed_values'])) {
+        $line .= ' -> allowed values: ' . implode('|', $field_definition['allowed_values']);
+      }
 
       $properties = $field_definition['properties'] ?? [];
       if (!empty($properties)) {

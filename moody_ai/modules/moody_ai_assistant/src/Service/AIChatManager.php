@@ -52,6 +52,13 @@ class AIChatManager {
   protected $layoutContextCollector;
 
   /**
+   * The current-user capability collector.
+   *
+   * @var \Drupal\moody_ai_assistant\Service\UserCapabilityCollector
+   */
+  protected $userCapabilityCollector;
+
+  /**
    * The placement manager.
    *
    * @var \Drupal\moody_ai_assistant\Service\LayoutPlacementManager
@@ -103,12 +110,13 @@ class AIChatManager {
   /**
    * Constructs the manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory, AIInstructionGenerator $instruction_generator, BlockParser $block_parser, LayoutContextCollector $layout_context_collector, LayoutPlacementManager $layout_placement_manager, AssistantPlanner $planner, LanguageManagerInterface $language_manager, AIAssetCreator $asset_creator, AIUsageTracker $usage_tracker, AIBlockInspector $block_inspector, CsrfTokenGenerator $csrf_token) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory, AIInstructionGenerator $instruction_generator, BlockParser $block_parser, LayoutContextCollector $layout_context_collector, UserCapabilityCollector $user_capability_collector, LayoutPlacementManager $layout_placement_manager, AssistantPlanner $planner, LanguageManagerInterface $language_manager, AIAssetCreator $asset_creator, AIUsageTracker $usage_tracker, AIBlockInspector $block_inspector, CsrfTokenGenerator $csrf_token) {
     $this->entityTypeManager = $entity_type_manager;
     $this->logger = $logger_factory->get('moody_ai_assistant');
     $this->instructionGenerator = $instruction_generator;
     $this->blockParser = $block_parser;
     $this->layoutContextCollector = $layout_context_collector;
+    $this->userCapabilityCollector = $user_capability_collector;
     $this->layoutPlacementManager = $layout_placement_manager;
     $this->planner = $planner;
     $this->languageManager = $language_manager;
@@ -263,9 +271,10 @@ class AIChatManager {
           $runtime_context['existing_media_ids'] ?? [],
           (string) ($runtime_context['existing_media_intent'] ?? 'inspiration'),
         ),
+        $this->assetCreator->prepareStoredUploadAssets($runtime_context['stored_upload_ids'] ?? []),
         $this->assetCreator->prepareUploadedAssets($uploaded_files),
       );
-      $context = $this->layoutContextCollector->collectEntityContext($entity, $runtime_context);
+      $context = $this->collectPageContext($entity, $account, $runtime_context);
       $runtime_context['selected_block_references'] = $context['selected_block_references'] ?? [];
       $runtime_context['selected_block_reference_ids'] = array_values(array_unique(array_filter(array_map(function (array $reference) {
         return !empty($reference['uuid']) ? (string) $reference['uuid'] : '';
@@ -277,7 +286,7 @@ class AIChatManager {
       $page_options = $this->getAvailablePageCreationOptions($account);
       $top_level_plan = $this->planner->planTopLevelAction($message, $context, $page_options);
       if (($top_level_plan['action'] ?? 'block') === 'guide') {
-        return $this->prepareSiteFunctionGuide($thread, $top_level_plan, $account);
+        return $this->prepareSiteFunctionGuide($thread, $top_level_plan, $account, $entity, $context);
       }
       if (($top_level_plan['action'] ?? 'block') === 'redirect') {
         return $this->prepareRedirectPreview($thread, $top_level_plan, $account);
@@ -287,8 +296,14 @@ class AIChatManager {
         return $this->preparePageCreationGuide($thread, $top_level_plan, $page_options, $structured_plan);
       }
 
-      $context = $this->enrichContextWithBlockInspection($entity, $message, $context, $runtime_context, $thread);
-      $action_plan = $this->planner->planConversationAction($message, $context, array_slice($thread->getMessages(), -8));
+      $explicit_creation = $this->isExplicitBlockCreationRequest($message, $context);
+      if ($explicit_creation) {
+        $action_plan = ['action' => 'create'];
+      }
+      else {
+        $context = $this->enrichContextWithBlockInspection($entity, $message, $context, $runtime_context, $thread);
+        $action_plan = $this->planner->planConversationAction($message, $context, array_slice($thread->getMessages(), -8));
+      }
       $explicit_target = !$this->hasSelectedNewBlockTokens($context) ? $this->getExplicitSelectedEditTarget($context) : NULL;
       if ($explicit_target) {
         $action_plan['action'] = 'edit';
@@ -361,10 +376,13 @@ class AIChatManager {
         'status_message' => t('AI created and placed a new block on this page. Refresh complete; the chat thread has been preserved below.'),
       ];
     }
-    catch (\Exception $e) {
-      $usage_status = 'error';
-      $thread->addMessage('assistant', 'I could not complete that request: ' . $e->getMessage());
-      $thread->save();
+    catch (\Throwable $e) {
+      $is_partial_build = $this->latestAssistantMessageIsPartialBuild($thread);
+      $usage_status = $is_partial_build ? 'partial' : 'error';
+      if (!$is_partial_build) {
+        $thread->addMessage('assistant', 'I could not complete that request: ' . $e->getMessage());
+        $thread->save();
+      }
       $this->logger->error('AI chat request failed for @entity_type/@entity_id: @message', [
         '@entity_type' => $entity->getEntityTypeId(),
         '@entity_id' => $entity->id(),
@@ -393,9 +411,10 @@ class AIChatManager {
           $runtime_context['existing_media_ids'] ?? [],
           (string) ($runtime_context['existing_media_intent'] ?? 'inspiration'),
         ),
+        $this->assetCreator->prepareStoredUploadAssets($runtime_context['stored_upload_ids'] ?? []),
         $this->assetCreator->prepareUploadedAssets($uploaded_files),
       );
-      $context = $this->layoutContextCollector->collectEntityContext($entity, $runtime_context);
+      $context = $this->collectPageContext($entity, $account, $runtime_context);
       $runtime_context['selected_block_references'] = $context['selected_block_references'] ?? [];
       $runtime_context['selected_block_reference_ids'] = array_values(array_unique(array_filter(array_map(function (array $reference) {
         return !empty($reference['uuid']) ? (string) $reference['uuid'] : '';
@@ -422,10 +441,13 @@ class AIChatManager {
         $stream_ping();
       });
     }
-    catch (\Exception $e) {
-      $usage_status = 'error';
-      $thread->addMessage('assistant', 'I could not complete that request: ' . $e->getMessage());
-      $thread->save();
+    catch (\Throwable $e) {
+      $is_partial_build = $this->latestAssistantMessageIsPartialBuild($thread);
+      $usage_status = $is_partial_build ? 'partial' : 'error';
+      if (!$is_partial_build) {
+        $thread->addMessage('assistant', 'I could not complete that request: ' . $e->getMessage());
+        $thread->save();
+      }
       $this->logger->error('AI streaming chat request failed for @entity_type/@entity_id: @message', [
         '@entity_type' => $entity->getEntityTypeId(),
         '@entity_id' => $entity->id(),
@@ -519,7 +541,7 @@ class AIChatManager {
     };
 
     $emit('Understanding request...');
-    $context = $this->layoutContextCollector->collectEntityContext($entity, $runtime_context);
+    $context = $this->collectPageContext($entity, $account, $runtime_context);
     if ($uploaded_assets) {
       $context['uploaded_assets'] = $uploaded_assets;
     }
@@ -540,7 +562,7 @@ class AIChatManager {
 
     if (($top_level_plan['action'] ?? 'block') === 'guide') {
       $emit('Finding the right site tool...');
-      $result = $this->prepareSiteFunctionGuide($thread, $top_level_plan, $account);
+      $result = $this->prepareSiteFunctionGuide($thread, $top_level_plan, $account, $entity, $context);
       $event_callback('complete', [
         'reload_url' => $this->buildAssistantCompletionUrl($entity, $runtime_context),
         'status_message' => (string) $result['status_message'],
@@ -571,15 +593,22 @@ class AIChatManager {
       return $result;
     }
 
-    $emit('Inspecting editable page blocks...');
-    $context = $this->enrichContextWithBlockInspection($entity, $message, $context, $runtime_context, $thread, function () use ($ping) {
-      $ping();
-    });
+    $explicit_creation = $this->isExplicitBlockCreationRequest($message, $context);
+    if ($explicit_creation) {
+      $emit('Preparing new page components...');
+      $action_plan = ['action' => 'create'];
+    }
+    else {
+      $emit('Inspecting editable page blocks...');
+      $context = $this->enrichContextWithBlockInspection($entity, $message, $context, $runtime_context, $thread, function () use ($ping) {
+        $ping();
+      });
 
-    $emit('Reviewing page context...');
-    $action_plan = $this->planner->planConversationAction($message, $context, array_slice($thread->getMessages(), -8), function () use ($ping) {
-      $ping();
-    });
+      $emit('Reviewing page context...');
+      $action_plan = $this->planner->planConversationAction($message, $context, array_slice($thread->getMessages(), -8), function () use ($ping) {
+        $ping();
+      });
+    }
     $explicit_target = !$this->hasSelectedNewBlockTokens($context) ? $this->getExplicitSelectedEditTarget($context) : NULL;
     if ($explicit_target) {
       $action_plan['action'] = 'edit';
@@ -605,13 +634,13 @@ class AIChatManager {
     }
 
     if (($action_plan['action'] ?? 'create') === 'edit') {
-      $emit('Preparing edit preview...');
-      $result = $this->prepareEditPreviewStream($entity, $thread, $message, $context, $action_plan, function () use ($ping) {
+      $emit('Preparing block edit...');
+      $result = $this->executeBlockEditStream($entity, $thread, $message, $context, $action_plan, $event_callback, function () use ($ping) {
         $ping();
       }, $runtime_context, $uploaded_assets);
       $event_callback('complete', [
-        'reload_url' => $this->buildAssistantCompletionUrl($entity, $runtime_context),
         'status_message' => (string) $result['status_message'],
+        'preserve_page' => TRUE,
       ]);
       return $result;
     }
@@ -624,10 +653,10 @@ class AIChatManager {
       $emit('Building multiple components...');
       $result = $this->executeStructuredBlockPlan($entity, $thread, $message, $context, $structured_plan, $emit, function () use ($ping) {
         $ping();
-      }, $runtime_context, $uploaded_assets);
+      }, $runtime_context, $uploaded_assets, $event_callback);
       $event_callback('complete', [
-        'reload_url' => $this->buildAssistantCompletionUrl($entity, $runtime_context),
         'status_message' => (string) $result['status_message'],
+        'preserve_page' => TRUE,
       ]);
       return $result;
     }
@@ -643,6 +672,25 @@ class AIChatManager {
     $instructions['block_title'] = $this->buildBlockTitle($entity, $selected_type);
     $instructions['reusable'] = FALSE;
 
+    $event_callback('queue', [
+      'items' => [[
+        'id' => 'component-1',
+        'operation' => 'create',
+        'label' => (string) (($structured_plan['blocks'][0]['label'] ?? '') ?: $instructions['block_title']),
+        'block_type' => $selected_type,
+        'status' => 'queued',
+      ]],
+    ]);
+    $event_callback('block', [
+      'id' => 'component-1',
+      'operation' => 'create',
+      'label' => $instructions['block_title'],
+      'block_type' => $selected_type,
+      'status' => 'working',
+      'position' => 1,
+      'total' => 1,
+    ]);
+
     $emit('Creating the block...');
     $blocks = $this->blockParser->createBlocksFromInstructions($instructions);
     if (empty($blocks)) {
@@ -652,8 +700,19 @@ class AIChatManager {
     $emit('Placing the block into the layout...');
     try {
       $placements = [];
-      foreach ($blocks as $block) {
-        $placements[] = $this->layoutPlacementManager->placeBlock($entity, $block, $runtime_context);
+      foreach ($blocks as $block_delta => $block) {
+        $placement = $this->layoutPlacementManager->placeBlock($entity, $block, $runtime_context);
+        $placements[] = $placement;
+        $event_callback('block', [
+          'id' => 'component-' . ($block_delta + 1),
+          'operation' => 'create',
+          'label' => $block->label(),
+          'block_type' => $block->bundle(),
+          'status' => 'complete',
+          'position' => $block_delta + 1,
+          'total' => count($blocks),
+          'placement' => $placement,
+        ]);
       }
     }
     catch (\Exception $placement_exception) {
@@ -679,11 +738,11 @@ class AIChatManager {
 
     $result = [
       'thread' => $thread,
-      'status_message' => t('AI created and placed a new block on this page. Refresh complete; the chat thread has been preserved below.'),
+      'status_message' => t('AI created and placed a new block in the working layout draft. Review it on the page, then save the layout when ready.'),
     ];
     $event_callback('complete', [
-      'reload_url' => $this->buildAssistantCompletionUrl($entity, $runtime_context),
       'status_message' => (string) $result['status_message'],
+      'preserve_page' => TRUE,
     ]);
     return $result;
   }
@@ -763,7 +822,7 @@ class AIChatManager {
       throw new \Exception('The target inline block revision could not be loaded.');
     }
 
-    $updated_block = $this->blockParser->updateBlockFromInstructions($block, $action['instructions']);
+    $updated_block = $this->blockParser->updateBlockFromInstructions($block, $action['instructions'], $entity);
     $placement = $this->layoutPlacementManager->updateInlineBlockComponent($entity, $target['component_uuid'], $updated_block);
 
     $thread->resolvePendingAction($action_id, 'approved', [
@@ -830,6 +889,15 @@ class AIChatManager {
       . $selected_refs_note
       . "\n\nRecent chat JSON:\n" . json_encode($recent_messages, JSON_PRETTY_PRINT)
       . "\n\nUser request:\n" . $message;
+  }
+
+  /**
+   * Collects page layout and current-user access context for one request.
+   */
+  protected function collectPageContext(ContentEntityInterface $entity, AccountInterface $account, array $runtime_context = []) {
+    $context = $this->layoutContextCollector->collectEntityContext($entity, $runtime_context);
+    $context['user_access'] = $this->userCapabilityCollector->collect($account, $entity);
+    return $context;
   }
 
   /**
@@ -917,7 +985,7 @@ class AIChatManager {
     $placement = $placements[0] ?? ['section_delta' => 0, 'region' => 'content'];
 
     return sprintf(
-      'Created a %s block for "%s" and placed it into section %d, region %s. Refreshing the page will show the new block and this chat will remain here.',
+      'Created a %s block for "%s" in the working Layout Builder draft in section %d, region %s. Review it on the page, then save the layout when ready.',
       str_replace('_', ' ', $selected_type),
       $entity->label(),
       $placement['section_delta'],
@@ -928,41 +996,117 @@ class AIChatManager {
   /**
    * Creates multiple coordinated blocks from a structured plan.
    */
-  protected function executeStructuredBlockPlan(ContentEntityInterface $entity, AIChatThread $thread, $message, array $context, array $structured_plan, ?callable $status_callback = NULL, ?callable $stream_callback = NULL, array $runtime_context = [], array $uploaded_assets = []) {
+  protected function executeStructuredBlockPlan(ContentEntityInterface $entity, AIChatThread $thread, $message, array $context, array $structured_plan, ?callable $status_callback = NULL, ?callable $stream_callback = NULL, array $runtime_context = [], array $uploaded_assets = [], ?callable $event_callback = NULL) {
     $blocks = [];
     $placements = [];
     $total = count($structured_plan['blocks']);
+
+    if ($event_callback) {
+      $event_callback('queue', [
+        'items' => array_map(static function (array $plan_item, $index) {
+          return [
+            'id' => 'component-' . ($index + 1),
+            'operation' => 'create',
+            'label' => (string) ($plan_item['label'] ?? ('Component ' . ($index + 1))),
+            'block_type' => (string) ($plan_item['selected_block_type'] ?? ''),
+            'placement_hint' => (string) ($plan_item['placement_hint'] ?? ''),
+            'status' => 'queued',
+          ];
+        }, $structured_plan['blocks'], array_keys($structured_plan['blocks'])),
+      ]);
+    }
 
     foreach ($structured_plan['blocks'] as $index => $plan_item) {
       $component_label = (string) ($plan_item['label'] ?? ('Component ' . ($index + 1)));
       if ($status_callback) {
         $status_callback(sprintf('Generating component %d of %d: %s...', $index + 1, $total, $component_label));
       }
+      if ($event_callback) {
+        $event_callback('block', [
+          'id' => 'component-' . ($index + 1),
+          'operation' => 'create',
+          'label' => $component_label,
+          'block_type' => (string) ($plan_item['selected_block_type'] ?? ''),
+          'status' => 'working',
+          'position' => $index + 1,
+          'total' => $total,
+        ]);
+      }
 
-      $component_prompt = $this->buildStructuredPlanPrompt($message, $context, $thread, $plan_item, $index + 1, $total);
-      $instructions = $this->instructionGenerator->generateFromStructuredPlanItem($component_prompt, $plan_item, [
-        'uploaded_assets' => $uploaded_assets,
-        'prefer_ai_images' => !empty($context['prefer_ai_images']),
-      ], $stream_callback);
-      $selected_type = $instructions['plan']['selected_block_type'] ?? ($plan_item['selected_block_type'] ?? 'block');
-      $instructions['block_title'] = $this->buildBlockTitle($entity, $selected_type, $component_label);
-      $instructions['reusable'] = FALSE;
-      $created_blocks = $this->blockParser->createBlocksFromInstructions($instructions);
+      try {
+        $component_prompt = $this->buildStructuredPlanPrompt($message, $context, $plan_item, $index + 1, $total);
+        $instructions = $this->instructionGenerator->generateFromStructuredPlanItem($component_prompt, $plan_item, [
+          'uploaded_assets' => $uploaded_assets,
+          'prefer_ai_images' => !empty($context['prefer_ai_images']),
+        ], $stream_callback);
+        $selected_type = $instructions['plan']['selected_block_type'] ?? ($plan_item['selected_block_type'] ?? 'block');
+        $instructions['block_title'] = $this->buildBlockTitle($entity, $selected_type, $component_label);
+        $instructions['reusable'] = FALSE;
+        $created_blocks = $this->blockParser->createBlocksFromInstructions($instructions);
 
-      foreach ($created_blocks as $block) {
-        $blocks[] = $block;
-        try {
+        foreach ($created_blocks as $block) {
+          $blocks[] = $block;
           if ($status_callback) {
             $status_callback(sprintf('Placing component %d of %d: %s...', $index + 1, $total, $component_label));
           }
-          $placements[] = $this->layoutPlacementManager->placeBlock($entity, $block, $runtime_context);
-        }
-        catch (\Exception $placement_exception) {
-          if ($this->isMissingLayoutBuilderOverridesException($placement_exception)) {
-            return $this->prepareLayoutBuilderPlacementAction($entity, $thread, $blocks, 'I created the planned page components, but I need Layout Builder initialized before I can place them on the page.');
+          $placement = $this->layoutPlacementManager->placeBlock($entity, $block, $runtime_context, $this->buildPlacementTarget($plan_item));
+          $placements[] = $placement;
+          if ($event_callback) {
+            $event_callback('block', [
+              'id' => 'component-' . ($index + 1),
+              'operation' => 'create',
+              'label' => $component_label,
+              'block_type' => $block->bundle(),
+              'status' => 'complete',
+              'position' => $index + 1,
+              'total' => $total,
+              'placement' => $placement,
+            ]);
           }
-          throw $placement_exception;
         }
+      }
+      catch (\Throwable $exception) {
+        if ($event_callback) {
+          $event_callback('block', [
+            'id' => 'component-' . ($index + 1),
+            'operation' => 'create',
+            'label' => $component_label,
+            'block_type' => (string) ($plan_item['selected_block_type'] ?? ''),
+            'status' => 'failed',
+            'position' => $index + 1,
+            'total' => $total,
+            'message' => $exception->getMessage(),
+          ]);
+        }
+        if ($exception instanceof \Exception && $this->isMissingLayoutBuilderOverridesException($exception)) {
+          return $this->prepareLayoutBuilderPlacementAction($entity, $thread, $blocks, 'I created the planned page components, but I need Layout Builder initialized before I can place them on the page.');
+        }
+
+        $completed = count($placements);
+        $failure_message = sprintf(
+          'Built %d of %d planned components for "%s", then stopped at component %d (%s) because its generated data could not be processed. The completed components remain in the working Layout Builder draft for review; you can keep them and ask me to continue with the remaining components.',
+          $completed,
+          $total,
+          $entity->label(),
+          $index + 1,
+          $component_label
+        );
+        $thread->addMessage('assistant', $failure_message, [
+          'structured_plan' => $structured_plan,
+          'placements' => $placements,
+          'created_blocks' => $this->buildCreatedBlockMetadata($blocks, $placements),
+          'partial_build' => [
+            'completed' => $completed,
+            'total' => $total,
+            'failed_position' => $index + 1,
+            'failed_label' => $component_label,
+            'remaining_blocks' => array_values(array_slice($structured_plan['blocks'], $index)),
+            'exception_class' => get_class($exception),
+            'exception_message' => $exception->getMessage(),
+          ],
+        ]);
+        $thread->save();
+        throw new \RuntimeException($failure_message, 0, $exception);
       }
     }
 
@@ -976,15 +1120,40 @@ class AIChatManager {
 
     return [
       'thread' => $thread,
-      'status_message' => t('AI created and placed multiple blocks on this page from a structured plan. Refresh complete; the chat thread has been preserved below.'),
+      'status_message' => t('AI created and placed multiple blocks in the working layout draft. Review them on the page, then save the layout when ready.'),
     ];
+  }
+
+  /**
+   * Normalizes an AI placement hint into a safe existing section target.
+   */
+  protected function buildPlacementTarget(array $plan_item) {
+    $target = [];
+    if (isset($plan_item['section_delta']) && is_numeric($plan_item['section_delta'])) {
+      $target['section_delta'] = max(0, (int) $plan_item['section_delta']);
+    }
+    elseif (preg_match('/\bsection\s+(\d+)\b/i', (string) ($plan_item['placement_hint'] ?? ''), $matches)) {
+      $target['section_delta'] = max(0, (int) $matches[1] - 1);
+    }
+    if (!empty($plan_item['region'])) {
+      $target['region'] = (string) $plan_item['region'];
+    }
+    return $target;
   }
 
   /**
    * Builds a component-specific prompt for structured plans.
    */
-  protected function buildStructuredPlanPrompt($message, array $context, AIChatThread $thread, array $plan_item, $position, $total) {
-    $recent_messages = array_slice($thread->getMessages(), -6);
+  protected function buildStructuredPlanPrompt($message, array $context, array $plan_item, $position, $total) {
+    $component_context = array_intersect_key($context, array_flip([
+      'entity_type',
+      'entity_id',
+      'bundle',
+      'label',
+      'prefer_ai_images',
+      'selected_block_references',
+      'selected_existing_block_references',
+    ]));
 
     return "The user is asking for a structured page build on the current page.\n\n"
       . "Overall request:\n" . $message
@@ -995,10 +1164,21 @@ class AIChatManager {
         'label' => $plan_item['label'] ?? ('Component ' . $position),
         'goal' => $plan_item['goal'] ?? '',
         'placement_hint' => $plan_item['placement_hint'] ?? '',
+        'section_delta' => $plan_item['section_delta'] ?? 0,
+        'region' => $plan_item['region'] ?? '',
         'selected_block_type' => $plan_item['selected_block_type'] ?? '',
       ], JSON_PRETTY_PRINT)
-        . "\n\nPage context JSON:\n" . json_encode($context, JSON_PRETTY_PRINT)
-      . "\n\nRecent chat JSON:\n" . json_encode($recent_messages, JSON_PRETTY_PRINT);
+        . "\n\nCompact page context JSON:\n" . json_encode($component_context, JSON_PRETTY_PRINT);
+  }
+
+  /**
+   * Detects whether the latest response already explains a partial page build.
+   */
+  protected function latestAssistantMessageIsPartialBuild(AIChatThread $thread) {
+    $messages = $thread->getMessages();
+    $message = $messages ? end($messages) : [];
+    return ($message['role'] ?? '') === 'assistant'
+      && !empty($message['metadata']['partial_build']);
   }
 
   /**
@@ -1014,7 +1194,7 @@ class AIChatManager {
     }
 
     return sprintf(
-      'Created %d coordinated block%s for "%s"%s. Refreshing the page will show the new layout and this chat will remain here.',
+      'Created %d coordinated block%s for "%s"%s in the working Layout Builder draft. Review them on the page, then save the layout when ready.',
       $count,
       $count === 1 ? '' : 's',
       $entity->label(),
@@ -1198,6 +1378,97 @@ class AIChatManager {
     $thread->save();
 
     return $entity;
+  }
+
+  /**
+   * Applies one streamed edit to the current Layout Builder draft.
+   */
+  protected function executeBlockEditStream(ContentEntityInterface $entity, AIChatThread $thread, $message, array $context, array $action_plan, callable $event_callback, callable $stream_callback, array $runtime_context = [], array $uploaded_assets = []) {
+    $target_component = $this->findContextComponentByUuid($context, (string) ($action_plan['target_component_uuid'] ?? ''));
+    if (!$target_component || empty($target_component['block_type']) || empty($target_component['block_revision_id'])) {
+      throw new \Exception('Select one existing block to edit so the assistant can update it safely.');
+    }
+
+    $queue_id = 'edit-' . $target_component['uuid'];
+    $label = (string) ($target_component['block_label'] ?? $target_component['label'] ?? 'Selected block');
+    $event_callback('queue', [
+      'items' => [[
+        'id' => $queue_id,
+        'operation' => 'edit',
+        'label' => $label,
+        'block_type' => (string) $target_component['block_type'],
+        'status' => 'queued',
+      ]],
+    ]);
+    $event_callback('block', [
+      'id' => $queue_id,
+      'operation' => 'edit',
+      'label' => $label,
+      'block_type' => (string) $target_component['block_type'],
+      'status' => 'working',
+      'position' => 1,
+      'total' => 1,
+    ]);
+
+    try {
+      $block = $this->entityTypeManager->getStorage('block_content')->loadRevision($target_component['block_revision_id']);
+      if (!$block) {
+        throw new \Exception('The selected block revision could not be loaded for editing.');
+      }
+
+      $existing_instruction = $this->blockParser->exportBlockToInstruction($block);
+      $instructions = $this->instructionGenerator->generateForExistingBlock($message, $target_component['block_type'], $existing_instruction, [
+        'uploaded_assets' => $uploaded_assets,
+        'prefer_ai_images' => !empty($context['prefer_ai_images']),
+        'block_tools' => $context['block_tools'] ?? [],
+      ], $stream_callback);
+      $changes = $this->buildInstructionChangePreview($block, $existing_instruction, $instructions);
+      $updated_block = $this->blockParser->updateBlockFromInstructions($block, $instructions, $entity);
+      $placement = $this->layoutPlacementManager->updateInlineBlockComponent($entity, $target_component['uuid'], $updated_block, $runtime_context);
+
+      $event_callback('block', [
+        'id' => $queue_id,
+        'operation' => 'edit',
+        'label' => $updated_block->label(),
+        'block_type' => $updated_block->bundle(),
+        'status' => 'complete',
+        'position' => 1,
+        'total' => 1,
+        'placement' => $placement,
+      ]);
+
+      $thread->addMessage('assistant', sprintf('Updated "%s" in the working Layout Builder draft. Review the block on the page and save the layout when ready.', $label), [
+        'edited_blocks' => [[
+          'block_id' => (int) $updated_block->id(),
+          'block_revision_id' => (int) $updated_block->getRevisionId(),
+          'block_type' => $updated_block->bundle(),
+          'block_label' => $updated_block->label(),
+          'component_uuid' => $placement['component_uuid'],
+          'section' => $placement['section_delta'],
+          'region' => $placement['region'],
+          'changes' => $changes,
+        ]],
+      ]);
+      $thread->save();
+
+      return [
+        'thread' => $thread,
+        'status_message' => t('AI updated the selected block in the working layout draft. Review it on the page, then save the layout when ready.'),
+      ];
+    }
+    catch (\Throwable $exception) {
+      $event_callback('block', [
+        'id' => $queue_id,
+        'operation' => 'edit',
+        'label' => $label,
+        'block_type' => (string) $target_component['block_type'],
+        'status' => 'failed',
+        'position' => 1,
+        'total' => 1,
+        'message' => $exception->getMessage(),
+      ]);
+      throw $exception;
+    }
   }
 
   /**
@@ -1527,11 +1798,12 @@ class AIChatManager {
   /**
    * Guides the user to an accessible Drupal administration page.
    */
-  protected function prepareSiteFunctionGuide(AIChatThread $thread, array $top_level_plan, AccountInterface $account) {
+  protected function prepareSiteFunctionGuide(AIChatThread $thread, array $top_level_plan, AccountInterface $account, ?ContentEntityInterface $entity = NULL, array $context = []) {
     $guides = [
       'menus' => ['Manage menus', [['entity.menu.collection', 'Open menus']]],
       'redirects' => ['Manage URL redirects', [['redirect.list', 'View redirects'], ['redirect.add', 'Add redirect']]],
       'content' => ['Manage content', [['system.admin_content', 'Open content']]],
+      'publishing' => ['Manage publication status', []],
       'media' => ['Manage media', [['entity.media.collection', 'Open media']]],
       'users' => ['Manage users', [['entity.user.collection', 'Open users']]],
       'taxonomy' => ['Manage taxonomy', [['entity.taxonomy_vocabulary.collection', 'Open taxonomy']]],
@@ -1550,6 +1822,23 @@ class AIChatManager {
         }
       }
       catch (\Exception $exception) {
+      }
+    }
+
+    if ($topic === 'publishing' && $entity && $entity->hasLinkTemplate('edit-form')) {
+      $publication = $context['user_access']['current_content']['publication'] ?? [];
+      $can_change_publication = !empty($publication['can_publish'])
+        || !empty($publication['can_unpublish'])
+        || !empty($publication['available_transitions']);
+      if ($can_change_publication) {
+        try {
+          $url = $entity->toUrl('edit-form');
+          if ($url->access($account)) {
+            $options[] = ['label' => 'Edit publication status', 'url' => $url->toString()];
+          }
+        }
+        catch (\Exception $exception) {
+        }
       }
     }
 
@@ -1704,7 +1993,7 @@ class AIChatManager {
       }
 
       $metadata = $thread_message['metadata'] ?? [];
-      foreach ($metadata['created_blocks'] ?? [] as $created_block) {
+      foreach (array_merge($metadata['created_blocks'] ?? [], $metadata['edited_blocks'] ?? []) as $created_block) {
         $matched = $this->findContextComponentForRecentBlock($context, $created_block);
         if ($matched) {
           return $matched;
@@ -1790,6 +2079,25 @@ class AIChatManager {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Detects clear creation requests that do not need edit-target model calls.
+   */
+  protected function isExplicitBlockCreationRequest($message, array $context) {
+    if (!empty($context['selected_existing_block_references']) || $this->isLikelyFollowUpEditMessage($message)) {
+      return FALSE;
+    }
+    if ($this->hasSelectedNewBlockTokens($context)) {
+      return TRUE;
+    }
+
+    $message = mb_strtolower(trim((string) $message));
+    if (!preg_match('/\b(?:add|build|create|make|place|continue)\b/', $message)) {
+      return FALSE;
+    }
+
+    return !preg_match('/\b(?:edit|update|revise|rewrite|replace|change|existing|same)\b/', $message);
   }
 
   /**
@@ -2029,15 +2337,16 @@ class AIChatManager {
    * Returns page creation options available to the current account.
    */
   protected function getAvailablePageCreationOptions(AccountInterface $account) {
-    if (!$this->entityTypeManager->hasDefinition('node_type')) {
+    if (!$this->entityTypeManager->hasDefinition('node') || !$this->entityTypeManager->hasDefinition('node_type')) {
       return [];
     }
 
     $options = [];
+    $access_handler = $this->entityTypeManager->getAccessControlHandler('node');
     $types = $this->entityTypeManager->getStorage('node_type')->loadMultiple();
     foreach ($types as $type) {
       $bundle = $type->id();
-      if (!$account->hasPermission('create ' . $bundle . ' content')) {
+      if (!$access_handler->createAccess($bundle, $account)) {
         continue;
       }
 

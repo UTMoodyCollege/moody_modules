@@ -31,3 +31,11 @@ moody_ai_assistant.chat_stream:
   requirements:
     _permission: 'use moody ai assistant'
   methods: [POST]
+
+moody_ai_assistant.private_uploads:
+  path: '/moody-ai/assistant/uploads'
+  defaults:
+    _form: '\Drupal\moody_ai_assistant\Form\PrivateUploadsForm'
+    _title: 'My Moody AI uploads'
+  requirements:
+    _permission: 'use moody ai assistant'

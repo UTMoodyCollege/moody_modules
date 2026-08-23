@@ -278,8 +278,16 @@ final class AiGenerationService {
     }
 
     if ($input === [] || $text_characters > 200000) {
+      $this->logger->warning('Rejected structured AI request with @messages messages and @characters text characters.', [
+        '@messages' => count($messages),
+        '@characters' => $text_characters,
+      ]);
       throw new \InvalidArgumentException('The structured request is empty or too large.');
     }
+    array_unshift($input, [
+      'role' => 'developer',
+      'content' => [['type' => 'input_text', 'text' => 'Return the response as a JSON object.']],
+    ]);
 
     try {
       $response = $this->httpClient->request('POST', self::OPENAI_RESPONSES_URL, [

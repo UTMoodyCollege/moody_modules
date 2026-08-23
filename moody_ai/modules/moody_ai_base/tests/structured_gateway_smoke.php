@@ -31,6 +31,14 @@ $stack = HandlerStack::create(new MockHandler([
       'total_tokens' => 26,
     ],
   ], JSON_THROW_ON_ERROR)),
+  new Response(200, [], json_encode([
+    'output_text' => '{"action":"redirect","redirect":{"source":"/old","destination":"/new","status_code":301}}',
+    'usage' => [
+      'input_tokens' => 20,
+      'output_tokens' => 8,
+      'total_tokens' => 28,
+    ],
+  ], JSON_THROW_ON_ERROR)),
 ]));
 $stack->push(Middleware::history($history));
 putenv('MOODY_AI_OPENAI_API_KEY=dummy');
@@ -54,6 +62,16 @@ try {
     ['entity_id' => 7268],
     [],
   );
+  $denied_redirect_plan = $planner->planTopLevelAction(
+    'Redirect /old to /new.',
+    [
+      'entity_id' => 7268,
+      'user_access' => [
+        'site_tools' => ['create_redirect' => FALSE],
+      ],
+    ],
+    [],
+  );
 }
 finally {
   putenv('MOODY_AI_OPENAI_API_KEY');
@@ -65,9 +83,13 @@ if (
   || ($result['usage']['total_tokens'] ?? 0) !== 16
   || ($payload['store'] ?? TRUE) !== FALSE
   || ($payload['text']['format']['type'] ?? '') !== 'json_object'
+  || ($payload['input'][0]['role'] ?? '') !== 'developer'
+  || !str_contains($payload['input'][0]['content'][0]['text'] ?? '', 'JSON')
   || !str_contains($payload['instructions'] ?? '', 'Drupal must recheck access')
   || ($plan['action'] ?? '') !== 'guide'
   || ($plan['guide']['topic'] ?? '') !== 'menus'
+  || ($denied_redirect_plan['action'] ?? '') !== 'guide'
+  || ($denied_redirect_plan['guide']['topic'] ?? '') !== 'redirects'
 ) {
   throw new RuntimeException('Structured gateway assertion failed.');
 }

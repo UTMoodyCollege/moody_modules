@@ -183,19 +183,76 @@ approves an existing-block edit or redirect. The model can propose only; Drupal
 remains authoritative for block types, Media creation, entity access, routes,
 and final persistence.
 
-Assistant attachments follow the proven Layout Builder workflow rather than
-the CKEditor dialog's temporary private-reference workflow. With Media create
-access, an upload becomes a permanent Drupal Media item backed by a public
-file; uploaded images receive generated alt text when the provider is
-available. Editors can also select access-checked existing Media as inspiration
-or permit it for page content. Do not use assistant uploads for restricted
-documents. Requests to generate an image also create Media, but model-supplied
-remote image URLs are never downloaded by the server.
+Every Assistant request also receives a compact access snapshot calculated by
+Drupal for that editor. It includes human-readable role names, content types
+the account can create or may edit, exact access to the current content item,
+valid content-moderation transitions, redirect creation, common administration
+areas, and creatable Media types. The planner uses this context to avoid
+suggesting unavailable workflows, but it never treats the snapshot as an
+authorization token: each route, entity, transition, and approved mutation is
+still checked again at execution time.
+
+Assistant attachments use the same user-owned private directory as CKEditor.
+The composer shows each selected filename before sending and preserves the
+attached-file list on the corresponding conversation message. Editors can
+select a recent private upload again, or open **Manage all private uploads** to
+remove an unused file; files referenced by Drupal content or Media cannot be
+removed from that screen. With Media create access, an Assistant attachment is
+converted to Media when the request is sent, and uploaded images receive
+generated alt text when the provider is available. Editors can also select
+access-checked existing Media as inspiration or permit it for page content.
+Do not use Assistant uploads for restricted documents. Requests to generate an
+image also create Media, but model-supplied remote image URLs are never
+downloaded by the server.
 
 New-page and site-administration requests intentionally continue through
 Drupal's standard forms so existing field validation, editorial workflow, and
-route access checks stay in force. Redirects and edits to existing inline
-blocks require an explicit preview approval. New block-building requests are
-executed when the editor sends the request, matching the current Layout Builder
-assistant workflow; pilot roles should therefore be limited to trusted site
+route access checks stay in force. Redirects require explicit preview approval.
+Block creation and existing-inline-block edits run as individual queued jobs in
+Layout Builder. Each completed job is written only to Layout Builder tempstore
+and replaces the visible layout through Drupal's native AJAX commands, so the
+editor can review, manually revise, reorder, save, or discard the AI draft
+without a page refresh. Pilot roles should therefore be limited to trusted site
 editors.
+
+### Local Assistant evaluation
+
+Use a disposable unpublished Layout Builder page and an account with Assistant
+and page-update access. The evaluation script runs the real provider flow and
+reports elapsed time, progress events, planned and placed block counts, token
+usage, and both the saved layout and the unsaved Layout Builder working copy:
+
+```bash
+MOODY_AI_EVAL_UID=1 \
+MOODY_AI_EVAL_ENTITY_ID=123 \
+MOODY_AI_EVAL_EXPECTED_MIN_BLOCKS=10 \
+MOODY_AI_EVAL_PROMPT='Build this current page with 10 coordinated, accessible blocks.' \
+ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/assistant_evaluation.php
+```
+
+Set `MOODY_AI_EVAL_DEBUG=1` when diagnosing a failed local request to include a
+PHP trace in the terminal-only JSON report. Do not use that option in shared
+logs. Multi-block plans are limited to 12 components per request to bound cost
+and execution time. If a later component fails, the Assistant records which
+component stopped, reports the request as partial, and leaves completed
+components in the working Layout Builder draft for review instead of claiming
+the whole build succeeded.
+
+Run the no-provider smoke tests before another paid evaluation. They create and
+delete temporary blocks to verify legacy serialized-field normalization, and
+verify the structured-plan limit, dynamic-block selection rules, explicit
+selection override, text-only filtering, multi-section placement, draft-only
+creation/editing, component UUID preservation, and Layout Builder AJAX output:
+
+```bash
+ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/block_payload_smoke.php
+ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/planner_constraints_smoke.php
+ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/layout_streaming_smoke.php
+```
+
+For a representative pilot pass, use separate unpublished pages for: a 10–12
+component build, recovery after a forced partial failure, a two-component
+text-only request, and access-aware guidance under a restricted editor account.
+Render each resulting page as well as checking entity validation: several UT
+custom field formatters depend on serialized nested values and can expose a
+bad payload only at render time.

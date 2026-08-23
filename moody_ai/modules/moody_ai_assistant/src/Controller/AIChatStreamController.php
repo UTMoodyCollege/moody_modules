@@ -10,7 +10,11 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Render\AttachmentsResponseProcessorInterface;
 use Drupal\moody_ai_base\AiGenerationService;
+use Drupal\moody_ai_assistant\Service\LayoutContextCollector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,15 +66,31 @@ class AIChatStreamController extends ControllerBase {
   protected $generator;
 
   /**
+   * The Layout Builder context collector.
+   *
+   * @var \Drupal\moody_ai_assistant\Service\LayoutContextCollector
+   */
+  protected $layoutContextCollector;
+
+  /**
+   * The Drupal AJAX attachment processor.
+   *
+   * @var \Drupal\Core\Render\AttachmentsResponseProcessorInterface
+   */
+  protected $ajaxAttachmentsProcessor;
+
+  /**
    * Constructs the controller.
    */
-  public function __construct(AIChatManager $chat_manager, EntityTypeManagerInterface $entity_type_manager, AccountProxyInterface $current_user, CsrfTokenGenerator $csrf_token, FloodInterface $flood, AiGenerationService $generator) {
+  public function __construct(AIChatManager $chat_manager, EntityTypeManagerInterface $entity_type_manager, AccountProxyInterface $current_user, CsrfTokenGenerator $csrf_token, FloodInterface $flood, AiGenerationService $generator, LayoutContextCollector $layout_context_collector, AttachmentsResponseProcessorInterface $ajax_attachments_processor) {
     $this->chatManager = $chat_manager;
     $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
     $this->csrfToken = $csrf_token;
     $this->flood = $flood;
     $this->generator = $generator;
+    $this->layoutContextCollector = $layout_context_collector;
+    $this->ajaxAttachmentsProcessor = $ajax_attachments_processor;
   }
 
   /**
@@ -83,7 +103,9 @@ class AIChatStreamController extends ControllerBase {
       $container->get('current_user'),
       $container->get('csrf_token'),
       $container->get('flood'),
-      $container->get('moody_ai_base.generator')
+      $container->get('moody_ai_base.generator'),
+      $container->get('moody_ai_assistant.layout_context_collector'),
+      $container->get('ajax_response.attachments_processor')
     );
   }
 
@@ -109,6 +131,7 @@ class AIChatStreamController extends ControllerBase {
     $resume_thread_id = (int) $request->request->get('resume_thread_id');
     $resume_action_id = trim((string) $request->request->get('resume_action_id'));
     $existing_media_ids = AiGenerationService::normalizeMediaIds($request->request->all('existing_media'));
+    $stored_upload_ids = $this->normalizeStoredUploadIds($request->request->all('previous_uploads'));
     $provider = trim((string) $request->request->get('provider')) ?: 'openai';
     $model = trim((string) $request->request->get('model')) ?: $this->generator->defaultModel();
     $runtime_context = [
@@ -118,6 +141,7 @@ class AIChatStreamController extends ControllerBase {
       'provider' => $provider,
       'model' => $model,
       'existing_media_ids' => $existing_media_ids,
+      'stored_upload_ids' => $stored_upload_ids,
       'existing_media_intent' => (string) ($request->request->get('existing_media_intent') ?: 'inspiration'),
     ];
     $uploaded_files = $request->files->get('attachments', []);
@@ -145,7 +169,7 @@ class AIChatStreamController extends ControllerBase {
     if (!in_array($runtime_context['existing_media_intent'], ['inspiration', 'content'], TRUE)) {
       return new Response('The selected Media use is invalid.', 400);
     }
-    if (count($uploaded_files) + count($existing_media_ids) > AiGenerationService::MAX_ATTACHMENTS) {
+    if (count($uploaded_files) + count($existing_media_ids) + count($stored_upload_ids) > AiGenerationService::MAX_ATTACHMENTS) {
       return new Response('Too many reference files or Media items were provided.', 400);
     }
     $upload_bytes = array_sum(array_map(static fn (UploadedFile $file): int => (int) ($file->getSize() ?? 0), $uploaded_files));
@@ -181,7 +205,10 @@ class AIChatStreamController extends ControllerBase {
       @ini_set('output_buffering', 'off');
       @ini_set('zlib.output_compression', '0');
 
-      $emit = function ($event, array $payload) {
+      $emit = function ($event, array $payload) use ($entity, $runtime_context) {
+        if ($event === 'block' && ($payload['status'] ?? '') === 'complete' && !empty($runtime_context['is_layout_builder_context'])) {
+          $payload['layout_commands'] = $this->buildLayoutCommands($entity, $runtime_context);
+        }
         echo 'event: ' . $event . "\n";
         echo 'data: ' . json_encode($payload) . "\n\n";
         @ob_flush();
@@ -202,7 +229,7 @@ class AIChatStreamController extends ControllerBase {
           $this->chatManager->processUserMessageStream($entity, $this->currentUser, $message, $emit, $runtime_context, $uploaded_files);
         }
       }
-      catch (\Exception $exception) {
+      catch (\Throwable $exception) {
         $emit('error', [
           'message' => $exception->getMessage(),
         ]);
@@ -214,6 +241,24 @@ class AIChatStreamController extends ControllerBase {
     $response->headers->set('X-Accel-Buffering', 'no');
 
     return $response;
+  }
+
+  /**
+   * Builds Drupal AJAX commands for the current Layout Builder draft.
+   */
+  protected function buildLayoutCommands(ContentEntityInterface $entity, array $runtime_context) {
+    $section_storage = $this->layoutContextCollector->getResolvedSectionStorage($entity, $runtime_context);
+    if (!$section_storage) {
+      return [];
+    }
+
+    $response = new AjaxResponse();
+    $response->addCommand(new ReplaceCommand('#layout-builder', [
+      '#type' => 'layout_builder',
+      '#section_storage' => $section_storage,
+    ]));
+    $response = $this->ajaxAttachmentsProcessor->processAttachments($response);
+    return json_decode((string) $response->getContent(), TRUE) ?: [];
   }
 
   /**
@@ -274,6 +319,17 @@ class AIChatStreamController extends ControllerBase {
 
     $normalized = strtolower(trim((string) $value));
     return in_array($normalized, ['1', 'true', 'yes', 'on'], TRUE);
+  }
+
+  /**
+   * Normalizes checkbox values for previously uploaded private files.
+   */
+  protected function normalizeStoredUploadIds($value) {
+    if (!is_array($value)) {
+      return [];
+    }
+
+    return array_values(array_unique(array_filter(array_map('intval', $value))));
   }
 
 }

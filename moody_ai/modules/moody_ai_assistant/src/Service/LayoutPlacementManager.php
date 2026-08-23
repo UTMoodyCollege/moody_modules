@@ -74,7 +74,7 @@ class LayoutPlacementManager {
   }
 
   /**
-   * Places a block into the first available Layout Builder section.
+   * Places a block into an editable Layout Builder section.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   The target page entity.
@@ -84,7 +84,7 @@ class LayoutPlacementManager {
    * @return array
    *   Placement metadata.
    */
-  public function placeBlock(ContentEntityInterface $entity, BlockContentInterface $block, array $runtime_context = []) {
+  public function placeBlock(ContentEntityInterface $entity, BlockContentInterface $block, array $runtime_context = [], array $placement_target = []) {
     if (!$entity->hasField('layout_builder__layout')) {
       throw new \Exception('This page does not support Layout Builder placements.');
     }
@@ -98,8 +98,9 @@ class LayoutPlacementManager {
       $section_storage->appendSection(new Section('layout_onecol'));
     }
 
-    $section = $section_storage->getSection(0);
-    $region = $section->getDefaultRegion();
+    $section_delta = $this->resolveSectionDelta($section_storage, $placement_target);
+    $section = $section_storage->getSection($section_delta);
+    $region = $this->resolveRegion($section, $placement_target);
     $component = new SectionComponent($this->uuid->generate(), $region, [
       'id' => 'inline_block:' . $block->bundle(),
       'label' => $block->label(),
@@ -119,15 +120,16 @@ class LayoutPlacementManager {
 
     $this->inlineBlockUsage->addUsage((int) $block->id(), $entity);
 
-    $this->logger->notice('Placed AI-generated block @block on @entity_type/@entity_id in section 0 region @region.', [
+    $this->logger->notice('Placed AI-generated block @block on @entity_type/@entity_id in section @section region @region.', [
       '@block' => $block->label(),
       '@entity_type' => $entity->getEntityTypeId(),
       '@entity_id' => $entity->id(),
+      '@section' => $section_delta,
       '@region' => $region,
     ]);
 
     return [
-      'section_delta' => 0,
+      'section_delta' => $section_delta,
       'region' => $region,
       'component_uuid' => $component->getUuid(),
     ];
@@ -222,7 +224,30 @@ class LayoutPlacementManager {
       return [$this->layoutTempstoreRepository->get($section_storage), TRUE];
     }
 
+    // Assistant work started from Layout Builder must remain in its draft
+    // workspace even before another Layout Builder action creates tempstore.
+    if (!empty($runtime_context['is_layout_builder_context'])) {
+      return [$section_storage, TRUE];
+    }
+
     return [$section_storage, FALSE];
+  }
+
+  /**
+   * Resolves a requested section with a safe fallback to the first section.
+   */
+  protected function resolveSectionDelta($section_storage, array $placement_target) {
+    $section_delta = isset($placement_target['section_delta']) ? (int) $placement_target['section_delta'] : 0;
+    return $section_delta >= 0 && $section_delta < $section_storage->count() ? $section_delta : 0;
+  }
+
+  /**
+   * Resolves a requested region against the selected layout definition.
+   */
+  protected function resolveRegion(Section $section, array $placement_target) {
+    $region = trim((string) ($placement_target['region'] ?? ''));
+    $regions = array_keys($section->getLayout()->getPluginDefinition()->getRegions());
+    return $region !== '' && in_array($region, $regions, TRUE) ? $region : $section->getDefaultRegion();
   }
 
 }
