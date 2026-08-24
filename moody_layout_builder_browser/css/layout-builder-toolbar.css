@@ -1339,6 +1339,11 @@ form:is(.layout-builder-add-block, .layout-builder-configure-block) .claro-detai
   font-style: normal;
 }
 
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .claro-details[open] > .claro-details__summary,
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .claro-details[open] > .claro-details__summary em {
+  color: var(--mlbt-white);
+}
+
 form:is(.layout-builder-add-block, .layout-builder-configure-block) .field-multiple-table td .claro-details {
   width: auto;
   min-width: 0;
