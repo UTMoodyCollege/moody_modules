@@ -10,3 +10,8 @@ assistant:
     - core/drupalSettings
     - core/once
     - moody_ai_base/ui
+
+private_uploads:
+  css:
+    theme:
+      css/moody-ai-private-uploads.css: {}

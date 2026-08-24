@@ -379,14 +379,19 @@ class AIChatManager {
     catch (\Throwable $e) {
       $is_partial_build = $this->latestAssistantMessageIsPartialBuild($thread);
       $usage_status = $is_partial_build ? 'partial' : 'error';
+      $technical_details = $this->buildTechnicalDetails($e, $entity, $thread, $runtime_context, count($uploaded_assets ?? []), 'Processing request', $message);
       if (!$is_partial_build) {
-        $thread->addMessage('assistant', 'I could not complete that request: ' . $e->getMessage());
+        $thread->addMessage('assistant', 'I could not complete that request: ' . $this->publicFailureMessage($e), [
+          'technical_details' => $technical_details,
+        ]);
         $thread->save();
       }
-      $this->logger->error('AI chat request failed for @entity_type/@entity_id: @message', [
+      $this->logger->error('AI chat request @support_code failed for @entity_type/@entity_id: @message. Technical details: @details', [
+        '@support_code' => $technical_details['support_code'],
         '@entity_type' => $entity->getEntityTypeId(),
         '@entity_id' => $entity->id(),
         '@message' => $e->getMessage(),
+        '@details' => $technical_details['report'],
       ]);
       throw $e;
     }
@@ -403,17 +408,31 @@ class AIChatManager {
     $this->planner->selectProviderAndModel($runtime_context['provider'] ?? NULL, $runtime_context['model'] ?? NULL);
     $thread = $this->getThread($entity, $account, TRUE);
     $usage_status = 'success';
+    $last_stage = 'Preparing request';
+    $tracked_event_callback = function ($event, array $payload) use (&$last_stage, $event_callback) {
+      $status = trim((string) ($payload['message'] ?? ''));
+      if ($event === 'status' && $status !== '' && !in_array($status, ['Thinking...', 'Still working...'], TRUE)) {
+        $last_stage = mb_substr($status, 0, 120);
+      }
+      $event_callback($event, $payload);
+    };
 
     try {
       $this->usageTracker->assertUserHasBudget($account);
+      $new_uploaded_assets = $this->assetCreator->prepareUploadedAssets($uploaded_files);
       $uploaded_assets = array_merge(
         $this->assetCreator->prepareExistingMediaAssets(
           $runtime_context['existing_media_ids'] ?? [],
           (string) ($runtime_context['existing_media_intent'] ?? 'inspiration'),
         ),
         $this->assetCreator->prepareStoredUploadAssets($runtime_context['stored_upload_ids'] ?? []),
-        $this->assetCreator->prepareUploadedAssets($uploaded_files),
+        $new_uploaded_assets,
       );
+      if ($new_uploaded_assets) {
+        $tracked_event_callback('uploads', [
+          'items' => $new_uploaded_assets,
+        ]);
+      }
       $context = $this->collectPageContext($entity, $account, $runtime_context);
       $runtime_context['selected_block_references'] = $context['selected_block_references'] ?? [];
       $runtime_context['selected_block_reference_ids'] = array_values(array_unique(array_filter(array_map(function (array $reference) {
@@ -422,8 +441,8 @@ class AIChatManager {
       $thread->addMessage('user', $message, $this->buildUserMessageMetadata($runtime_context, $uploaded_assets));
       $thread->save();
 
-      $emit = function ($status) use ($event_callback, $thread) {
-        $event_callback('status', [
+      $emit = function ($status) use ($tracked_event_callback, $thread) {
+        $tracked_event_callback('status', [
           'message' => $status,
           'thread_id' => (int) $thread->id(),
         ]);
@@ -437,26 +456,32 @@ class AIChatManager {
         }
       };
 
-      return $this->executeUserMessageStream($entity, $account, $thread, $message, $event_callback, $runtime_context, $uploaded_assets, function () use ($stream_ping) {
+      return $this->executeUserMessageStream($entity, $account, $thread, $message, $tracked_event_callback, $runtime_context, $uploaded_assets, function () use ($stream_ping) {
         $stream_ping();
       });
     }
     catch (\Throwable $e) {
       $is_partial_build = $this->latestAssistantMessageIsPartialBuild($thread);
       $usage_status = $is_partial_build ? 'partial' : 'error';
+      $technical_details = $this->buildTechnicalDetails($e, $entity, $thread, $runtime_context, count($uploaded_assets ?? []), $last_stage, $message);
       if (!$is_partial_build) {
-        $thread->addMessage('assistant', 'I could not complete that request: ' . $e->getMessage());
+        $thread->addMessage('assistant', 'I could not complete that request: ' . $this->publicFailureMessage($e), [
+          'technical_details' => $technical_details,
+        ]);
         $thread->save();
       }
-      $this->logger->error('AI streaming chat request failed for @entity_type/@entity_id: @message', [
+      $this->logger->error('AI streaming chat request @support_code failed for @entity_type/@entity_id: @message. Technical details: @details', [
+        '@support_code' => $technical_details['support_code'],
         '@entity_type' => $entity->getEntityTypeId(),
         '@entity_id' => $entity->id(),
         '@message' => $e->getMessage(),
+        '@details' => $technical_details['report'],
       ]);
-      $event_callback('error', [
-        'message' => $e->getMessage(),
+      $tracked_event_callback('error', [
+        'message' => $this->publicFailureMessage($e),
+        'technical_details' => $technical_details,
       ]);
-      throw $e;
+      return NULL;
     }
     finally {
       $this->recordWidgetUsage($account, $entity, $message, $thread, $usage_status);
@@ -846,7 +871,24 @@ class AIChatManager {
    * Builds a prompt enriched with page context and recent thread history.
    */
   protected function buildPrompt($message, array $context, AIChatThread $thread) {
-    $recent_messages = array_slice($thread->getMessages(), -6);
+    $prompt_context = array_intersect_key($context, array_flip([
+      'entity_type',
+      'entity_id',
+      'bundle',
+      'label',
+      'is_layout_builder_context',
+      'prefer_ai_images',
+      'existing_components',
+      'selected_block_references',
+      'selected_existing_block_references',
+      'uploaded_assets',
+    ]));
+    $recent_messages = array_map(static function (array $item) {
+      return [
+        'role' => (string) ($item['role'] ?? ''),
+        'content' => mb_substr((string) ($item['content'] ?? ''), 0, 2000),
+      ];
+    }, array_slice($thread->getMessages(), -6));
     $selected_refs_note = '';
     if (!empty($context['selected_block_references'])) {
       $selected_new_labels = [];
@@ -885,10 +927,56 @@ class AIChatManager {
       : 'If uploaded media assets are provided, prefer reusing those media IDs before generating or downloading a new asset.';
 
     return "The user is asking for block creation and/or revision on the current page. Use the page context to choose the right blocks to create or update. " . $image_preference_note . " If an image would help and the chosen block supports it, prepare one.\n\n"
-      . "Page context JSON:\n" . json_encode($context, JSON_PRETTY_PRINT)
+      . "Page context JSON:\n" . json_encode($prompt_context, JSON_PRETTY_PRINT)
       . $selected_refs_note
       . "\n\nRecent chat JSON:\n" . json_encode($recent_messages, JSON_PRETTY_PRINT)
       . "\n\nUser request:\n" . $message;
+  }
+
+  /**
+   * Builds a prompt-free troubleshooting receipt for users and server logs.
+   */
+  protected function buildTechnicalDetails(\Throwable $exception, ContentEntityInterface $entity, AIChatThread $thread, array $runtime_context, $attachment_count, $stage, $message) {
+    $exception_message = (string) $exception->getMessage();
+    $error_code = str_contains($exception_message, 'structured request is empty or too large')
+      ? 'request_context_too_large'
+      : ($exception instanceof \InvalidArgumentException ? 'request_validation_failed' : 'assistant_request_failed');
+    $exception_class = (new \ReflectionClass($exception))->getShortName();
+    $safe_value = static function ($value, $maximum = 120) {
+      $value = preg_replace('/[^A-Za-z0-9 ._:\/-]+/', '', trim((string) $value));
+      return mb_substr((string) $value, 0, $maximum);
+    };
+
+    $details = [
+      'support_code' => 'AI-' . strtoupper(bin2hex(random_bytes(4))),
+      'timestamp_utc' => gmdate('Y-m-d\TH:i:s\Z'),
+      'error_code' => $error_code,
+      'stage' => $safe_value($stage),
+      'site' => $safe_value($runtime_context['site_host'] ?? ''),
+      'provider' => $safe_value($runtime_context['provider'] ?? 'openai', 40),
+      'model' => $safe_value($runtime_context['model'] ?? '', 80),
+      'target' => $safe_value($entity->getEntityTypeId() . '/' . $entity->id()),
+      'thread_id' => (int) $thread->id(),
+      'layout_builder' => !empty($runtime_context['is_layout_builder_context']),
+      'ai_images' => !empty($runtime_context['prefer_ai_images']),
+      'attachment_count' => (int) $attachment_count,
+      'existing_media_count' => count($runtime_context['existing_media_ids'] ?? []),
+      'selected_component_count' => count($runtime_context['selected_block_references'] ?? []),
+      'prompt_character_count' => mb_strlen((string) $message),
+      'exception_type' => $safe_value($exception_class, 80),
+    ];
+    $details['report'] = json_encode($details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    return $details;
+  }
+
+  /**
+   * Converts internal validation wording into a useful public explanation.
+   */
+  protected function publicFailureMessage(\Throwable $exception) {
+    if (str_contains((string) $exception->getMessage(), 'structured request is empty or too large')) {
+      return 'The assistant received more page context than it could safely process.';
+    }
+    return $exception->getMessage();
   }
 
   /**

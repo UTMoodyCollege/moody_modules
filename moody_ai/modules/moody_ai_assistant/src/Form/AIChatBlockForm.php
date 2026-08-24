@@ -83,10 +83,12 @@ class AIChatBlockForm extends FormBase {
 
   protected $flood;
 
+  protected $assetCreator;
+
   /**
    * Constructs the form.
    */
-  public function __construct(AIChatManager $chat_manager, AccountProxyInterface $current_user, EntityTypeManagerInterface $entity_type_manager, LayoutContextCollector $layout_context_collector, RequestStack $request_stack, ModuleExtensionList $module_extension_list, BlockReferenceCatalog $block_reference_catalog, AIUsageTracker $usage_tracker, AiGenerationService $generator, FloodInterface $flood) {
+  public function __construct(AIChatManager $chat_manager, AccountProxyInterface $current_user, EntityTypeManagerInterface $entity_type_manager, LayoutContextCollector $layout_context_collector, RequestStack $request_stack, ModuleExtensionList $module_extension_list, BlockReferenceCatalog $block_reference_catalog, AIUsageTracker $usage_tracker, AiGenerationService $generator, FloodInterface $flood, AIAssetCreator $asset_creator) {
     $this->chatManager = $chat_manager;
     $this->currentUser = $current_user;
     $this->entityTypeManager = $entity_type_manager;
@@ -97,6 +99,7 @@ class AIChatBlockForm extends FormBase {
     $this->usageTracker = $usage_tracker;
     $this->generator = $generator;
     $this->flood = $flood;
+    $this->assetCreator = $asset_creator;
   }
 
   /**
@@ -113,7 +116,8 @@ class AIChatBlockForm extends FormBase {
       $container->get('moody_ai_assistant.block_reference_catalog'),
       $container->get('moody_ai_assistant.usage_tracker'),
       $container->get('moody_ai_base.generator'),
-      $container->get('flood')
+      $container->get('flood'),
+      $container->get('moody_ai_assistant.asset_creator')
     );
   }
 
@@ -688,37 +692,36 @@ class AIChatBlockForm extends FormBase {
       ],
     ];
 
-    if ($previous_uploads) {
-      $form['attachments']['previous_uploads'] = [
-        '#type' => 'details',
-        '#title' => $this->t('Use a previous upload (@count)', ['@count' => count($previous_uploads)]),
-        '#open' => FALSE,
-        '#attributes' => [
-          'class' => ['ai-moody-assistant__previous-uploads'],
-        ],
-      ];
-      $form['attachments']['previous_uploads']['files'] = [
-        '#type' => 'checkboxes',
-        '#parents' => ['previous_uploads'],
-        '#title' => $this->t('Previous private uploads'),
-        '#title_display' => 'invisible',
-        '#options' => array_map(static fn(array $upload): string => $upload['label'], $previous_uploads),
-        '#attributes' => [
-          'data-ai-assistant-previous-uploads' => TRUE,
-        ],
-      ];
-      $form['attachments']['previous_uploads']['manage'] = [
-        '#type' => 'link',
-        '#title' => $this->t('Manage all private uploads'),
-        '#url' => Url::fromRoute('moody_ai_assistant.private_uploads'),
-        '#attributes' => [
-          'class' => ['ai-moody-assistant__manage-uploads'],
-          'target' => '_blank',
-          'rel' => 'noopener',
-        ],
-      ];
-      $form['#attached']['drupalSettings']['moodyAiAssistant']['privateUploads'] = $previous_uploads;
-    }
+    $form['attachments']['previous_uploads'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Use a previous upload (@count)', ['@count' => count($previous_uploads)]),
+      '#open' => FALSE,
+      '#attributes' => [
+        'class' => ['ai-moody-assistant__previous-uploads'],
+        'data-ai-assistant-previous-upload-shell' => TRUE,
+      ],
+    ];
+    $form['attachments']['previous_uploads']['files'] = [
+      '#type' => 'checkboxes',
+      '#parents' => ['previous_uploads'],
+      '#title' => $this->t('Previous private uploads'),
+      '#title_display' => 'invisible',
+      '#options' => array_map(static fn(array $upload): string => $upload['label'], $previous_uploads),
+      '#attributes' => [
+        'data-ai-assistant-previous-uploads' => TRUE,
+      ],
+    ];
+    $form['attachments']['previous_uploads']['manage'] = [
+      '#type' => 'link',
+      '#title' => $this->t('Manage all private uploads'),
+      '#url' => Url::fromRoute('moody_ai_assistant.private_uploads'),
+      '#attributes' => [
+        'class' => ['ai-moody-assistant__manage-uploads'],
+        'target' => '_blank',
+        'rel' => 'noopener',
+      ],
+    ];
+    $form['#attached']['drupalSettings']['moodyAiAssistant']['privateUploads'] = $previous_uploads;
 
     $form['privacy_notice'] = [
       '#type' => 'html_tag',
@@ -770,26 +773,10 @@ class AIChatBlockForm extends FormBase {
         continue;
       }
 
-      $size = (int) $file->getSize();
-      $uploads[(int) $file->id()] = [
-        'id' => (int) $file->id(),
-        'name' => $file->getFilename(),
-        'size' => $size,
-        'type' => $file->getMimeType() ?: 'application/octet-stream',
-        'label' => sprintf('%s · %s · %s', $file->getFilename(), gmdate('M j, Y', (int) $file->getCreatedTime()), $this->formatFileSize($size)),
-      ];
+      $uploads[(int) $file->id()] = $this->assetCreator->buildPrivateUploadSummary($file);
     }
 
     return $uploads;
-  }
-
-  /**
-   * Formats a compact file size for upload choices.
-   */
-  protected function formatFileSize($bytes) {
-    return $bytes >= 1048576
-      ? rtrim(rtrim(number_format($bytes / 1048576, 1), '0'), '.') . ' MB'
-      : max(1, (int) round($bytes / 1024)) . ' KB';
   }
 
   /**

@@ -90,7 +90,7 @@
     <div class="ai-moody-assistant__history">
       {% if messages %}
         {% for message in messages %}
-          <div class="ai-moody-assistant__message ai-moody-assistant__message--{{ message.role|default('assistant') }}">
+          <div class="ai-moody-assistant__message ai-moody-assistant__message--{{ message.role|default('assistant') }}{{ message.metadata.technical_details|default(null) ? ' ai-moody-assistant__message--error' : '' }}">
             <strong>{{ message.role|default('assistant') == 'user' ? 'You' : 'Moody' }}</strong>
             <div>{{ message.content }}</div>
             {% set pending_action = message.metadata.pending_action|default(null) %}
@@ -102,6 +102,7 @@
             {% set selected_block_references = message.metadata.selected_block_references|default([]) %}
             {% set edited_blocks = message.metadata.edited_blocks|default([]) %}
             {% set prefer_ai_images = message.metadata.prefer_ai_images|default(false) %}
+            {% set technical_details = message.metadata.technical_details|default(null) %}
             {% if uploaded_assets %}
               <div class="ai-moody-assistant__preview">
                 <div class="ai-moody-assistant__preview-title">Attached files sent with this request</div>
@@ -277,6 +278,13 @@
               <div class="ai-moody-assistant__preview-actions">
                 <a class="ai-moody-assistant__preview-button ai-moody-assistant__preview-button--approve" href="{{ action_resolution.result_link.url }}">{{ action_resolution.result_link.label|default('View result') }}</a>
               </div>
+            {% endif %}
+            {% if technical_details.report|default(null) %}
+              <details class="ai-moody-assistant__technical-details" data-ai-assistant-technical-details>
+                <summary>Technical details</summary>
+                <p>Send this diagnostic receipt to Moody Web Services. It excludes your prompt, page content, file names, and credentials.</p>
+                <pre>{{ technical_details.report }}</pre>
+              </details>
             {% endif %}
           </div>
         {% endfor %}

@@ -1,0 +1,189 @@
+.ai-moody-private-uploads {
+  --ut-burnt-orange: #bf5700;
+  --ut-charcoal: #333f48;
+  --ut-warm-white: #f8f6f4;
+  --ut-border: #d6d2ce;
+  max-width: 92rem;
+}
+
+.ai-moody-private-uploads__intro {
+  max-width: 58rem;
+  margin-block-end: 1.5rem;
+  border-inline-start: 0.35rem solid var(--ut-burnt-orange);
+  background: var(--ut-warm-white);
+  padding: 0.75rem 1rem;
+}
+
+.ai-moody-private-uploads__intro p {
+  margin: 0;
+}
+
+.ai-moody-private-uploads__intro p + p {
+  margin-block-start: 0.5rem;
+  color: #4f5961;
+  font-size: 0.92rem;
+}
+
+.ai-moody-private-uploads__table-wrap {
+  margin-block: 1rem 1.5rem;
+  overflow-x: auto;
+  border: 1px solid var(--ut-border);
+  border-block-start: 0.35rem solid var(--ut-burnt-orange);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1.5rem rgb(51 63 72 / 10%);
+}
+
+.ai-moody-private-uploads__table {
+  width: 100%;
+  min-width: 56rem;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.ai-moody-private-uploads__table thead {
+  background: var(--ut-charcoal);
+  color: #fff;
+}
+
+.ai-moody-private-uploads__table th {
+  border: 0;
+  color: #fff;
+  padding: 0.8rem 0.75rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  text-align: start;
+}
+
+.ai-moody-private-uploads__table td {
+  vertical-align: middle;
+  border-block-end: 1px solid var(--ut-border);
+  padding: 0.75rem;
+}
+
+.ai-moody-private-uploads__table tbody tr:nth-child(even) {
+  background: #f8f6f4;
+}
+
+.ai-moody-private-uploads__table tbody tr:hover {
+  background: #fff5eb;
+}
+
+.ai-moody-private-uploads__table tbody tr.disabled {
+  opacity: 1;
+}
+
+.ai-moody-private-uploads__preview-cell {
+  width: 5rem;
+}
+
+.ai-moody-private-uploads__preview {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  overflow: hidden;
+  border: 2px solid #fff;
+  border-radius: 0.25rem;
+  background: var(--ut-charcoal);
+  color: #fff;
+  box-shadow: 0 0 0 1px var(--ut-border);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.ai-moody-private-uploads__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ai-moody-private-uploads__extension {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.ai-moody-private-uploads__file {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 12rem;
+}
+
+.ai-moody-private-uploads__file a,
+.ai-moody-private-uploads__usage-links a {
+  color: #9d4700;
+  font-weight: 700;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.ai-moody-private-uploads__file small {
+  color: #5c656d;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.ai-moody-private-uploads__status {
+  display: inline-block;
+  border-radius: 999px;
+  background: #e9e6e2;
+  color: #333f48;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  line-height: 1.25;
+}
+
+.ai-moody-private-uploads__usage.is-used .ai-moody-private-uploads__status {
+  background: #fbe8d8;
+  color: #6f2f00;
+}
+
+.ai-moody-private-uploads__usage.is-removable .ai-moody-private-uploads__status {
+  background: #e5f2e8;
+  color: #1e522c;
+}
+
+.ai-moody-private-uploads__usage-links {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.6rem 0 0;
+  padding-inline-start: 1.15rem;
+  font-size: 0.9rem;
+}
+
+.ai-moody-private-uploads__media-delete {
+  color: #8c1d18 !important;
+}
+
+.ai-moody-private-uploads__delete.button,
+.ai-moody-private-uploads__delete.button:hover,
+.ai-moody-private-uploads__delete.button:focus,
+.ai-moody-private-uploads__delete.button:disabled {
+  border: 2px solid var(--ut-burnt-orange) !important;
+  background: var(--ut-burnt-orange) !important;
+  color: #fff !important;
+  opacity: 1 !important;
+  font-weight: 800;
+}
+
+.ai-moody-private-uploads__delete.button:focus-visible {
+  outline: 3px solid #333f48;
+  outline-offset: 3px;
+}
+
+.ai-moody-private-uploads__delete.button:disabled {
+  cursor: not-allowed;
+}
+
+@media (max-width: 48rem) {
+  .ai-moody-private-uploads__intro {
+    margin-block-end: 1rem;
+  }
+
+  .ai-moody-private-uploads__table-wrap {
+    margin-inline: -0.75rem;
+    border-inline: 0;
+    border-radius: 0;
+  }
+}

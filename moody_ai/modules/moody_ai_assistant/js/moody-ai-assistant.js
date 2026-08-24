@@ -1320,6 +1320,34 @@
       clearRetryAction(message);
     }
     scrollHistoryToBottom(wrapper);
+    return message;
+  }
+
+  function renderTechnicalDetails(message, technicalDetails) {
+    if (!message || !technicalDetails || !technicalDetails.report) {
+      return;
+    }
+
+    const existing = message.querySelector('[data-ai-assistant-technical-details]');
+    if (existing) {
+      existing.remove();
+    }
+
+    const details = document.createElement('details');
+    details.className = 'ai-moody-assistant__technical-details';
+    details.setAttribute('data-ai-assistant-technical-details', '');
+
+    const summary = document.createElement('summary');
+    summary.textContent = 'Technical details';
+
+    const guidance = document.createElement('p');
+    guidance.textContent = 'Send this diagnostic receipt to Moody Web Services. It excludes your prompt, page content, file names, and credentials.';
+
+    const report = document.createElement('pre');
+    report.textContent = technicalDetails.report;
+
+    details.append(summary, guidance, report);
+    message.appendChild(details);
   }
 
   function createStreamWatchdog(wrapper, onTimeout) {
@@ -1452,6 +1480,137 @@
         type: upload.type || ''
       };
     });
+  }
+
+  function renderPreviousUploads(wrapper) {
+    const shell = wrapper.querySelector('[data-ai-assistant-previous-upload-shell]');
+    const list = wrapper.querySelector('[data-ai-assistant-previous-uploads]');
+    if (!shell || !list) {
+      return;
+    }
+
+    const settings = drupalSettings.moodyAiAssistant = drupalSettings.moodyAiAssistant || {};
+    const uploads = Object.values(settings.privateUploads || {}).sort((a, b) => Number(b.created || 0) - Number(a.created || 0)).slice(0, 20);
+    const selected = new Set(Array.from(list.querySelectorAll('input[type="checkbox"]:checked')).map(input => String(input.value)));
+    const summary = shell.querySelector('summary');
+    if (summary) {
+      summary.textContent = 'Use a previous upload (' + uploads.length + ')';
+    }
+
+    list.innerHTML = '';
+    list.classList.add('ai-moody-assistant__upload-table');
+    list.setAttribute('role', 'table');
+    list.setAttribute('aria-label', 'Previous private uploads');
+
+    if (!uploads.length) {
+      const empty = document.createElement('p');
+      empty.className = 'ai-moody-assistant__upload-table-empty';
+      empty.textContent = 'New uploads will appear here after you send them.';
+      list.appendChild(empty);
+      return;
+    }
+
+    const header = document.createElement('div');
+    header.className = 'ai-moody-assistant__upload-table-header';
+    header.setAttribute('role', 'row');
+    ['Use', 'Preview', 'File', 'Open'].forEach((heading) => {
+      const cell = document.createElement('span');
+      cell.setAttribute('role', 'columnheader');
+      cell.textContent = heading;
+      header.appendChild(cell);
+    });
+    list.appendChild(header);
+
+    uploads.forEach((upload) => {
+      const id = String(upload.id || '');
+      if (!id) {
+        return;
+      }
+
+      const row = document.createElement('div');
+      row.className = 'ai-moody-assistant__upload-row';
+      row.setAttribute('role', 'row');
+
+      const selectCell = document.createElement('span');
+      selectCell.className = 'ai-moody-assistant__upload-select';
+      selectCell.setAttribute('role', 'cell');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'form-checkbox';
+      checkbox.id = 'ai-moody-previous-upload-' + id;
+      checkbox.name = 'previous_uploads[' + id + ']';
+      checkbox.value = id;
+      checkbox.checked = selected.has(id);
+      checkbox.setAttribute('aria-label', 'Use ' + (upload.name || 'private upload'));
+      selectCell.appendChild(checkbox);
+
+      const previewCell = document.createElement('span');
+      previewCell.className = 'ai-moody-assistant__upload-preview';
+      previewCell.setAttribute('role', 'cell');
+      const preview = upload.url ? document.createElement('a') : document.createElement('span');
+      if (upload.url) {
+        preview.href = upload.url;
+        preview.target = '_blank';
+        preview.rel = 'noopener';
+        preview.setAttribute('aria-label', 'Open ' + (upload.name || 'upload') + ' in a new tab');
+      }
+      if (upload.is_image && upload.preview_url) {
+        const image = document.createElement('img');
+        image.src = upload.preview_url;
+        image.alt = '';
+        image.loading = 'lazy';
+        preview.appendChild(image);
+      }
+      else {
+        preview.textContent = upload.extension || getFileExtension(upload.name);
+      }
+      previewCell.appendChild(preview);
+
+      const meta = document.createElement('span');
+      meta.className = 'ai-moody-assistant__upload-meta';
+      meta.setAttribute('role', 'cell');
+      const name = document.createElement('label');
+      name.htmlFor = checkbox.id;
+      name.textContent = upload.name || ('Private upload ' + id);
+      const details = document.createElement('small');
+      details.textContent = [upload.uploaded || '', formatFileSize(Number(upload.size || 0))].filter(Boolean).join(' · ');
+      meta.append(name, details);
+
+      const openCell = document.createElement('span');
+      openCell.className = 'ai-moody-assistant__upload-open';
+      openCell.setAttribute('role', 'cell');
+      if (upload.url) {
+        const open = document.createElement('a');
+        open.href = upload.url;
+        open.target = '_blank';
+        open.rel = 'noopener';
+        open.textContent = 'Open';
+        open.setAttribute('aria-label', 'Open ' + (upload.name || 'upload') + ' in a new tab');
+        openCell.appendChild(open);
+      }
+
+      row.append(selectCell, previewCell, meta, openCell);
+      list.appendChild(row);
+    });
+  }
+
+  function addPreviousUploads(wrapper, uploads) {
+    if (!Array.isArray(uploads) || !uploads.length) {
+      return;
+    }
+
+    const settings = drupalSettings.moodyAiAssistant = drupalSettings.moodyAiAssistant || {};
+    settings.privateUploads = settings.privateUploads || {};
+    uploads.forEach((upload) => {
+      if (upload && upload.id) {
+        settings.privateUploads[String(upload.id)] = upload;
+      }
+    });
+    renderPreviousUploads(wrapper);
+    const shell = wrapper.querySelector('[data-ai-assistant-previous-upload-shell]');
+    if (shell) {
+      shell.open = true;
+    }
   }
 
   function bindFileUploader(wrapper) {
@@ -1735,6 +1894,9 @@
           await applyLayoutCommands(wrapper, payload);
         }
       }
+      else if (eventName === 'uploads') {
+        addPreviousUploads(wrapper, payload.items || []);
+      }
       else if (eventName === 'complete') {
         completionPayload = payload;
         if (payload.preserve_page) {
@@ -1757,7 +1919,9 @@
         if (pendingItems.length) {
           renderWorkQueue(wrapper, { items: pendingItems });
         }
-        throw new Error(payload.message || 'The AI request failed.');
+        const streamError = new Error(payload.message || 'The AI request failed.');
+        streamError.technicalDetails = payload.technical_details || null;
+        throw streamError;
       }
     };
 
@@ -1793,6 +1957,8 @@
     if (!form || !input || !submit) {
       return;
     }
+
+    renderPreviousUploads(wrapper);
 
     const refreshTokenCounter = () => {
       tokenCounter.update({
@@ -2001,9 +2167,10 @@
         if (error && error.name === 'AbortError') {
           return;
         }
-        updateThinkingMessage(wrapper, 'I could not complete that request: ' + error.message, true, () => {
+        const errorMessage = updateThinkingMessage(wrapper, 'I could not complete that request: ' + error.message, true, () => {
           submitRequest();
         });
+        renderTechnicalDetails(errorMessage, error.technicalDetails);
         if (composer && composer.editor) {
           composer.editor.setAttribute('contenteditable', 'true');
           composer.editor.removeAttribute('aria-busy');

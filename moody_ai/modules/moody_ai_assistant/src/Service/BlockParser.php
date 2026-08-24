@@ -1634,6 +1634,13 @@ class BlockParser {
       return $this->normalizeLinkUri($candidate);
     }
 
+    if ($property_name === 'date') {
+      $date = str_ireplace(['a.m.', 'p.m.'], ['am', 'pm'], trim((string) $candidate));
+      $date = preg_replace('/\bat\b/i', ' ', $date);
+      $timestamp = strtotime((string) $date);
+      return $timestamp === FALSE ? '' : date('Y-m-d', $timestamp);
+    }
+
     if ($data_type === 'boolean') {
       return !empty($candidate) ? 1 : 0;
     }

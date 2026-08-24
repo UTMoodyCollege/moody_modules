@@ -346,7 +346,7 @@ class AIAssetCreator {
     if ($existing_media_id) {
       $existing_media = $this->entityTypeManager->getStorage('media')->load($existing_media_id);
       if ($existing_media) {
-        return $this->buildUploadedAssetSummary($existing_media, $asset_type, $mime_type, $original_name);
+        return $this->buildUploadedAssetSummary($existing_media, $asset_type, $mime_type, $original_name, [], $file);
       }
     }
 
@@ -381,7 +381,7 @@ class AIAssetCreator {
     $file->setPermanent();
     $file->save();
     $media = $this->createMediaFromFileEntity($file, $media_bundle, $field_data);
-    return $this->buildUploadedAssetSummary($media, $asset_type, $mime_type, $original_name, $field_data);
+    return $this->buildUploadedAssetSummary($media, $asset_type, $mime_type, $original_name, $field_data, $file);
   }
 
   /**
@@ -665,7 +665,7 @@ class AIAssetCreator {
   /**
    * Builds prompt-ready metadata for an uploaded media asset.
    */
-  protected function buildUploadedAssetSummary($media, $asset_type, $mime_type, $original_name, array $field_data = []) {
+  protected function buildUploadedAssetSummary($media, $asset_type, $mime_type, $original_name, array $field_data = [], ?FileInterface $file = NULL) {
     $summary = [
       'target_id' => (int) $media->id(),
       'media_id' => (int) $media->id(),
@@ -685,7 +685,49 @@ class AIAssetCreator {
       $summary['alt'] = $alt;
     }
 
+    if ($file) {
+      $summary += $this->buildPrivateUploadSummary($file);
+    }
+
     return $summary;
+  }
+
+  /**
+   * Builds safe display metadata for one private upload owned by the user.
+   */
+  public function buildPrivateUploadSummary(FileInterface $file) {
+    $mime_type = strtolower((string) ($file->getMimeType() ?: 'application/octet-stream'));
+    $extension = strtolower((string) pathinfo($file->getFilename(), PATHINFO_EXTENSION));
+    $is_image = str_starts_with($mime_type, 'image/') || in_array($extension, ['png', 'gif', 'jpg', 'jpeg', 'webp'], TRUE);
+    $preview_url = '';
+    if ($is_image && $this->entityTypeManager->hasDefinition('image_style')) {
+      $thumbnail = $this->entityTypeManager->getStorage('image_style')->load('thumbnail');
+      $preview_url = $thumbnail ? $thumbnail->buildUrl($file->getFileUri()) : '';
+    }
+
+    $size = (int) $file->getSize();
+    return [
+      'id' => (int) $file->id(),
+      'name' => $file->getFilename(),
+      'size' => $size,
+      'type' => $mime_type,
+      'extension' => strtoupper($extension ?: 'FILE'),
+      'created' => (int) $file->getCreatedTime(),
+      'uploaded' => gmdate('M j, Y', (int) $file->getCreatedTime()),
+      'url' => $file->createFileUrl(FALSE),
+      'preview_url' => $preview_url,
+      'is_image' => $is_image,
+      'label' => sprintf('%s · %s · %s', $file->getFilename(), gmdate('M j, Y', (int) $file->getCreatedTime()), $this->formatFileSize($size)),
+    ];
+  }
+
+  /**
+   * Formats a compact file size for upload displays.
+   */
+  protected function formatFileSize($bytes) {
+    return $bytes >= 1048576
+      ? rtrim(rtrim(number_format($bytes / 1048576, 1), '0'), '.') . ' MB'
+      : max(1, (int) round($bytes / 1024)) . ' KB';
   }
 
   /**

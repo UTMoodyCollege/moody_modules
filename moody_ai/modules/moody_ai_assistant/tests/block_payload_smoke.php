@@ -182,6 +182,30 @@ try {
     throw new RuntimeException('The image-free Flex Content Area did not retain the formatter-safe zero sentinel.');
   }
 
+  $promotion_blocks = $parser->createBlocksFromInstructions([
+    'block_title' => 'Moody AI parser smoke — Promotion',
+    'reusable' => FALSE,
+    'instructions' => [[
+      'block_type' => 'moody_promotion',
+      'field_info' => [
+        'field_block_moody_promotion' => [
+          'type' => 'moody_promotion',
+          'value' => [
+            'headline' => 'Featured event',
+            'date' => 'August 26 at 10:00 p.m.',
+            'copy_value' => '<p>Featured event details.</p>',
+            'copy_format' => 'flex_html',
+          ],
+        ],
+      ],
+    ]],
+  ]);
+  $blocks = array_merge($blocks, $promotion_blocks);
+  $promotion = $promotion_blocks[0] ?? NULL;
+  if (!$promotion instanceof BlockContentInterface || (string) $promotion->get('field_block_moody_promotion')->first()->date !== date('Y') . '-08-26') {
+    throw new RuntimeException('The generated Promotion date was not normalized for its date-only field.');
+  }
+
   print json_encode([
     'promo_list_items' => count($items),
     'normalized_view_mode' => (string) $profile->get('field_utprof_view_mode')->target_id,
@@ -189,6 +213,7 @@ try {
     'resource_items' => count($resource_items),
     'focus_area_items' => count($focus_items),
     'flex_content_links' => count($flex_links),
+    'promotion_date' => (string) $promotion->get('field_block_moody_promotion')->first()->date,
   ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
 }
 finally {

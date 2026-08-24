@@ -135,6 +135,7 @@ class AIChatStreamController extends ControllerBase {
     $provider = trim((string) $request->request->get('provider')) ?: 'openai';
     $model = trim((string) $request->request->get('model')) ?: $this->generator->defaultModel();
     $runtime_context = [
+      'site_host' => $request->getHost(),
       'is_layout_builder_context' => $this->toBoolean($request->request->get('is_layout_builder_context')),
       'prefer_ai_images' => $this->toBoolean($request->request->get('prefer_ai_images')),
       'selected_block_references' => $this->extractSelectedBlockReferences((string) $request->request->get('selected_block_references_json', '[]')),
