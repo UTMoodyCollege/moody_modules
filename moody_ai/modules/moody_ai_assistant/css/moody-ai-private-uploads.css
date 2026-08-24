@@ -33,7 +33,7 @@
   box-shadow: 0 0.5rem 1.5rem rgb(51 63 72 / 10%);
 }
 
-.ai-moody-private-uploads__table {
+table.ai-moody-private-uploads__table {
   width: 100%;
   min-width: 56rem;
   margin: 0;

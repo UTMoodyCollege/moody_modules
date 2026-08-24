@@ -97,11 +97,11 @@ try {
   if (!in_array('moody_ai_assistant/private_uploads', $uploads_form['#attached']['library'] ?? [], TRUE)) {
     throw new RuntimeException('The private upload management stylesheet was not attached.');
   }
-  if (empty($uploads_form['uploads']['#options'][(int) $summary_file->id()]['#disabled']) || !empty($uploads_form['uploads']['#options'][(int) $document_file->id()]['#disabled']) || !empty($uploads_form['actions']['delete']['#disabled'])) {
+  if (empty($uploads_form['uploads']['#options'][(int) $summary_file->id()]['#disabled']) || !empty($uploads_form['uploads']['#options'][(int) $document_file->id()]['#disabled']) || empty($uploads_form['uploads']['#js_select']) || !empty($uploads_form['actions']['delete']['#disabled'])) {
     throw new RuntimeException('Private upload removal safeguards were not reflected in the form state.');
   }
   $uploads_html = (string) \Drupal::service('renderer')->renderRoot($uploads_form);
-  foreach (['ai-moody-private-uploads__table-wrap', 'ai-moody-private-uploads__preview', 'ai-moody-private-uploads__delete', 'Stored in Media; not placed in content', 'Delete Media'] as $expected) {
+  foreach (['ai-moody-private-uploads__table-wrap', 'ai-moody-private-uploads__preview', 'ai-moody-private-uploads__delete', 'select-all', 'Stored in Media; not placed in content', 'Delete Media'] as $expected) {
     if (!str_contains($uploads_html, $expected)) {
       throw new RuntimeException(sprintf('Private upload management markup did not contain "%s".', $expected));
     }
