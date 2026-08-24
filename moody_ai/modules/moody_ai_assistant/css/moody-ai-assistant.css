@@ -598,6 +598,64 @@ body {
   animation: ai-moody-assistant-layout-update 1.8s var(--ease-out);
 }
 
+.layout-builder-block.ai-moody-assistant-edit-target {
+  position: relative;
+  cursor: pointer;
+  outline: 0.1875rem solid transparent;
+  outline-offset: 0.1875rem;
+  transition: outline-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+.layout-builder-block.ai-moody-assistant-edit-target:hover,
+.layout-builder-block.ai-moody-assistant-edit-target:has(.ai-moody-assistant__layout-edit-target-button:focus-visible) {
+  outline-color: #bf5700;
+  box-shadow: 0 0 0 0.375rem rgb(191 87 0 / 16%);
+}
+
+.layout-builder-block.is-ai-moody-assistant-edit-target-selected {
+  outline-color: #005f86;
+  box-shadow: 0 0 0 0.375rem rgb(0 95 134 / 18%);
+}
+
+.ai-moody-assistant__layout-edit-target-button {
+  position: absolute;
+  z-index: 8;
+  inset-inline-end: 0.75rem;
+  inset-block-end: 0.75rem;
+  min-height: 2.75rem;
+  border: 1px solid #8f3d00;
+  border-radius: 999px;
+  background: #bf5700;
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 16%);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  padding: 0.5rem 0.75rem;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  transform: translateY(0.5rem);
+  transition: opacity 120ms ease-out, transform 120ms ease-out;
+}
+
+.layout-builder-block.ai-moody-assistant-edit-target:hover > .ai-moody-assistant__layout-edit-target-button,
+.ai-moody-assistant__layout-edit-target-button:focus-visible,
+.ai-moody-assistant__layout-edit-target-button[aria-pressed="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ai-moody-assistant__layout-edit-target-button:hover,
+.ai-moody-assistant__layout-edit-target-button:focus-visible {
+  background: #8f3d00;
+}
+
+.ai-moody-assistant__layout-edit-target-button:focus-visible {
+  outline: 2px solid #005f86;
+  outline-offset: 0.25rem;
+}
+
 @keyframes ai-moody-assistant-work-pulse {
   50% {
     opacity: 0.35;
@@ -1257,6 +1315,17 @@ body {
   white-space: nowrap;
 }
 
+.ai-moody-assistant__selected-block-chip-mode {
+  border-radius: var(--radius-pill);
+  background: var(--color-ink-2);
+  color: var(--color-paper);
+  padding: var(--space-2xs) var(--space-xs);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .ai-moody-assistant__selected-block-preview-chip small {
   display: none;
 }
@@ -1770,6 +1839,11 @@ body {
 }
 
 @media (pointer: coarse) {
+  .layout-builder-block.ai-moody-assistant-edit-target > .ai-moody-assistant__layout-edit-target-button {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   .ai-moody-assistant button,
   .ai-moody-assistant summary,
   .ai-moody-assistant [role="button"],

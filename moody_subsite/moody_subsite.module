@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 
 /**
@@ -60,6 +61,86 @@ function moody_subsite_theme() {
       'template' => 'field--moody-subsite-menu',
     ],
   ];
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function moody_subsite_toolbar() {
+  $account = \Drupal::currentUser();
+  $items['moody_subsites'] = [
+    '#cache' => [
+      'contexts' => ['user'],
+      'tags' => ['moody_subsite_list', 'workbench_access_view', 'user:' . $account->id()],
+    ],
+  ];
+  if (!in_array('moody_subsite_editor', $account->getRoles(), TRUE)) {
+    return $items;
+  }
+
+  $resolver = \Drupal::service('moody_subsite.editor_context');
+  $subsites = $resolver->assignedSubsites($account);
+  if (!$subsites) {
+    return $items;
+  }
+
+  $first = reset($subsites);
+  $multiple = count($subsites) > 1;
+  $items['moody_subsites'] += [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      '#type' => 'link',
+      '#title' => $multiple ? t('My subsites') : t('My subsite'),
+      '#url' => $first->toUrl('canonical'),
+      '#attributes' => [
+        'title' => $multiple
+          ? t('View your assigned subsites')
+          : t('View the @subsite dashboard', ['@subsite' => $resolver->label($first)]),
+        'class' => ['toolbar-icon', 'toolbar-icon-system-admin-structure'],
+      ],
+    ],
+    '#weight' => 101,
+  ];
+
+  if ($multiple) {
+    $links = [];
+    foreach ($subsites as $subsite) {
+      $links['moody_subsite_' . $subsite->id()] = [
+        'title' => $resolver->label($subsite),
+        'url' => $subsite->toUrl('canonical'),
+      ];
+      $items['moody_subsites']['#cache']['tags'] = array_merge(
+        $items['moody_subsites']['#cache']['tags'],
+        $subsite->getCacheTags(),
+      );
+    }
+    $items['moody_subsites']['tray'] = [
+      '#heading' => t('Your assigned subsites'),
+      'links' => [
+        '#theme' => 'links__toolbar_user',
+        '#links' => $links,
+        '#attributes' => ['class' => ['toolbar-menu']],
+      ],
+    ];
+  }
+  else {
+    $items['moody_subsites']['#cache']['tags'] = array_merge(
+      $items['moody_subsites']['#cache']['tags'],
+      $first->getCacheTags(),
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Adds subsite assignments to Moody AI's authoritative user context.
+ */
+function moody_subsite_moody_ai_user_capabilities_alter(array &$capabilities, AccountInterface $account) {
+  $context = \Drupal::service('moody_subsite.editor_context')->collect($account);
+  if ($context['active']) {
+    $capabilities['subsites'] = $context;
+  }
 }
 
 /**

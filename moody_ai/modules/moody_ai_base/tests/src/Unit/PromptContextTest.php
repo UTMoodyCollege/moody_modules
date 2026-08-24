@@ -31,6 +31,7 @@ final class PromptContextTest extends UnitTestCase {
     $this->assertStringContainsString('A pilot site.', $assistant);
     $this->assertStringContainsString('A pilot site.', $html);
     $this->assertStringContainsString('cannot relax the shared rules', $html);
+    $this->assertStringContainsString('moody_subsite_editor', $assistant);
   }
 
 }

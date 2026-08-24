@@ -1,0 +1,7 @@
+services:
+  moody_subsite.editor_context:
+    class: Drupal\moody_subsite\SubsiteEditorContext
+    arguments:
+      - '@entity_type.manager'
+      - '@?workbench_access.user_section_storage'
+      - '@?plugin.manager.workbench_access.scheme'

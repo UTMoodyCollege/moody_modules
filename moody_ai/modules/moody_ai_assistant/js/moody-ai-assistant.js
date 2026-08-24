@@ -745,6 +745,7 @@
         window.setTimeout(() => component.classList.remove('ai-moody-assistant-layout-update'), 1800);
       }
     }
+    wrapper.dispatchEvent(new CustomEvent('moody-ai-assistant:layout-updated'));
     Drupal.announce((payload.operation === 'edit' ? 'Updated ' : 'Added ') + (payload.label || 'block') + ' in the working layout draft.');
     applyLayoutBuilderToolbarClearance(wrapper);
   }
@@ -838,7 +839,7 @@
     selectedBlocks.forEach((blockRef) => {
       const chip = document.createElement('span');
       chip.className = 'ai-moody-assistant__selected-block-preview-chip ai-moody-assistant__selected-block-preview-chip--' + (blockRef.selectionMode === 'edit' ? 'edit' : 'new');
-      chip.textContent = blockRef.label || 'Selected block';
+      chip.textContent = (blockRef.selectionMode === 'edit' ? 'Edit: ' : '') + (blockRef.label || 'Selected block');
       if (blockRef.typeLabel) {
         const meta = document.createElement('small');
         meta.textContent = blockRef.typeLabel;
@@ -982,6 +983,7 @@
 
     const selected = [];
     const selectedById = new Map();
+    let syncDirectEditTargets = () => {};
 
     const hydrateReference = (button) => ({
       referenceId: button.getAttribute('data-ai-assistant-block-ref-reference-id') || button.getAttribute('data-ai-assistant-block-ref-plugin-id') || button.getAttribute('data-ai-assistant-block-ref-id') || '',
@@ -1019,6 +1021,13 @@
         const chip = document.createElement('div');
         chip.className = 'ai-moody-assistant__selected-block-chip ai-moody-assistant__selected-block-chip--' + item.selectionMode;
 
+        if (item.selectionMode === 'edit') {
+          const mode = document.createElement('span');
+          mode.className = 'ai-moody-assistant__selected-block-chip-mode';
+          mode.textContent = 'Edit';
+          chip.appendChild(mode);
+        }
+
         const title = document.createElement('span');
         title.className = 'ai-moody-assistant__selected-block-chip-title';
         title.textContent = item.label;
@@ -1040,10 +1049,17 @@
       });
 
       syncHiddenInput();
+      syncDirectEditTargets(wrapper.classList.contains('is-open'));
     };
 
     const addReference = (reference) => {
-      if (!reference || !reference.referenceId || selectedById.has(reference.referenceId)) {
+      if (!reference || !reference.referenceId) {
+        return;
+      }
+
+      if (selectedById.has(reference.referenceId)) {
+        scrollComposerIntoView(wrapper);
+        focusComposer(wrapper);
         return;
       }
 
@@ -1065,6 +1081,7 @@
       scrollComposerIntoView(wrapper);
       scrollHistoryToBottom(wrapper);
       focusComposer(wrapper);
+      wrapper.dispatchEvent(new CustomEvent('moody-ai-assistant:selection-change'));
     };
 
     blockLibraries.forEach((blockLibrary) => {
@@ -1094,6 +1111,106 @@
         addReference(hydrateReference(button));
       });
     });
+
+    const editableReferencesByUuid = new Map();
+    blockButtons.forEach((button) => {
+      const reference = hydrateReference(button);
+      if (reference.selectionMode === 'edit' && reference.uuid && reference.canEdit) {
+        editableReferencesByUuid.set(reference.uuid, button);
+      }
+    });
+
+    const targetSelector = '.layout-builder-block[data-layout-block-uuid]';
+    const directButtonSelector = '[data-ai-assistant-layout-edit]';
+    let selectLayoutBlock = () => false;
+
+    syncDirectEditTargets = (isOpen) => {
+      document.querySelectorAll(targetSelector).forEach((block) => {
+        const uuid = block.getAttribute('data-layout-block-uuid') || '';
+        const referenceButton = editableReferencesByUuid.get(uuid);
+        const existingButton = Array.from(block.children).find((child) => child.matches && child.matches(directButtonSelector));
+
+        if (!isOpen || !referenceButton) {
+          block.classList.remove('ai-moody-assistant-edit-target', 'is-ai-moody-assistant-edit-target-selected');
+          if (existingButton) {
+            existingButton.remove();
+          }
+          return;
+        }
+
+        const reference = hydrateReference(referenceButton);
+        const isSelected = selectedById.has(reference.referenceId);
+        block.classList.add('ai-moody-assistant-edit-target');
+        block.classList.toggle('is-ai-moody-assistant-edit-target-selected', isSelected);
+
+        const directButton = existingButton || document.createElement('button');
+        directButton.type = 'button';
+        directButton.className = 'ai-moody-assistant__layout-edit-target-button';
+        directButton.setAttribute('data-ai-assistant-layout-edit', uuid);
+        directButton.setAttribute('aria-label', 'Edit ' + reference.label + ' with Moody AI');
+        directButton.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+        directButton.textContent = isSelected ? 'Selected for AI edit' : 'Edit with Moody AI';
+        if (!existingButton) {
+          directButton.addEventListener('click', (event) => {
+            if (selectLayoutBlock(block)) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+          });
+          block.appendChild(directButton);
+        }
+      });
+    };
+
+    selectLayoutBlock = (block) => {
+      const uuid = block ? block.getAttribute('data-layout-block-uuid') || '' : '';
+      const referenceButton = editableReferencesByUuid.get(uuid);
+      if (!referenceButton) {
+        return false;
+      }
+
+      const reference = hydrateReference(referenceButton);
+      if (selected.length !== 1 || !selectedById.has(reference.referenceId)) {
+        selected.length = 0;
+        selectedById.clear();
+      }
+      addReference(reference);
+      Drupal.announce('Editing ' + reference.label + ' with Moody AI. Describe the change, then send your request.');
+      return true;
+    };
+
+    document.addEventListener('click', (event) => {
+      if (!wrapper.classList.contains('is-open')) {
+        return;
+      }
+
+      const target = event.target instanceof Element ? event.target : null;
+      const block = target ? target.closest(targetSelector) : null;
+      if (!block || wrapper.contains(block)) {
+        return;
+      }
+
+      const directButton = target.closest(directButtonSelector);
+      const interactiveTarget = target.closest('a, button, input, select, textarea, [contenteditable="true"], [role="button"], .contextual, .layout-builder__link');
+      if (!directButton && interactiveTarget) {
+        return;
+      }
+
+      if (selectLayoutBlock(block)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
+
+    wrapper.addEventListener('moody-ai-assistant:open-state', (event) => {
+      syncDirectEditTargets(Boolean(event.detail && event.detail.isOpen));
+    });
+
+    wrapper.addEventListener('moody-ai-assistant:layout-updated', () => {
+      syncDirectEditTargets(wrapper.classList.contains('is-open'));
+    });
+
+    syncDirectEditTargets(wrapper.classList.contains('is-open'));
 
     return {
       getSelected() {
@@ -1645,6 +1762,8 @@
       window.requestAnimationFrame(refreshTokenCounter);
     });
 
+    wrapper.addEventListener('moody-ai-assistant:selection-change', refreshTokenCounter);
+
     refreshTokenCounter();
 
     let isSubmitting = false;
@@ -1987,6 +2106,9 @@
     toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     panel.hidden = !isOpen;
     wrapper.classList.toggle('is-open', isOpen);
+    wrapper.dispatchEvent(new CustomEvent('moody-ai-assistant:open-state', {
+      detail: { isOpen: isOpen }
+    }));
     if (isOpen) {
       scrollHistoryToBottom(wrapper);
     }

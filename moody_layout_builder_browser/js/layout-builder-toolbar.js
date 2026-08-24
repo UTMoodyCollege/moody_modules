@@ -69,12 +69,13 @@
         ?.querySelector('h2')
         ?.textContent.trim();
       const accessibleLabel = title
-        ? Drupal.t('Edit @title block options', { '@title': title })
-        : Drupal.t('Edit block options');
+        ? Drupal.t('@title block options', { '@title': title })
+        : Drupal.t('Block options');
 
       trigger.classList.remove('visually-hidden', 'focusable');
       trigger.classList.add('moody-layout-builder-block__edit-trigger');
       trigger.dataset.moodyEditLabel = Drupal.t('Edit');
+      trigger.dataset.moodyCloseLabel = Drupal.t('Close');
       trigger.setAttribute('aria-label', accessibleLabel);
     });
   };
@@ -783,6 +784,29 @@
     );
   };
 
+  const syncMobileToolbar = (toolbar) => {
+    const toggle = toolbar.querySelector(
+      '[data-moody-layout-builder-toolbar-toggle]',
+    );
+    if (!toggle) {
+      return;
+    }
+
+    const mobile = mobilePreviewQuery.matches;
+    const collapsed =
+      mobile && toolbar.dataset.moodyLayoutBuilderMobileCollapsed === 'true';
+
+    toggle.hidden = !mobile;
+    toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    toggle.setAttribute(
+      'aria-label',
+      collapsed
+        ? Drupal.t('Show layout controls')
+        : Drupal.t('Hide layout controls'),
+    );
+    toolbar.classList.toggle('is-mobile-collapsed', collapsed);
+  };
+
   Drupal.behaviors.moodyLayoutBuilderToolbar = {
     attach(context) {
       enhanceEditorActions(context);
@@ -800,13 +824,37 @@
       }
 
       once('moody-layout-builder-toolbar', toolbar).forEach(() => {
+        const toggle = toolbar.querySelector(
+          '[data-moody-layout-builder-toolbar-toggle]',
+        );
+        if (toolbar.dataset.moodyLayoutBuilderMobileCollapsed === undefined) {
+          toolbar.dataset.moodyLayoutBuilderMobileCollapsed = 'true';
+        }
+
         const update = () => updateToolbar(toolbar);
+        const sync = () => {
+          syncMobileToolbar(toolbar);
+          update();
+        };
+        const onToggle = () => {
+          toolbar.dataset.moodyLayoutBuilderMobileCollapsed =
+            toolbar.dataset.moodyLayoutBuilderMobileCollapsed === 'true'
+              ? 'false'
+              : 'true';
+          sync();
+        };
         const resizeObserver = new ResizeObserver(update);
 
         toolbar.moodyLayoutBuilderToolbarObservers = {
           resizeObserver,
+          toggle,
+          onToggle,
+          sync,
         };
+        toggle?.addEventListener('click', onToggle);
+        mobilePreviewQuery.addEventListener('change', sync);
         resizeObserver.observe(toolbar);
+        syncMobileToolbar(toolbar);
       });
       updateToolbar(toolbar);
     },
@@ -870,6 +918,10 @@
         .forEach((toolbar) => {
           const observers = toolbar.moodyLayoutBuilderToolbarObservers;
           observers?.resizeObserver.disconnect();
+          observers?.toggle?.removeEventListener('click', observers.onToggle);
+          if (observers?.sync) {
+            mobilePreviewQuery.removeEventListener('change', observers.sync);
+          }
           delete toolbar.moodyLayoutBuilderToolbarObservers;
         });
     },

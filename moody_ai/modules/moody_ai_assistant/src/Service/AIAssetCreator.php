@@ -550,7 +550,12 @@ class AIAssetCreator {
       throw new \Exception(sprintf('Unsupported uploaded file type: .%s', $extension));
     }
 
-    $mime_type = strtolower((string) ($uploaded_file->getMimeType() ?: ''));
+    $image_extensions = ['png', 'gif', 'jpg', 'jpeg', 'webp'];
+    $real_path = $uploaded_file->getRealPath();
+    $image_info = in_array($extension, $image_extensions, TRUE) && $real_path
+      ? @getimagesize($real_path)
+      : FALSE;
+    $mime_type = strtolower((string) (($image_info['mime'] ?? NULL) ?: $uploaded_file->getMimeType() ?: ''));
     $allowed_mime_types = [
       'png' => ['image/png'],
       'gif' => ['image/gif'],
@@ -568,11 +573,8 @@ class AIAssetCreator {
       throw new \Exception(sprintf('The contents of "%s" do not match its file type.', $uploaded_file->getClientOriginalName()));
     }
 
-    if (in_array($extension, ['png', 'gif', 'jpg', 'jpeg', 'webp'], TRUE)) {
-      $real_path = $uploaded_file->getRealPath();
-      if (!$real_path || @getimagesize($real_path) === FALSE) {
-        throw new \Exception('An uploaded image could not be validated.');
-      }
+    if (in_array($extension, $image_extensions, TRUE) && $image_info === FALSE) {
+      throw new \Exception('An uploaded image could not be validated.');
     }
   }
 

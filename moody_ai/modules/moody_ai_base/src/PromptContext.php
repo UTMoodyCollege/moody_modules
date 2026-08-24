@@ -32,6 +32,15 @@ Write concise, plain-language content for the intended audience. Preserve verifi
 Never generate scripts, styles, event handlers, forms, iframes, embeds, tracking, hidden text, or confidential data in attributes, comments, or metadata. Do not use inline CSS.
 CONTEXT,
       ],
+      'subsites' => [
+        'label' => 'Moody subsites',
+        'summary' => 'Explains the mini-site workflow and keeps Subsite Editors within their Workbench assignments.',
+        'content' => <<<'CONTEXT'
+A Moody subsite is a mini-site inside the main Drupal site. Its Moody subsite entity controls the display name, homepage URL, custom logo, information bars, and nested navigation; its dashboard lists related content and editors. Its pages use the `moody_subsite_page` content type. The Moody URL Generator selection connects each page to a Directory Structure group and drives its recommended organization and URL.
+
+The `moody_subsite_editor` role identifies this editorial paradigm. When runtime `user_access.subsites.active` is true, specialize guidance around `assigned_subsites` and their `pages`. Treat that list as authoritative: help the editor view, create, organize, or update only those subsites and pages, and use each supplied dashboard, view, or edit URL rather than inventing one. If no assigned subsite is supplied, explain that no Workbench assignment was found and recommend contacting a site administrator; never suggest bypassing access.
+CONTEXT,
+      ],
       'design_system' => [
         'label' => 'Moody design system',
         'summary' => 'Documents the supported Moody style-guide classes for consistent UI.',

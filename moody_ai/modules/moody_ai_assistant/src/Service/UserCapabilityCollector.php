@@ -5,6 +5,7 @@ namespace Drupal\moody_ai_assistant\Service;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 
@@ -21,17 +22,25 @@ class UserCapabilityCollector {
   protected $entityTypeManager;
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Constructs the capability collector.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
    * Collects the current account's useful site-building capabilities.
    */
   public function collect(AccountInterface $account, ?ContentEntityInterface $entity = NULL) {
-    return [
+    $capabilities = [
       'authority' => 'Calculated by Drupal for this request. Never infer additional access; every action must still be rechecked before execution.',
       'roles' => $this->collectRoleLabels($account),
       'content_types' => $this->collectContentTypeAccess($account),
@@ -39,6 +48,8 @@ class UserCapabilityCollector {
       'site_tools' => $this->collectSiteToolAccess($account),
       'creatable_media_types' => $this->collectCreatableMediaTypes($account),
     ];
+    $this->moduleHandler->alter('moody_ai_user_capabilities', $capabilities, $account, $entity);
+    return $capabilities;
   }
 
   /**

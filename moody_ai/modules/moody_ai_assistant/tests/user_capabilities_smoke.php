@@ -42,6 +42,10 @@ if (($snapshot['site_tools']['create_redirect'] ?? NULL) !== $expected_redirect_
   throw new RuntimeException('Redirect creation access does not match Drupal entity access.');
 }
 
+if (in_array('moody_subsite_editor', $account->getRoles(), TRUE) && empty($snapshot['subsites']['active'])) {
+  throw new RuntimeException('Subsite Editor context was not added to the capability snapshot.');
+}
+
 foreach ($snapshot['current_content']['publication']['available_transitions'] ?? [] as $transition) {
   if (empty($transition['id']) || !$account->hasPermission('use ' . $snapshot['current_content']['publication']['workflow_id'] . ' transition ' . $transition['id'])) {
     throw new RuntimeException('The snapshot contains a publication transition the account cannot use.');

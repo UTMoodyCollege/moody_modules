@@ -61,6 +61,19 @@ function moody_layout_builder_browser_form_alter(array &$form, FormStateInterfac
 
   $form['actions']['#attributes']['class'][] = 'moody-layout-builder-toolbar';
   $form['actions']['#attributes']['data-moody-layout-builder-toolbar'] = TRUE;
+  $form['actions']['mobile_toggle'] = [
+    '#type' => 'html_tag',
+    '#tag' => 'button',
+    '#value' => new TranslatableMarkup('Layout controls'),
+    '#attributes' => [
+      'type' => 'button',
+      'class' => ['moody-layout-builder-toolbar__mobile-toggle'],
+      'data-moody-layout-builder-toolbar-toggle' => TRUE,
+      'aria-expanded' => 'true',
+      'hidden' => TRUE,
+    ],
+    '#weight' => -40,
+  ];
   $form['actions']['unsaved_changes'] = [
     '#type' => 'container',
     '#attributes' => [

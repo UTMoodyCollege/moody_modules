@@ -61,6 +61,16 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
       'moody-layout-builder-toolbar',
       $form['actions']['#attributes']['class'],
     );
+    $this->assertSame(-40, $form['actions']['mobile_toggle']['#weight']);
+    $this->assertSame(
+      'button',
+      $form['actions']['mobile_toggle']['#attributes']['type'],
+    );
+    $this->assertTrue($form['actions']['mobile_toggle']['#attributes']['hidden']);
+    $this->assertSame(
+      'true',
+      $form['actions']['mobile_toggle']['#attributes']['aria-expanded'],
+    );
     $this->assertTrue($form['actions']['unsaved_changes']['#attributes']['hidden']);
     $this->assertSame(
       'status',

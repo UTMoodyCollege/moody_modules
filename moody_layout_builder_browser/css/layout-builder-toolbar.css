@@ -92,6 +92,10 @@ form.layout-builder-form .moody-layout-builder-toolbar,
   font-size: 0.9375rem;
 }
 
+.layout-builder .layout-builder-block > .contextual.open > .trigger.moody-layout-builder-block__edit-trigger::after {
+  content: attr(data-moody-close-label);
+}
+
 [dir='rtl'] .layout-builder .layout-builder-block > .contextual > .trigger.moody-layout-builder-block__edit-trigger {
   justify-content: flex-start;
   padding-inline: 0.875rem 2.125rem !important;
@@ -112,7 +116,93 @@ form.layout-builder-form .moody-layout-builder-toolbar,
 }
 
 .layout-builder .layout-builder-block > .contextual.open > .contextual-links {
-  margin-block-start: 0.375rem;
+  display: grid;
+  box-sizing: border-box;
+  width: min(17rem, calc(100vw - 2rem));
+  margin: 0.5rem 0 0;
+  padding: 0.375rem;
+  color: var(--mlbt-charcoal);
+  border: 1px solid var(--mlbt-border);
+  border-block-start: 4px solid var(--mlbt-burnt-orange);
+  border-radius: 0.25rem;
+  background: var(--mlbt-white);
+  box-shadow: 0 0.4rem 1rem var(--mlbt-shadow);
+  text-align: start;
+  white-space: normal;
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links > li {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  line-height: inherit;
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links > li + li {
+  margin-block-start: 0.125rem;
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links > li > a {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  color: var(--mlbt-charcoal);
+  border: 1px solid transparent;
+  border-radius: 0.1875rem;
+  outline: 3px solid transparent;
+  outline-offset: 1px;
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+  white-space: normal;
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links a[href*='/layout_builder/update/block/'] {
+  color: var(--mlbt-status-ink);
+  background: var(--mlbt-status-bg);
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links a[href*='/layout_builder/remove/block/'] {
+  color: var(--mlbt-danger);
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links a[href*='/layout_builder/convert/reusable/'] {
+  margin-block-start: 0.25rem;
+  color: var(--mlbt-charcoal);
+  border-color: var(--mlbt-border);
+  background: var(--mlbt-paper);
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links > li > a:hover {
+  color: var(--mlbt-status-ink);
+  border-color: var(--mlbt-burnt-orange);
+  background: var(--mlbt-status-bg);
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links a[href*='/layout_builder/remove/block/']:hover {
+  color: var(--mlbt-danger-hover);
+  border-color: var(--mlbt-danger);
+  background: #fff1f0;
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links > li > a:focus-visible {
+  color: var(--mlbt-charcoal);
+  outline-color: var(--mlbt-burnt-orange);
+  background: var(--mlbt-white);
+}
+
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links a[href*='/layout_builder/remove/block/']:focus-visible {
+  color: var(--mlbt-danger-hover);
+  outline-color: var(--mlbt-danger);
+  background: #fff1f0;
 }
 
 /* Keep Layout Builder's page-level publishing controls compact and legible. */
@@ -1578,6 +1668,78 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button.is-loading
 
 form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
   display: none;
+}
+
+@media (max-width: 39.999rem) {
+  form.layout-builder-form .moody-layout-builder-toolbar__mobile-toggle {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2.75rem;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding: 0.625rem 0.75rem;
+    color: var(--mlbt-white);
+    border: 2px solid var(--mlbt-charcoal);
+    border-radius: 0.25rem;
+    background: var(--mlbt-charcoal);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar__mobile-toggle::after {
+    flex: 0 0 auto;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-inline: 0.75rem 0.25rem;
+    content: '';
+    border-inline-end: 2px solid currentColor;
+    border-block-end: 2px solid currentColor;
+    transform: translateY(-0.125rem) rotate(45deg);
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar__mobile-toggle[aria-expanded='true']::after {
+    transform: translateY(0.125rem) rotate(225deg);
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar__mobile-toggle:focus-visible {
+    outline: 3px solid var(--mlbt-white);
+    outline-offset: 0;
+    box-shadow: 0 0 0 5px var(--mlbt-charcoal);
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar.is-mobile-collapsed {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    overflow: visible;
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar.is-mobile-collapsed > :not(.moody-layout-builder-toolbar__mobile-toggle, .moody-layout-builder-toolbar__status) {
+    display: none;
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar.is-mobile-collapsed .moody-layout-builder-toolbar__mobile-toggle {
+    flex: 1 1 auto;
+    width: auto;
+  }
+
+  form.layout-builder-form .moody-layout-builder-toolbar.is-mobile-collapsed .moody-layout-builder-toolbar__status:not([hidden]) {
+    flex: 0 1 auto;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.625rem;
+    border-inline-start-width: 1px;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {

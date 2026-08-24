@@ -21,7 +21,7 @@ services:
 
   moody_ai_assistant.user_capability_collector:
     class: Drupal\moody_ai_assistant\Service\UserCapabilityCollector
-    arguments: ['@entity_type.manager']
+    arguments: ['@entity_type.manager', '@module_handler']
 
   moody_ai_assistant.block_reference_catalog:
     class: Drupal\moody_ai_assistant\Service\BlockReferenceCatalog
