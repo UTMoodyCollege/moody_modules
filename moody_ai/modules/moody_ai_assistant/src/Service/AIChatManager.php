@@ -312,7 +312,7 @@ class AIChatManager {
         $action_plan['preview_title'] = $action_plan['preview_title'] ?? 'Preview update to selected block';
         $action_plan['preview_summary'] = $action_plan['preview_summary'] ?? sprintf('I will update the selected block "%s" directly.', $explicit_target['block_label'] ?? $explicit_target['label'] ?? 'Selected block');
       }
-      $follow_up_target = $this->inferFollowUpTarget($thread, $context, $message);
+      $follow_up_target = $explicit_target ? NULL : $this->inferFollowUpTarget($thread, $context, $message);
       if ($follow_up_target) {
         $action_plan['action'] = 'edit';
         $action_plan['target_component_uuid'] = $follow_up_target['uuid'];
@@ -617,7 +617,7 @@ class AIChatManager {
       $action_plan['preview_title'] = $action_plan['preview_title'] ?? 'Preview update to selected block';
       $action_plan['preview_summary'] = $action_plan['preview_summary'] ?? sprintf('I will update the selected block "%s" directly.', $explicit_target['block_label'] ?? $explicit_target['label'] ?? 'Selected block');
     }
-    $follow_up_target = $this->inferFollowUpTarget($thread, $context, $message);
+    $follow_up_target = $explicit_target ? NULL : $this->inferFollowUpTarget($thread, $context, $message);
     if ($follow_up_target) {
       $action_plan['action'] = 'edit';
       $action_plan['target_component_uuid'] = $follow_up_target['uuid'];
@@ -1471,6 +1471,7 @@ class AIChatManager {
         'position' => 1,
         'total' => 1,
         'placement' => $placement,
+        'changes' => $changes,
       ]);
 
       $thread->addMessage('assistant', sprintf('Updated "%s" in the working Layout Builder draft. Review the block on the page and save the layout when ready.', $label), [
@@ -1949,30 +1950,98 @@ class AIChatManager {
     $new_fields = $instructions['instructions'][0]['field_info'] ?? [];
 
     foreach ($new_fields as $field_name => $field_data) {
-      $old_value = $this->stringifyFieldPreviewValue($current_fields[$field_name] ?? []);
+      $current_field_data = $current_fields[$field_name] ?? [];
+      $current_field_data = is_array($current_field_data) ? $current_field_data : ['value' => $current_field_data];
+      $field_data = is_array($field_data) ? $field_data : ['value' => $field_data];
+      $old_value = $this->stringifyFieldPreviewValue($current_field_data);
       $new_value = $this->stringifyFieldPreviewValue($field_data);
-      $old_detail = $this->stringifyFieldPreviewDetailValue($current_fields[$field_name] ?? []);
+      $old_detail = $this->stringifyFieldPreviewDetailValue($current_field_data);
       $new_detail = $this->stringifyFieldPreviewDetailValue($field_data);
 
-      if ($old_value === $new_value) {
+      $old_comparison = $current_field_data;
+      $new_comparison = $field_data;
+      unset($old_comparison['type'], $new_comparison['type']);
+      if ($old_comparison == $new_comparison) {
         continue;
       }
 
       $field_label = $field_name;
       if ($block->hasField($field_name)) {
-        $field_label = (string) $block->getFieldDefinition($field_name)->getLabel();
+        $field_label = ucfirst((string) $block->getFieldDefinition($field_name)->getLabel());
+      }
+
+      $changed_properties = [];
+      if (is_array($old_comparison['value'] ?? NULL) && is_array($new_comparison['value'] ?? NULL)) {
+        $compound_preview = $this->buildCompoundFieldChangePreview($old_comparison['value'], $new_comparison['value']);
+        if ($compound_preview['labels']) {
+          $changed_properties = $compound_preview['labels'];
+          $old_detail = $compound_preview['before'];
+          $new_detail = $compound_preview['after'];
+        }
       }
 
       $changes[] = [
         'field_name' => $field_name,
         'field_label' => $field_label,
-        'summary' => sprintf('%s: %s -> %s', $field_label, $old_value, $new_value),
+        'summary' => $changed_properties
+          ? sprintf('%s updated: %s', $field_label, implode(', ', $changed_properties))
+          : sprintf('%s: %s -> %s', $field_label, $old_value, $new_value),
         'before' => $old_detail,
         'after' => $new_detail,
       ];
     }
 
+    if (!$changes) {
+      throw new \UnexpectedValueException('The assistant did not propose any field changes. Name the field and desired value, or provide an approved source for factual copy.');
+    }
+
     return $changes;
+  }
+
+  /**
+   * Formats only the changed properties of a compound field value.
+   */
+  protected function buildCompoundFieldChangePreview(array $before, array $after) {
+    $labels = [];
+    $before_lines = [];
+    $after_lines = [];
+
+    foreach (array_unique(array_merge(array_keys($before), array_keys($after))) as $property) {
+      $before_value = $before[$property] ?? NULL;
+      $after_value = $after[$property] ?? NULL;
+      if ($before_value == $after_value) {
+        continue;
+      }
+
+      $label = ucwords(str_replace('_', ' ', (string) $property));
+      $labels[] = $label;
+      $before_lines[] = $label . ': ' . $this->stringifyCompoundFieldProperty($before_value);
+      $after_lines[] = $label . ': ' . $this->stringifyCompoundFieldProperty($after_value);
+    }
+
+    return [
+      'labels' => $labels,
+      'before' => implode("\n", $before_lines),
+      'after' => implode("\n", $after_lines),
+    ];
+  }
+
+  /**
+   * Formats one compound field property for a change preview.
+   */
+  protected function stringifyCompoundFieldProperty($value) {
+    if ($value === NULL || $value === '' || $value === []) {
+      return 'empty';
+    }
+    if (is_bool($value)) {
+      return $value ? 'Yes' : 'No';
+    }
+    if (is_array($value)) {
+      return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    $value = trim(strip_tags((string) $value));
+    return $value === '' ? 'empty' : $value;
   }
 
   /**

@@ -177,6 +177,28 @@ body {
   transform: none;
 }
 
+.ai-moody-assistant.is-minimized.is-working .ai-moody-assistant__launcher {
+  animation: ai-moody-assistant-working-pulse 1.4s ease-out infinite;
+}
+
+@keyframes ai-moody-assistant-working-pulse {
+  0%,
+  100% {
+    box-shadow: var(--shadow-raised), 0 0 0 0 rgb(191 87 0 / 55%);
+  }
+
+  55% {
+    box-shadow: var(--shadow-raised), 0 0 0 0.75rem rgb(191 87 0 / 0%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-moody-assistant.is-minimized.is-working .ai-moody-assistant__launcher {
+    animation: none;
+    box-shadow: var(--shadow-raised), 0 0 0 var(--space-2xs) rgb(191 87 0 / 35%);
+  }
+}
+
 .ai-moody-assistant.is-open .ai-moody-assistant__launcher {
   display: none;
 }
@@ -578,6 +600,12 @@ body {
   white-space: nowrap;
 }
 
+.ai-moody-assistant__work-changes {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-inline-start: calc(0.75rem + var(--space-xs));
+}
+
 .ai-moody-assistant__work-item[data-status="working"] .ai-moody-assistant__work-indicator {
   border-color: var(--color-accent);
   background: var(--color-accent);
@@ -769,6 +797,13 @@ body {
   color: var(--color-ink);
   font-size: var(--text-sm);
   overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+@media (min-width: 48rem) {
+  .ai-moody-assistant__change-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .ai-moody-assistant__preview-status,

@@ -426,6 +426,32 @@ class AssistantPlanner {
 
     $response = $this->requestChatCompletion($messages, 0.6, $stream_callback);
     $payload = $this->parseJsonMessage($response);
+    $selected_type = (string) ($plan['selected_block_type'] ?? '');
+
+    if (!empty($context['edit_mode'])) {
+      if (!isset($payload['values']) || !is_array($payload['values'])) {
+        throw new \Exception('Editor agent did not return block values.');
+      }
+
+      $allowed_fields = array_fill_keys(array_filter(
+        array_keys($blockData['content_blocks'][$selected_type]['fields'] ?? []),
+        static fn ($field_name): bool => $field_name === 'body' || str_starts_with($field_name, 'field_')
+      ), TRUE);
+      $field_info = [];
+      foreach ($payload['values'] as $field_name => $field_value) {
+        if (isset($allowed_fields[$field_name])) {
+          $field_info[$field_name] = is_array($field_value) ? $field_value : ['value' => $field_value];
+        }
+      }
+
+      $payload = [
+        'instructions' => [[
+          'block_type' => $selected_type,
+          'description' => trim((string) ($payload['description'] ?? 'Update the selected block.')),
+          'field_info' => $field_info,
+        ]],
+      ];
+    }
 
     if (empty($payload['instructions']) || !is_array($payload['instructions'])) {
       throw new \Exception('Creator agent did not return block instructions.');
@@ -433,7 +459,6 @@ class AssistantPlanner {
 
     $plan = $this->mergeInferredAssetRequirements($plan, $prompt, $blockData);
     $payload = $this->normalizeAssetRequirements($payload, $plan, $blockData, $context);
-    $selected_type = (string) ($plan['selected_block_type'] ?? '');
     if ($selected_type !== '' && isset($blockData['content_blocks'][$selected_type])) {
       foreach ($payload['instructions'] as &$instruction) {
         if (is_array($instruction)) {
@@ -605,6 +630,10 @@ class AssistantPlanner {
   protected function getCreatorPrompt(array $plan, array $blockData, array $context) {
     $selected_block_type = $plan['selected_block_type'] ?? '';
     $selected_definition = $blockData['content_blocks'][$selected_block_type] ?? ($blockData['selected_block']['definition'] ?? []);
+    if (!empty($context['edit_mode'])) {
+      return $this->getEditorPrompt($selected_block_type, $selected_definition, $context);
+    }
+
     $custom_field_guidance = $this->getCustomFieldGuidance($selected_definition);
     $compact_schema = $this->buildCompactFieldSchema($selected_definition);
 
@@ -651,6 +680,59 @@ class AssistantPlanner {
       . (!empty($context['block_tools']) ? "\n\nBlock inspection tool JSON:\n" . json_encode($context['block_tools'], JSON_PRETTY_PRINT) : '')
       . "\n\nExisting instructions JSON for revision context:\n"
       . json_encode($context['current_instructions']['instructions'] ?? [], JSON_PRETTY_PRINT)
+      . $this->getConfiguredContextPrompt();
+  }
+
+  /**
+   * Builds the compact schema/value contract for one existing block edit.
+   */
+  protected function getEditorPrompt($block_type, array $block_definition, array $context) {
+    $schema = [];
+    foreach ($block_definition['fields'] ?? [] as $field_name => $field) {
+      if ($field_name !== 'body' && !str_starts_with($field_name, 'field_')) {
+        continue;
+      }
+      $schema[$field_name] = array_filter([
+        'label' => (string) ($field['label'] ?? $field_name),
+        'type' => (string) ($field['type'] ?? ''),
+        'required' => !empty($field['required']),
+        'cardinality' => isset($field['cardinality']) ? (int) $field['cardinality'] : NULL,
+        'target_type' => (string) ($field['target_type'] ?? ''),
+        'allowed_values' => array_values($field['allowed_values'] ?? []),
+        'properties' => $field['properties'] ?? [],
+        'guidance' => (string) ($field['guidance'] ?? ''),
+      ], static fn ($value): bool => $value !== '' && $value !== [] && $value !== NULL && $value !== FALSE);
+    }
+
+    $values = [];
+    foreach ($context['current_instructions']['instructions'][0]['field_info'] ?? [] as $field_name => $field_value) {
+      $field_value = is_array($field_value) ? $field_value : ['value' => $field_value];
+      unset($field_value['type']);
+      $values[$field_name] = $field_value;
+    }
+
+    return "You edit one existing Drupal block through a compact JSON contract.\n\n"
+      . "Return valid JSON only in this shape:\n"
+      . "{\n"
+      . "  \"description\": \"short summary\",\n"
+      . "  \"values\": {\n"
+      . "    \"field_name\": {\"value\": \"complete updated value\"}\n"
+      . "  }\n"
+      . "}\n\n"
+      . "Rules:\n"
+      . "- Use only field names present in schema.\n"
+      . "- Return only fields whose values must change; omitted fields remain unchanged.\n"
+      . "- For a changed compound or multi-value field, return its complete updated value, including retained items.\n"
+      . "- Preserve valid formats, IDs, option tokens, and structured subproperties unless the request changes them.\n"
+      . "- Do not invent quotations, attributions, factual claims, URLs, or media IDs. If an approved source or exact value is required but missing, return an empty values object.\n"
+      . "- Never wrap JSON in markdown fences.\n\n"
+      . "Edit contract JSON:\n"
+      . json_encode([
+        'block_type' => (string) $block_type,
+        'schema' => $schema,
+        'values' => $values,
+      ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+      . (!empty($context['block_tools']) ? "\n\nBlock inspection JSON:\n" . json_encode($context['block_tools'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : '')
       . $this->getConfiguredContextPrompt();
   }
 
@@ -933,6 +1015,10 @@ class AssistantPlanner {
             'title' => $instruction['field_info'][$field_name]['title'] ?? $requirement['title'] ?? 'AI generated image',
           ]
         );
+      }
+
+      if (!empty($context['edit_mode'])) {
+        continue;
       }
 
       foreach ($field_definitions as $field_name => $field_definition) {

@@ -100,6 +100,7 @@
             {% set action_resolution = message.metadata.action_resolution|default(null) %}
             {% set uploaded_assets = message.metadata.uploaded_assets|default([]) %}
             {% set selected_block_references = message.metadata.selected_block_references|default([]) %}
+            {% set edited_blocks = message.metadata.edited_blocks|default([]) %}
             {% set prefer_ai_images = message.metadata.prefer_ai_images|default(false) %}
             {% if uploaded_assets %}
               <div class="ai-moody-assistant__preview">
@@ -134,6 +135,36 @@
                 <div class="ai-moody-assistant__preview-title">Image preference</div>
                 <span class="ai-moody-assistant__preference-badge">AI image</span>
               </div>
+            {% endif %}
+            {% if edited_blocks %}
+              {% for edited_block in edited_blocks %}
+                {% if edited_block.changes %}
+                  <div class="ai-moody-assistant__preview">
+                    <div class="ai-moody-assistant__preview-title">Changes applied to the working draft</div>
+                    <div class="ai-moody-assistant__preview-target">{{ edited_block.block_label|default('Updated block') }}</div>
+                    <div class="ai-moody-assistant__preview-list ai-moody-assistant__preview-list--changes">
+                      {% for change in edited_block.changes %}
+                        <details class="ai-moody-assistant__change-card"{% if edited_block.changes|length == 1 %} open{% endif %}>
+                          <summary class="ai-moody-assistant__change-summary">
+                            <span class="ai-moody-assistant__change-title">{{ change.field_label|default(change.field_name|default('Changed field')) }}</span>
+                            <span class="ai-moody-assistant__change-copy">{{ change.summary|default('Updated') }}</span>
+                          </summary>
+                          <div class="ai-moody-assistant__change-details">
+                            <div class="ai-moody-assistant__change-pane">
+                              <div class="ai-moody-assistant__change-pane-label">Before</div>
+                              <div class="ai-moody-assistant__change-pane-value">{{ change.before|default('empty') }}</div>
+                            </div>
+                            <div class="ai-moody-assistant__change-pane">
+                              <div class="ai-moody-assistant__change-pane-label">After</div>
+                              <div class="ai-moody-assistant__change-pane-value">{{ change.after|default('empty') }}</div>
+                            </div>
+                          </div>
+                        </details>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
             {% endif %}
             {% if pending_action %}
               <div class="ai-moody-assistant__preview">

@@ -88,10 +88,10 @@ class AIInstructionGenerator {
     ];
 
     $payload = $this->planner->createBlockPayload($prompt, $plan, $blockData, [
-      'revision_prompt' => $prompt,
       'current_instructions' => [
         'instructions' => [$existing_instruction],
       ],
+      'edit_mode' => TRUE,
       'uploaded_assets' => $context['uploaded_assets'] ?? [],
       'prefer_ai_images' => !empty($context['prefer_ai_images']),
       'block_tools' => $context['block_tools'] ?? [],

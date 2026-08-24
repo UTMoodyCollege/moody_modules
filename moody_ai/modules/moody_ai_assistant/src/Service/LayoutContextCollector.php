@@ -123,6 +123,16 @@ class LayoutContextCollector {
       }
     }
 
+    $selected_references = $this->normalizeSelectedBlockReferences($runtime_context['selected_block_references'] ?? []);
+    $selected_ids = is_array($runtime_context['selected_block_reference_ids'] ?? NULL)
+      ? $runtime_context['selected_block_reference_ids']
+      : [];
+    foreach ($selected_references as $reference) {
+      if (($reference['selection_mode'] ?? 'new') === 'edit' && !empty($reference['uuid'])) {
+        $selected_ids[] = (string) $reference['uuid'];
+      }
+    }
+
     return [
       'entity_type' => $entity->getEntityTypeId(),
       'entity_id' => $entity->id(),
@@ -131,8 +141,8 @@ class LayoutContextCollector {
       'is_layout_builder_context' => $this->isLayoutBuilderContext($entity, $runtime_context),
       'prefer_ai_images' => !empty($runtime_context['prefer_ai_images']),
       'existing_components' => $components,
-      'selected_block_references' => $this->normalizeSelectedBlockReferences($runtime_context['selected_block_references'] ?? []),
-      'selected_existing_block_references' => $this->resolveSelectedBlockReferences($components, $runtime_context['selected_block_reference_ids'] ?? []),
+      'selected_block_references' => $selected_references,
+      'selected_existing_block_references' => $this->resolveSelectedBlockReferences($components, array_values(array_unique($selected_ids))),
     ];
   }
 

@@ -641,6 +641,8 @@
   }
 
   function stopThinkingStatus(wrapper, isError) {
+    wrapper.classList.remove('is-working');
+    wrapper.removeAttribute('aria-busy');
     const state = thinkingStatusByWrapper.get(wrapper);
     if (!state) {
       return;
@@ -669,6 +671,61 @@
         meta.textContent = 'Completed in the working layout draft';
       }
     }
+  }
+
+  function renderWorkItemChanges(row, changes) {
+    let container = row.querySelector('[data-ai-assistant-work-changes]');
+    if (!Array.isArray(changes) || !changes.length) {
+      if (container) {
+        container.remove();
+      }
+      return;
+    }
+
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'ai-moody-assistant__work-changes';
+      container.setAttribute('data-ai-assistant-work-changes', 'true');
+      row.appendChild(container);
+    }
+    container.replaceChildren();
+
+    changes.forEach((change) => {
+      const details = document.createElement('details');
+      details.className = 'ai-moody-assistant__change-card';
+      details.open = changes.length === 1;
+
+      const summary = document.createElement('summary');
+      summary.className = 'ai-moody-assistant__change-summary';
+      const title = document.createElement('span');
+      title.className = 'ai-moody-assistant__change-title';
+      title.textContent = change.field_label || change.field_name || 'Changed field';
+      const copy = document.createElement('span');
+      copy.className = 'ai-moody-assistant__change-copy';
+      copy.textContent = change.summary || 'Updated';
+      summary.append(title, copy);
+      details.appendChild(summary);
+
+      const panes = document.createElement('div');
+      panes.className = 'ai-moody-assistant__change-details';
+      [['Before', change.before], ['After', change.after]].forEach(([label, value]) => {
+        if (typeof value === 'undefined') {
+          return;
+        }
+        const pane = document.createElement('div');
+        pane.className = 'ai-moody-assistant__change-pane';
+        const paneLabel = document.createElement('div');
+        paneLabel.className = 'ai-moody-assistant__change-pane-label';
+        paneLabel.textContent = label;
+        const paneValue = document.createElement('div');
+        paneValue.className = 'ai-moody-assistant__change-pane-value';
+        paneValue.textContent = value;
+        pane.append(paneLabel, paneValue);
+        panes.appendChild(pane);
+      });
+      details.appendChild(panes);
+      container.appendChild(details);
+    });
   }
 
   function renderWorkQueue(wrapper, payload) {
@@ -714,6 +771,7 @@
       if (item.message && status === 'failed') {
         row.querySelector('small').textContent = item.message;
       }
+      renderWorkItemChanges(row, item.changes);
     });
     scrollHistoryToBottom(wrapper);
   }
@@ -755,6 +813,9 @@
     if (!history) {
       return;
     }
+
+    wrapper.classList.add('is-working');
+    wrapper.setAttribute('aria-busy', 'true');
 
     const existing = history.querySelector('.ai-moody-assistant__message--thinking');
     if (existing) {

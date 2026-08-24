@@ -70,7 +70,21 @@ try {
   $working_storage = $collector->getResolvedSectionStorage($reloaded, $runtime_context);
   $working_component = $working_storage->getSection($placement['section_delta'])->getComponent($placement['component_uuid']);
 
-  $block = \Drupal::service('moody_ai_assistant.block_parser')->updateBlockFromInstructions($block, [
+  $selected_context = $collector->collectEntityContext($reloaded, $runtime_context + [
+    'selected_block_references' => [[
+      'reference_id' => $placement['component_uuid'],
+      'uuid' => $placement['component_uuid'],
+      'label' => $block->label(),
+      'selection_mode' => 'edit',
+    ]],
+  ]);
+  if (($selected_context['selected_existing_block_references'][0]['uuid'] ?? '') !== $placement['component_uuid']) {
+    throw new RuntimeException('An explicitly selected edit token did not resolve to its Layout Builder component.');
+  }
+
+  $parser = \Drupal::service('moody_ai_assistant.block_parser');
+  $existing_instruction = $parser->exportBlockToInstruction($block);
+  $updated_instructions = [
     'instructions' => [[
       'block_type' => 'basic',
       'field_info' => [
@@ -81,7 +95,58 @@ try {
         ],
       ],
     ]],
-  ], $node);
+  ];
+
+  $chat_manager = \Drupal::service('moody_ai_assistant.chat_manager');
+  $change_method = new ReflectionMethod($chat_manager, 'buildInstructionChangePreview');
+  $change_method->setAccessible(TRUE);
+  $changes = $change_method->invoke($chat_manager, $block, $existing_instruction, $updated_instructions);
+  if (($changes[0]['field_label'] ?? '') !== 'Body' || !str_contains($changes[0]['before'] ?? '', 'Initial streaming') || !str_contains($changes[0]['after'] ?? '', 'Updated streaming')) {
+    throw new RuntimeException('Block edit changes did not retain readable field labels and before/after values.');
+  }
+  $compound_instruction = $existing_instruction;
+  $compound_instruction['field_info']['field_test_compound'] = [
+    'value' => ['quote' => 'Initial quote', 'author' => 'Same author'],
+  ];
+  $changed_compound_instruction = $compound_instruction;
+  $changed_compound_instruction['field_info']['field_test_compound']['value']['quote'] = 'Updated quote';
+  $compound_changes = $change_method->invoke($chat_manager, $block, $compound_instruction, [
+    'instructions' => [$changed_compound_instruction],
+  ]);
+  if (($compound_changes[0]['summary'] ?? '') !== 'field_test_compound updated: Quote' || ($compound_changes[0]['before'] ?? '') !== 'Quote: Initial quote' || ($compound_changes[0]['after'] ?? '') !== 'Quote: Updated quote') {
+    throw new RuntimeException('Compound change previews did not isolate readable changed properties.');
+  }
+  try {
+    $change_method->invoke($chat_manager, $block, $existing_instruction, ['instructions' => [$existing_instruction]]);
+    throw new RuntimeException('A no-op edit was incorrectly accepted as completed work.');
+  }
+  catch (UnexpectedValueException $exception) {
+  }
+
+  $planner = \Drupal::service('moody_ai_assistant.planner');
+  $prompt_method = new ReflectionMethod($planner, 'getCreatorPrompt');
+  $prompt_method->setAccessible(TRUE);
+  $editor_prompt = $prompt_method->invoke($planner, ['selected_block_type' => 'basic'], [
+    'content_blocks' => [
+      'basic' => [
+        'fields' => [
+          'body' => [
+            'label' => 'Body',
+            'type' => 'text_with_summary',
+            'required' => FALSE,
+          ],
+        ],
+      ],
+    ],
+  ], [
+    'edit_mode' => TRUE,
+    'current_instructions' => ['instructions' => [$existing_instruction]],
+  ]);
+  if (!str_contains($editor_prompt, '"schema"') || !str_contains($editor_prompt, '"values"') || !str_contains($editor_prompt, '"body"')) {
+    throw new RuntimeException('The edit prompt did not use the compact schema/value JSON contract.');
+  }
+
+  $block = $parser->updateBlockFromInstructions($block, $updated_instructions, $node);
   $updated_placement = $placement_manager->updateInlineBlockComponent($reloaded, $placement['component_uuid'], $block, $runtime_context);
 
   $working_storage = $collector->getResolvedSectionStorage($reloaded, $runtime_context);
@@ -139,6 +204,10 @@ try {
     'requested_section_target' => $placement['section_delta'] . ':' . $placement['region'],
     'invalid_target_fallback' => $invalid_section_fallback . ':' . $invalid_region_fallback,
     'component_uuid_preserved' => $placement['component_uuid'] === $updated_placement['component_uuid'],
+    'explicit_edit_target_resolved' => TRUE,
+    'schema_value_contract' => TRUE,
+    'no_op_edit_rejected' => TRUE,
+    'before_after_change_preview' => TRUE,
     'layout_ajax_replace' => TRUE,
   ], JSON_PRETTY_PRINT) . PHP_EOL;
 }
