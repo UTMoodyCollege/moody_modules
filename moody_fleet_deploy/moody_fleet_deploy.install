@@ -110,6 +110,13 @@ function moody_fleet_deploy_update_9011() {
 }
 
 /**
+ * Adds the shared Moody text-size scale to Flex HTML.
+ */
+function moody_fleet_deploy_update_9012() {
+  _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
+}
+
+/**
  * Adds the Inner Rail filter to the Flex HTML text format.
  */
 function _moody_fleet_deploy_enable_inner_rail_on_flex_html() {
@@ -300,40 +307,32 @@ function _moody_fleet_deploy_enable_moody_text_styles_on_flex_html() {
   $styles = $editor->get('settings.plugins.ckeditor5_style.styles') ?? [];
   $definitions = [
     [
-      'label' => 'UT Size: Small',
+      'label' => 'Text size: Small',
       'element' => '<span class="moody-text-size-sm">',
     ],
     [
-      'label' => 'UT Size: Large',
+      'label' => 'Text size: Large',
       'element' => '<span class="moody-text-size-lg">',
     ],
     [
-      'label' => 'UT Size: XL',
+      'label' => 'Text size: Extra large',
       'element' => '<span class="moody-text-size-xl">',
     ],
     [
-      'label' => 'UT Size: 2XL',
+      'label' => 'Text size: Display',
       'element' => '<span class="moody-text-size-2xl">',
     ],
   ];
 
-  $existing_elements = [];
-  foreach ($styles as $style) {
-    if (!empty($style['element']) && is_string($style['element'])) {
-      $existing_elements[] = $style['element'];
-    }
-  }
+  $size_elements = array_column($definitions, 'element');
+  $other_styles = array_values(array_filter(
+    $styles,
+    static fn(array $style): bool => !in_array($style['element'] ?? '', $size_elements, TRUE),
+  ));
+  $updated_styles = array_merge($definitions, $other_styles);
 
-  $updated = FALSE;
-  foreach ($definitions as $definition) {
-    if (!in_array($definition['element'], $existing_elements, TRUE)) {
-      $styles[] = $definition;
-      $updated = TRUE;
-    }
-  }
-
-  if ($updated) {
-    $editor->set('settings.plugins.ckeditor5_style.styles', $styles)->save();
+  if ($updated_styles !== $styles) {
+    $editor->set('settings.plugins.ckeditor5_style.styles', $updated_styles)->save();
   }
 }
 

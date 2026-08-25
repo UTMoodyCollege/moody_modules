@@ -71,9 +71,9 @@ function _moody_ckeditor_custom_style_definitions(): array {
     ['label' => 'UT Background: Green', 'element' => '<span class="moody-bg-green">'],
     ['label' => 'UT Background: Lime', 'element' => '<span class="moody-bg-lime">'],
     ['label' => 'UT Background: Gold', 'element' => '<span class="moody-bg-gold">'],
-    ['label' => 'UT Size: Small', 'element' => '<span class="moody-text-size-sm">'],
-    ['label' => 'UT Size: Large', 'element' => '<span class="moody-text-size-lg">'],
-    ['label' => 'UT Size: XL', 'element' => '<span class="moody-text-size-xl">'],
-    ['label' => 'UT Size: 2XL', 'element' => '<span class="moody-text-size-2xl">'],
+    ['label' => 'Text size: Small', 'element' => '<span class="moody-text-size-sm">'],
+    ['label' => 'Text size: Large', 'element' => '<span class="moody-text-size-lg">'],
+    ['label' => 'Text size: Extra large', 'element' => '<span class="moody-text-size-xl">'],
+    ['label' => 'Text size: Display', 'element' => '<span class="moody-text-size-2xl">'],
   ];
 }

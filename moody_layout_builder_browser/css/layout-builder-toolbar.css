@@ -1335,6 +1335,14 @@ form:is(.layout-builder-add-block, .layout-builder-configure-block) .claro-detai
   line-height: 1.35;
 }
 
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .claro-details__summary::marker {
+  content: "";
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .claro-details__summary::-webkit-details-marker {
+  display: none;
+}
+
 form:is(.layout-builder-add-block, .layout-builder-configure-block) .claro-details__summary em {
   font-style: normal;
 }

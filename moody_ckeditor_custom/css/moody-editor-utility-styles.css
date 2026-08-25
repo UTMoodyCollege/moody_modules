@@ -140,22 +140,33 @@
 
 .ck-content .moody-text-size-sm,
 .moody-text-size-sm {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1.385;
 }
 
 .ck-content .moody-text-size-lg,
 .moody-text-size-lg {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
+  line-height: 1.25;
 }
 
 .ck-content .moody-text-size-xl,
 .moody-text-size-xl {
-  font-size: 1.375rem;
+  font-size: 1.5625rem;
+  line-height: 1.25;
 }
 
 .ck-content .moody-text-size-2xl,
 .moody-text-size-2xl {
   font-size: 1.75rem;
+  line-height: 1.154;
+}
+
+@media (min-width: 768px) {
+  .ck-content .moody-text-size-2xl,
+  .moody-text-size-2xl {
+    font-size: 2.4375rem;
+  }
 }
 
 .ck-content .moody-readable-text,
