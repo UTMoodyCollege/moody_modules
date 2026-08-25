@@ -52,6 +52,27 @@ function moody_layout_builder_browser_form_alter(array &$form, FormStateInterfac
     $form['settings']['label_display']['#description'] = new TranslatableMarkup(
       'Optional. Select this to show the title to site visitors as part of the block.',
     );
+    $form['actions']['#type'] = 'container';
+    $form['actions']['#attributes']['class'][] = 'moody-block-form-toolbar';
+    $form['actions']['#attributes']['data-moody-block-form-toolbar'] = TRUE;
+    $form['actions']['unsaved_changes'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['moody-layout-builder-toolbar__status'],
+        'data-moody-block-form-unsaved-status' => TRUE,
+        'hidden' => TRUE,
+        'role' => 'status',
+        'aria-live' => 'polite',
+        'aria-atomic' => 'true',
+      ],
+      '#weight' => -10,
+      'label' => [
+        '#markup' => new TranslatableMarkup('Unsaved changes'),
+      ],
+    ];
+    $form['actions']['submit']['#weight'] = 10;
+    $form['actions']['submit']['#attributes']['class'][] = 'moody-layout-builder-toolbar__button';
+    $form['actions']['submit']['#attributes']['class'][] = 'moody-layout-builder-toolbar__button--primary';
     _moody_layout_builder_browser_add_live_preview($form, $form_state, $form_id);
   }
 

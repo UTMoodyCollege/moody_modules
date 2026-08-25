@@ -1477,6 +1477,41 @@ form:is(.layout-builder-add-block, .layout-builder-configure-block) .field-multi
   opacity: 0.7;
 }
 
+form:is(.layout-builder-add-block, .layout-builder-configure-block) {
+  padding-block-end: calc(var(--moody-block-form-toolbar-height, 8rem) + 1rem);
+}
+
+.moody-block-form-toolbar {
+  position: fixed;
+  z-index: var(--mlbt-z-index);
+  inset-inline: max(0.5rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-right));
+  inset-block-end: max(0.5rem, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  box-sizing: border-box;
+  width: auto;
+  max-width: 68.75rem;
+  margin: 0 auto;
+  padding: 0.75rem;
+  color: var(--mlbt-charcoal);
+  border: 1px solid var(--mlbt-border);
+  border-block-start: 4px solid var(--mlbt-burnt-orange);
+  border-radius: 0.25rem;
+  background: var(--mlbt-paper);
+  box-shadow: 0 0.5rem 1.5rem var(--mlbt-shadow);
+  font-family: inherit;
+}
+
+.moody-block-form-toolbar .moody-layout-builder-toolbar__status {
+  order: 0;
+}
+
+.moody-block-form-toolbar .moody-layout-builder-toolbar__button.button {
+  order: 1;
+  width: 100%;
+}
+
 form.layout-builder-form .moody-layout-builder-toolbar {
 
   position: fixed;
@@ -1607,7 +1642,7 @@ form.layout-builder-form .moody-layout-builder-toolbar__option .form-checkbox:fo
   outline-offset: 3px;
 }
 
-form.layout-builder-form .moody-layout-builder-toolbar__button.button {
+.moody-layout-builder-toolbar__button.button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1632,13 +1667,13 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button {
     transform 100ms var(--mlbt-ease-out);
 }
 
-form.layout-builder-form .moody-layout-builder-toolbar__button--primary.button {
+.moody-layout-builder-toolbar__button--primary.button {
   color: var(--mlbt-accent-ink);
   border-color: var(--mlbt-burnt-orange);
   background: var(--mlbt-burnt-orange);
 }
 
-form.layout-builder-form .moody-layout-builder-toolbar__button--secondary.button {
+.moody-layout-builder-toolbar__button--secondary.button {
   border-color: var(--mlbt-charcoal);
   background: var(--mlbt-charcoal);
 }
@@ -1648,19 +1683,19 @@ form.layout-builder-form .moody-layout-builder-toolbar > #edit-discard-changes.m
   background: var(--mlbt-danger);
 }
 
-form.layout-builder-form .moody-layout-builder-toolbar__button.button:focus-visible {
+.moody-layout-builder-toolbar__button.button:focus-visible {
   outline: 3px solid var(--mlbt-white);
   outline-offset: 0;
   box-shadow: 0 0 0 5px var(--mlbt-charcoal);
 }
 
-form.layout-builder-form .moody-layout-builder-toolbar__button.button:active {
+.moody-layout-builder-toolbar__button.button:active {
   transform: translateY(1px);
 }
 
-form.layout-builder-form .moody-layout-builder-toolbar__button.button:disabled,
-form.layout-builder-form .moody-layout-builder-toolbar__button.button.is-disabled,
-form.layout-builder-form .moody-layout-builder-toolbar__button.button[aria-disabled='true'] {
+.moody-layout-builder-toolbar__button.button:disabled,
+.moody-layout-builder-toolbar__button.button.is-disabled,
+.moody-layout-builder-toolbar__button.button[aria-disabled='true'] {
   color: var(--mlbt-muted);
   border-color: var(--mlbt-border);
   background: var(--mlbt-disabled);
@@ -1670,12 +1705,12 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button[aria-disab
   transform: none;
 }
 
-form.layout-builder-form .moody-layout-builder-toolbar__button.button[aria-busy='true'],
-form.layout-builder-form .moody-layout-builder-toolbar__button.button.is-loading {
+.moody-layout-builder-toolbar__button.button[aria-busy='true'],
+.moody-layout-builder-toolbar__button.button.is-loading {
   cursor: wait;
 }
 
-form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
+.moody-layout-builder-toolbar__button.button.hidden {
   display: none;
 }
 
@@ -1804,13 +1839,13 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
     border-color: var(--mlbt-burnt-orange);
   }
 
-  form.layout-builder-form .moody-layout-builder-toolbar__button--primary.button:hover {
+  .moody-layout-builder-toolbar__button--primary.button:hover {
     border-color: var(--mlbt-burnt-orange-hover);
     background: var(--mlbt-burnt-orange-hover);
     transform: translateY(-1px);
   }
 
-  form.layout-builder-form .moody-layout-builder-toolbar__button--secondary.button:hover {
+  .moody-layout-builder-toolbar__button--secondary.button:hover {
     border-color: var(--mlbt-charcoal-hover);
     background: var(--mlbt-charcoal-hover);
     transform: translateY(-1px);
@@ -1824,6 +1859,21 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
 }
 
 @media (min-width: 40rem) {
+  .moody-block-form-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-inline: 1rem;
+  }
+
+  .moody-block-form-toolbar .moody-layout-builder-toolbar__button.button {
+    width: auto;
+    min-width: 10rem;
+    padding-inline: 1.5rem;
+    font-size: 0.875rem;
+  }
+
   form:is(.layout-builder-add-block, .layout-builder-configure-block) .moody-block-live-preview__header {
     display: flex;
   }
@@ -1884,7 +1934,7 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
     width: auto;
   }
 
-  form.layout-builder-form .moody-layout-builder-toolbar__button.button {
+  .moody-layout-builder-toolbar__button.button {
     padding-inline: 1rem;
     font-size: 0.875rem;
   }
@@ -1956,7 +2006,7 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
   form:is(.layout-builder-add-block, .layout-builder-configure-block) .moody-block-live-preview__device,
   .moody-layout-builder-toolbar__status,
   form.layout-builder-form .moody-layout-builder-toolbar__option > .form-item,
-  form.layout-builder-form .moody-layout-builder-toolbar__button.button {
+  .moody-layout-builder-toolbar__button.button {
     min-height: 3rem;
   }
 }
@@ -1968,7 +2018,7 @@ form.layout-builder-form .moody-layout-builder-toolbar__button.button.hidden {
   form:is(.layout-builder-add-block, .layout-builder-configure-block) .moody-block-live-preview__refresh.button,
   form:is(.layout-builder-add-block, .layout-builder-configure-block) .moody-block-live-preview__toggle.button,
   form:is(.layout-builder-add-block, .layout-builder-configure-block) .moody-block-live-preview__device,
-  form.layout-builder-form .moody-layout-builder-toolbar__button.button {
+  .moody-layout-builder-toolbar__button.button {
     transition-duration: 0.01ms;
   }
 

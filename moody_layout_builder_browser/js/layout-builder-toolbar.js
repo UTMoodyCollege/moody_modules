@@ -1,4 +1,4 @@
-(function (Drupal, once) {
+(function (Drupal, once, $) {
   const unsavedMessage = Drupal.t('You have unsaved changes.');
   const blockPreviewPreferenceKey =
     'Drupal.moodyLayoutBuilder.blockLivePreview';
@@ -766,6 +766,51 @@
     });
   };
 
+  const enhanceBlockFormToolbar = (context) => {
+    once(
+      'moody-block-form-toolbar',
+      '[data-moody-block-form-toolbar]',
+      context,
+    ).forEach((toolbar) => {
+      const form = toolbar.closest(
+        'form.layout-builder-add-block, form.layout-builder-configure-block',
+      );
+      const status = toolbar.querySelector(
+        '[data-moody-block-form-unsaved-status]',
+      );
+      if (!form || !status) {
+        return;
+      }
+
+      const update = () => {
+        const dirty = form.dataset.moodyBlockFormDirty === 'true';
+        toolbar.classList.toggle('is-unsaved', dirty);
+        status.hidden = !dirty;
+        form.style.setProperty(
+          '--moody-block-form-toolbar-height',
+          `${Math.ceil(toolbar.getBoundingClientRect().height)}px`,
+        );
+      };
+      const markDirty = (event) => {
+        if (event.target.matches('[data-moody-block-preview-preference]')) {
+          return;
+        }
+        form.dataset.moodyBlockFormDirty = 'true';
+        update();
+      };
+      const resizeObserver = new ResizeObserver(update);
+
+      $(form).on('formUpdated.moodyBlockFormToolbar', markDirty);
+      resizeObserver.observe(toolbar);
+      toolbar.moodyBlockFormToolbar = {
+        form,
+        markDirty,
+        resizeObserver,
+      };
+      update();
+    });
+  };
+
   const updateToolbar = (toolbar) => {
     const status = toolbar.querySelector(
       '[data-layout-builder-unsaved-status]',
@@ -815,6 +860,7 @@
       syncBlockPreviewResponse(context);
       enhanceBlockPreviewDevices(context);
       enhanceBlockLivePreview(context);
+      enhanceBlockFormToolbar(context);
 
       const toolbar = document.querySelector(
         '[data-moody-layout-builder-toolbar]',
@@ -911,6 +957,24 @@
 
       once
         .remove(
+          'moody-block-form-toolbar',
+          '[data-moody-block-form-toolbar]',
+          context,
+        )
+        .forEach((toolbar) => {
+          const behavior = toolbar.moodyBlockFormToolbar;
+          if (behavior) {
+            $(behavior.form).off(
+              'formUpdated.moodyBlockFormToolbar',
+              behavior.markDirty,
+            );
+          }
+          behavior?.resizeObserver.disconnect();
+          delete toolbar.moodyBlockFormToolbar;
+        });
+
+      once
+        .remove(
           'moody-layout-builder-toolbar',
           '[data-moody-layout-builder-toolbar]',
           context,
@@ -926,4 +990,4 @@
         });
     },
   };
-})(Drupal, once);
+})(Drupal, once, jQuery);
