@@ -139,6 +139,11 @@ function _moody_media_image_helper_alter_selection_widget(array &$element, array
     $element['media_library_selection']['#attributes']['id'] = $selection_input_id;
   }
 
+  $guidance = $element['#description'] ?? NULL;
+  $guidance_id = $guidance !== NULL && trim((string) $guidance) !== ''
+    ? Html::getId($widget_root_id . '-guidance')
+    : NULL;
+  $guidance_attached = FALSE;
   $altered = FALSE;
   foreach (Element::children($element['selection']) as $delta) {
     $item =& $element['selection'][$delta];
@@ -180,18 +185,30 @@ function _moody_media_image_helper_alter_selection_widget(array &$element, array
       '#weight' => 5,
     ];
 
-    $item['crop_action'] = moody_media_image_helper_build_crop_action($media, [
+    $action_context = [
       'context_mode' => 'selection',
       'widget_root_id' => $widget_root_id,
       'selection_input_id' => $selection_input_id,
       'target_input_id' => $target_input_id,
       'preview_wrapper_id' => $preview_wrapper_id,
       'action_wrapper_id' => $action_wrapper_id,
-    ]) + [
+    ];
+    if (!$guidance_attached && $guidance_id !== NULL) {
+      $action_context['guidance'] = $guidance;
+      $action_context['guidance_id'] = $guidance_id;
+      $guidance_attached = TRUE;
+    }
+
+    $item['crop_action'] = moody_media_image_helper_build_crop_action($media, $action_context) + [
       '#weight' => 15,
     ];
 
     $altered = TRUE;
+  }
+
+  if ($guidance_attached) {
+    unset($element['#description']);
+    $element['#attributes']['aria-describedby'] = $guidance_id;
   }
 
   return $altered;
@@ -243,6 +260,58 @@ function moody_media_image_helper_build_crop_action(MediaInterface $media, array
   $dimensions = $source_file ? $crop_manager->getFileDimensions($source_file) : ['width' => 0, 'height' => 0];
   $source_uri = $source_file ? $source_file->getFileUri() : '';
   $source_url = $source_file ? $file_url_generator->generateString($source_uri) : '';
+  $owner = $media->getOwner();
+  $created = $media->getCreatedTime() > 0
+    ? \Drupal::service('date.formatter')->format($media->getCreatedTime(), 'short')
+    : '';
+  $guidance = $context['guidance'] ?? NULL;
+  $has_guidance = $guidance !== NULL && trim((string) $guidance) !== '';
+
+  $detail_rows = [
+    [
+      'data' => [
+        ['data' => t('Name'), 'header' => TRUE],
+        ['data' => ['#plain_text' => $media->label()]],
+      ],
+    ],
+    [
+      'data' => [
+        ['data' => t('Uploaded by'), 'header' => TRUE],
+        ['data' => ['#plain_text' => $owner?->getDisplayName() ?? '']],
+      ],
+    ],
+    [
+      'data' => [
+        ['data' => t('Added'), 'header' => TRUE],
+        ['data' => ['#plain_text' => $created]],
+      ],
+    ],
+    [
+      'data' => [
+        ['data' => t('Original size'), 'header' => TRUE],
+        ['data' => ['#plain_text' => t('@width × @height px', [
+          '@width' => $dimensions['width'],
+          '@height' => $dimensions['height'],
+        ])]],
+      ],
+    ],
+  ];
+  if ($source_url !== '') {
+    $detail_rows[] = [
+      'data' => [
+        ['data' => t('Source file'), 'header' => TRUE],
+        ['data' => [
+          '#type' => 'link',
+          '#title' => t('Open source file'),
+          '#url' => Url::fromUserInput($source_url),
+          '#attributes' => [
+            'target' => '_blank',
+            'rel' => 'noopener noreferrer',
+          ],
+        ]],
+      ],
+    ];
+  }
 
   $query = array_filter([
     'context_mode' => (string) ($context['context_mode'] ?? 'selection'),
@@ -283,16 +352,31 @@ function moody_media_image_helper_build_crop_action(MediaInterface $media, array
         'rel' => 'noopener noreferrer',
       ],
     ],
-    'meta' => [
-      '#markup' => '<div class="moody-media-image-helper__meta">' . t('Original: @width × @height px', [
-        '@width' => $dimensions['width'],
-        '@height' => $dimensions['height'],
-      ]) . '</div>',
+    'details' => [
+      '#type' => 'table',
+      '#caption' => t('Selected media details'),
+      '#attributes' => [
+        'class' => ['moody-media-image-helper__details'],
+      ],
+      '#rows' => $detail_rows,
     ],
-    'source_url' => [
-      '#markup' => $source_url !== ''
-        ? '<div class="moody-media-image-helper__source"><strong>' . t('Source file') . ':</strong> <a href="' . Html::escape($source_url) . '" target="_blank" rel="noopener noreferrer">' . Html::escape($source_url) . '</a></div>'
-        : '',
+    'guidance' => [
+      '#type' => 'container',
+      '#access' => $has_guidance,
+      '#attributes' => [
+        'id' => (string) ($context['guidance_id'] ?? ''),
+        'class' => ['moody-media-image-helper__guidance'],
+      ],
+      'label' => [
+        '#markup' => '<strong>' . t('Image guidance') . '</strong>',
+      ],
+      'copy' => [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['moody-media-image-helper__guidance-copy'],
+        ],
+        '#markup' => $guidance,
+      ],
     ],
   ];
 }
