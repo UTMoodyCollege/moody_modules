@@ -1,0 +1,4 @@
+administer moody account expiration:
+  title: 'Administer Moody account expiration'
+  description: 'View and change account expiration dates for other users.'
+  restrict access: true

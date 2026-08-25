@@ -1,0 +1,68 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall hooks for Moody Account Expiration.
+ */
+
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\user\Entity\Role;
+
+/**
+ * Implements hook_install().
+ */
+function moody_account_expiration_install(): void {
+  $form_display = EntityFormDisplay::load('user.user.default');
+  if (!$form_display) {
+    $form_display = EntityFormDisplay::create([
+      'targetEntityType' => 'user',
+      'bundle' => 'user',
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+  }
+  $form_display->setComponent('field_moody_account_expiration', [
+    'type' => 'datetime_default',
+    'weight' => 20,
+    'region' => 'content',
+  ])->save();
+
+  $view_display = EntityViewDisplay::load('user.user.default');
+  if (!$view_display) {
+    $view_display = EntityViewDisplay::create([
+      'targetEntityType' => 'user',
+      'bundle' => 'user',
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+  }
+  $view_display->setComponent('field_moody_account_expiration', [
+    'type' => 'datetime_custom',
+    'label' => 'above',
+    'weight' => 20,
+    'region' => 'content',
+    'settings' => [
+      'date_format' => 'F j, Y',
+      'timezone_override' => '',
+    ],
+  ])->save();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function moody_account_expiration_uninstall(): void {
+  if ($form_display = EntityFormDisplay::load('user.user.default')) {
+    $form_display->removeComponent('field_moody_account_expiration')->save();
+  }
+  if ($view_display = EntityViewDisplay::load('user.user.default')) {
+    $view_display->removeComponent('field_moody_account_expiration')->save();
+  }
+  FieldConfig::load('user.user.field_moody_account_expiration')?->delete();
+  FieldStorageConfig::load('user.field_moody_account_expiration')?->delete();
+  Role::load('moody_account_expiration_administrator')?->delete();
+  \Drupal::keyValue('moody_account_expiration.blocked_accounts')->deleteAll();
+}

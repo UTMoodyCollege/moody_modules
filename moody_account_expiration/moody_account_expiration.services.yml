@@ -1,0 +1,13 @@
+services:
+  logger.channel.moody_account_expiration:
+    parent: logger.channel_base
+    arguments: ['moody_account_expiration']
+
+  moody_account_expiration.processor:
+    class: Drupal\moody_account_expiration\AccountExpirationProcessor
+    arguments:
+      - '@entity_type.manager'
+      - '@datetime.time'
+      - '@config.factory'
+      - '@keyvalue'
+      - '@logger.channel.moody_account_expiration'

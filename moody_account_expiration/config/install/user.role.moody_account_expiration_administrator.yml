@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - moody_account_expiration
+id: moody_account_expiration_administrator
+label: 'Account Expiration Administrator'
+weight: 37
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'access user profiles'
+  - 'administer moody account expiration'
+  - 'administer users'
+  - 'view the administration theme'

@@ -1,0 +1,9 @@
+name: 'Moody Account Expiration'
+type: module
+description: 'Privately schedules and enforces expiration dates for user accounts.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:datetime
+  - drupal:field
+  - drupal:user

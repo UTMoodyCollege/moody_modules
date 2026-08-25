@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_moody_account_expiration
+  module:
+    - datetime
+    - moody_account_expiration
+    - user
+id: user.user.field_moody_account_expiration
+field_name: field_moody_account_expiration
+entity_type: user
+bundle: user
+label: 'Account expiration date'
+description: "Drupal cron blocks the account on or after the start of this date in the site's timezone. Clearing the date or moving it into the future reactivates an account that this module blocked. User 1 is never blocked."
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

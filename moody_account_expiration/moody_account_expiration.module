@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * @file
+ * Account expiration access and lifecycle hooks.
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\moody_account_expiration\AccountExpirationProcessor;
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_cron().
+ */
+function moody_account_expiration_cron(): void {
+  \Drupal::service('moody_account_expiration.processor')->process();
+}
+
+/**
+ * Implements hook_entity_field_access().
+ */
+function moody_account_expiration_entity_field_access(
+  string $operation,
+  FieldDefinitionInterface $field_definition,
+  AccountInterface $account,
+  ?FieldItemListInterface $items = NULL,
+) {
+  if ($field_definition->getName() !== AccountExpirationProcessor::FIELD_NAME) {
+    return AccessResult::neutral();
+  }
+
+  $can_administer = (int) $account->id() === 1
+    || $account->hasPermission('administer moody account expiration');
+  $target = $items?->getEntity();
+  $is_owner = $target instanceof UserInterface
+    && $account->isAuthenticated()
+    && (int) $account->id() === (int) $target->id();
+  $allowed = $operation === 'edit'
+    ? $can_administer
+    : ($operation === 'view' && ($can_administer || $is_owner));
+
+  $result = $allowed ? AccessResult::allowed() : AccessResult::forbidden();
+  return $result->cachePerPermissions()->cachePerUser();
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for the user edit form.
+ */
+function moody_account_expiration_form_user_form_alter(array &$form, FormStateInterface $form_state): void {
+  $account = $form_state->getFormObject()->getEntity();
+  if (!$account instanceof UserInterface || !$account->hasField(AccountExpirationProcessor::FIELD_NAME)) {
+    return;
+  }
+
+  $field = $account->get(AccountExpirationProcessor::FIELD_NAME);
+  if (!$field->access('edit') && $field->access('view')) {
+    $value = $field->isEmpty()
+      ? ['#plain_text' => t('No expiration date')]
+      : $field->view([
+        'label' => 'hidden',
+        'type' => 'datetime_custom',
+        'settings' => [
+          'date_format' => 'F j, Y',
+          'timezone_override' => '',
+        ],
+      ]);
+    $form['moody_account_expiration_read_only'] = [
+      '#type' => 'item',
+      '#title' => t('Account expiration date'),
+      '#description' => t('Only an Account Expiration Administrator can change this date.'),
+      '#weight' => 20,
+      'value' => $value,
+    ];
+  }
+}
+
+/**
+ * Implements hook_user_presave().
+ */
+function moody_account_expiration_user_presave(UserInterface $account): void {
+  \Drupal::service('moody_account_expiration.processor')->prepareReactivation($account);
+}
+
+/**
+ * Implements hook_user_update().
+ */
+function moody_account_expiration_user_update(UserInterface $account): void {
+  \Drupal::service('moody_account_expiration.processor')->completeReactivation($account);
+}
+
+/**
+ * Implements hook_user_delete().
+ */
+function moody_account_expiration_user_delete(UserInterface $account): void {
+  \Drupal::service('moody_account_expiration.processor')->forget($account);
+}

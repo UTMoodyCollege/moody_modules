@@ -1,0 +1,7 @@
+services:
+  drush.commands.moody_account_expiration:
+    class: Drupal\moody_account_expiration\Commands\AccountExpirationCommands
+    arguments:
+      - '@moody_account_expiration.processor'
+    tags:
+      - { name: drush.command }
