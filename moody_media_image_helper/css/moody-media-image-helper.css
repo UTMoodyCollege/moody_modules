@@ -20,6 +20,10 @@
   --mmih-overlay-strong: rgba(20, 19, 23, 0.85);
 }
 
+.media-library-widget-modal .ui-dialog-title {
+  color: var(--mmih-white);
+}
+
 /* Keep the most-used Media Library controls compact without changing Drupal's
  * upload, filtering, selection, or AJAX behavior. */
 .media-library-widget-modal .media-library-wrapper {
