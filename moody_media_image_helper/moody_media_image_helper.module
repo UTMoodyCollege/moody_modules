@@ -11,6 +11,14 @@ use Drupal\media\MediaInterface;
  * Implements hook_form_alter().
  */
 function moody_media_image_helper_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $is_media_library_form = str_starts_with($form_id, 'media_library_add_form_')
+    || str_starts_with($form_id, 'views_form_media_library_widget_')
+    || ($form_id === 'views_exposed_form'
+      && ($form['#id'] ?? '') === 'views-exposed-form-media-library-widget');
+  if ($is_media_library_form) {
+    $form['#attached']['library'][] = 'moody_media_image_helper/media_helper';
+  }
+
   $form['#after_build'][] = 'moody_media_image_helper_form_after_build';
 }
 

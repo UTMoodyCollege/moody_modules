@@ -1,12 +1,16 @@
-/* Hallmark · component: selected media widget · genre: modern-minimal · theme: UT brand
+/* Hallmark · component: Media Library/editor helper · macrostructure: compact control rail
+ * genre: modern-minimal · tone: compact UT editorial · anchor: burnt orange
  * states: default · hover · focus · active · disabled · loading · error · success
- * contrast: inherited from Claro · responsive: container-aware at 320–768 px
- * pre-emit critique: P5 H4 E5 S5 R5 V4
+ * contrast: pass (40–41) · mobile: pass (34, 49–57)
+ * pre-emit critique: P5 H5 E5 S5 R5 V4
  */
 .moody-media-image-helper__widget,
 .moody-media-image-helper__form,
-.moody-media-image-helper__edit-panel {
+.moody-media-image-helper__edit-panel,
+.media-library-widget-modal {
   --mmih-burnt-orange: #bf5700;
+  --mmih-burnt-orange-dark: #9d4700;
+  --mmih-charcoal: #333f48;
   --mmih-paper: #f7f2ec;
   --mmih-paper-strong: #ece3d9;
   --mmih-border: #d3c4b1;
@@ -14,6 +18,204 @@
   --mmih-white: #fff;
   --mmih-overlay: rgba(20, 19, 23, 0.38);
   --mmih-overlay-strong: rgba(20, 19, 23, 0.85);
+}
+
+/* Keep the most-used Media Library controls compact without changing Drupal's
+ * upload, filtering, selection, or AJAX behavior. */
+.media-library-widget-modal .media-library-wrapper {
+  flex-direction: column;
+  min-width: 0;
+}
+
+.media-library-widget-modal .media-library-menu {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  overflow-x: auto;
+  color: var(--mmih-charcoal);
+  border-bottom: 1px solid var(--mmih-border);
+  background: var(--mmih-paper);
+  scrollbar-width: thin;
+}
+
+.media-library-widget-modal .media-library-menu__item {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.media-library-widget-modal .media-library-menu__item::before,
+.media-library-widget-modal .media-library-menu__link::before {
+  display: none;
+}
+
+.media-library-widget-modal .media-library-menu__link,
+.media-library-widget-modal .media-library-menu__link.active {
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.75rem 1rem 0.5rem;
+  white-space: nowrap;
+  border: 0;
+  border-bottom: 0.25rem solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.media-library-widget-modal .media-library-menu__link.active {
+  color: var(--mmih-charcoal);
+  border-bottom-color: var(--mmih-burnt-orange);
+  font-weight: 700;
+}
+
+.media-library-widget-modal .media-library-menu__link:focus::after {
+  inset: 0.25rem;
+  margin: 0;
+}
+
+.media-library-widget-modal .media-library-menu + .media-library-content {
+  min-width: 0;
+  padding: 0.75rem;
+  border-inline-start: 0;
+  box-shadow: none;
+}
+
+.media-library-widget-modal #media-library-add-form-wrapper {
+  margin: 0;
+}
+
+.media-library-widget-modal .media-library-add-form__input-wrapper {
+  padding: 0 0 0.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--mmih-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.media-library-widget-modal .media-library-add-form--without-input :is(.form-item-upload, .form-item--upload) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "upload-label"
+    "upload-help"
+    "upload-control";
+  gap: 0.25rem;
+  min-width: 0;
+  margin: 0;
+}
+
+.media-library-widget-modal :is(.form-item-upload, .form-item--upload) > label {
+  grid-area: upload-label;
+  margin: 0;
+}
+
+.media-library-widget-modal :is(.form-item-upload, .form-item--upload) > .form-item__description {
+  grid-area: upload-help;
+  margin: 0;
+  color: var(--mmih-muted);
+  line-height: 1.35;
+}
+
+.media-library-widget-modal :is(.form-item-upload, .form-item--upload) > .form-managed-file {
+  grid-area: upload-control;
+  min-width: 0;
+}
+
+.media-library-widget-modal :is(.form-item-upload, .form-item--upload) .form-file {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-height: 2.75rem;
+  padding: 0;
+}
+
+.media-library-widget-modal :is(.form-item-upload, .form-item--upload) .form-file::file-selector-button {
+  min-height: calc(2.75rem - 4px);
+  margin-inline-end: 0.75rem;
+  padding-inline: 1rem;
+  color: var(--mmih-white);
+  border: 0;
+  background: var(--mmih-burnt-orange);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.media-library-widget-modal :is(.form-item-upload, .form-item--upload) .form-file:disabled::file-selector-button {
+  color: var(--mmih-charcoal);
+  background: var(--mmih-paper-strong);
+  cursor: not-allowed;
+}
+
+.media-library-widget-modal :is(.form-item-upload, .form-item--upload) .form-file:not(:disabled):active::file-selector-button {
+  color: var(--mmih-white);
+  background: var(--mmih-burnt-orange-dark);
+  box-shadow: inset 0 2px 0 var(--mmih-overlay);
+}
+
+.media-library-widget-modal #views-exposed-form-media-library-widget {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: end;
+  min-width: 0;
+  margin: 0 0 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--mmih-border);
+  background: transparent;
+  box-shadow: none;
+}
+
+.media-library-widget-modal #views-exposed-form-media-library-widget .form-item,
+.media-library-widget-modal #views-exposed-form-media-library-widget .form-actions,
+.media-library-widget-modal #views-exposed-form-media-library-widget .views-exposed-form__item--actions {
+  min-width: 0;
+  margin: 0;
+}
+
+.media-library-widget-modal #views-exposed-form-media-library-widget .form-item__label {
+  margin: 0 0 0.25rem;
+}
+
+.media-library-widget-modal #views-exposed-form-media-library-widget .form-element,
+.media-library-widget-modal #views-exposed-form-media-library-widget .button {
+  box-sizing: border-box;
+  width: 100%;
+  height: 3rem;
+  min-height: 3rem;
+  margin: 0;
+}
+
+.media-library-widget-modal #views-exposed-form-media-library-widget .button {
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .media-library-widget-modal :is(.form-item-upload, .form-item--upload) .form-file:not(:disabled)::file-selector-button:hover {
+    color: var(--mmih-white);
+    background: var(--mmih-burnt-orange-dark);
+  }
+}
+
+@media (min-width: 40rem) {
+  .media-library-widget-modal .media-library-add-form--without-input :is(.form-item-upload, .form-item--upload) {
+    grid-template-columns: minmax(10rem, max-content) minmax(16rem, 1fr);
+    grid-template-areas:
+      "upload-label upload-control"
+      "upload-help upload-control";
+    column-gap: 1rem;
+    align-items: center;
+  }
+
+  .media-library-widget-modal #views-exposed-form-media-library-widget {
+    grid-template-columns: minmax(12rem, 1fr) minmax(10rem, 13rem) max-content;
+  }
+
+  .media-library-widget-modal #views-exposed-form-media-library-widget .button {
+    width: auto;
+  }
 }
 
 .moody-media-image-helper__widget {
