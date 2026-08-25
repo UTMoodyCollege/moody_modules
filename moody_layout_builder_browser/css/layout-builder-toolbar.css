@@ -205,6 +205,10 @@ form.layout-builder-form .moody-layout-builder-toolbar,
   background: #fff1f0;
 }
 
+.layout-builder .layout-builder-block > .contextual.open > .contextual-links a[href*='/layout_builder/convert/reusable/']:is(:hover, :focus-visible) {
+  color: var(--mlbt-charcoal) !important;
+}
+
 /* Keep Layout Builder's page-level publishing controls compact and legible. */
 form.layout-builder-form #edit-layout-builder-message {
   margin-block: 0 0.75rem;
