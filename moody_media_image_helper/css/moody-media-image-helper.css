@@ -279,12 +279,14 @@
   object-fit: contain;
 }
 
-.moody-media-image-helper__widget .media-library-item__remove.button {
+.moody-media-image-helper__widget .media-library-selection .media-library-item__remove.button {
   width: 2.75rem;
   min-width: 2.75rem;
   height: 2.75rem;
   min-height: 2.75rem;
   margin: 0;
+  background-image: url("data:image/svg+xml,%3csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M2.344 2.343l11.313 11.313M2.344 13.657L13.657 2.343' stroke='%23fff' stroke-width='3'/%3e%3c/svg%3e");
+  background-position: center;
 }
 
 .moody-media-image-helper__actions {
@@ -313,6 +315,7 @@
   max-width: 100%;
   min-height: 2.75rem;
   margin: 0;
+  line-height: 1;
   text-align: center;
   white-space: nowrap;
 }
