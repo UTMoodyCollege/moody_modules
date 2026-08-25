@@ -1477,6 +1477,81 @@ form:is(.layout-builder-add-block, .layout-builder-configure-block) .field-multi
   opacity: 0.7;
 }
 
+.moody-block-styles.claro-details {
+  margin-block: 1rem;
+  border: 1px solid var(--mlbt-border);
+  border-block-start: 4px solid var(--mlbt-burnt-orange);
+  border-radius: 0.25rem;
+  background: var(--mlbt-white);
+  box-shadow: none;
+}
+
+.moody-block-styles > .claro-details__summary {
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  color: var(--mlbt-charcoal);
+  background: var(--mlbt-paper);
+  font-size: 1rem;
+}
+
+form details.moody-block-styles[open] > summary.claro-details__summary {
+  color: var(--mlbt-white);
+  background: var(--mlbt-charcoal);
+}
+
+.moody-block-styles > .claro-details__wrapper {
+  padding: 1rem;
+}
+
+.moody-block-styles .claro-details__description {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  color: var(--mlbt-muted);
+  border-inline-start: 4px solid var(--mlbt-burnt-orange);
+  background: var(--mlbt-paper);
+  line-height: 1.45;
+}
+
+.moody-block-styles__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+}
+
+.moody-block-styles__grid > :is(.form-item, .fieldset) {
+  box-sizing: border-box;
+  min-width: 0;
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--mlbt-border);
+  border-block-start: 3px solid var(--mlbt-burnt-orange);
+  border-radius: 0.25rem;
+  background: var(--mlbt-paper);
+}
+
+.moody-block-styles__grid .fieldset__legend,
+.moody-block-styles__grid .form-item__label:not(.option) {
+  margin: 0 0 0.5rem;
+  color: var(--mlbt-charcoal);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.moody-block-styles__grid .form-checkboxes {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.moody-block-styles__grid .form-type--checkbox {
+  margin: 0;
+}
+
+.moody-block-styles__grid .form-select {
+  width: 100%;
+  max-width: 100%;
+}
+
 form:is(.layout-builder-add-block, .layout-builder-configure-block) {
   padding-block-end: calc(var(--moody-block-form-toolbar-height, 8rem) + 1rem);
 }

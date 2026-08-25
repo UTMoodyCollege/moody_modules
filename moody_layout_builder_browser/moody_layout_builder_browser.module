@@ -73,6 +73,35 @@ function moody_layout_builder_browser_form_alter(array &$form, FormStateInterfac
     $form['actions']['submit']['#weight'] = 10;
     $form['actions']['submit']['#attributes']['class'][] = 'moody-layout-builder-toolbar__button';
     $form['actions']['submit']['#attributes']['class'][] = 'moody-layout-builder-toolbar__button--primary';
+
+    $style_elements = [];
+    foreach (array_keys($form) as $key) {
+      if (str_starts_with($key, 'layout_builder_style_')) {
+        $style_elements[$key] = $form[$key];
+        $style_elements[$key]['#parents'] = [$key];
+        unset($form[$key]);
+      }
+    }
+    if ($style_elements !== []) {
+      $form['moody_block_styles'] = [
+        '#type' => 'details',
+        '#title' => new TranslatableMarkup('Block Styles (Optional)'),
+        '#description' => new TranslatableMarkup(
+          'Most blocks do not need these options. Expand this section only when you need to adjust borders, spacing, or items per row.',
+        ),
+        '#open' => FALSE,
+        '#weight' => 90,
+        '#attributes' => [
+          'class' => ['moody-block-styles'],
+        ],
+        'styles' => [
+          '#type' => 'container',
+          '#attributes' => [
+            'class' => ['moody-block-styles__grid'],
+          ],
+        ] + $style_elements,
+      ];
+    }
     _moody_layout_builder_browser_add_live_preview($form, $form_state, $form_id);
   }
 
