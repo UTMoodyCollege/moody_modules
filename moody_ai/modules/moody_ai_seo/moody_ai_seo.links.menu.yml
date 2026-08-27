@@ -1,0 +1,5 @@
+moody_ai_seo.settings:
+  title: 'Moody AI SEO readiness'
+  description: 'Review agent guidance, trust anchors, and structured organization data.'
+  route_name: moody_ai_seo.settings
+  parent: system.admin_config_services

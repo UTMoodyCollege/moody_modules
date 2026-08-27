@@ -1,0 +1,72 @@
+moody_ai_seo.settings:
+  type: config_object
+  label: 'Moody AI SEO settings'
+  mapping:
+    organization:
+      type: mapping
+      label: 'Organization structured data'
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Publish organization structured data'
+        type:
+          type: string
+          label: 'Schema.org organization type'
+        name:
+          type: string
+          label: 'Organization name override'
+        description:
+          type: text
+          label: 'Organization description override'
+        url:
+          type: uri
+          label: 'Canonical organization URL override'
+        logo:
+          type: uri
+          label: 'Logo URL'
+        email:
+          type: email
+          label: 'Contact email override'
+        telephone:
+          type: string
+          label: 'Contact telephone'
+        contact_type:
+          type: string
+          label: 'Contact type'
+        street_address:
+          type: string
+          label: 'Street address'
+        address_locality:
+          type: string
+          label: 'Locality'
+        address_region:
+          type: string
+          label: 'Region'
+        postal_code:
+          type: string
+          label: 'Postal code'
+        address_country:
+          type: string
+          label: 'Country code'
+        same_as:
+          type: text
+          label: 'Identity URLs'
+        parent_name:
+          type: string
+          label: 'Parent organization name'
+        parent_url:
+          type: uri
+          label: 'Parent organization URL'
+    trust:
+      type: mapping
+      label: 'Trust anchors'
+      mapping:
+        about:
+          type: string
+          label: 'About path'
+        contact:
+          type: string
+          label: 'Contact path'
+        privacy:
+          type: string
+          label: 'Privacy path'

@@ -17,6 +17,10 @@
         "email": "mmarsello@austin.utexas.edu",
         "docs": "https://webusersguide.moody.utexas.edu/"
     },
+    "require": {
+        "drupal/llms_txt": "^1.1",
+        "drupal/markdownify": "^1.2"
+    },
     "config": {
         "sort-packages": true
     }

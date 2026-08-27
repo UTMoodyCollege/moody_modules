@@ -1,0 +1,4 @@
+administer moody ai seo:
+  title: 'Administer Moody AI SEO'
+  description: 'Configure public agent guidance and structured organization data.'
+  restrict access: true

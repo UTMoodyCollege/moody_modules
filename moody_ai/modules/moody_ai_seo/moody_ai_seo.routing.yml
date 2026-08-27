@@ -1,0 +1,7 @@
+moody_ai_seo.settings:
+  path: '/admin/config/services/moody-ai/seo'
+  defaults:
+    _form: '\Drupal\moody_ai_seo\Form\SeoSettingsForm'
+    _title: 'Moody AI SEO readiness'
+  requirements:
+    _permission: 'administer moody ai seo'

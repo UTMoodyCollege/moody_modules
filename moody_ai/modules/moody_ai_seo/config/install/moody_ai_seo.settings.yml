@@ -1,0 +1,22 @@
+organization:
+  enabled: false
+  type: CollegeOrUniversity
+  name: ''
+  description: ''
+  url: ''
+  logo: ''
+  email: ''
+  telephone: ''
+  contact_type: 'general inquiries'
+  street_address: ''
+  address_locality: ''
+  address_region: ''
+  postal_code: ''
+  address_country: US
+  same_as: ''
+  parent_name: 'The University of Texas at Austin'
+  parent_url: 'https://www.utexas.edu'
+trust:
+  about: /about
+  contact: /contact
+  privacy: /privacy

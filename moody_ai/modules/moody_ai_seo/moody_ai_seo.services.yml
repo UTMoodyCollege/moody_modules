@@ -1,0 +1,17 @@
+services:
+  moody_ai_seo.organization_schema:
+    class: Drupal\moody_ai_seo\OrganizationSchema
+    arguments:
+      - '@config.factory'
+      - '@request_stack'
+
+  moody_ai_seo.agent_response_subscriber:
+    class: Drupal\moody_ai_seo\EventSubscriber\AgentResponseSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  moody_ai_seo.readiness_auditor:
+    class: Drupal\moody_ai_seo\ReadinessAuditor
+    arguments:
+      - '@http_client'
+      - '@config.factory'

@@ -1,0 +1,8 @@
+name: 'Moody AI SEO'
+type: module
+description: 'Adds agent discovery, structured identity data, recovery responses, and readiness auditing.'
+package: 'Moody AI'
+core_version_requirement: ^10.5 || ^11.2
+configure: moody_ai_seo.settings
+dependencies:
+  - llms_txt:llms_txt

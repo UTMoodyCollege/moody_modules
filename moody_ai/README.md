@@ -15,6 +15,10 @@ This directory is the shared home for opt-in AI features that ship with
   previews redirect creation, and links to normal access-controlled Drupal
   workflows for new pages, menus, content, Media, users, taxonomy, and
   configuration.
+- `moody_ai_seo` provides public agent guidance, homepage organization
+  structured data, agent-friendly 404 recovery, and a read-only readiness
+  audit. It does not use an AI provider and remains independent of the Moody AI
+  service availability switch.
 - `MOODY_PAGE_BUILDING.md` remains the larger Layout Builder component context
   for future features; it is not sent with each CKEditor request.
 

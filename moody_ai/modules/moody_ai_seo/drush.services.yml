@@ -1,0 +1,8 @@
+services:
+  drush.commands.moody_ai_seo:
+    class: Drupal\moody_ai_seo\Commands\SeoAuditCommands
+    arguments:
+      - '@moody_ai_seo.readiness_auditor'
+      - '@request_stack'
+    tags:
+      - { name: drush.command }
