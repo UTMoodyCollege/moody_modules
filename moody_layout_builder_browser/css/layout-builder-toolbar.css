@@ -1382,6 +1382,26 @@ form:is(.layout-builder-add-block, .layout-builder-configure-block) .field-multi
   min-width: 0;
 }
 
+/* Keep tabledrag controls compact so the item editor receives the form width. */
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .draggable-table > :is(thead, tbody) > tr > :is(.tabledrag-hide, :last-child) {
+  width: 1%;
+  white-space: nowrap;
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .draggable-table > tbody > tr > :last-child {
+  vertical-align: top;
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .draggable-table .tabledrag-cell-content__item {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .draggable-table .tabledrag-cell-content__item > .claro-details {
+  box-sizing: border-box;
+  width: 100%;
+}
+
 #drupal-off-canvas-wrapper .js-layout-builder-filter {
   box-sizing: border-box;
   width: 100%;

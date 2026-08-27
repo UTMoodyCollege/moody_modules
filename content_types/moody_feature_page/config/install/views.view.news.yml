@@ -5,7 +5,7 @@ dependencies:
     - field.storage.node.field_moody_subtitle
     - field.storage.node.field_news_categories
     - field.storage.node.field_thumbnail_image_for_summar
-    - image.style.moody_image_style_363w_x_190h
+    - image.style.moody_image_style_960w_x_540h
     - node.type.moody_feature_page
   module:
     - date_ap_style
@@ -82,7 +82,7 @@ display:
           type: media_thumbnail
           settings:
             image_link: ''
-            image_style: moody_image_style_363w_x_190h
+            image_style: moody_image_style_960w_x_540h
             image_loading:
               attribute: lazy
           group_column: target_id
@@ -714,7 +714,7 @@ display:
           type: media_thumbnail
           settings:
             image_link: ''
-            image_style: moody_image_style_363w_x_190h
+            image_style: moody_image_style_960w_x_540h
           group_column: target_id
           group_columns: {  }
           group_rows: true

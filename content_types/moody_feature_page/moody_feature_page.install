@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for Moody Feature Page.
+ */
+
+/**
+ * Use a high-resolution 16:9 derivative for shared news listings.
+ */
+function moody_feature_page_update_11001() {
+  $config_factory = \Drupal::configFactory();
+
+  foreach (['views.view.news', 'views.view.news_filtered'] as $config_name) {
+    $config = $config_factory->getEditable($config_name);
+    if ($config->isNew()) {
+      continue;
+    }
+
+    $displays = _moody_feature_page_upgrade_news_image_styles($config->get('display') ?? []);
+    $config->set('display', $displays)->save();
+  }
+}
+
+/**
+ * Upgrades only the legacy shared news-card image style.
+ */
+function _moody_feature_page_upgrade_news_image_styles(array $displays) {
+  foreach ($displays as $id => $display) {
+    if (($display['display_options']['fields']['field_thumbnail_image_for_summar']['settings']['image_style'] ?? NULL) === 'moody_image_style_363w_x_190h') {
+      $displays[$id]['display_options']['fields']['field_thumbnail_image_for_summar']['settings']['image_style'] = 'moody_image_style_960w_x_540h';
+    }
+  }
+
+  return $displays;
+}

@@ -147,8 +147,8 @@ div.news-view.latest-news-block > .views-row a {
 div.news-view.latest-news-block .latest-news-block-image-field {
   width: 100%;
   overflow: hidden;
-  /* Keep thumbnails visually consistent; crop when aspect ratios differ. */
-  aspect-ratio: 363 / 190;
+  /* Match the shared high-resolution news derivative. */
+  aspect-ratio: 16 / 9;
 }
 
 div.news-view.latest-news-block .latest-news-block-image-field img,

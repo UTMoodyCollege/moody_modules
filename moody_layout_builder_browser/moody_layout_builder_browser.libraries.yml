@@ -10,7 +10,7 @@ block_type_labels:
     - core/once
 
 editor_toolbar:
-  version: 1.6.2
+  version: 1.6.3
   css:
     theme:
       css/layout-builder-toolbar.css: {}
