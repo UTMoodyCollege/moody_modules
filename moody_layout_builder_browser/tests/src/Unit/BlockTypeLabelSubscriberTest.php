@@ -101,6 +101,12 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
         'label' => [],
         'label_display' => [],
       ],
+      'layout_builder_style_utexas_items_per_row' => [
+        '#type' => 'select',
+      ],
+      'layout_builder_style_utexas_borders' => [
+        '#type' => 'checkboxes',
+      ],
     ];
     $form_state = $this->createMock(FormStateInterface::class);
     $form_state->method('getTriggeringElement')->willReturn(NULL);
@@ -143,6 +149,15 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
     $this->assertSame(-90, $form['settings']['label']['#weight']);
     $this->assertSame(-80, $form['settings']['label_display']['#weight']);
     $this->assertSame(-70, $preview['#weight']);
+    $this->assertArrayHasKey('layout_builder_style_utexas_items_per_row', $form);
+    $this->assertArrayHasKey('layout_builder_style_utexas_borders', $form);
+    $this->assertSame('select', $form['layout_builder_style_utexas_items_per_row']['#type']);
+    $this->assertSame('container', $form['layout_builder_style_utexas_borders']['#type']);
+    $this->assertFalse($form['layout_builder_style_utexas_borders']['#access']);
+    $this->assertSame(
+      ['layout_builder_style_utexas_borders'],
+      $form['moody_block_styles']['styles']['layout_builder_style_utexas_borders']['#parents'],
+    );
     $this->assertContains(
       'moody_layout_builder_browser/editor_toolbar',
       $form['#attached']['library'],
