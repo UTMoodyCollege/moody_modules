@@ -104,12 +104,11 @@
         : Drupal.t('Collapse preview');
       toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
       toggle.setAttribute('aria-label', label);
-      toggle.textContent = label;
-      if (mobilePreviewQuery.matches) {
-        toggle.textContent = collapsed
-          ? Drupal.t('Open preview')
-          : Drupal.t('Collapse');
-      }
+      toggle.textContent = collapsed
+        ? Drupal.t('Preview')
+        : mobilePreviewQuery.matches
+          ? Drupal.t('Collapse')
+          : label;
     }
   };
 
@@ -186,9 +185,7 @@
       }
 
       if (form.dataset.moodyBlockPreviewCollapsed === undefined) {
-        form.dataset.moodyBlockPreviewCollapsed = mobilePreviewQuery.matches
-          ? 'true'
-          : 'false';
+        form.dataset.moodyBlockPreviewCollapsed = 'true';
       }
 
       let dragState;
@@ -212,15 +209,6 @@
           const position = getBlockPreviewPosition(form);
           setBlockPreviewPosition(preview, form, position.x, position.y);
         });
-      };
-
-      const onMobileChange = () => {
-        if (form.dataset.moodyBlockPreviewCollapseSetByUser !== 'true') {
-          form.dataset.moodyBlockPreviewCollapsed = mobilePreviewQuery.matches
-            ? 'true'
-            : 'false';
-          syncBlockPreviewPanel(preview);
-        }
       };
 
       const markPreviewPending = () => {
@@ -317,7 +305,6 @@
       move?.addEventListener('pointerdown', onPointerDown);
       move?.addEventListener('lostpointercapture', finishDrag);
       move?.addEventListener('keydown', onMoveKeydown);
-      mobilePreviewQuery.addEventListener('change', onMobileChange);
       floatingPreviewQuery.addEventListener('change', queuePositionSync);
       window.addEventListener('pointermove', onPointerMove);
       window.addEventListener('pointerup', finishDrag);
@@ -337,7 +324,6 @@
           move?.removeEventListener('pointerdown', onPointerDown);
           move?.removeEventListener('lostpointercapture', finishDrag);
           move?.removeEventListener('keydown', onMoveKeydown);
-          mobilePreviewQuery.removeEventListener('change', onMobileChange);
           floatingPreviewQuery.removeEventListener(
             'change',
             queuePositionSync,

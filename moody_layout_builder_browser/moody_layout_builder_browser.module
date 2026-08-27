@@ -220,7 +220,7 @@ function _moody_layout_builder_browser_build_live_preview_panel(array $result): 
     '#weight' => -70,
     '#attributes' => [
       'id' => 'moody-block-live-preview',
-      'class' => ['moody-block-live-preview'],
+      'class' => ['moody-block-live-preview', 'is-collapsed'],
       'data-moody-block-live-preview' => TRUE,
       'data-state' => $result['state'],
       'aria-labelledby' => 'moody-block-live-preview-title',
@@ -267,13 +267,14 @@ function _moody_layout_builder_browser_build_live_preview_panel(array $result): 
         'toggle' => [
           '#type' => 'html_tag',
           '#tag' => 'button',
-          '#value' => new TranslatableMarkup('Collapse preview'),
+          '#value' => new TranslatableMarkup('Preview'),
           '#attributes' => [
             'type' => 'button',
             'class' => ['button', 'moody-block-live-preview__toggle'],
             'data-moody-block-preview-toggle' => TRUE,
             'aria-controls' => 'moody-block-live-preview-body',
-            'aria-expanded' => 'true',
+            'aria-expanded' => 'false',
+            'aria-label' => new TranslatableMarkup('Expand preview'),
           ],
         ],
         'refresh' => [

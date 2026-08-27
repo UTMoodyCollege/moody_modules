@@ -113,6 +113,7 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
 
     $preview = $form['settings']['moody_live_preview'];
     $this->assertSame('moody-block-live-preview', $preview['#attributes']['id']);
+    $this->assertContains('is-collapsed', $preview['#attributes']['class']);
     $this->assertSame('waiting', $preview['#attributes']['data-state']);
     $this->assertSame('status', $preview['body']['status']['#attributes']['role']);
     $this->assertSame(
@@ -124,8 +125,12 @@ class BlockTypeLabelSubscriberTest extends UnitTestCase {
       $preview['header']['actions']['toggle']['#attributes']['aria-controls'],
     );
     $this->assertSame(
-      'true',
+      'false',
       $preview['header']['actions']['toggle']['#attributes']['aria-expanded'],
+    );
+    $this->assertSame(
+      'Expand preview',
+      (string) $preview['header']['actions']['toggle']['#attributes']['aria-label'],
     );
     $this->assertSame(
       'moody_layout_builder_browser_live_preview_ajax',
