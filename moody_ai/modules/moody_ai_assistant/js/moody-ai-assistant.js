@@ -558,6 +558,119 @@
     return composer;
   }
 
+  function closeToolDialog(element, restoreFocus = true) {
+    const dialog = element instanceof HTMLDialogElement
+      ? element
+      : element?.closest?.('[data-ai-assistant-tool-dialog]');
+    if (!dialog) {
+      return;
+    }
+
+    const id = dialog.getAttribute('data-ai-assistant-tool-dialog') || '';
+    const wrapper = dialog.closest('.ai-moody-assistant');
+    const trigger = id && wrapper ? wrapper.querySelector('[data-ai-assistant-tool-open="' + CSS.escape(id) + '"]') : null;
+    dialog.dataset.restoreFocus = restoreFocus ? 'true' : 'false';
+    if (typeof dialog.close === 'function' && dialog.open) {
+      dialog.close();
+    }
+    else {
+      dialog.removeAttribute('open');
+      trigger?.setAttribute('aria-expanded', 'false');
+      if (restoreFocus) {
+        trigger?.focus();
+      }
+    }
+  }
+
+  function bindToolDialogs(wrapper) {
+    const dialogs = Array.from(wrapper.querySelectorAll('[data-ai-assistant-tool-dialog]'));
+    const triggers = Array.from(wrapper.querySelectorAll('[data-ai-assistant-tool-open]'));
+    if (!dialogs.length || !triggers.length) {
+      return;
+    }
+
+    const dialogById = new Map(dialogs.map(dialog => [dialog.getAttribute('data-ai-assistant-tool-dialog') || '', dialog]));
+    const triggerById = new Map(triggers.map(trigger => [trigger.getAttribute('data-ai-assistant-tool-open') || '', trigger]));
+
+    dialogs.forEach((dialog, index) => {
+      const id = dialog.getAttribute('data-ai-assistant-tool-dialog') || String(index);
+      const trigger = triggerById.get(id);
+      if (!dialog.id) {
+        dialog.id = 'ai-moody-assistant-tool-' + id + '-' + index;
+      }
+      trigger?.setAttribute('aria-controls', dialog.id);
+      trigger?.setAttribute('aria-expanded', 'false');
+
+      dialog.querySelectorAll('[data-ai-assistant-tool-close]').forEach((button) => {
+        button.addEventListener('click', () => closeToolDialog(dialog));
+      });
+
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) {
+          closeToolDialog(dialog);
+        }
+      });
+
+      dialog.addEventListener('close', () => {
+        trigger?.setAttribute('aria-expanded', 'false');
+        wrapper.classList.toggle('has-open-tool-dialog', dialogs.some(candidate => candidate.open));
+        if (dialog.dataset.restoreFocus !== 'false') {
+          trigger?.focus();
+        }
+        delete dialog.dataset.restoreFocus;
+      });
+
+      dialog.querySelectorAll('.media-library-open-button').forEach((button) => {
+        button.addEventListener('mousedown', () => {
+          const existingDialogs = new Set(document.querySelectorAll('.ui-dialog[role="dialog"]'));
+          const observer = new MutationObserver(() => {
+            const childDialog = Array.from(document.querySelectorAll('.ui-dialog[role="dialog"]')).find(candidate => !existingDialogs.has(candidate));
+            if (!childDialog) {
+              return;
+            }
+            observer.disconnect();
+            closeToolDialog(dialog, false);
+          });
+          observer.observe(document.body, {childList: true, subtree: true});
+          window.setTimeout(() => observer.disconnect(), 5000);
+        });
+      });
+
+    });
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const id = trigger.getAttribute('data-ai-assistant-tool-open') || '';
+        const dialog = dialogById.get(id);
+        if (!dialog) {
+          return;
+        }
+
+        dialogs.forEach((candidate) => {
+          if (candidate !== dialog && candidate.open) {
+            closeToolDialog(candidate, false);
+          }
+        });
+        if (!dialog.open && dialog.dataset.aiAssistantToolMode === 'nonmodal' && typeof dialog.show === 'function') {
+          dialog.show();
+        }
+        else if (!dialog.open && typeof dialog.showModal === 'function') {
+          dialog.showModal();
+        }
+        else if (!dialog.open) {
+          dialog.setAttribute('open', 'open');
+        }
+        trigger.setAttribute('aria-expanded', 'true');
+        wrapper.classList.add('has-open-tool-dialog');
+
+        window.requestAnimationFrame(() => {
+          const firstBodyControl = dialog.querySelector('.ai-moody-assistant__tool-dialog-body button:not([disabled]), .ai-moody-assistant__tool-dialog-body input:not([disabled]), .ai-moody-assistant__tool-dialog-body select:not([disabled]), .ai-moody-assistant__tool-dialog-body textarea:not([disabled]), .ai-moody-assistant__tool-dialog-body a[href], .ai-moody-assistant__tool-dialog-body summary, .ai-moody-assistant__tool-dialog-body [role="button"]');
+          (firstBodyControl || dialog.querySelector('.ai-moody-assistant__tool-dialog-done') || dialog.querySelector('[data-ai-assistant-tool-close]'))?.focus();
+        });
+      });
+    });
+  }
+
   function bindStarterPrompts(wrapper) {
     const promptButtons = Array.from(wrapper.querySelectorAll('[data-ai-assistant-prompt]'));
     if (!promptButtons.length) {
@@ -572,6 +685,7 @@
           return;
         }
 
+        closeToolDialog(button, false);
         insertComposerText(wrapper, prompt);
       });
     });
@@ -1113,12 +1227,13 @@
       syncDirectEditTargets(wrapper.classList.contains('is-open'));
     };
 
-    const addReference = (reference) => {
+    const addReference = (reference, sourceElement = null) => {
       if (!reference || !reference.referenceId) {
         return;
       }
 
       if (selectedById.has(reference.referenceId)) {
+        closeToolDialog(sourceElement, false);
         scrollComposerIntoView(wrapper);
         focusComposer(wrapper);
         return;
@@ -1139,6 +1254,7 @@
         setComposerText(wrapper, reference.selectionMode === 'edit' ? 'Update the selected existing block.' : 'Use the selected block type as the pattern for this request.');
       }
 
+      closeToolDialog(sourceElement, false);
       scrollComposerIntoView(wrapper);
       scrollHistoryToBottom(wrapper);
       focusComposer(wrapper);
@@ -1154,7 +1270,7 @@
         }
 
         event.preventDefault();
-        addReference(hydrateReference(button));
+        addReference(hydrateReference(button), button);
       });
 
       blockLibrary.addEventListener('keydown', (event) => {
@@ -1169,7 +1285,7 @@
         }
 
         event.preventDefault();
-        addReference(hydrateReference(button));
+        addReference(hydrateReference(button), button);
       });
     });
 
@@ -1482,6 +1598,56 @@
     });
   }
 
+  function setPreviousUploadStatus(wrapper, message, isError = false) {
+    const status = wrapper.querySelector('[data-ai-assistant-upload-status]');
+    if (!status) {
+      return;
+    }
+    status.textContent = message || '';
+    status.classList.toggle('is-error', Boolean(isError));
+  }
+
+  async function removePreviousUpload(wrapper, upload, button) {
+    const settings = drupalSettings.moodyAiAssistant = drupalSettings.moodyAiAssistant || {};
+    if (!upload.remove_url || !settings.privateUploadCsrfToken) {
+      setPreviousUploadStatus(wrapper, 'Open upload management to remove this file.', true);
+      return;
+    }
+    if (!window.confirm('Remove "' + (upload.name || 'this upload') + '"? This cannot be undone.')) {
+      return;
+    }
+
+    const originalLabel = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Removing…';
+    setPreviousUploadStatus(wrapper, 'Removing ' + (upload.name || 'upload') + '…');
+
+    try {
+      const response = await fetch(upload.remove_url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-Token': settings.privateUploadCsrfToken
+        }
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.message || 'The upload could not be removed.');
+      }
+
+      delete settings.privateUploads[String(upload.id)];
+      renderPreviousUploads(wrapper);
+      setPreviousUploadStatus(wrapper, 'Removed ' + (upload.name || 'upload') + '.');
+      Drupal.announce('Removed ' + (upload.name || 'private upload') + '.');
+    }
+    catch (error) {
+      button.disabled = false;
+      button.textContent = originalLabel;
+      setPreviousUploadStatus(wrapper, error instanceof Error ? error.message : 'The upload could not be removed.', true);
+    }
+  }
+
   function renderPreviousUploads(wrapper) {
     const shell = wrapper.querySelector('[data-ai-assistant-previous-upload-shell]');
     const list = wrapper.querySelector('[data-ai-assistant-previous-uploads]');
@@ -1492,9 +1658,9 @@
     const settings = drupalSettings.moodyAiAssistant = drupalSettings.moodyAiAssistant || {};
     const uploads = Object.values(settings.privateUploads || {}).sort((a, b) => Number(b.created || 0) - Number(a.created || 0)).slice(0, 20);
     const selected = new Set(Array.from(list.querySelectorAll('input[type="checkbox"]:checked')).map(input => String(input.value)));
-    const summary = shell.querySelector('summary');
-    if (summary) {
-      summary.textContent = 'Use a previous upload (' + uploads.length + ')';
+    const trigger = wrapper.querySelector('[data-ai-assistant-previous-upload-trigger]');
+    if (trigger) {
+      trigger.textContent = 'Previous uploads (' + uploads.length + ')';
     }
 
     list.innerHTML = '';
@@ -1513,7 +1679,7 @@
     const header = document.createElement('div');
     header.className = 'ai-moody-assistant__upload-table-header';
     header.setAttribute('role', 'row');
-    ['Use', 'Preview', 'File', 'Open'].forEach((heading) => {
+    ['Use', 'Preview', 'File', 'Actions'].forEach((heading) => {
       const cell = document.createElement('span');
       cell.setAttribute('role', 'columnheader');
       cell.textContent = heading;
@@ -1576,9 +1742,14 @@
       details.textContent = [upload.uploaded || '', formatFileSize(Number(upload.size || 0))].filter(Boolean).join(' · ');
       meta.append(name, details);
 
-      const openCell = document.createElement('span');
-      openCell.className = 'ai-moody-assistant__upload-open';
-      openCell.setAttribute('role', 'cell');
+      const operationsCell = document.createElement('span');
+      operationsCell.className = 'ai-moody-assistant__upload-operations';
+      operationsCell.setAttribute('role', 'cell');
+      const operations = document.createElement('details');
+      operations.className = 'ai-moody-assistant__upload-menu';
+      const operationsSummary = document.createElement('summary');
+      operationsSummary.textContent = 'Actions';
+      operations.appendChild(operationsSummary);
       if (upload.url) {
         const open = document.createElement('a');
         open.href = upload.url;
@@ -1586,10 +1757,31 @@
         open.rel = 'noopener';
         open.textContent = 'Open';
         open.setAttribute('aria-label', 'Open ' + (upload.name || 'upload') + ' in a new tab');
-        openCell.appendChild(open);
+        operations.appendChild(open);
       }
 
-      row.append(selectCell, previewCell, meta, openCell);
+      const manageLink = wrapper.querySelector('.ai-moody-assistant__manage-uploads');
+      if (upload.removable && upload.remove_url) {
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'ai-moody-assistant__upload-remove';
+        remove.textContent = 'Remove';
+        remove.setAttribute('aria-label', 'Remove unused upload ' + (upload.name || ''));
+        remove.addEventListener('click', () => removePreviousUpload(wrapper, upload, remove));
+        operations.appendChild(remove);
+      }
+      else if (manageLink) {
+        const manage = document.createElement('a');
+        manage.href = manageLink.href;
+        manage.target = '_blank';
+        manage.rel = 'noopener';
+        manage.textContent = 'Manage';
+        manage.setAttribute('aria-label', 'Manage ' + (upload.name || 'upload') + ' and its usage in a new tab');
+        operations.appendChild(manage);
+      }
+      operationsCell.appendChild(operations);
+
+      row.append(selectCell, previewCell, meta, operationsCell);
       list.appendChild(row);
     });
   }
@@ -1607,10 +1799,6 @@
       }
     });
     renderPreviousUploads(wrapper);
-    const shell = wrapper.querySelector('[data-ai-assistant-previous-upload-shell]');
-    if (shell) {
-      shell.open = true;
-    }
   }
 
   function bindFileUploader(wrapper) {
@@ -2413,6 +2601,7 @@
         });
 
         bindConversationSearch(wrapper);
+        bindToolDialogs(wrapper);
         bindStarterPrompts(wrapper);
         bindFormSubmission(wrapper);
         resumeDeferredRequestIfNeeded(wrapper);

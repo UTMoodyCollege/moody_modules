@@ -32,6 +32,16 @@ moody_ai_assistant.chat_stream:
     _permission: 'use moody ai assistant'
   methods: [POST]
 
+moody_ai_assistant.chat_form:
+  path: '/moody-ai/assistant/form/{entity_type}/{entity_id}'
+  defaults:
+    _controller: '\Drupal\moody_ai_assistant\Controller\AIChatFormController::form'
+  requirements:
+    _permission: 'use moody ai assistant'
+    entity_type: '[a-z0-9_]+'
+    entity_id: '\d+'
+  methods: [POST]
+
 moody_ai_assistant.private_uploads:
   path: '/moody-ai/assistant/uploads'
   defaults:
@@ -39,3 +49,12 @@ moody_ai_assistant.private_uploads:
     _title: 'My Moody AI uploads'
   requirements:
     _permission: 'use moody ai assistant'
+
+moody_ai_assistant.private_upload_remove:
+  path: '/moody-ai/assistant/uploads/{file}/remove'
+  defaults:
+    _controller: '\Drupal\moody_ai_assistant\Controller\PrivateUploadActionController::remove'
+  requirements:
+    _permission: 'use moody ai assistant'
+    file: '\d+'
+  methods: [POST]

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\file\FileInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 
 $account = \Drupal::entityTypeManager()->getStorage('user')->load(1);
 if (!$account) {
@@ -93,6 +94,33 @@ try {
     throw new RuntimeException('Private document display metadata was incomplete.');
   }
 
+  $chat_form = \Drupal::formBuilder()->getForm(Drupal\moody_ai_assistant\Form\AIChatBlockForm::class);
+  foreach (['help', 'prompts', 'generation_options', 'previous_uploads'] as $dialog_key) {
+    if (($chat_form['tool_dialogs'][$dialog_key]['#tag'] ?? '') !== 'dialog') {
+      throw new RuntimeException(sprintf('The %s assistant tool did not render as a native dialog.', $dialog_key));
+    }
+  }
+  $media_ajax_element = [
+    '#moody_ai_ajax_route_parameters' => [
+      'entity_type' => 'node',
+      'entity_id' => 1,
+    ],
+    'open_button' => ['#ajax' => []],
+    'update_button' => ['#ajax' => []],
+  ];
+  $complete_form = [];
+  Drupal\moody_ai_assistant\Form\AIChatBlockForm::applyMediaLibraryAjaxUrl($media_ajax_element, new Drupal\Core\Form\FormState(), $complete_form);
+  foreach (['open_button', 'update_button'] as $ajax_button) {
+    $ajax_url = $media_ajax_element[$ajax_button]['#ajax']['url'] ?? NULL;
+    if (!$ajax_url instanceof Drupal\Core\Url || !str_contains($ajax_url->toString(), '/moody-ai/assistant/form/node/1') || ($media_ajax_element[$ajax_button]['#ajax']['options']['query']['ajax_form'] ?? 0) !== 1) {
+      throw new RuntimeException('Media Library callbacks were not routed through the stable assistant AJAX form endpoint.');
+    }
+  }
+  $private_upload_settings = $chat_form['#attached']['drupalSettings']['moodyAiAssistant']['privateUploads'] ?? [];
+  if (empty($private_upload_settings[(int) $document_file->id()]['removable']) || empty($private_upload_settings[(int) $document_file->id()]['remove_url']) || !empty($private_upload_settings[(int) $summary_file->id()]['removable'])) {
+    throw new RuntimeException('The assistant upload dialog did not distinguish removable and in-use files.');
+  }
+
   $uploads_form = \Drupal::formBuilder()->getForm(Drupal\moody_ai_assistant\Form\PrivateUploadsForm::class);
   if (!in_array('moody_ai_assistant/private_uploads', $uploads_form['#attached']['library'] ?? [], TRUE)) {
     throw new RuntimeException('The private upload management stylesheet was not attached.');
@@ -107,6 +135,25 @@ try {
     }
   }
 
+  $controller = Drupal\moody_ai_assistant\Controller\PrivateUploadActionController::create(\Drupal::getContainer());
+  $invalid_response = $controller->remove((int) $document_file->id(), Request::create('/', 'POST'));
+  if ($invalid_response->getStatusCode() !== 403) {
+    throw new RuntimeException('Private upload removal accepted a request without a CSRF token.');
+  }
+  $request = Request::create('/', 'POST', [], [], [], [
+    'HTTP_X_CSRF_TOKEN' => \Drupal::service('csrf_token')->get('moody_ai_assistant.private_upload_remove'),
+  ]);
+  $in_use_response = $controller->remove((int) $summary_file->id(), $request);
+  if ($in_use_response->getStatusCode() !== 409) {
+    throw new RuntimeException(sprintf('Private upload removal did not protect an in-use file (HTTP %d: %s).', $in_use_response->getStatusCode(), $in_use_response->getContent()));
+  }
+  $removed_file_id = (int) $document_file->id();
+  $remove_response = $controller->remove($removed_file_id, $request);
+  if ($remove_response->getStatusCode() !== 200 || \Drupal::entityTypeManager()->getStorage('file')->load($removed_file_id)) {
+    throw new RuntimeException('An owned, unused private upload was not removed.');
+  }
+  $document_file = NULL;
+
   echo json_encode([
     'octet_stream_gif_accepted' => TRUE,
     'disguised_gif_rejected' => $disguised_rejected,
@@ -114,6 +161,9 @@ try {
     'thumbnail_available' => TRUE,
     'document_extension_badge' => TRUE,
     'private_upload_management_form' => TRUE,
+    'assistant_tool_dialogs' => TRUE,
+    'stable_media_library_ajax' => TRUE,
+    'secure_inline_upload_removal' => TRUE,
   ], JSON_PRETTY_PRINT) . PHP_EOL;
 }
 finally {

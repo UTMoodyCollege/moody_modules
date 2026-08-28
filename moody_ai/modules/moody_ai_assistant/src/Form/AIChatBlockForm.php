@@ -11,6 +11,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
+use Drupal\file\FileUsage\FileUsageInterface;
+use Drupal\media_library_form_element\Element\MediaLibrary as MediaLibraryElement;
 use Drupal\moody_ai_assistant\Service\AIChatManager;
 use Drupal\moody_ai_assistant\Service\AIAssetCreator;
 use Drupal\moody_ai_assistant\Service\AIUsageTracker;
@@ -86,9 +88,16 @@ class AIChatBlockForm extends FormBase {
   protected $assetCreator;
 
   /**
+   * Drupal's file usage tracker.
+   *
+   * @var \Drupal\file\FileUsage\FileUsageInterface
+   */
+  protected $fileUsage;
+
+  /**
    * Constructs the form.
    */
-  public function __construct(AIChatManager $chat_manager, AccountProxyInterface $current_user, EntityTypeManagerInterface $entity_type_manager, LayoutContextCollector $layout_context_collector, RequestStack $request_stack, ModuleExtensionList $module_extension_list, BlockReferenceCatalog $block_reference_catalog, AIUsageTracker $usage_tracker, AiGenerationService $generator, FloodInterface $flood, AIAssetCreator $asset_creator) {
+  public function __construct(AIChatManager $chat_manager, AccountProxyInterface $current_user, EntityTypeManagerInterface $entity_type_manager, LayoutContextCollector $layout_context_collector, RequestStack $request_stack, ModuleExtensionList $module_extension_list, BlockReferenceCatalog $block_reference_catalog, AIUsageTracker $usage_tracker, AiGenerationService $generator, FloodInterface $flood, AIAssetCreator $asset_creator, FileUsageInterface $file_usage) {
     $this->chatManager = $chat_manager;
     $this->currentUser = $current_user;
     $this->entityTypeManager = $entity_type_manager;
@@ -100,6 +109,7 @@ class AIChatBlockForm extends FormBase {
     $this->generator = $generator;
     $this->flood = $flood;
     $this->assetCreator = $asset_creator;
+    $this->fileUsage = $file_usage;
   }
 
   /**
@@ -117,7 +127,8 @@ class AIChatBlockForm extends FormBase {
       $container->get('moody_ai_assistant.usage_tracker'),
       $container->get('moody_ai_base.generator'),
       $container->get('flood'),
-      $container->get('moody_ai_assistant.asset_creator')
+      $container->get('moody_ai_assistant.asset_creator'),
+      $container->get('file.usage')
     );
   }
 
@@ -135,6 +146,12 @@ class AIChatBlockForm extends FormBase {
     $upload_input_id = 'ai-chat-block-attachments-' . ($entity ? $entity->id() : '0');
     $ui = $this->generator->uiSettings();
     $form['#attributes']['enctype'] = 'multipart/form-data';
+    if ($entity) {
+      $form['#action'] = Url::fromRoute('moody_ai_assistant.chat_form', [
+        'entity_type' => $entity->getEntityTypeId(),
+        'entity_id' => $entity->id(),
+      ])->toString();
+    }
 
     if (!$ui['enabled']) {
       $form['offline'] = [
@@ -167,6 +184,13 @@ class AIChatBlockForm extends FormBase {
       ],
     ];
 
+    $form['tool_dialogs'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['ai-moody-assistant__tool-dialogs'],
+      ],
+    ];
+
     if (!empty($budget_summary['has_budget'])) {
       $remaining = (int) $budget_summary['remaining'];
       $form['usage_budget'] = [
@@ -182,29 +206,17 @@ class AIChatBlockForm extends FormBase {
       ];
     }
 
-    $form['utility_links']['help'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Help'),
-      '#open' => FALSE,
-      '#attributes' => [
-        'class' => ['ai-moody-assistant__help'],
-      ],
-      'content' => [
-        '#markup' => '<p>' . $this->t('Ask AI to create or revise a block for this page. Example: <em>Create a new block on this page promoting our graduate program with an editorial image of students in class.</em> You can also attach one or more files and tell the assistant to use them in the generated block.') . '</p>',
-      ],
+    $form['utility_links']['help'] = $this->buildToolTrigger('help', $this->t('Help'));
+    $form['tool_dialogs']['help'] = $this->buildToolDialog('help', $this->t('Help'));
+    $form['tool_dialogs']['help']['body']['content'] = [
+      '#markup' => '<p>' . $this->t('Ask AI to create or revise a block for this page. Example: <em>Create a new block on this page promoting our graduate program with an editorial image of students in class.</em> You can also attach one or more files and tell the assistant to use them in the generated block.') . '</p>',
     ];
 
     if ($starter_prompts) {
-      $form['utility_links']['prompts'] = [
-        '#type' => 'details',
-        '#title' => $this->t('Ideas'),
-        '#open' => FALSE,
-        '#attributes' => [
-          'class' => ['ai-moody-assistant__help', 'ai-moody-assistant__prompts'],
-        ],
-      ];
+      $form['utility_links']['prompts'] = $this->buildToolTrigger('prompts', $this->t('Ideas'));
+      $form['tool_dialogs']['prompts'] = $this->buildToolDialog('prompts', $this->t('Ideas'));
 
-      $form['utility_links']['prompts']['content'] = [
+      $form['tool_dialogs']['prompts']['body']['content'] = [
         '#type' => 'container',
         '#attributes' => [
           'class' => ['ai-moody-assistant__prompt-list'],
@@ -212,7 +224,7 @@ class AIChatBlockForm extends FormBase {
       ];
 
       foreach ($starter_prompts as $index => $starter_prompt) {
-        $form['utility_links']['prompts']['content']['prompt_' . $index] = [
+        $form['tool_dialogs']['prompts']['body']['content']['prompt_' . $index] = [
           '#type' => 'button',
           '#value' => $starter_prompt['label'],
           '#attributes' => [
@@ -224,16 +236,10 @@ class AIChatBlockForm extends FormBase {
     }
 
     if ($block_reference_groups) {
-      $form['utility_links']['blocks'] = [
-        '#type' => 'details',
-        '#title' => $this->t('Add block'),
-        '#open' => FALSE,
-        '#attributes' => [
-          'class' => ['ai-moody-assistant__help', 'ai-moody-assistant__blocks'],
-        ],
-      ];
+      $form['utility_links']['blocks'] = $this->buildToolTrigger('blocks', $this->t('Add block'));
+      $form['tool_dialogs']['blocks'] = $this->buildToolDialog('blocks', $this->t('Add block'));
 
-      $form['utility_links']['blocks']['content'] = [
+      $form['tool_dialogs']['blocks']['body']['content'] = [
         '#type' => 'container',
         '#attributes' => [
           'class' => ['ai-moody-assistant__block-library'],
@@ -243,7 +249,7 @@ class AIChatBlockForm extends FormBase {
 
       foreach ($block_reference_groups as $group_index => $group) {
         $group_key = 'group_' . $group_index;
-        $form['utility_links']['blocks']['content'][$group_key] = [
+        $form['tool_dialogs']['blocks']['body']['content'][$group_key] = [
           '#type' => 'details',
           '#title' => $group['label'],
           '#open' => !empty($group['opened']),
@@ -252,7 +258,7 @@ class AIChatBlockForm extends FormBase {
           ],
         ];
 
-        $form['utility_links']['blocks']['content'][$group_key]['items'] = [
+        $form['tool_dialogs']['blocks']['body']['content'][$group_key]['items'] = [
           '#type' => 'container',
           '#attributes' => [
             'class' => ['ai-moody-assistant__block-library-items'],
@@ -260,22 +266,16 @@ class AIChatBlockForm extends FormBase {
         ];
 
         foreach ($group['items'] as $item_index => $item) {
-          $form['utility_links']['blocks']['content'][$group_key]['items']['item_' . $item_index] = $this->buildBlockReferenceElement($item);
+          $form['tool_dialogs']['blocks']['body']['content'][$group_key]['items']['item_' . $item_index] = $this->buildBlockReferenceElement($item);
         }
       }
     }
 
     if ($existing_block_reference_groups) {
-      $form['utility_links']['existing_blocks'] = [
-        '#type' => 'details',
-        '#title' => $this->t('Edit block'),
-        '#open' => FALSE,
-        '#attributes' => [
-          'class' => ['ai-moody-assistant__help', 'ai-moody-assistant__blocks', 'ai-moody-assistant__blocks--existing'],
-        ],
-      ];
+      $form['utility_links']['existing_blocks'] = $this->buildToolTrigger('existing-blocks', $this->t('Edit block'));
+      $form['tool_dialogs']['existing_blocks'] = $this->buildToolDialog('existing-blocks', $this->t('Edit block'));
 
-      $form['utility_links']['existing_blocks']['content'] = [
+      $form['tool_dialogs']['existing_blocks']['body']['content'] = [
         '#type' => 'container',
         '#attributes' => [
           'class' => ['ai-moody-assistant__block-library'],
@@ -285,7 +285,7 @@ class AIChatBlockForm extends FormBase {
 
       foreach ($existing_block_reference_groups as $group_index => $group) {
         $group_key = 'group_' . $group_index;
-        $form['utility_links']['existing_blocks']['content'][$group_key] = [
+        $form['tool_dialogs']['existing_blocks']['body']['content'][$group_key] = [
           '#type' => 'details',
           '#title' => $group['label'],
           '#open' => !empty($group['opened']),
@@ -294,7 +294,7 @@ class AIChatBlockForm extends FormBase {
           ],
         ];
 
-        $form['utility_links']['existing_blocks']['content'][$group_key]['items'] = [
+        $form['tool_dialogs']['existing_blocks']['body']['content'][$group_key]['items'] = [
           '#type' => 'container',
           '#attributes' => [
             'class' => ['ai-moody-assistant__block-library-items'],
@@ -302,28 +302,24 @@ class AIChatBlockForm extends FormBase {
         ];
 
         foreach ($group['items'] as $item_index => $item) {
-          $form['utility_links']['existing_blocks']['content'][$group_key]['items']['item_' . $item_index] = $this->buildBlockReferenceElement($item);
+          $form['tool_dialogs']['existing_blocks']['body']['content'][$group_key]['items']['item_' . $item_index] = $this->buildBlockReferenceElement($item);
         }
       }
     }
 
-    $form['utility_links']['generation_options'] = [
-      '#type' => 'details',
-      '#title' => $this->t('AI options'),
-      '#open' => FALSE,
-      '#attributes' => [
-        'class' => ['ai-moody-assistant__help', 'ai-moody-assistant__generation-options'],
-      ],
-    ];
+    $form['utility_links']['generation_options'] = $this->buildToolTrigger('generation-options', $this->t('AI options'));
+    // Keep this dialog out of the browser top layer so Drupal's Media Library
+    // can open its own modal from the media form element.
+    $form['tool_dialogs']['generation_options'] = $this->buildToolDialog('generation-options', $this->t('AI options'), [], FALSE);
 
-    $form['utility_links']['generation_options']['choices'] = [
+    $form['tool_dialogs']['generation_options']['body']['choices'] = [
       '#type' => 'container',
       '#attributes' => [
         'class' => ['moody-ai-ui__choices', 'ai-moody-assistant__model-choices'],
       ],
     ];
 
-    $form['utility_links']['generation_options']['choices']['provider'] = [
+    $form['tool_dialogs']['generation_options']['body']['choices']['provider'] = [
       '#type' => 'select',
       '#title' => $this->t('Provider'),
       '#options' => $ui['providerOptions'],
@@ -332,7 +328,7 @@ class AIChatBlockForm extends FormBase {
       '#attributes' => ['class' => ['moody-ai-ui__control']],
     ];
 
-    $form['utility_links']['generation_options']['choices']['model'] = [
+    $form['tool_dialogs']['generation_options']['body']['choices']['model'] = [
       '#type' => 'select',
       '#title' => $this->t('Model'),
       '#options' => $ui['modelOptions'],
@@ -341,8 +337,8 @@ class AIChatBlockForm extends FormBase {
       '#attributes' => ['class' => ['moody-ai-ui__control']],
     ];
 
-    if ($media_bundle_ids) {
-      $form['utility_links']['generation_options']['existing_media'] = [
+    if ($media_bundle_ids && $entity) {
+      $form['tool_dialogs']['generation_options']['body']['existing_media'] = [
         '#type' => 'media_library',
         '#allowed_bundles' => $media_bundle_ids,
         '#cardinality' => AiGenerationService::MAX_ATTACHMENTS,
@@ -350,9 +346,19 @@ class AIChatBlockForm extends FormBase {
         '#default_value' => NULL,
         '#description' => $this->t('Add existing Media as source material for this request.'),
         '#attributes' => ['data-ai-assistant-existing-media' => TRUE],
+        '#process' => [
+          [MediaLibraryElement::class, 'processAjaxForm'],
+          [MediaLibraryElement::class, 'processMediaLibrary'],
+          [static::class, 'applyMediaLibraryAjaxUrl'],
+          [MediaLibraryElement::class, 'processGroup'],
+        ],
+        '#moody_ai_ajax_route_parameters' => [
+          'entity_type' => $entity->getEntityTypeId(),
+          'entity_id' => $entity->id(),
+        ],
       ];
 
-      $form['utility_links']['generation_options']['existing_media_intent'] = [
+      $form['tool_dialogs']['generation_options']['body']['existing_media_intent'] = [
         '#type' => 'select',
         '#title' => $this->t('How may Moody AI use selected Media?'),
         '#options' => [
@@ -692,16 +698,22 @@ class AIChatBlockForm extends FormBase {
       ],
     ];
 
-    $form['attachments']['previous_uploads'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Use a previous upload (@count)', ['@count' => count($previous_uploads)]),
-      '#open' => FALSE,
+    $form['attachments']['previous_uploads'] = $this->buildToolTrigger('previous-uploads', $this->t('Previous uploads (@count)', ['@count' => count($previous_uploads)]), ['ai-moody-assistant__previous-uploads-trigger']);
+    $form['attachments']['previous_uploads']['#attributes']['data-ai-assistant-previous-upload-trigger'] = TRUE;
+    $form['tool_dialogs']['previous_uploads'] = $this->buildToolDialog('previous-uploads', $this->t('Previous uploads'), ['ai-moody-assistant__previous-uploads']);
+    $form['tool_dialogs']['previous_uploads']['#attributes']['data-ai-assistant-previous-upload-shell'] = TRUE;
+    $form['tool_dialogs']['previous_uploads']['body']['status'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => '',
       '#attributes' => [
-        'class' => ['ai-moody-assistant__previous-uploads'],
-        'data-ai-assistant-previous-upload-shell' => TRUE,
+        'class' => ['ai-moody-assistant__upload-status'],
+        'data-ai-assistant-upload-status' => TRUE,
+        'role' => 'status',
+        'aria-live' => 'polite',
       ],
     ];
-    $form['attachments']['previous_uploads']['files'] = [
+    $form['tool_dialogs']['previous_uploads']['body']['files'] = [
       '#type' => 'checkboxes',
       '#parents' => ['previous_uploads'],
       '#title' => $this->t('Previous private uploads'),
@@ -711,7 +723,7 @@ class AIChatBlockForm extends FormBase {
         'data-ai-assistant-previous-uploads' => TRUE,
       ],
     ];
-    $form['attachments']['previous_uploads']['manage'] = [
+    $form['tool_dialogs']['previous_uploads']['body']['manage'] = [
       '#type' => 'link',
       '#title' => $this->t('Manage all private uploads'),
       '#url' => Url::fromRoute('moody_ai_assistant.private_uploads'),
@@ -773,10 +785,117 @@ class AIChatBlockForm extends FormBase {
         continue;
       }
 
-      $uploads[(int) $file->id()] = $this->assetCreator->buildPrivateUploadSummary($file);
+      $summary = $this->assetCreator->buildPrivateUploadSummary($file);
+      $summary['removable'] = $this->fileUsage->listUsage($file) === [];
+      $summary['remove_url'] = Url::fromRoute('moody_ai_assistant.private_upload_remove', [
+        'file' => $file->id(),
+      ])->toString();
+      $uploads[(int) $file->id()] = $summary;
     }
 
     return $uploads;
+  }
+
+  /**
+   * Builds a button that opens one assistant tool dialog.
+   */
+  private function buildToolTrigger(string $id, $label, array $classes = []): array {
+    return [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#value' => $label,
+      '#attributes' => [
+        'type' => 'button',
+        'class' => array_merge(['ai-moody-assistant__tool-trigger'], $classes),
+        'data-ai-assistant-tool-open' => $id,
+        'aria-haspopup' => 'dialog',
+      ],
+    ];
+  }
+
+  /**
+   * Builds a native, dismissible dialog within the assistant form.
+   */
+  private function buildToolDialog(string $id, $title, array $classes = [], bool $modal = TRUE): array {
+    $title_id = Html::getUniqueId('ai-moody-assistant-' . $id . '-title');
+    return [
+      '#type' => 'html_tag',
+      '#tag' => 'dialog',
+      '#attributes' => [
+        'class' => array_merge(['ai-moody-assistant__tool-dialog'], $classes),
+        'data-ai-assistant-tool-dialog' => $id,
+        'data-ai-assistant-tool-mode' => $modal ? 'modal' : 'nonmodal',
+        'aria-labelledby' => $title_id,
+      ],
+      'header' => [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['ai-moody-assistant__tool-dialog-header']],
+        'title' => [
+          '#type' => 'html_tag',
+          '#tag' => 'h2',
+          '#value' => $title,
+          '#attributes' => [
+            'id' => $title_id,
+            'class' => ['ai-moody-assistant__tool-dialog-title'],
+          ],
+        ],
+        'close' => [
+          '#type' => 'html_tag',
+          '#tag' => 'button',
+          '#value' => '×',
+          '#attributes' => [
+            'type' => 'button',
+            'class' => ['ai-moody-assistant__tool-dialog-close'],
+            'data-ai-assistant-tool-close' => TRUE,
+            'aria-label' => $this->t('Close @title', ['@title' => $title]),
+          ],
+        ],
+      ],
+      'body' => [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['ai-moody-assistant__tool-dialog-body']],
+      ],
+      'footer' => [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['ai-moody-assistant__tool-dialog-footer']],
+        'done' => [
+          '#type' => 'html_tag',
+          '#tag' => 'button',
+          '#value' => $this->t('Done'),
+          '#attributes' => [
+            'type' => 'button',
+            'class' => ['ai-moody-assistant__tool-dialog-done'],
+            'data-ai-assistant-tool-close' => TRUE,
+          ],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Sends Media Library callbacks to a route that rebuilds this embedded form.
+   */
+  public static function applyMediaLibraryAjaxUrl(array &$element, FormStateInterface $form_state, array &$complete_form): array {
+    $parameters = $element['#moody_ai_ajax_route_parameters'] ?? [];
+    if (empty($parameters['entity_type']) || empty($parameters['entity_id'])) {
+      return $element;
+    }
+
+    $url = Url::fromRoute('moody_ai_assistant.chat_form', $parameters);
+    $apply_url = static function (array &$children) use (&$apply_url, $url): void {
+      if (isset($children['#ajax'])) {
+        $children['#ajax']['url'] = $url;
+        $children['#ajax']['options']['query']['ajax_form'] = 1;
+      }
+      foreach ($children as $key => &$child) {
+        if (is_string($key) && !str_starts_with($key, '#') && is_array($child)) {
+          $apply_url($child);
+        }
+      }
+    };
+    $apply_url($element);
+
+    return $element;
   }
 
   /**

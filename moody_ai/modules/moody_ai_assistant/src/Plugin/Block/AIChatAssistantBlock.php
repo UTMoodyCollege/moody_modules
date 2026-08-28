@@ -167,6 +167,7 @@ class AIChatAssistantBlock extends BlockBase implements BlockPluginInterface, Co
           'moodyAiAssistant' => [
             'streamUrl' => Url::fromRoute('moody_ai_assistant.chat_stream')->toString(),
             'csrfToken' => \Drupal::service('csrf_token')->get('moody_ai_assistant.chat_stream'),
+            'privateUploadCsrfToken' => \Drupal::service('csrf_token')->get('moody_ai_assistant.private_upload_remove'),
           ],
         ],
       ],
