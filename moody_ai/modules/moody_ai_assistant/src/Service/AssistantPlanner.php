@@ -208,6 +208,7 @@ class AssistantPlanner {
           . "- Content type edit_scope is only a broad permission scope; individual content items always require their own access check.\n"
           . "- Otherwise choose \"block\".\n"
           . "- For redirects, use 301 unless the user clearly asks for a temporary redirect.\n"
+          . "- available_page_types is the complete page recommendation allowlist. Never recommend or mention another page type.\n"
           . "- For create_page, suggested_bundles must come from available_page_types.\n"
           . "- Never wrap JSON in markdown fences.\n\n"
           . "Page context JSON:\n" . json_encode($page_context, JSON_PRETTY_PRINT)
@@ -290,6 +291,7 @@ class AssistantPlanner {
           . "- Do not use a dynamic profile listing, feed, or other record-driven block unless the user explicitly selected that block type and supplied the existing records or filters it needs. Use a generated-content block instead.\n"
           . "- Block type values must come from available_block_types when present.\n"
           . "- Place each block in an existing page_context section and region. section_delta is zero-based; never invent a section or region. Use section 0 and an empty region when unsure.\n"
+          . "- available_page_types is the complete page recommendation allowlist. Never recommend or mention another page type.\n"
           . "- Page type values must come from available_page_types.\n"
           . "- Never wrap JSON in markdown fences.\n\n"
           . "Page context JSON:\n" . json_encode($page_context, JSON_PRETTY_PRINT)

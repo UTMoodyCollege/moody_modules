@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Session\UserSession;
 use Drupal\moody_ai_assistant\Service\AssistantPlanner;
 
 $planner = \Drupal::service('moody_ai_assistant.planner');
@@ -103,6 +104,33 @@ if (
 }
 
 $chat_manager = \Drupal::service('moody_ai_assistant.chat_manager');
+$page_bundle_method = new ReflectionMethod($chat_manager, 'getRecommendedPageBundleCandidates');
+$base_page_bundles = $page_bundle_method->invoke($chat_manager, new UserSession([
+  'uid' => 10,
+  'roles' => ['authenticated'],
+]));
+$feature_page_bundles = $page_bundle_method->invoke($chat_manager, new UserSession([
+  'uid' => 11,
+  'roles' => ['authenticated', 'moody_feature_page_editor'],
+]));
+$faculty_page_bundles = $page_bundle_method->invoke($chat_manager, new UserSession([
+  'uid' => 12,
+  'roles' => ['authenticated', 'faculty_bio_editor'],
+]));
+$admin_page_bundles = $page_bundle_method->invoke($chat_manager, new UserSession([
+  'uid' => 1,
+  'roles' => ['authenticated'],
+]));
+if (
+  $base_page_bundles !== ['moody_standard_page', 'moody_landing_page', 'moody_subsite_page']
+  || !in_array('moody_feature_page', $feature_page_bundles, TRUE)
+  || in_array('moody_faculty_bio', $feature_page_bundles, TRUE)
+  || !in_array('moody_faculty_bio', $faculty_page_bundles, TRUE)
+  || !in_array('moody_faculty_bio', $admin_page_bundles, TRUE)
+) {
+  throw new RuntimeException('The role-aware page recommendation allowlist is incorrect.');
+}
+
 $creation_method = new ReflectionMethod($chat_manager, 'isExplicitBlockCreationRequest');
 if (
   !$creation_method->invoke($chat_manager, 'Add two new blocks to this page.', [])
@@ -121,5 +149,11 @@ print json_encode([
   'explicit_profile_listing_available' => TRUE,
   'text_only_required_media_types_excluded' => array_values($required_media_types),
   'text_only_media_payload_scrubbed' => TRUE,
+  'page_recommendation_bundles' => [
+    'base' => $base_page_bundles,
+    'feature_editor' => $feature_page_bundles,
+    'faculty_editor' => $faculty_page_bundles,
+    'uid_1' => $admin_page_bundles,
+  ],
   'creation_requests_skip_edit_analysis' => TRUE,
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";

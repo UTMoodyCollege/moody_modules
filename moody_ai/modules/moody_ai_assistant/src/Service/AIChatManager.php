@@ -2537,24 +2537,40 @@ class AIChatManager {
     $options = [];
     $access_handler = $this->entityTypeManager->getAccessControlHandler('node');
     $types = $this->entityTypeManager->getStorage('node_type')->loadMultiple();
-    foreach ($types as $type) {
-      $bundle = $type->id();
-      if (!$access_handler->createAccess($bundle, $account)) {
+    foreach ($this->getRecommendedPageBundleCandidates($account) as $bundle) {
+      if (!isset($types[$bundle]) || !$access_handler->createAccess($bundle, $account)) {
         continue;
       }
 
       $options[] = [
         'bundle' => $bundle,
-        'label' => $type->label(),
+        'label' => $types[$bundle]->label(),
         'url' => Url::fromUri('internal:/node/add/' . $bundle)->toString(),
       ];
     }
 
-    usort($options, function (array $a, array $b) {
-      return strnatcasecmp($a['label'], $b['label']);
-    });
-
     return $options;
+  }
+
+  /**
+   * Returns the complete role-aware page recommendation allowlist.
+   */
+  protected function getRecommendedPageBundleCandidates(AccountInterface $account) {
+    $roles = $account->getRoles();
+    $bundles = [
+      'moody_standard_page',
+      'moody_landing_page',
+      'moody_subsite_page',
+    ];
+
+    if (array_intersect($roles, ['moody_feature_page_editor', 'feature_page_editor'])) {
+      $bundles[] = 'moody_feature_page';
+    }
+    if ((int) $account->id() === 1 || array_intersect($roles, ['faculty_bio_editor', 'administrator', 'moody_administrator'])) {
+      $bundles[] = 'moody_faculty_bio';
+    }
+
+    return $bundles;
   }
 
   /**
