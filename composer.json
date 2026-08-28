@@ -19,7 +19,8 @@
     },
     "require": {
         "drupal/llms_txt": "^1.1",
-        "drupal/markdownify": "^1.2"
+        "drupal/markdownify": "^1.2",
+        "drupal/masquerade": "^2.2"
     },
     "config": {
         "sort-packages": true

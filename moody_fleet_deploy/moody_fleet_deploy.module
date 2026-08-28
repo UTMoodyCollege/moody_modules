@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Runtime hooks for Moody Fleet Deploy.
+ */
+
+use Drupal\Core\Session\AccountInterface;
+use Drupal\utexas_saml_auth_helper\Hook\Hooks as SamlAuthHooks;
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function moody_fleet_deploy_module_implements_alter(array &$implementations, $hook) {
+  if ($hook === 'user_logout' && isset($implementations['utexas_saml_auth_helper'])) {
+    unset($implementations['utexas_saml_auth_helper']);
+  }
+}
+
+/**
+ * Implements hook_user_logout().
+ */
+function moody_fleet_deploy_user_logout(AccountInterface $account) {
+  $module_handler = \Drupal::moduleHandler();
+
+  // Masquerade calls logout hooks while switching accounts. Preserve UT SSO.
+  if ($module_handler->moduleExists('masquerade') && \Drupal::service('masquerade')->isMasquerading()) {
+    return;
+  }
+
+  // Preserve the UTexas helper's normal logout behavior for real logouts.
+  if ($module_handler->moduleExists('utexas_saml_auth_helper')) {
+    \Drupal::service(SamlAuthHooks::class)->userLogout($account);
+  }
+}
