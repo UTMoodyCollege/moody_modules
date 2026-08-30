@@ -1,0 +1,8 @@
+services:
+  moody_media_remediation.manager:
+    class: Drupal\moody_media_remediation\MediaRemediationManager
+    arguments:
+      - '@database'
+      - '@entity_type.manager'
+      - '@file.usage'
+      - '@current_user'

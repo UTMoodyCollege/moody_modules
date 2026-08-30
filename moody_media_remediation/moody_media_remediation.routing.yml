@@ -1,0 +1,26 @@
+moody_media_remediation.dashboard:
+  path: '/admin/content/media-remediation'
+  defaults:
+    _form: '\Drupal\moody_media_remediation\Form\DashboardForm'
+    _title: 'Media remediation'
+  requirements:
+    _permission: 'administer moody media remediation'
+
+moody_media_remediation.group:
+  path: '/admin/content/media-remediation/{scan_id}/duplicate/{sha256}'
+  defaults:
+    _form: '\Drupal\moody_media_remediation\Form\DuplicateGroupForm'
+    _title: 'Review exact duplicates'
+  requirements:
+    _permission: 'administer moody media remediation'
+    scan_id: '\d+'
+    sha256: '[a-f0-9]{64}'
+
+moody_media_remediation.undo:
+  path: '/admin/content/media-remediation/undo/{operation_id}'
+  defaults:
+    _form: '\Drupal\moody_media_remediation\Form\UndoOperationForm'
+    _title: 'Undo media remediation'
+  requirements:
+    _permission: 'administer moody media remediation'
+    operation_id: '\d+'

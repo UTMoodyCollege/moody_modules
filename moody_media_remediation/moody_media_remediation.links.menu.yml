@@ -1,0 +1,6 @@
+moody_media_remediation.dashboard:
+  title: 'Media remediation'
+  description: 'Scan and safely consolidate managed media files.'
+  route_name: moody_media_remediation.dashboard
+  parent: system.admin_content
+  weight: 30

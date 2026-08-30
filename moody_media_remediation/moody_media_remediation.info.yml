@@ -1,0 +1,9 @@
+name: 'Moody Media Remediation'
+type: module
+description: 'Scans managed files and safely consolidates exact duplicate references.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:file
+  - drupal:media
+  - entity_usage:entity_usage

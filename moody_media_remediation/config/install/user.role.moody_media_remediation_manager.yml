@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - moody_media_remediation
+id: moody_media_remediation_manager
+label: 'Media Remediation Manager'
+weight: 38
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'administer moody media remediation'
+  - 'view the administration theme'

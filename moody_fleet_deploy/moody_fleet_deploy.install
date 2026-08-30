@@ -17,6 +17,7 @@ function moody_fleet_deploy_install() {
   _moody_fleet_deploy_enable_moody_text_styles_on_flex_html();
   _moody_fleet_deploy_enable_moody_block_publishing();
   _moody_fleet_deploy_enable_moody_media_image_helper();
+  _moody_fleet_deploy_enable_moody_media_remediation();
   _moody_fleet_deploy_enable_moody_layout_builder_browser();
   _moody_fleet_deploy_revert_moody_layout_builder_browser();
   _moody_fleet_deploy_install_speedway_theme();
@@ -122,6 +123,13 @@ function moody_fleet_deploy_update_9012() {
  */
 function moody_fleet_deploy_update_9013() {
   _moody_fleet_deploy_enable_masquerade();
+}
+
+/**
+ * Ensures the Moody Media Remediation module is enabled.
+ */
+function moody_fleet_deploy_update_9014() {
+  _moody_fleet_deploy_enable_moody_media_remediation();
 }
 
 /**
@@ -373,6 +381,17 @@ function _moody_fleet_deploy_enable_moody_media_image_helper() {
   }
 
   \Drupal::service('module_installer')->install(['moody_media_image_helper'], TRUE);
+}
+
+/**
+ * Ensures the Moody Media Remediation module is enabled.
+ */
+function _moody_fleet_deploy_enable_moody_media_remediation() {
+  if (\Drupal::moduleHandler()->moduleExists('moody_media_remediation')) {
+    return;
+  }
+
+  \Drupal::service('module_installer')->install(['moody_media_remediation'], TRUE);
 }
 
 /**

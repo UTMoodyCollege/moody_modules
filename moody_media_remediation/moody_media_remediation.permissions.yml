@@ -1,0 +1,4 @@
+administer moody media remediation:
+  title: 'Administer Moody media remediation'
+  description: 'Scan files and consolidate exact duplicate file references.'
+  restrict access: true
