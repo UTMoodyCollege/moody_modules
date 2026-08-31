@@ -51,7 +51,7 @@ final class DashboardForm extends FormBase {
     $scan = $this->manager->getLatestScan();
 
     $form['intro'] = [
-      '#markup' => '<p>' . $this->t('Scan this site for missing, unused, and byte-identical managed files. Exact duplicate consolidation changes only known current Drupal references; it never deletes a file or binary.') . '</p>',
+      '#markup' => '<p>' . $this->t('Scan this site for missing, unused, and byte-identical managed files. Exact duplicate consolidation changes only known current Drupal references. Redundant file entities and binaries can optionally be deleted after a guarded review.') . '</p>',
     ];
     $form['actions'] = [
       '#type' => 'actions',
@@ -251,7 +251,7 @@ final class DashboardForm extends FormBase {
       }
       $form['operations'] = [
         '#type' => 'details',
-        '#title' => $this->t('Recent reversible operations'),
+        '#title' => $this->t('Recent operations'),
         '#open' => TRUE,
       ];
       $form['operations']['table'] = [

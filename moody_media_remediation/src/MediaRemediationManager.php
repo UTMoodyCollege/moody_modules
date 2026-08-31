@@ -15,7 +15,7 @@ use Drupal\file\FileInterface;
 use Drupal\file\FileUsage\FileUsageInterface;
 
 /**
- * Scans managed files and applies reversible reference consolidations.
+ * Scans managed files and consolidates exact duplicates.
  */
 final class MediaRemediationManager {
 
@@ -426,13 +426,14 @@ final class MediaRemediationManager {
   }
 
   /**
-   * Consolidates managed current references and retains every file.
+   * Consolidates managed current references and optionally deletes duplicates.
    */
   public function consolidateGroup(
     int $scan_id,
     string $sha256,
     int $canonical_fid,
     array $duplicate_fids,
+    bool $delete_duplicates = FALSE,
   ): array {
     $group = $this->getGroup($scan_id, $sha256);
     $duplicate_fids = array_values(array_unique(array_map('intval', $duplicate_fids)));
@@ -461,6 +462,28 @@ final class MediaRemediationManager {
       }
     }
 
+    if ($delete_duplicates) {
+      $uri_fids = [];
+      $uri_query = $this->database->select('file_managed', 'f');
+      $uri_query->fields('f', ['fid', 'uri']);
+      $uri_query->condition('f.uri', array_map(
+        static fn (int $fid): string => $files[$fid]->getFileUri(),
+        $duplicate_fids,
+      ), 'IN');
+      foreach ($uri_query->execute() as $row) {
+        $uri_fids[(string) $row->uri][] = (int) $row->fid;
+      }
+      foreach ($duplicate_fids as $fid) {
+        $file = $files[$fid];
+        if (!$file->access('delete', $this->currentUser)) {
+          throw new \RuntimeException(sprintf('Delete access was denied for file %d; no changes were made.', $fid));
+        }
+        if (count($uri_fids[$file->getFileUri()] ?? []) !== 1) {
+          throw new \RuntimeException(sprintf('File %d shares its URI with another managed file; deletion was stopped.', $fid));
+        }
+      }
+    }
+
     $source_ids = [];
     foreach ($duplicate_fids as $fid) {
       foreach ($this->fileUsage->listUsage($files[$fid]) as $module_usage) {
@@ -471,11 +494,26 @@ final class MediaRemediationManager {
         }
       }
     }
+    $tracked_sources = $this->database->select('entity_usage', 'u');
+    $tracked_sources->fields('u', ['source_type', 'source_id', 'source_id_string']);
+    $tracked_sources
+      ->condition('u.target_type', 'file')
+      ->condition('u.target_id', $duplicate_fids, 'IN')
+      ->condition('u.count', 0, '>');
+    foreach ($tracked_sources->execute() as $usage) {
+      $source_id = $usage->source_id ?: $usage->source_id_string;
+      if ($source_id !== NULL && $source_id !== '') {
+        $source_ids[(string) $usage->source_type][(string) $source_id] = (string) $source_id;
+      }
+    }
 
     $entities = [];
     $changes = [];
     foreach ($source_ids as $entity_type => $ids) {
       if (!$this->entityTypeManager->hasDefinition($entity_type)) {
+        if ($delete_duplicates) {
+          throw new \RuntimeException(sprintf('File usage source type %s is not a managed entity; deletion was stopped.', $entity_type));
+        }
         continue;
       }
       $storage = $this->entityTypeManager->getStorage($entity_type);
@@ -533,11 +571,13 @@ final class MediaRemediationManager {
       }
     }
 
-    if (!$changes) {
+    if (!$changes && !$delete_duplicates) {
       return [
         'operation_id' => NULL,
         'changed_fields' => 0,
         'changed_entities' => 0,
+        'deleted_files' => 0,
+        'remaining_group_files' => count($group),
       ];
     }
 
@@ -556,35 +596,75 @@ final class MediaRemediationManager {
     $transaction = $this->database->startTransaction();
     try {
       foreach ($entities as $entity) {
-        $this->prepareRevision($entity, 'Consolidated exact duplicate file references.');
+        if (!$delete_duplicates) {
+          $this->prepareRevision($entity, 'Consolidated exact duplicate file references.');
+        }
         $entity->save();
       }
+
       $operation_id = (int) $this->database->insert(self::OPERATION_TABLE)
         ->fields([
           'scan_id' => $scan_id,
           'uid' => (int) $this->currentUser->id(),
           'created' => time(),
-          'status' => 'applied',
+          'status' => $delete_duplicates ? 'deleted' : 'applied',
           'sha256' => $sha256,
           'canonical_fid' => $canonical_fid,
           'duplicate_fids' => Json::encode($duplicate_fids),
           'changes' => Json::encode($changes),
         ])
         ->execute();
+
+      if ($delete_duplicates) {
+        $remaining_group_files = count($group) - count($duplicate_fids);
+        $scan = $this->database->select(self::SCAN_TABLE, 's')
+          ->fields('s', ['duplicate_groups', 'duplicate_files', 'unused_files'])
+          ->condition('scan_id', $scan_id)
+          ->execute()
+          ->fetchAssoc();
+        if (!$scan) {
+          throw new \RuntimeException('The source scan is no longer available; deletion was stopped and no changes were saved.');
+        }
+        $unused_deleted = count(array_filter(
+          $duplicate_fids,
+          static fn (int $fid): bool => (int) $group[$fid]['core_usage'] === 0 && (int) $group[$fid]['tracked_usage'] === 0,
+        ));
+        $this->database->update(self::SCAN_TABLE)
+          ->fields([
+            'duplicate_groups' => max(0, (int) $scan['duplicate_groups'] - (int) ($remaining_group_files < 2)),
+            'duplicate_files' => max(0, (int) $scan['duplicate_files'] - ($remaining_group_files < 2 ? count($group) : count($duplicate_fids))),
+            'unused_files' => max(0, (int) $scan['unused_files'] - $unused_deleted),
+          ])
+          ->condition('scan_id', $scan_id)
+          ->execute();
+        $this->database->delete(self::ITEM_TABLE)
+          ->condition('scan_id', $scan_id)
+          ->condition('fid', $duplicate_fids, 'IN')
+          ->execute();
+        $this->refreshUsage($scan_id, $canonical_fid);
+
+        // Keep physical deletion last so prior database failures roll back
+        // while all selected file entities and binaries still exist.
+        $file_storage->delete(array_intersect_key($files, array_flip($duplicate_fids)));
+      }
     }
     catch (\Throwable $exception) {
       $transaction->rollBack();
       throw $exception;
     }
 
-    foreach (array_merge([$canonical_fid], $duplicate_fids) as $fid) {
-      $this->refreshUsage($scan_id, $fid);
+    if (!$delete_duplicates) {
+      foreach (array_merge([$canonical_fid], $duplicate_fids) as $fid) {
+        $this->refreshUsage($scan_id, $fid);
+      }
     }
 
     return [
       'operation_id' => $operation_id,
       'changed_fields' => count($changes),
       'changed_entities' => count($entities),
+      'deleted_files' => $delete_duplicates ? count($duplicate_fids) : 0,
+      'remaining_group_files' => count($group) - ($delete_duplicates ? count($duplicate_fids) : 0),
     ];
   }
 

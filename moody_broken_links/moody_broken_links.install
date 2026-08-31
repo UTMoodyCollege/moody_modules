@@ -1,0 +1,232 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for Moody Broken Links.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function moody_broken_links_install(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('user_role');
+  $role = $storage->load('moody_broken_links_manager');
+  if (!$role) {
+    $role = $storage->create([
+      'id' => 'moody_broken_links_manager',
+      'label' => 'Moody Broken Links Manager',
+      'weight' => 39,
+    ]);
+  }
+  foreach ([
+    'access administration pages',
+    'administer moody broken links reports',
+    'view the administration theme',
+  ] as $permission) {
+    $role->grantPermission($permission);
+  }
+  $role->save();
+}
+
+/**
+ * Implements hook_schema().
+ */
+function moody_broken_links_schema(): array {
+  $schema['moody_broken_links_scan'] = [
+    'description' => 'Broken-link scans.',
+    'fields' => [
+      'scan_id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'status' => [
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => 'running',
+      ],
+      'started' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'completed' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'bundles' => [
+        'type' => 'blob',
+        'size' => 'normal',
+        'not null' => TRUE,
+      ],
+      'total_nodes' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'processed_nodes' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'total_links' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'broken_links' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'warning_links' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['scan_id'],
+    'indexes' => [
+      'status' => ['status'],
+    ],
+  ];
+
+  $schema['moody_broken_links_result'] = [
+    'description' => 'Links found during a broken-link scan.',
+    'fields' => [
+      'result_id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'scan_id' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'nid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'bundle' => [
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ],
+      'title' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'langcode' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'source_type' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ],
+      'source_data' => [
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+      ],
+      'source_label' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'source_hash' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ],
+      'occurrence' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'href' => [
+        'type' => 'text',
+        'not null' => TRUE,
+      ],
+      'link_text' => [
+        'type' => 'text',
+        'not null' => FALSE,
+      ],
+      'absolute_url' => [
+        'type' => 'text',
+        'not null' => TRUE,
+      ],
+      'url_hash' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ],
+      'result_status' => [
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE,
+      ],
+      'http_code' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'message' => [
+        'type' => 'text',
+        'not null' => FALSE,
+      ],
+      'remediated' => [
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'action' => [
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'changed' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['result_id'],
+    'indexes' => [
+      'scan_status' => ['scan_id', 'result_status'],
+      'scan_node' => ['scan_id', 'nid'],
+      'scan_remediated' => ['scan_id', 'remediated'],
+      'scan_url' => ['scan_id', 'url_hash'],
+    ],
+  ];
+
+  return $schema;
+}

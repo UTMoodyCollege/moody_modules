@@ -1,0 +1,8 @@
+services:
+  moody_broken_links.manager:
+    class: Drupal\moody_broken_links\BrokenLinksManager
+    arguments:
+      - '@database'
+      - '@entity_type.manager'
+      - '@current_user'
+      - '@http_client'

@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - moody_broken_links
+id: moody_broken_links_manager
+label: 'Moody Broken Links Manager'
+weight: 39
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'administer moody broken links reports'
+  - 'view the administration theme'

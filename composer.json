@@ -20,6 +20,7 @@
     "require": {
         "drupal/llms_txt": "^1.1",
         "drupal/markdownify": "^1.2",
+        "drupal/media_library_form_element": "^2.1",
         "drupal/masquerade": "^2.2"
     },
     "config": {

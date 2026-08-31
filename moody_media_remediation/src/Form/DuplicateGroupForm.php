@@ -69,7 +69,7 @@ final class DuplicateGroupForm extends FormBase {
       '#url' => Url::fromRoute('moody_media_remediation.dashboard'),
     ];
     $form['explanation'] = [
-      '#markup' => '<p>' . $this->t('Every file below had the same SHA-256 during the scan. Consolidation rechecks the bytes, rewrites only current managed file/image fields, creates content revisions when supported, and retains every original file and binary.') . '</p>',
+      '#markup' => '<p>' . $this->t('Every file below had the same SHA-256 during the scan. Consolidation rechecks the bytes, rewrites only current managed file/image fields, and creates content revisions when supported. Deleting the redundant file entities and binaries is optional and requires a platform backup to restore.') . '</p>',
     ];
 
     $options = [];
@@ -156,20 +156,33 @@ final class DuplicateGroupForm extends FormBase {
     ];
     $form['duplicate_fids'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Files whose managed references should be consolidated'),
+      '#title' => $this->t('Files to consolidate'),
       '#options' => $options,
       '#default_value' => array_map('intval', array_keys($group)),
       '#description' => $this->t('The selected canonical file is automatically excluded. Uncheck any other file you do not want to process.'),
     ];
     $form['acknowledge'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('I understand that this changes current managed references but does not delete files.'),
+      '#title' => $this->t('I understand that this changes current managed references.'),
       '#required' => TRUE,
+    ];
+    $form['delete_files'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Also delete the selected duplicate file entities and their binaries.'),
+      '#description' => $this->t('The canonical file and its binary are retained. Media entities are retained and repointed to the canonical file.'),
+    ];
+    $form['acknowledge_delete'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('I understand that deleted files cannot be restored by this dashboard, may break historical revisions or untracked URLs, and require a platform backup.'),
+      '#states' => [
+        'visible' => [':input[name="delete_files"]' => ['checked' => TRUE]],
+        'required' => [':input[name="delete_files"]' => ['checked' => TRUE]],
+      ],
     ];
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Consolidate selected references'),
+      '#value' => $this->t('Consolidate selected files'),
       '#button_type' => 'primary',
       '#disabled' => !$all_exist,
     ];
@@ -231,6 +244,9 @@ final class DuplicateGroupForm extends FormBase {
     if (!$duplicate_fids) {
       $form_state->setErrorByName('duplicate_fids', $this->t('Select at least one non-canonical file.'));
     }
+    if ($form_state->getValue('delete_files') && !$form_state->getValue('acknowledge_delete')) {
+      $form_state->setErrorByName('acknowledge_delete', $this->t('Confirm the deletion and platform-backup recovery warning.'));
+    }
     $form_state->setValue('duplicate_fids', $duplicate_fids);
   }
 
@@ -244,9 +260,18 @@ final class DuplicateGroupForm extends FormBase {
         $this->sha256,
         (int) $form_state->getValue('canonical_fid'),
         (array) $form_state->getValue('duplicate_fids'),
+        (bool) $form_state->getValue('delete_files'),
       );
       if (!$result['operation_id']) {
         $this->messenger()->addWarning($this->t('No current managed references pointed at the selected duplicate files. Nothing changed.'));
+      }
+      elseif ($result['deleted_files']) {
+        $this->messenger()->addStatus($this->t('Operation @operation updated @fields fields on @entities entities and deleted @files duplicate file entities and binaries. Restore a platform backup to recover deleted files.', [
+          '@operation' => $result['operation_id'],
+          '@fields' => $result['changed_fields'],
+          '@entities' => $result['changed_entities'],
+          '@files' => $result['deleted_files'],
+        ]));
       }
       else {
         $this->messenger()->addStatus($this->t('Operation @operation updated @fields fields on @entities entities. Every file and binary was retained.', [
@@ -259,10 +284,15 @@ final class DuplicateGroupForm extends FormBase {
     catch (\Throwable $exception) {
       $this->messenger()->addError($exception->getMessage());
     }
-    $form_state->setRedirect('moody_media_remediation.group', [
-      'scan_id' => $this->scanId,
-      'sha256' => $this->sha256,
-    ]);
+    if (($result['remaining_group_files'] ?? 2) < 2) {
+      $form_state->setRedirect('moody_media_remediation.dashboard');
+    }
+    else {
+      $form_state->setRedirect('moody_media_remediation.group', [
+        'scan_id' => $this->scanId,
+        'sha256' => $this->sha256,
+      ]);
+    }
   }
 
 }

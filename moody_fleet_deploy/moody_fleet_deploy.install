@@ -18,6 +18,8 @@ function moody_fleet_deploy_install() {
   _moody_fleet_deploy_enable_moody_block_publishing();
   _moody_fleet_deploy_enable_moody_media_image_helper();
   _moody_fleet_deploy_enable_moody_media_remediation();
+  _moody_fleet_deploy_enable_moody_broken_links();
+  _moody_fleet_deploy_enable_moody_ai();
   _moody_fleet_deploy_enable_moody_layout_builder_browser();
   _moody_fleet_deploy_revert_moody_layout_builder_browser();
   _moody_fleet_deploy_install_speedway_theme();
@@ -130,6 +132,20 @@ function moody_fleet_deploy_update_9013() {
  */
 function moody_fleet_deploy_update_9014() {
   _moody_fleet_deploy_enable_moody_media_remediation();
+}
+
+/**
+ * Ensures the Moody Broken Links module is enabled.
+ */
+function moody_fleet_deploy_update_9015() {
+  _moody_fleet_deploy_enable_moody_broken_links();
+}
+
+/**
+ * Enables the Moody AI suite with provider access off by default.
+ */
+function moody_fleet_deploy_update_9016() {
+  _moody_fleet_deploy_enable_moody_ai();
 }
 
 /**
@@ -392,6 +408,30 @@ function _moody_fleet_deploy_enable_moody_media_remediation() {
   }
 
   \Drupal::service('module_installer')->install(['moody_media_remediation'], TRUE);
+}
+
+/**
+ * Enables Moody Broken Links without assigning its manager role.
+ */
+function _moody_fleet_deploy_enable_moody_broken_links() {
+  if (\Drupal::moduleHandler()->moduleExists('moody_broken_links')) {
+    return;
+  }
+
+  \Drupal::service('module_installer')->install(['moody_broken_links'], TRUE);
+}
+
+/**
+ * Enables the Moody AI suite without granting feature permissions.
+ */
+function _moody_fleet_deploy_enable_moody_ai() {
+  \Drupal::service('module_installer')->install([
+    'moody_ai',
+    'moody_ai_base',
+    'moody_ai_ckeditor',
+    'moody_ai_assistant',
+    'moody_ai_seo',
+  ], TRUE);
 }
 
 /**

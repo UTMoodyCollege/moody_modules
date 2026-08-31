@@ -24,6 +24,7 @@ $account_switcher = \Drupal::service('account_switcher');
 $admin = \Drupal::entityTypeManager()->getStorage('user')->load(1);
 $scan_id = NULL;
 $operation_id = NULL;
+$delete_operation_id = NULL;
 $media_id = NULL;
 $file_ids = [];
 $switched_account = FALSE;
@@ -133,6 +134,37 @@ try {
     (int) $restored_media->get('field_utexas_media_image')->target_id === (int) $duplicate->id(),
     'Undo did not restore the original file reference.',
   );
+
+  $duplicate_uri = $duplicate->getFileUri();
+  $delete_result = $manager->consolidateGroup(
+    $scan_id,
+    hash('sha256', $png),
+    (int) $canonical->id(),
+    [(int) $duplicate->id()],
+    TRUE,
+  );
+  $delete_operation_id = (int) $delete_result['operation_id'];
+  remediation_check($delete_operation_id > 0, 'Deletion did not create an operation.');
+  remediation_check($delete_result['deleted_files'] === 1, 'The duplicate file was not reported as deleted.');
+  $file_storage->resetCache([(int) $duplicate->id()]);
+  remediation_check($file_storage->load($duplicate->id()) === NULL, 'The duplicate file entity was not deleted.');
+  remediation_check(!file_exists($duplicate_uri), 'The duplicate binary was not deleted.');
+  $media_storage->resetCache([$media_id]);
+  $deleted_media = $media_storage->load($media_id);
+  remediation_check(
+    (int) $deleted_media->get('field_utexas_media_image')->target_id === (int) $canonical->id(),
+    'The media reference was not left on the canonical file after deletion.',
+  );
+  try {
+    $manager->undoOperation($delete_operation_id);
+    throw new RuntimeException('A deletion operation was incorrectly available to undo.');
+  }
+  catch (InvalidArgumentException $exception) {
+    remediation_check(
+      str_contains($exception->getMessage(), 'not available to undo'),
+      'Deletion undo returned an unexpected error.',
+    );
+  }
 
   print "Media remediation smoke check passed.\n";
 }

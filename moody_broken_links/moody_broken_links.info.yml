@@ -1,0 +1,11 @@
+name: Moody Broken Links
+type: module
+description: 'Scans selected content types for broken links and provides revision-safe remediation.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:block_content
+  - drupal:layout_builder
+  - drupal:link
+  - drupal:node
+  - drupal:text

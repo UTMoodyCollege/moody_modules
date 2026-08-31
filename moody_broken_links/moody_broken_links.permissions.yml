@@ -1,0 +1,4 @@
+administer moody broken links reports:
+  title: 'Administer Moody broken links reports'
+  description: 'Run link scans and revise or remove links from content.'
+  restrict access: true

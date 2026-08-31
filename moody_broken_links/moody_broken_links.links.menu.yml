@@ -1,0 +1,6 @@
+moody_broken_links.dashboard:
+  title: 'Broken links'
+  description: 'Scan selected content types and safely remediate broken links.'
+  route_name: moody_broken_links.dashboard
+  parent: system.admin_content
+  weight: 30

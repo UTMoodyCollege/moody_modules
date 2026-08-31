@@ -1,0 +1,35 @@
+moody_broken_links.dashboard:
+  path: '/admin/content/broken-links'
+  defaults:
+    _form: '\Drupal\moody_broken_links\Form\DashboardForm'
+    _title: 'Broken links'
+  requirements:
+    _permission: 'administer moody broken links reports'
+
+moody_broken_links.page:
+  path: '/admin/content/broken-links/{scan_id}/page/{nid}'
+  defaults:
+    _form: '\Drupal\moody_broken_links\Form\PageRemediationForm'
+    _title: 'Queue page link fixes'
+  requirements:
+    _permission: 'administer moody broken links reports'
+    scan_id: '\d+'
+    nid: '\d+'
+
+moody_broken_links.revise:
+  path: '/admin/content/broken-links/{result_id}/revise'
+  defaults:
+    _form: '\Drupal\moody_broken_links\Form\ReviseLinkForm'
+    _title: 'Revise link'
+  requirements:
+    _permission: 'administer moody broken links reports'
+    result_id: '\d+'
+
+moody_broken_links.remove:
+  path: '/admin/content/broken-links/{result_id}/remove'
+  defaults:
+    _form: '\Drupal\moody_broken_links\Form\RemoveLinkForm'
+    _title: 'Remove link'
+  requirements:
+    _permission: 'administer moody broken links reports'
+    result_id: '\d+'

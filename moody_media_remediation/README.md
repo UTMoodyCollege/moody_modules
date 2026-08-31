@@ -9,9 +9,14 @@ The exact-duplicate review form can consolidate current managed `file` and
 `image` field references onto a selected canonical file. Before saving, it
 rehashes every selected binary, checks entity update access, and validates the
 affected entities. It creates revisions where supported and records the exact
-before/after field values for guarded undo.
+before/after field values for guarded undo when every file is retained.
 
-The module never deletes files, file entities, media entities, or binaries.
+Deletion is optional and off by default. When explicitly selected and confirmed,
+the module consolidates known current core and Entity Usage sources, rejects
+unmanaged usage sources and shared file URIs, retains all media entities, and
+then deletes the redundant file entities and binaries. Deleted files cannot be
+restored by the dashboard; historical revisions and untracked hard-coded URLs
+may break, so use a Pantheon platform backup to recover them.
 “Unused” reflects Drupal core file usage plus Entity Usage tracking and remains
 a review signal, not proof that a file is safe to delete. Hard-coded URLs and
 historical revisions may not be represented by those trackers.
