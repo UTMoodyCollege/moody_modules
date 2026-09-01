@@ -12,6 +12,29 @@ block.settings.moody_feature_page_feature_pages_editors_picks:
       type: string
       label: 'Image style override'
 
+block.settings.moody_feature_page_media_mentions:
+  type: block_settings
+  label: 'Moody Media Mentions block'
+  mapping:
+    items:
+      type: sequence
+      label: 'Media mentions'
+      sequence:
+        type: mapping
+        mapping:
+          media_source:
+            type: string
+            label: 'Media source name'
+          headline:
+            type: string
+            label: 'Headline'
+          link:
+            type: string
+            label: 'Link'
+          date:
+            type: string
+            label: 'Date'
+
 block.settings.moody_feature_page_news_and_announcements:
   type: block_settings
   label: 'News and Announcements block'

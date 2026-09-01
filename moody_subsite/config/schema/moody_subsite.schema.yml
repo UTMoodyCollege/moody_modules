@@ -1,0 +1,7 @@
+block.settings.moody_subsite_subsite_blog_grid:
+  type: block_settings
+  label: 'Subsite Blog Grid block'
+  mapping:
+    subsite_to_show:
+      type: integer
+      label: 'Directory Structure term ID'

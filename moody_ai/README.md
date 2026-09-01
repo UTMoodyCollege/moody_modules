@@ -19,8 +19,9 @@ This directory is the shared home for opt-in AI features that ship with
   structured data, agent-friendly 404 recovery, and a read-only readiness
   audit. It does not use an AI provider and remains independent of the Moody AI
   service availability switch.
-- `MOODY_PAGE_BUILDING.md` remains the larger Layout Builder component context
-  for future features; it is not sent with each CKEditor request.
+- `MOODY_PAGE_BUILDING.md` is the audited Layout Builder selection and
+  authoring reference used by the Assistant planner. It is not sent with
+  CKEditor requests.
 
 Both editor experiences consume the same UI contract from `moody_ai_base`.
 They share the configured provider and model choices, prompt ideas and token
@@ -204,6 +205,15 @@ areas, and creatable Media types. The planner uses this context to avoid
 suggesting unavailable workflows, but it never treats the snapshot as an
 authorization token: each route, entity, transition, and approved mutation is
 still checked again at execution time.
+
+Block recommendations use the same enabled Layout Builder Browser entities as
+the component picker. Installed but disabled bundles are excluded before both
+single- and multi-block generation. Purpose-built Moody or UT inline
+components are preferred when their structured fields match the content;
+Basic block remains the fallback for ordinary prose. Configurable plugin
+blocks are included as alternatives in the planning reference, but the
+automatic creator does not silently replace an explicitly selected plugin
+with an inline block.
 
 Assistant attachments use the same user-owned private directory as CKEditor.
 The composer shows each selected filename before sending and preserves the

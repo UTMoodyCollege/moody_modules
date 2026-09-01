@@ -56,7 +56,7 @@ try {
     ['role' => 'system', 'content' => 'Return a supported action as JSON.'],
     ['role' => 'user', 'content' => 'Where do I edit menus?'],
   ]);
-  $planner = new AssistantPlanner($service, \Drupal::service('logger.factory'));
+  $planner = new AssistantPlanner($service, \Drupal::service('logger.factory'), \Drupal::service('extension.list.module'));
   $plan = $planner->planTopLevelAction(
     'Where do I edit menus?',
     ['entity_id' => 7268],

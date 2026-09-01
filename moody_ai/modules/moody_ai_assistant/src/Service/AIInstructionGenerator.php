@@ -24,10 +24,8 @@ class AIInstructionGenerator {
   }
 
   public function generate($prompt, $context = [], ?callable $stream_callback = NULL) {
-    $blockData = $this->blockDataCollector->getStoredData();
-    if (empty($blockData['content_blocks'])) {
-      $blockData = $this->blockDataCollector->collectBlockData();
-    }
+    $blockData = $this->getBlockData();
+    $blockData = $this->limitContentBlocks($blockData, $context['available_block_types'] ?? []);
 
     $current_plan = $context['current_plan'] ?? [];
     $revision_prompt = trim((string) ($context['revision_prompt'] ?? ''));
@@ -74,10 +72,7 @@ class AIInstructionGenerator {
    *   The generated payload.
    */
   public function generateForExistingBlock($prompt, $block_type, array $existing_instruction, array $context = [], ?callable $stream_callback = NULL) {
-    $blockData = $this->blockDataCollector->getStoredData();
-    if (empty($blockData['content_blocks'])) {
-      $blockData = $this->blockDataCollector->collectBlockData();
-    }
+    $blockData = $this->getBlockData();
 
     $plan = [
       'selected_block_type' => $block_type,
@@ -105,10 +100,7 @@ class AIInstructionGenerator {
    * Plans a structured multi-block build or page blueprint.
    */
   public function planStructuredBuild($prompt, array $page_context, array $recent_messages = [], array $page_options = [], ?callable $stream_callback = NULL) {
-    $blockData = $this->blockDataCollector->getStoredData();
-    if (empty($blockData['content_blocks'])) {
-      $blockData = $this->blockDataCollector->collectBlockData();
-    }
+    $blockData = $this->getBlockData();
 
     return $this->planner->planStructuredBuild($prompt, $page_context, $recent_messages, $page_options, $blockData, $stream_callback);
   }
@@ -117,10 +109,7 @@ class AIInstructionGenerator {
    * Generates one component from a structured multi-block plan.
    */
   public function generateFromStructuredPlanItem($prompt, array $plan_item, array $context = [], ?callable $stream_callback = NULL) {
-    $blockData = $this->blockDataCollector->getStoredData();
-    if (empty($blockData['content_blocks'])) {
-      $blockData = $this->blockDataCollector->collectBlockData();
-    }
+    $blockData = $this->getBlockData();
 
     $current_plan = [
       'selected_block_type' => (string) ($plan_item['selected_block_type'] ?? ''),
@@ -232,5 +221,33 @@ class AIInstructionGenerator {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Limits new block generation to bundles offered by Layout Builder Browser.
+   */
+  protected function limitContentBlocks(array $block_data, array $available_types) {
+    $available_types = array_values(array_unique(array_filter(array_map('strval', $available_types))));
+    if (!$available_types) {
+      return $block_data;
+    }
+
+    $allowed = array_fill_keys($available_types, TRUE);
+    $block_data['content_blocks'] = array_intersect_key($block_data['content_blocks'] ?? [], $allowed);
+    return $block_data;
+  }
+
+  /**
+   * Returns cached block metadata, rebuilding older cache formats on demand.
+   */
+  protected function getBlockData() {
+    $block_data = $this->blockDataCollector->getStoredData();
+    if (
+      empty($block_data['content_blocks'])
+      || (int) ($block_data['schema_version'] ?? 0) < BlockDataCollectorService::DATA_SCHEMA_VERSION
+    ) {
+      $block_data = $this->blockDataCollector->collectBlockData();
+    }
+    return $block_data;
   }
 }

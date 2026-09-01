@@ -52,6 +52,13 @@ class AIChatManager {
   protected $layoutContextCollector;
 
   /**
+   * The authoritative Layout Builder Browser catalog.
+   *
+   * @var \Drupal\moody_ai_assistant\Service\BlockReferenceCatalog
+   */
+  protected $blockReferenceCatalog;
+
+  /**
    * The current-user capability collector.
    *
    * @var \Drupal\moody_ai_assistant\Service\UserCapabilityCollector
@@ -110,12 +117,13 @@ class AIChatManager {
   /**
    * Constructs the manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory, AIInstructionGenerator $instruction_generator, BlockParser $block_parser, LayoutContextCollector $layout_context_collector, UserCapabilityCollector $user_capability_collector, LayoutPlacementManager $layout_placement_manager, AssistantPlanner $planner, LanguageManagerInterface $language_manager, AIAssetCreator $asset_creator, AIUsageTracker $usage_tracker, AIBlockInspector $block_inspector, CsrfTokenGenerator $csrf_token) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory, AIInstructionGenerator $instruction_generator, BlockParser $block_parser, LayoutContextCollector $layout_context_collector, BlockReferenceCatalog $block_reference_catalog, UserCapabilityCollector $user_capability_collector, LayoutPlacementManager $layout_placement_manager, AssistantPlanner $planner, LanguageManagerInterface $language_manager, AIAssetCreator $asset_creator, AIUsageTracker $usage_tracker, AIBlockInspector $block_inspector, CsrfTokenGenerator $csrf_token) {
     $this->entityTypeManager = $entity_type_manager;
     $this->logger = $logger_factory->get('moody_ai_assistant');
     $this->instructionGenerator = $instruction_generator;
     $this->blockParser = $block_parser;
     $this->layoutContextCollector = $layout_context_collector;
+    $this->blockReferenceCatalog = $block_reference_catalog;
     $this->userCapabilityCollector = $user_capability_collector;
     $this->layoutPlacementManager = $layout_placement_manager;
     $this->planner = $planner;
@@ -283,6 +291,9 @@ class AIChatManager {
       if ($uploaded_assets) {
         $context['uploaded_assets'] = $uploaded_assets;
       }
+      if ($plugin_references = $this->getSelectedNewPluginReferences($context)) {
+        return $this->preparePluginComponentGuide($thread, $plugin_references);
+      }
       $page_options = $this->getAvailablePageCreationOptions($account);
       $top_level_plan = $this->planner->planTopLevelAction($message, $context, $page_options);
       if (($top_level_plan['action'] ?? 'block') === 'guide') {
@@ -340,6 +351,7 @@ class AIChatManager {
       $instructions = $this->instructionGenerator->generate($this->buildPrompt($message, $context, $thread), [
         'uploaded_assets' => $uploaded_assets,
         'prefer_ai_images' => !empty($context['prefer_ai_images']),
+        'available_block_types' => $this->getAvailableInlineBlockTypes($context),
       ]);
       $selected_type = $instructions['plan']['selected_block_type'] ?? 'block';
       $instructions['block_title'] = $this->buildBlockTitle($entity, $selected_type);
@@ -570,6 +582,15 @@ class AIChatManager {
     if ($uploaded_assets) {
       $context['uploaded_assets'] = $uploaded_assets;
     }
+    if ($plugin_references = $this->getSelectedNewPluginReferences($context)) {
+      $emit('Preparing the selected component guidance...');
+      $result = $this->preparePluginComponentGuide($thread, $plugin_references);
+      $event_callback('complete', [
+        'reload_url' => $this->buildAssistantCompletionUrl($entity, $runtime_context),
+        'status_message' => (string) $result['status_message'],
+      ]);
+      return $result;
+    }
     $page_options = $this->getAvailablePageCreationOptions($account);
     $top_level_plan = $this->planner->planTopLevelAction($message, $context, $page_options, function () use ($ping) {
       $ping();
@@ -690,6 +711,7 @@ class AIChatManager {
     $instructions = $this->instructionGenerator->generate($this->buildPrompt($message, $context, $thread), [
       'uploaded_assets' => $uploaded_assets,
       'prefer_ai_images' => !empty($context['prefer_ai_images']),
+      'available_block_types' => $this->getAvailableInlineBlockTypes($context),
     ], function () use ($ping) {
       $ping();
     });
@@ -879,6 +901,7 @@ class AIChatManager {
       'is_layout_builder_context',
       'prefer_ai_images',
       'existing_components',
+      'available_block_references',
       'selected_block_references',
       'selected_existing_block_references',
       'uploaded_assets',
@@ -984,8 +1007,62 @@ class AIChatManager {
    */
   protected function collectPageContext(ContentEntityInterface $entity, AccountInterface $account, array $runtime_context = []) {
     $context = $this->layoutContextCollector->collectEntityContext($entity, $runtime_context);
+    $context['available_block_references'] = $this->blockReferenceCatalog->getAvailableReferences($entity, $runtime_context);
     $context['user_access'] = $this->userCapabilityCollector->collect($account, $entity);
     return $context;
+  }
+
+  /**
+   * Returns inline block bundles editors can add through Layout Builder.
+   */
+  protected function getAvailableInlineBlockTypes(array $context) {
+    $types = [];
+    foreach ($context['available_block_references'] ?? [] as $reference) {
+      if (empty($reference['is_available_block'])) {
+        continue;
+      }
+      $type = trim((string) ($reference['block_type'] ?? ''));
+      if ($type !== '') {
+        $types[] = $type;
+      }
+    }
+    return array_values(array_unique($types));
+  }
+
+  /**
+   * Returns explicitly selected configurable plugin blocks.
+   */
+  protected function getSelectedNewPluginReferences(array $context) {
+    return array_values(array_filter($context['selected_block_references'] ?? [], static function (array $reference): bool {
+      return ($reference['selection_mode'] ?? 'new') === 'new'
+        && trim((string) ($reference['plugin_id'] ?? '')) !== ''
+        && trim((string) ($reference['block_type'] ?? '')) === '';
+    }));
+  }
+
+  /**
+   * Explains the safe handoff for plugin blocks the inline creator cannot add.
+   */
+  protected function preparePluginComponentGuide(AIChatThread $thread, array $references) {
+    $labels = array_values(array_unique(array_filter(array_map(static function (array $reference): string {
+      return trim((string) ($reference['label'] ?? $reference['type_label'] ?? $reference['plugin_id'] ?? ''));
+    }, $references))));
+    $component_list = $labels ? implode(', ', $labels) : 'the selected configurable component';
+    $message = sprintf(
+      'You selected %s. This is a configurable plugin block rather than an inline content block. I will not replace it with a different component. Add it from the current page\'s Layout Builder component library, then complete its block settings there; the options shown by that form are authoritative for this site.',
+      $component_list
+    );
+    $thread->addMessage('assistant', $message, [
+      'plugin_component_guide' => [
+        'references' => $references,
+      ],
+    ]);
+    $thread->save();
+
+    return [
+      'thread' => $thread,
+      'status_message' => t('The selected plugin component requires its Layout Builder settings form; no substitute block was created.'),
+    ];
   }
 
   /**
@@ -1621,6 +1698,7 @@ class AIChatManager {
       $instructions = $this->instructionGenerator->generate($this->buildPrompt($message, $context, $thread), [
         'uploaded_assets' => $uploaded_assets,
         'prefer_ai_images' => !empty($context['prefer_ai_images']),
+        'available_block_types' => $this->getAvailableInlineBlockTypes($context),
       ]);
       $selected_type = $instructions['plan']['selected_block_type'] ?? 'block';
       $instructions['block_title'] = $this->buildBlockTitle($entity, $selected_type);
@@ -1717,6 +1795,7 @@ class AIChatManager {
       $instructions = $this->instructionGenerator->generate($this->buildPrompt($message, $context, $thread), [
         'uploaded_assets' => $uploaded_assets,
         'prefer_ai_images' => !empty($context['prefer_ai_images']),
+        'available_block_types' => $this->getAvailableInlineBlockTypes($context),
       ], $stream_callback);
       $selected_type = $instructions['plan']['selected_block_type'] ?? 'block';
       $instructions['block_title'] = $this->buildBlockTitle($entity, $selected_type);

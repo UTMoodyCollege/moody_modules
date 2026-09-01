@@ -2,6 +2,7 @@
 
 namespace Drupal\moody_ai_assistant\Service;
 
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Block\BlockManagerInterface;
@@ -9,28 +10,33 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
 class BlockDataCollectorService {
+  const DATA_SCHEMA_VERSION = 2;
   protected $entityTypeManager;
   protected $blockManager;
   protected $state;
   protected $entityFieldManager;
   protected $logger;
+  protected $typedConfigManager;
 
   public function __construct(
     EntityTypeManagerInterface $entity_type_manager,
     BlockManagerInterface $block_manager,
     StateInterface $state,
     EntityFieldManagerInterface $entity_field_manager,
-    LoggerChannelFactoryInterface $logger_factory
+    LoggerChannelFactoryInterface $logger_factory,
+    TypedConfigManagerInterface $typed_config_manager
   ) {
     $this->entityTypeManager = $entity_type_manager;
     $this->blockManager = $block_manager;
     $this->state = $state;
     $this->entityFieldManager = $entity_field_manager;
     $this->logger = $logger_factory->get('moody_ai_assistant');
+    $this->typedConfigManager = $typed_config_manager;
   }
 
   public function collectBlockData() {
     $data = [
+      'schema_version' => static::DATA_SCHEMA_VERSION,
       'content_blocks' => $this->getContentBlockData(),
       'plugin_blocks' => $this->getPluginBlockData(),
       'last_updated' => time(),
@@ -306,10 +312,27 @@ class BlockDataCollectorService {
 
     foreach ($definitions as $plugin_id => $definition) {
       try {
+        $provider = (string) ($definition['provider'] ?? 'unknown');
+        $configuration = [];
+        $configuration_schema = [];
+        if (str_starts_with($provider, 'moody_')) {
+          try {
+            $configuration = $this->blockManager->createInstance($plugin_id, [])->defaultConfiguration();
+            $configuration_schema = $this->getPluginConfigurationSchema($plugin_id);
+          }
+          catch (\Throwable $e) {
+            $this->logger->warning('Could not inspect configuration for @plugin: @message', [
+              '@plugin' => $plugin_id,
+              '@message' => $e->getMessage(),
+            ]);
+          }
+        }
         $blocks[$plugin_id] = [
           'label' => is_string($definition['admin_label']) ? $definition['admin_label'] : (string) ($definition['admin_label'] ?? $plugin_id),
-          'provider' => $definition['provider'] ?? 'unknown',
+          'provider' => $provider,
           'category' => $definition['category'] ?? 'Other',
+          'configuration' => $configuration,
+          'configuration_schema' => $configuration_schema,
         ];
       }
       catch (\Exception $e) {
@@ -322,6 +345,51 @@ class BlockDataCollectorService {
     }
 
     return $blocks;
+  }
+
+  /**
+   * Returns a compact typed-config schema for one block plugin.
+   */
+  protected function getPluginConfigurationSchema($plugin_id) {
+    $definition = $this->typedConfigManager->getDefinition('block.settings.' . $plugin_id, FALSE);
+    return $this->normalizeConfigurationSchema($definition['mapping'] ?? []);
+  }
+
+  /**
+   * Removes schema bookkeeping while preserving valid keys, types, and labels.
+   */
+  protected function normalizeConfigurationSchema(array $mapping) {
+    $schema = [];
+    foreach ($mapping as $key => $definition) {
+      if (!is_array($definition)) {
+        continue;
+      }
+      $record = array_filter([
+        'type' => (string) ($definition['type'] ?? ''),
+        'label' => isset($definition['label']) ? (string) $definition['label'] : '',
+      ], static fn ($value): bool => $value !== '');
+      if (!empty($definition['mapping']) && is_array($definition['mapping'])) {
+        $record['mapping'] = $this->normalizeConfigurationSchema($definition['mapping']);
+      }
+      elseif (str_contains((string) ($definition['type'] ?? ''), '.')) {
+        $nested = $this->typedConfigManager->getDefinition((string) $definition['type'], FALSE);
+        if (!empty($nested['mapping']) && is_array($nested['mapping'])) {
+          $record['mapping'] = $this->normalizeConfigurationSchema($nested['mapping']);
+        }
+      }
+      if (!empty($definition['sequence']) && is_array($definition['sequence'])) {
+        $sequence = $definition['sequence'];
+        $record['sequence'] = array_filter([
+          'type' => (string) ($sequence['type'] ?? ''),
+          'label' => isset($sequence['label']) ? (string) $sequence['label'] : '',
+        ], static fn ($value): bool => $value !== '');
+        if (!empty($sequence['mapping']) && is_array($sequence['mapping'])) {
+          $record['sequence']['mapping'] = $this->normalizeConfigurationSchema($sequence['mapping']);
+        }
+      }
+      $schema[$key] = $record;
+    }
+    return $schema;
   }
 
   public function getStoredData() {

@@ -2,6 +2,33 @@ block.settings.moody_interactive_featurette_moody_interactive_featurette:
   type: block_settings
   label: 'Moody Interactive Featurette block'
   mapping:
-    example:
+    image_1:
+      type: integer
+      label: 'Image 1 media ID'
+    image_1_color:
       type: string
-      label: Example
+      label: 'Image 1 background color'
+    image_2:
+      type: integer
+      label: 'Image 2 media ID'
+    image_2_color:
+      type: string
+      label: 'Image 2 background color'
+    image_3:
+      type: integer
+      label: 'Image 3 media ID'
+    image_3_color:
+      type: string
+      label: 'Image 3 background color'
+    heading:
+      type: string
+      label: 'Heading'
+    text:
+      type: text
+      label: 'Text'
+    link:
+      type: string
+      label: 'Link'
+    link_text:
+      type: string
+      label: 'Link text'

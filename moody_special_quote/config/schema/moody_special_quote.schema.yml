@@ -1,0 +1,16 @@
+block.settings.moody_special_quote_special_quote:
+  type: block_settings
+  label: 'Moody Special Quote block'
+  mapping:
+    headline:
+      type: string
+      label: 'Headline'
+    quote:
+      type: text
+      label: 'Quote'
+    quote2:
+      type: text
+      label: 'Quote 2'
+    image:
+      type: integer
+      label: 'Image media ID'

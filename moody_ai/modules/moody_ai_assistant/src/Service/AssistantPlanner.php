@@ -2,6 +2,7 @@
 
 namespace Drupal\moody_ai_assistant\Service;
 
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\moody_ai_base\AiGenerationService;
 
@@ -18,13 +19,17 @@ class AssistantPlanner {
   protected $logger;
   protected $usageEvents = [];
   protected $selectedModel;
+  protected $componentContext;
 
   public function __construct(
     AiGenerationService $generator,
-    LoggerChannelFactoryInterface $logger_factory
+    LoggerChannelFactoryInterface $logger_factory,
+    ModuleExtensionList $module_extension_list
   ) {
     $this->generator = $generator;
     $this->logger = $logger_factory->get('moody_ai_assistant');
+    $context_path = DRUPAL_ROOT . '/' . $module_extension_list->getPath('moody_ai') . '/MOODY_PAGE_BUILDING.md';
+    $this->componentContext = is_readable($context_path) ? trim((string) file_get_contents($context_path)) : '';
   }
 
   /**
@@ -288,6 +293,9 @@ class AssistantPlanner {
           . "- Use mode=page_blueprint only when the user explicitly requests a new, another, separate, additional, fresh, or different page.\n"
           . "- Use mode=single when one block is enough.\n"
           . "- A multi-block plan may contain at most " . static::MAX_STRUCTURED_BLOCKS . " blocks. Prioritize a complete, coherent page flow within that limit.\n"
+          . "- Treat available_block_references as the authoritative component library for this site. Installed-but-unlisted components are unavailable.\n"
+          . "- Prefer a purpose-built Moody or UT custom inline component when it directly fits the content. Use Basic block for ordinary prose, not to recreate a structured component with ad hoc markup.\n"
+          . "- Configurable plugin blocks in available_block_references are valid alternatives to consider and explain, but selected_block_type is limited to the inline bundles in available_block_types because this automated build creates inline content blocks. Never silently substitute an explicitly selected plugin block.\n"
           . "- Do not use a dynamic profile listing, feed, or other record-driven block unless the user explicitly selected that block type and supplied the existing records or filters it needs. Use a generated-content block instead.\n"
           . "- Block type values must come from available_block_types when present.\n"
           . "- Place each block in an existing page_context section and region. section_delta is zero-based; never invent a section or region. Use section 0 and an empty region when unsure.\n"
@@ -298,7 +306,8 @@ class AssistantPlanner {
           . "\n\nRecent messages JSON:\n" . json_encode($recent_messages, JSON_PRETTY_PRINT)
           . "\n\nAvailable page types JSON:\n" . json_encode($page_options, JSON_PRETTY_PRINT)
           . "\n\nAvailable block types JSON:\n" . json_encode($available_block_types, JSON_PRETTY_PRINT)
-          . $this->getConfiguredContextPrompt(),
+          . "\n\nInstalled Moody plugin block schemas JSON (availability still comes only from page_context.available_block_references):\n" . json_encode($this->buildMoodyPluginCatalog($blockData), JSON_PRETTY_PRINT)
+          . $this->getConfiguredContextPrompt(TRUE),
       ],
       [
         'role' => 'user',
@@ -370,6 +379,19 @@ class AssistantPlanner {
    */
   protected function getStructuredPlanBlockTypes($message, array $page_context, array $blockData) {
     $types = array_keys($blockData['content_blocks'] ?? []);
+    $browser_types = [];
+    foreach ($page_context['available_block_references'] ?? [] as $reference) {
+      if (empty($reference['is_available_block'])) {
+        continue;
+      }
+      $browser_type = trim((string) ($reference['block_type'] ?? ''));
+      if ($browser_type !== '') {
+        $browser_types[] = $browser_type;
+      }
+    }
+    if ($browser_types) {
+      $types = array_values(array_intersect($types, array_unique($browser_types)));
+    }
     $explicit_types = [];
     foreach ($page_context['selected_block_references'] ?? [] as $reference) {
       foreach (['block_type', 'reference_id', 'plugin_id'] as $key) {
@@ -591,15 +613,19 @@ class AssistantPlanner {
       . "}\n\n"
       . "Rules:\n"
       . "- Choose exactly one block type.\n"
+      . "- selected_block_type must be an inline content block from Available block types JSON. Plugin blocks are provided only so you can consider and explain valid alternatives; never return a plugin ID as selected_block_type.\n"
       . "- Use only fields that exist on the chosen block type.\n"
-      . "- Prefer the simplest valid block type that fulfills the request.\n"
+      . "- Prefer the simplest purpose-built Moody or UT custom block that fulfills the request. Use Basic only for general prose or when no structured component fits.\n"
       . "- If prefer_ai_images is true in the prompt/context, strongly prefer generating a new AI image prompt for the relevant field instead of selecting existing media, unless the user explicitly supplied a direct image URL or clearly asked to use a specific uploaded asset.\n"
       . "- If uploaded_assets appear in the prompt/context with media target_id values, prefer reusing those assets only when prefer_ai_images is false or the user explicitly asked to use those uploaded assets.\n"
       . "- If the chosen block type has any image-capable field, including custom compound fields with properties like image or media, and the prompt mentions an image, picture, photo, illustration, graphic, or similar visual, add an image asset requirement.\n"
       . "- If the user provides a direct image URL, include it in asset_requirements as image_url and prefer using that source instead of generating a new image.\n"
       . "- Never wrap the JSON in markdown fences.\n\n"
       . "Available block types JSON:\n"
-      . json_encode($this->buildIdentifierCatalog($blockData), JSON_PRETTY_PRINT);
+      . json_encode($this->buildIdentifierCatalog($blockData), JSON_PRETTY_PRINT)
+      . "\n\nInstalled Moody plugin block schemas JSON:\n"
+      . json_encode($this->buildMoodyPluginCatalog($blockData), JSON_PRETTY_PRINT)
+      . $this->getConfiguredContextPrompt(TRUE);
   }
 
   /**
@@ -625,6 +651,27 @@ class AssistantPlanner {
         'label' => (string) ($definition['label'] ?? $block_type),
         'fields' => $fields,
       ];
+    }
+    return $catalog;
+  }
+
+  /**
+   * Builds a compact catalog of moody_modules plugin configuration contracts.
+   */
+  protected function buildMoodyPluginCatalog(array $blockData) {
+    $catalog = [];
+    foreach ($blockData['plugin_blocks'] ?? [] as $plugin_id => $definition) {
+      $provider = (string) ($definition['provider'] ?? '');
+      if (!str_starts_with($provider, 'moody_') || $plugin_id === 'moody_ai_assistant_block') {
+        continue;
+      }
+      $catalog[$plugin_id] = array_filter([
+        'label' => (string) ($definition['label'] ?? $plugin_id),
+        'provider' => $provider,
+        'category' => (string) ($definition['category'] ?? ''),
+        'defaults' => $definition['configuration'] ?? [],
+        'schema' => $definition['configuration_schema'] ?? [],
+      ], static fn ($value): bool => $value !== '' && $value !== []);
     }
     return $catalog;
   }
@@ -741,8 +788,11 @@ class AssistantPlanner {
   /**
    * Formats configured reference sources for composition prompts.
    */
-  protected function getConfiguredContextPrompt(): string {
-    return '';
+  protected function getConfiguredContextPrompt($include_component_catalog = FALSE): string {
+    if (!$include_component_catalog || $this->componentContext === '') {
+      return '';
+    }
+    return "\n\nMoody component selection and authoring reference:\n" . $this->componentContext;
   }
 
   protected function buildCreatorInput($prompt, array $context) {

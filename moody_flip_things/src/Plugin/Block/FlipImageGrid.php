@@ -58,6 +58,7 @@ final class FlipImageGrid extends BlockBase implements ContainerFactoryPluginInt
   public function defaultConfiguration(): array
   {
     return [
+      'headline' => '',
       'items' => [],
     ];
   }

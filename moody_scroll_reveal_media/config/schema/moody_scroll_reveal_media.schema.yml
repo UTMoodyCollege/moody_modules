@@ -1,0 +1,49 @@
+block.settings.moody_scroll_reveal_media_block:
+  type: block_settings
+  label: 'Moody Scroll Reveal Media block'
+  mapping:
+    headline:
+      type: string
+      label: 'Section headline'
+    animation_style:
+      type: string
+      label: 'Animation style'
+    slides:
+      type: sequence
+      label: 'Reveal slides'
+      sequence:
+        type: mapping
+        mapping:
+          media:
+            type: integer
+            label: 'Media ID'
+          video_url:
+            type: string
+            label: 'Vimeo video URL'
+          video_autoplay:
+            type: boolean
+            label: 'Autoplay video'
+          eyebrow:
+            type: string
+            label: 'Eyebrow'
+          title:
+            type: string
+            label: 'Title'
+          title_display:
+            type: string
+            label: 'Text display'
+          title_position_y:
+            type: string
+            label: 'Vertical overlay position'
+          title_position_x:
+            type: string
+            label: 'Horizontal overlay position'
+          title_position:
+            type: string
+            label: 'Normalized overlay position'
+          body:
+            type: text_format
+            label: 'Body'
+          direction:
+            type: string
+            label: 'Reveal direction'

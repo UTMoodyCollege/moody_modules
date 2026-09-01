@@ -62,6 +62,16 @@ class BlockReferenceCatalog {
    *   Grouped block references.
    */
   public function getGroupedReferences(ContentEntityInterface $entity, array $runtime_context = []) {
+    return $this->groupReferences($this->getAvailableReferences($entity, $runtime_context));
+  }
+
+  /**
+   * Returns the flat, authoritative list of blocks offered by the browser.
+   *
+   * The assistant uses the same list as the picker so it cannot recommend an
+   * installed block that editors cannot actually add on the current site.
+   */
+  public function getAvailableReferences(ContentEntityInterface $entity, array $runtime_context = []) {
     $context = $this->layoutContextCollector->collectEntityContext($entity, $runtime_context);
     $browser_metadata = $this->loadLayoutBuilderBrowserMetadata();
     $usage = $this->buildExistingUsageLookup($context['existing_components'] ?? []);
@@ -78,7 +88,7 @@ class BlockReferenceCatalog {
       }
     }
 
-    return $this->groupReferences($references);
+    return array_values($references);
   }
 
   /**

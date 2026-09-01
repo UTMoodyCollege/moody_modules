@@ -75,8 +75,8 @@ class MoodyEventsSliderFilterableBlock extends BlockBase implements ContainerFac
    */
   public function defaultConfiguration() {
     return [
-      'event_exclusions' => null,
-      'event_host' => null,
+      'event_exclusions' => '',
+      'event_host' => '',
     ];
   }
 

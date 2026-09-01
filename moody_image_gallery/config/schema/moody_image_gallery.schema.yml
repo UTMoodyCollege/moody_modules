@@ -1,0 +1,28 @@
+block.settings.moody_image_gallery_block:
+  type: block_settings
+  label: 'Moody Image Gallery block'
+  mapping:
+    headline:
+      type: string
+      label: 'Headline'
+    gutter:
+      type: string
+      label: 'Gutter size'
+    items:
+      type: sequence
+      label: 'Gallery images'
+      sequence:
+        type: mapping
+        mapping:
+          media:
+            type: integer
+            label: 'Image media ID'
+          caption:
+            type: string
+            label: 'Caption'
+          focus_x:
+            type: string
+            label: 'Horizontal focal position'
+          focus_y:
+            type: string
+            label: 'Vertical focal position'

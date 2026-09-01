@@ -1,0 +1,25 @@
+block.settings.moody_image_grid_image_grid:
+  type: block_settings
+  label: 'Moody Image Grid block'
+  mapping:
+    headline:
+      type: string
+      label: 'Headline'
+    image_style:
+      type: string
+      label: 'Image style'
+    items:
+      type: sequence
+      label: 'Image grid items'
+      sequence:
+        type: mapping
+        mapping:
+          image:
+            type: integer
+            label: 'Image media ID'
+          headline:
+            type: string
+            label: 'Headline'
+          link_url:
+            type: string
+            label: 'Link URL'

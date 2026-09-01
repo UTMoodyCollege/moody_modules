@@ -58,7 +58,9 @@ final class ImageGridBlock extends BlockBase implements ContainerFactoryPluginIn
   public function defaultConfiguration(): array
   {
     return [
+      'headline' => '',
       'items' => [],
+      'image_style' => 'moody_image_style_560w_x_315h',
     ];
   }
 

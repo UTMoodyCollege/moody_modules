@@ -1,0 +1,90 @@
+block.settings.moody_flip_things_dynamic_flip_grid:
+  type: block_settings
+  label: 'Moody Dynamic Flip Grid block'
+  mapping:
+    headline:
+      type: string
+      label: 'Headline'
+    style:
+      type: string
+      label: 'Card shape'
+    items_per_row:
+      type: string
+      label: 'Items per row'
+    items:
+      type: sequence
+      label: 'Flip cards'
+      sequence:
+        type: mapping
+        mapping:
+          front:
+            type: moody_flip_things.side
+            label: 'Front side'
+          back:
+            type: moody_flip_things.side
+            label: 'Back side'
+
+block.settings.moody_flip_things_flip_image_grid:
+  type: block_settings
+  label: 'Moody Flip Image Grid block'
+  mapping:
+    headline:
+      type: string
+      label: 'Headline'
+    items:
+      type: sequence
+      label: 'Flip image items'
+      sequence:
+        type: mapping
+        mapping:
+          image:
+            type: integer
+            label: 'Image media ID'
+          headline:
+            type: string
+            label: 'Headline'
+          body:
+            type: text_format
+            label: 'Body'
+          link_url:
+            type: string
+            label: 'Link URL'
+
+moody_flip_things.side:
+  type: mapping
+  mapping:
+    media:
+      type: integer
+      label: 'Image media ID'
+    headline:
+      type: string
+      label: 'Headline'
+    headline_bg_style:
+      type: string
+      label: 'Headline background style'
+    body:
+      type: text_format
+      label: 'Body'
+    body_bg_style:
+      type: string
+      label: 'Body background style'
+    cta:
+      type: mapping
+      label: 'Call to action'
+      mapping:
+        link:
+          type: mapping
+          label: 'Link'
+          mapping:
+            uri:
+              type: string
+              label: 'URI'
+            title:
+              type: label
+              label: 'Link text'
+            options:
+              type: ignore
+              label: 'Link options'
+    position:
+      type: string
+      label: 'Content position'

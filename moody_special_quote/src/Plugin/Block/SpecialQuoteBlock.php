@@ -58,7 +58,10 @@ final class SpecialQuoteBlock extends BlockBase implements ContainerFactoryPlugi
   public function defaultConfiguration(): array
   {
     return [
-      'items' => [],
+      'headline' => '',
+      'quote' => '',
+      'quote2' => '',
+      'image' => NULL,
     ];
   }
 

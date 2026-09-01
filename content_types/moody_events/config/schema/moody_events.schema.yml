@@ -1,3 +1,14 @@
+block.settings.moody_events_moody_events_slider_filterable:
+  type: block_settings
+  label: 'Moody Events Slider - Filterable block'
+  mapping:
+    event_exclusions:
+      type: string
+      label: 'Comma-separated excluded event IDs'
+    event_host:
+      type: string
+      label: 'Comma-separated included event host IDs'
+
 block.settings.moody_events_moody_events_v2:
   type: block_settings
   label: 'Moody Events V2 block'

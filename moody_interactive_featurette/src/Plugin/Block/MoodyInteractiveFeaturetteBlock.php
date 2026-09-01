@@ -53,7 +53,16 @@ final class MoodyInteractiveFeaturetteBlock extends BlockBase implements Contain
   public function defaultConfiguration(): array
   {
     return [
-      'example' => $this->t('Hello world!'),
+      'image_1' => NULL,
+      'image_1_color' => '',
+      'image_2' => NULL,
+      'image_2_color' => '',
+      'image_3' => NULL,
+      'image_3_color' => '',
+      'heading' => '',
+      'text' => '',
+      'link' => '',
+      'link_text' => '',
     ];
   }
 
@@ -119,7 +128,7 @@ final class MoodyInteractiveFeaturetteBlock extends BlockBase implements Contain
       '#type' => 'textfield',
       '#title' => $this->t('Link Text'),
       '#description' => $this->t('Enter the link text for the featurette.'),
-      '#default_value' => $this->configuration['link_text'],
+      '#default_value' => $this->configuration['link_text'] ?? '',
     ];
 
 
@@ -181,7 +190,7 @@ final class MoodyInteractiveFeaturetteBlock extends BlockBase implements Contain
             '#theme' => 'image_style',
             '#style_name' => $image_style,
             '#uri' => $image_file->getFileUri(),
-            '#alt' => $this->configuration['image_' . $i . '_alt'],
+            '#alt' => $image_entity->field_utexas_media_image->alt ?? '',
             '#attributes' => ['class' => ['featurette-image-' . $i]], // Optional, if you want to add custom classes.
           ];
         }
@@ -190,7 +199,7 @@ final class MoodyInteractiveFeaturetteBlock extends BlockBase implements Contain
         // We can check for the $image_$i_color value and use that as a background color.
         $image_render_arrays[] = [
           '#theme' => 'moody_interactive_featurette_color',
-          '#color' => $this->configuration['image_' . $i . '_color'],
+          '#color' => $this->configuration['image_' . $i . '_color'] ?? '',
         ];
       }
     }

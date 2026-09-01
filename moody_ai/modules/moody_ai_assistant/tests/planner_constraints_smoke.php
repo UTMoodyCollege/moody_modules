@@ -24,6 +24,34 @@ foreach (['feed_block', 'utprof_profile_listing'] as $dynamic_type) {
   }
 }
 
+$browser_limited_types = $method->invoke($planner, 'Build a page introduction.', [
+  'available_block_references' => [
+    ['plugin_id' => 'inline_block:basic', 'block_type' => 'basic', 'is_available_block' => TRUE],
+    ['plugin_id' => 'inline_block:moody_hero', 'block_type' => 'moody_hero', 'is_available_block' => TRUE],
+    ['plugin_id' => 'moody_charts_block', 'block_type' => '', 'is_available_block' => TRUE],
+  ],
+], $block_data);
+if (array_diff($browser_limited_types, ['basic', 'moody_hero']) || !in_array('basic', $browser_limited_types, TRUE)) {
+  throw new RuntimeException('Structured planning was not limited to browser-enabled inline block bundles.');
+}
+
+$context_method = new ReflectionMethod($planner, 'getConfiguredContextPrompt');
+$component_context = $context_method->invoke($planner, TRUE);
+if (!str_contains($component_context, '26 enabled components') || !str_contains($component_context, 'Prefer the simplest component')) {
+  throw new RuntimeException('The audited Moody component guide is absent from builder planning context.');
+}
+
+$limit_method = new ReflectionMethod(\Drupal::service('moody_ai_assistant.instruction_generator'), 'limitContentBlocks');
+$limited_data = $limit_method->invoke(\Drupal::service('moody_ai_assistant.instruction_generator'), [
+  'content_blocks' => [
+    'basic' => ['label' => 'Basic'],
+    'unavailable' => ['label' => 'Unavailable'],
+  ],
+], ['basic']);
+if (array_keys($limited_data['content_blocks']) !== ['basic']) {
+  throw new RuntimeException('Single-block generation retained an unavailable block bundle.');
+}
+
 $resolve_type_method = new ReflectionMethod($planner, 'resolveAllowedBlockType');
 if (
   $resolve_type_method->invoke($planner, 'moody_flex_list', ['basic', 'utexas_flex_list']) !== 'utexas_flex_list'
@@ -141,11 +169,34 @@ if (
   throw new RuntimeException('Creation-request routing could bypass required edit-target analysis.');
 }
 
+$plugin_reference_method = new ReflectionMethod($chat_manager, 'getSelectedNewPluginReferences');
+$selected_plugins = $plugin_reference_method->invoke($chat_manager, [
+  'selected_block_references' => [
+    [
+      'plugin_id' => 'moody_charts_block',
+      'block_type' => '',
+      'selection_mode' => 'new',
+      'label' => 'Chart',
+    ],
+    [
+      'plugin_id' => 'inline_block:moody_hero',
+      'block_type' => 'moody_hero',
+      'selection_mode' => 'new',
+      'label' => 'Moody Hero',
+    ],
+  ],
+]);
+if (array_column($selected_plugins, 'plugin_id') !== ['moody_charts_block']) {
+  throw new RuntimeException('An explicitly selected plugin block could be silently substituted by the inline creator.');
+}
+
 print json_encode([
   'structured_block_limit' => AssistantPlanner::MAX_STRUCTURED_BLOCKS,
   'identifier_catalog_characters' => strlen(json_encode($identifier_catalog, JSON_PRETTY_PRINT)),
   'invalid_block_type_fallback' => 'basic',
   'default_dynamic_types_excluded' => ['feed_block', 'utprof_profile_listing'],
+  'browser_enabled_inline_types_enforced' => TRUE,
+  'moody_component_guide_loaded' => TRUE,
   'explicit_profile_listing_available' => TRUE,
   'text_only_required_media_types_excluded' => array_values($required_media_types),
   'text_only_media_payload_scrubbed' => TRUE,
@@ -156,4 +207,5 @@ print json_encode([
     'uid_1' => $admin_page_bundles,
   ],
   'creation_requests_skip_edit_analysis' => TRUE,
+  'selected_plugin_blocks_require_manual_configuration' => TRUE,
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
