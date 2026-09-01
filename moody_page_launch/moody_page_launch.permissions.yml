@@ -1,0 +1,4 @@
+administer moody page launches:
+  title: 'Administer Moody page launches'
+  description: 'Preview and launch replacement pages, including publication, alias, and redirect changes.'
+  restrict access: true

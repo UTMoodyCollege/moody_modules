@@ -1,0 +1,9 @@
+moody_page_launch.form:
+  path: '/admin/content/moody-page-launch'
+  defaults:
+    _form: '\Drupal\moody_page_launch\Form\PageLaunchForm'
+    _title: 'Launch a replacement page'
+  requirements:
+    _permission: 'administer moody page launches'
+  options:
+    _admin_route: true

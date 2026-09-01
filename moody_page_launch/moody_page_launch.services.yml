@@ -1,0 +1,16 @@
+services:
+  moody_page_launch.launcher:
+    class: Drupal\moody_page_launch\PageLauncher
+    arguments:
+      - '@database'
+      - '@entity_type.manager'
+      - '@datetime.time'
+      - '@current_user'
+      - '@lock'
+      - '@logger.channel.moody_page_launch'
+      - '@path_alias.manager'
+      - '@cache_tags.invalidator'
+
+  logger.channel.moody_page_launch:
+    parent: logger.channel_base
+    arguments: ['moody_page_launch']

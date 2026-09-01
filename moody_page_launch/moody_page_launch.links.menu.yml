@@ -1,0 +1,6 @@
+moody_page_launch.form:
+  title: 'Launch a replacement page'
+  description: 'Replace a published page with a redesigned page and preserve its old URLs.'
+  route_name: moody_page_launch.form
+  parent: system.admin_content
+  weight: 32

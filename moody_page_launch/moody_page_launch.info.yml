@@ -1,0 +1,9 @@
+name: 'Moody Page Launch'
+type: module
+description: 'Safely replaces a published page with a redesigned page while preserving old URLs.'
+core_version_requirement: ^10 || ^11
+package: Moody
+dependencies:
+  - drupal:node
+  - drupal:path
+  - redirect:redirect
