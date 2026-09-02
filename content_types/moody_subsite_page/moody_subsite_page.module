@@ -254,6 +254,26 @@ function moody_subsite_preprocess_page_title(&$variables)
 function moody_subsite_page_form_node_form_alter(&$form, FormStateInterface $form_state)
 {
   $form['#validate'][] = '_moody_subsite_page_node_form_validate';
+
+  $form['legacy_subsite_options'] = [
+    '#type' => 'details',
+    '#title' => t('Legacy Subsite Options'),
+    '#description' => t(
+      'These settings support the legacy subsite hero and information bar display. New pages hide both by default.'
+    ),
+    '#open' => FALSE,
+    '#weight' => 27,
+  ];
+  $legacy_fields = [
+    'field_primary_subsite_hero',
+    'field_hide_default_hero',
+    'field_hide_default_infobar',
+  ];
+  foreach ($legacy_fields as $field_name) {
+    if (isset($form[$field_name])) {
+      $form[$field_name]['#group'] = 'legacy_subsite_options';
+    }
+  }
 }
 
 /**

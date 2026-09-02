@@ -46,6 +46,21 @@
   min-width: 3.5rem;
 }
 
+.moody-subsite-related-pages {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.moody-subsite-related-pages .button {
+  margin: 0;
+}
+
+.js-moody-subsite-related-pages-status {
+  color: #545560;
+}
+
 @media (max-width: 900px) {
   .moody-subsite-menu-table .moody-subsite-menu-fields {
     grid-template-columns: 1fr;

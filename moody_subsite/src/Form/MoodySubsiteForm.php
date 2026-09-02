@@ -97,6 +97,39 @@ class MoodySubsiteForm extends ContentEntityForm {
         }
       }
       unset($item);
+
+      $related_pages = $this->relatedPages();
+      if ($related_pages) {
+        $form['#attached']['drupalSettings']['moodySubsite']['relatedPages'] = $related_pages;
+        $form['subsite_nav']['related_pages'] = [
+          '#type' => 'container',
+          '#weight' => 101,
+          '#attributes' => ['class' => ['moody-subsite-related-pages']],
+          'button' => [
+            '#type' => 'html_tag',
+            '#tag' => 'button',
+            '#value' => $this->t('Add related pages'),
+            '#attributes' => [
+              'type' => 'button',
+              'class' => ['button', 'button--small', 'js-moody-subsite-related-pages'],
+            ],
+          ],
+          'status' => [
+            '#type' => 'html_tag',
+            '#tag' => 'span',
+            '#value' => $this->formatPlural(
+              count($related_pages),
+              '1 related page found.',
+              '@count related pages found.',
+            ),
+            '#attributes' => [
+              'class' => ['js-moody-subsite-related-pages-status'],
+              'role' => 'status',
+              'aria-live' => 'polite',
+            ],
+          ],
+        ];
+      }
     }
 
     if ((int) $this->account->id() !== 1 && !in_array('moody_administrator', $this->account->getRoles(), TRUE)) {
@@ -123,6 +156,39 @@ class MoodySubsiteForm extends ContentEntityForm {
     }
 
     return $form;
+  }
+
+  /**
+   * Returns pages associated with this subsite's directory terms.
+   */
+  protected function relatedPages() {
+    $term_ids = array_column($this->entity->get('directory_structure')->getValue(), 'target_id');
+    if (!$term_ids) {
+      return [];
+    }
+
+    $storage = $this->entityTypeManager->getStorage('node');
+    try {
+      $ids = $storage->getQuery()
+        ->condition('field_moody_url_generator.target_id', $term_ids, 'IN')
+        ->sort('title')
+        ->accessCheck(TRUE)
+        ->execute();
+    }
+    catch (\Exception) {
+      return [];
+    }
+
+    $pages = [];
+    foreach ($storage->loadMultiple($ids) as $node) {
+      if ($node->access('view', $this->account)) {
+        $pages[] = [
+          'title' => (string) $node->label(),
+          'url' => $node->toUrl()->toString(),
+        ];
+      }
+    }
+    return $pages;
   }
 
   /**

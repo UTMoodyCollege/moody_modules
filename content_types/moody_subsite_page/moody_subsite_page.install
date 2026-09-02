@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for Moody Subsite Page.
+ */
+
+use Drupal\field\Entity\FieldConfig;
+
+/**
+ * Hides the legacy default hero and information bar on new pages.
+ */
+function moody_subsite_page_update_11001() {
+  foreach (['field_hide_default_hero', 'field_hide_default_infobar'] as $field_name) {
+    $field = FieldConfig::loadByName('node', 'moody_subsite_page', $field_name);
+    if ($field) {
+      $field->setDefaultValue(TRUE)->save();
+    }
+  }
+}

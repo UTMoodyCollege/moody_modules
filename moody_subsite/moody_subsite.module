@@ -212,6 +212,15 @@ function moody_subsite_moody_subsite_view(array &$build, EntityInterface $entity
         'aria-label' => t('Subsite editing tools'),
       ],
     ];
+    $homepage = trim((string) $entity->get('base_url')->value);
+    if (str_starts_with($homepage, '/')) {
+      $build['editor_actions']['view_homepage'] = [
+        '#type' => 'link',
+        '#title' => t('View Homepage'),
+        '#url' => Url::fromUserInput($homepage),
+        '#attributes' => ['class' => ['button']],
+      ];
+    }
     if ($create_page_access->isAllowed()) {
       $build['editor_actions']['create_page'] = [
         '#type' => 'link',
