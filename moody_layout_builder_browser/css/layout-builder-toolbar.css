@@ -1717,6 +1717,7 @@ form.layout-builder-form .moody-layout-builder-toolbar > #edit-block-type-labels
 form.layout-builder-form .moody-layout-builder-toolbar > #edit-revert {
   grid-column: 1 / -1;
   order: 1;
+  color: var(--mlbt-charcoal);
 }
 
 form.layout-builder-form .moody-layout-builder-toolbar > #edit-submit {
