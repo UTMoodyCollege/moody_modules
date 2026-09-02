@@ -3,7 +3,22 @@
 declare(strict_types=1);
 
 use Drupal\Core\Session\UserSession;
+use Drupal\moody_ai_assistant\Service\AIInstructionGenerator;
 use Drupal\moody_ai_assistant\Service\AssistantPlanner;
+
+final class ContextCapturingAssistantPlanner extends AssistantPlanner {
+
+  public array $pageContext = [];
+
+  public function __construct() {
+  }
+
+  public function planStructuredBuild($message, array $page_context, array $recent_messages, array $page_options, array $blockData, ?callable $stream_callback = NULL) {
+    $this->pageContext = $page_context;
+    return ['mode' => 'single'];
+  }
+
+}
 
 $planner = \Drupal::service('moody_ai_assistant.planner');
 $block_data = \Drupal::service('moody_ai_assistant.block_data_collector')->getStoredData();
@@ -204,6 +219,26 @@ if (array_column($selected_plugins, 'plugin_id') !== ['moody_charts_block']) {
   throw new RuntimeException('An explicitly selected plugin block could be silently substituted by the inline creator.');
 }
 
+$capturing_planner = new ContextCapturingAssistantPlanner();
+$context_limited_generator = new AIInstructionGenerator(
+  \Drupal::state(),
+  \Drupal::service('plugin.manager.core.layout'),
+  \Drupal::service('moody_ai_assistant.block_data_collector'),
+  $capturing_planner,
+);
+$context_limited_generator->planStructuredBuild('Build a basic block.', [
+  'existing_components' => [['uuid' => 'test-component']],
+  'available_block_references' => [['block_type' => 'basic']],
+  'user_access' => ['oversized' => str_repeat('x', 210000)],
+]);
+if (
+  isset($capturing_planner->pageContext['user_access'])
+  || empty($capturing_planner->pageContext['existing_components'])
+  || empty($capturing_planner->pageContext['available_block_references'])
+) {
+  throw new RuntimeException('Structured planning retained oversized access context or removed required block context.');
+}
+
 print json_encode([
   'structured_block_limit' => AssistantPlanner::MAX_STRUCTURED_BLOCKS,
   'identifier_catalog_characters' => strlen(json_encode($identifier_catalog, JSON_PRETTY_PRINT)),
@@ -223,4 +258,5 @@ print json_encode([
   ],
   'creation_requests_skip_edit_analysis' => TRUE,
   'selected_plugin_blocks_require_manual_configuration' => TRUE,
+  'structured_planning_access_context_removed' => TRUE,
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";

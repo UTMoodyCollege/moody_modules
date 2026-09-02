@@ -101,6 +101,7 @@ class AIInstructionGenerator {
    */
   public function planStructuredBuild($prompt, array $page_context, array $recent_messages = [], array $page_options = [], ?callable $stream_callback = NULL) {
     $blockData = $this->getBlockData();
+    unset($page_context['user_access']);
 
     return $this->planner->planStructuredBuild($prompt, $page_context, $recent_messages, $page_options, $blockData, $stream_callback);
   }
