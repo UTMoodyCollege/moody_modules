@@ -36,6 +36,92 @@ class MoodySubsiteForm extends ContentEntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     /* @var \Drupal\moody_subsite\Entity\MoodySubsite $entity */
     $form = parent::buildForm($form, $form_state);
+
+    $menu_only = $this->getRequest()->query->get('section') === 'menu';
+    $form['#attached']['library'][] = 'moody_subsite/subsite-edit-form';
+    $form['subsite_edit_intro'] = [
+      '#type' => 'container',
+      '#weight' => -30,
+      '#attributes' => ['class' => ['moody-subsite-edit-intro']],
+      'title' => [
+        '#type' => 'html_tag',
+        '#tag' => 'h2',
+        '#value' => $this->t('Edit subsite'),
+      ],
+      'description' => [
+        '#markup' => '<p>' . $this->t('Update the visitor-facing settings for this subsite. Changes take effect when you save the form.') . '</p>',
+      ],
+    ];
+    $form['subsite_sections'] = [
+      '#type' => 'vertical_tabs',
+      '#weight' => -20,
+    ];
+
+    $sections = [
+      'basics' => [
+        'title' => $this->t('Basics'),
+        'description' => $this->t('Set the public name, homepage, and page-title behavior.'),
+        'fields' => ['display_name', 'base_url', 'title_display_option'],
+        'open' => !$menu_only,
+      ],
+      'navigation' => [
+        'title' => $this->t('Navigation'),
+        'description' => $this->t('Drag links to reorder them. Indent a link once to place it beneath the nearest top-level link.'),
+        'fields' => ['subsite_nav'],
+        'open' => $menu_only,
+        'attributes' => ['id' => 'subsite-navigation'],
+      ],
+      'branding' => [
+        'title' => $this->t('Branding'),
+        'description' => $this->t('Configure the default hero treatment and subsite logo.'),
+        'fields' => ['hero', 'subsite_home_hero', 'custom_logo'],
+      ],
+      'header_footer' => [
+        'title' => $this->t('Header and footer'),
+        'description' => $this->t('Manage information bars, social links, giving link, and footer text.'),
+        'fields' => ['subsite_info_bars', 'subsite_social_links', 'hide_all_social_accounts', 'give_link', 'subsite_footer_text'],
+      ],
+      'administration' => [
+        'title' => $this->t('Administration'),
+        'description' => $this->t('Administrative settings used to organize and manage the subsite.'),
+        'fields' => ['status', 'name', 'user_id', 'directory_structure'],
+      ],
+    ];
+
+    if (isset($form['subsite_nav']['widget']['add_more'])) {
+      $form['subsite_nav']['widget']['add_more']['#value'] = $this->t('Add navigation link');
+      foreach ($form['subsite_nav']['widget'] as $delta => &$item) {
+        if (is_int($delta) && isset($item['_actions']['delete'])) {
+          $item['_actions']['delete']['#value'] = $this->t('Remove');
+          $item['_actions']['delete']['#attributes']['aria-label'] = $this->t('Remove navigation link');
+        }
+      }
+      unset($item);
+    }
+
+    if ((int) $this->account->id() !== 1 && !in_array('moody_administrator', $this->account->getRoles(), TRUE)) {
+      $form['directory_structure']['#access'] = FALSE;
+    }
+
+    $section_weight = -10;
+    foreach ($sections as $section_name => $section) {
+      $form[$section_name] = [
+        '#type' => 'details',
+        '#title' => $section['title'],
+        '#description' => $section['description'],
+        '#group' => 'subsite_sections',
+        '#open' => $section['open'] ?? FALSE,
+        '#weight' => $section_weight++,
+        '#attributes' => $section['attributes'] ?? [],
+      ];
+      foreach ($section['fields'] as $field_name) {
+        if (isset($form[$field_name])) {
+          $form[$section_name][$field_name] = $form[$field_name];
+          unset($form[$field_name]);
+        }
+      }
+    }
+
     return $form;
   }
 

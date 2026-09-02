@@ -64,6 +64,43 @@ function moody_subsite_theme() {
 }
 
 /**
+ * Implements hook_preprocess_field_multiple_value_form().
+ */
+function moody_subsite_preprocess_field_multiple_value_form(array &$variables) {
+  if (($variables['element']['#field_name'] ?? '') !== 'subsite_nav' || empty($variables['table']['#rows'])) {
+    return;
+  }
+
+  $variables['table']['#attributes']['class'][] = 'moody-subsite-menu-table';
+  $variables['table']['#tabledrag'][] = [
+    'action' => 'match',
+    'relationship' => 'parent',
+    'group' => 'subsite-menu-parent',
+    'subgroup' => 'subsite-menu-parent',
+    'source' => 'subsite-menu-id',
+    'hidden' => FALSE,
+    'limit' => 1,
+  ];
+  $variables['table']['#tabledrag'][] = [
+    'action' => 'depth',
+    'relationship' => 'group',
+    'group' => 'subsite-menu-depth',
+    'hidden' => FALSE,
+  ];
+
+  foreach ($variables['table']['#rows'] as &$row) {
+    $item = &$row['data'][1]['data'];
+    $depth = (int) ($item['is_child']['#value'] ?? $item['is_child']['#default_value'] ?? 0);
+    $row['data'][0]['data'] = [
+      '#theme' => 'indentation',
+      '#size' => min(1, $depth),
+    ];
+    $row['data'][0]['class'][] = 'moody-subsite-menu-drag';
+  }
+  unset($row, $item);
+}
+
+/**
  * Implements hook_toolbar().
  */
 function moody_subsite_toolbar() {
@@ -156,6 +193,46 @@ function moody_subsite_moody_subsite_view(array &$build, EntityInterface $entity
   $cacheability = (new CacheableMetadata())
     ->addCacheContexts(['user.permissions', 'user.node_grants:view', 'timezone'])
     ->addCacheTags(['node_list', 'node_type_list', 'user_list']);
+
+  $account = \Drupal::currentUser();
+  $update_access = $entity->access('update', $account, TRUE);
+  $create_page_access = \Drupal::entityTypeManager()
+    ->getAccessControlHandler('node')
+    ->createAccess('moody_subsite_page', $account, [], TRUE);
+  $cacheability
+    ->addCacheableDependency($update_access)
+    ->addCacheableDependency($create_page_access);
+
+  if ($update_access->isAllowed()) {
+    $build['editor_actions'] = [
+      '#type' => 'container',
+      '#weight' => -100,
+      '#attributes' => [
+        'class' => ['moody-subsite-editor-toolbar'],
+        'aria-label' => t('Subsite editing tools'),
+      ],
+    ];
+    if ($create_page_access->isAllowed()) {
+      $build['editor_actions']['create_page'] = [
+        '#type' => 'link',
+        '#title' => t('Create subsite page'),
+        '#url' => Url::fromRoute('node.add', ['node_type' => 'moody_subsite_page'], [
+          'query' => ['moody_subsite' => $entity->id()],
+        ]),
+        '#attributes' => ['class' => ['button', 'button--primary']],
+      ];
+    }
+    $build['editor_actions']['edit_navigation'] = [
+      '#type' => 'link',
+      '#title' => t('Edit navigation'),
+      '#url' => $entity->toUrl('edit-form', [
+        'query' => ['section' => 'menu'],
+        'fragment' => 'subsite-navigation',
+      ]),
+      '#attributes' => ['class' => ['button']],
+    ];
+    $cacheability->applyTo($build['editor_actions']);
+  }
 
   $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadMultiple($term_ids);
   $term_labels = [];
@@ -368,30 +445,45 @@ function moody_subsite_moody_subsite_view(array &$build, EntityInterface $entity
 }
 
 /**
- * Implements hook_form_alter().
- */
-function moody_subsite_form_moody_subsite_edit_form_alter(&$form, FormStateInterface &$form_state, $form_id) {
-  if ($form_id == 'moody_subsite_edit_form') {
-    // Get roles for currently logged in user.
-    $current_user = \Drupal::currentUser();
-    $roles = $current_user->getRoles();
-    // Disable directory_structure field if user does not have adminstrator role.
-    if (!in_array('moody_administrator', $roles)) {
-      $form['directory_structure']['#attributes']['class'][] = 'visually-hidden';
-    }
-    
-    
-  }
-}
-
-/**
  * Implements hook_alter for the node form.
  */
 function moody_subsite_form_node_form_alter(&$form, FormStateInterface &$form_state, $form_id) {
+  $node = $form_state->getFormObject()->getEntity();
+  $subsite_id = (int) \Drupal::request()->query->get('moody_subsite', 0);
+  if ($node->isNew() && $node->bundle() === 'moody_subsite_page' && $subsite_id && $node->hasField('field_moody_url_generator')) {
+    $subsite = \Drupal::entityTypeManager()->getStorage('moody_subsite')->load($subsite_id);
+    if ($subsite && $subsite->access('update')) {
+      $term_ids = array_values(array_filter(array_map('intval', array_column($subsite->get('directory_structure')->getValue(), 'target_id'))));
+      if ($term_ids && $node->get('field_moody_url_generator')->isEmpty()) {
+        $term_id = $term_ids[0];
+        $node->set('field_moody_url_generator', $term_id);
+        if (isset($form['field_moody_url_generator']['widget'])) {
+          $form['field_moody_url_generator']['widget']['#default_value'] = $term_id;
+        }
+        $form['moody_subsite_context'] = [
+          '#type' => 'html_tag',
+          '#tag' => 'div',
+          '#value' => t('This page will be created in @subsite.', [
+            '@subsite' => trim((string) $subsite->get('display_name')->value) ?: $subsite->label(),
+          ]),
+          '#attributes' => [
+            'class' => ['messages', 'messages--status'],
+            'role' => 'status',
+          ],
+          '#weight' => -20,
+        ];
+      }
+    }
+  }
+
   // Add a state to be invisible via Drupal form API to the $form['subsite_blog_summary'] if the subsite_page checkbox is not checked
   $invisible_state_for_blog_checked = [
     ':input[name="field_subsite_blog_page[value]"]' => ['checked' => FALSE],
   ];
-  $form['field_subsite_blog_image']['#states']['invisible'] = $invisible_state_for_blog_checked;
-  $form['field_subsite_blog_summary']['#states']['invisible'] = $invisible_state_for_blog_checked;
+  if (isset($form['field_subsite_blog_image'])) {
+    $form['field_subsite_blog_image']['#states']['invisible'] = $invisible_state_for_blog_checked;
+  }
+  if (isset($form['field_subsite_blog_summary'])) {
+    $form['field_subsite_blog_summary']['#states']['invisible'] = $invisible_state_for_blog_checked;
+  }
 }

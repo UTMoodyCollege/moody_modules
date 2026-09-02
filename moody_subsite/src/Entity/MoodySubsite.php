@@ -204,7 +204,8 @@ class MoodySubsite extends ContentEntityBase implements MoodySubsiteInterface {
     // *** Custom fields ***
     // Subsite navigation.
     $fields['subsite_nav'] = BaseFieldDefinition::create('moody_subsite_menu')
-      ->setLabel(t('Subsite Navigation'))
+      ->setLabel(t('Navigation links'))
+      ->setDescription(t('Drag links to set their order. Indent a link once, or choose Submenu in its Level field, to nest it beneath the nearest top-level link.'))
       ->setCardinality('-1')
       ->setDisplayOptions('form', [
         'type' => 'moody_subsite_menu_widget',

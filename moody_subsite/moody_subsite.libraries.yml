@@ -1,8 +1,14 @@
 subsite-edit-form:
   version: 1.x
+  js:
+    js/subsite-menu-editor.js: {}
   css:
     theme:
       theme/subsite-edit-form.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.tabledrag
+    - core/once
 
 subsite-admin:
   css:
