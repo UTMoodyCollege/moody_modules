@@ -179,11 +179,12 @@ class AssistantPlanner {
           . "- working with page blocks on the current page\n"
           . "- creating a redirect\n"
           . "- creating a brand new page\n"
+          . "- managing an assigned Moody subsite\n"
           . "- changing or explaining publication status\n"
           . "- finding a Drupal administration page for a site-management task\n\n"
           . "Return valid JSON only with this structure:\n"
           . "{\n"
-          . "  \"action\": \"block|redirect|create_page|guide\",\n"
+          . "  \"action\": \"block|redirect|create_page|subsite|guide\",\n"
           . "  \"reasoning\": \"short explanation\",\n"
           . "  \"redirect\": {\n"
           . "    \"source\": \"relative source path beginning with / or empty string\",\n"
@@ -195,8 +196,12 @@ class AssistantPlanner {
           . "    \"summary\": \"one sentence summary\",\n"
           . "    \"suggested_bundles\": [\"machine_name\", \"machine_name\"]\n"
           . "  },\n"
+          . "  \"subsite\": {\n"
+          . "    \"subsite_id\": 0,\n"
+          . "    \"summary\": \"one sentence summary\"\n"
+          . "  },\n"
           . "  \"guide\": {\n"
-          . "    \"topic\": \"menus|redirects|content|publishing|media|users|taxonomy|configuration\",\n"
+          . "    \"topic\": \"menus|redirects|content|publishing|media|users|taxonomy|configuration|subsites\",\n"
           . "    \"summary\": \"one sentence explaining where the user can continue\"\n"
           . "  }\n"
           . "}\n\n"
@@ -205,6 +210,9 @@ class AssistantPlanner {
           . "- When page_context has an entity_id, page-building requests apply to that existing current page by default.\n"
           . "- Phrases such as \"make a page\", \"build a page\", or \"create a page\" do not by themselves request a new page; use \"block\" so the current page is composed with blocks.\n"
           . "- Choose \"create_page\" only when the user explicitly distinguishes a new target with language such as new, another, separate, additional, fresh, or different page/node.\n"
+          . "- Choose \"subsite\" when the user asks to change a subsite setting, nested menu, attached-image logo, or to create a Moody Subsite Page inside a specific subsite.\n"
+          . "- Choose subsite only when user_access.subsites.manage_tool.available is true, and use an exact subsite_id from manage_tool.targets. Otherwise use guide with topic=subsites and explain that the account cannot manage that subsite.\n"
+          . "- For subsite requests, this step selects only the target. A dedicated access-checked planner will inspect that one subsite's current values next.\n"
           . "- Choose \"guide\" with topic=publishing when the user asks to publish, unpublish, archive, draft, or explain the publication state of the current content.\n"
           . "- Choose \"guide\" for how-to or navigation requests about menus, redirects without enough details to create one, content, media, users, taxonomy, or configuration.\n"
           . "- user_access is a Drupal-calculated snapshot for this request. Never claim or plan access beyond it. False values and omitted content types are unavailable.\n"
@@ -227,7 +235,7 @@ class AssistantPlanner {
 
     $response = $this->requestChatCompletion($messages, 0.1, $stream_callback);
     $plan = $this->parseJsonMessage($response);
-    $plan['action'] = in_array(($plan['action'] ?? 'block'), ['block', 'redirect', 'create_page', 'guide'], TRUE) ? $plan['action'] : 'block';
+    $plan['action'] = in_array(($plan['action'] ?? 'block'), ['block', 'redirect', 'create_page', 'subsite', 'guide'], TRUE) ? $plan['action'] : 'block';
     if ($plan['action'] === 'create_page' && $build_on_current_page) {
       $plan['action'] = 'block';
       $plan['reasoning'] = 'Build on the current page because the user did not explicitly request a separate new page.';
@@ -235,6 +243,7 @@ class AssistantPlanner {
     $plan['redirect'] = !empty($plan['redirect']) && is_array($plan['redirect']) ? $plan['redirect'] : [];
     $plan['page'] = !empty($plan['page']) && is_array($plan['page']) ? $plan['page'] : [];
     $plan['page']['suggested_bundles'] = !empty($plan['page']['suggested_bundles']) && is_array($plan['page']['suggested_bundles']) ? array_values($plan['page']['suggested_bundles']) : [];
+    $plan['subsite'] = !empty($plan['subsite']) && is_array($plan['subsite']) ? $plan['subsite'] : [];
     $plan['guide'] = !empty($plan['guide']) && is_array($plan['guide']) ? $plan['guide'] : [];
 
     if ($plan['action'] === 'redirect' && isset($page_context['user_access']['site_tools']['create_redirect']) && empty($page_context['user_access']['site_tools']['create_redirect'])) {
@@ -245,7 +254,75 @@ class AssistantPlanner {
         'summary' => 'Your current Drupal access does not allow you to create redirects on this site.',
       ];
     }
+    if ($plan['action'] === 'subsite' && empty($page_context['user_access']['subsites']['manage_tool']['available'])) {
+      $plan['action'] = 'guide';
+      $plan['subsite'] = [];
+      $plan['guide'] = [
+        'topic' => 'subsites',
+        'summary' => 'Your current Drupal access does not allow you to manage a subsite on this site.',
+      ];
+    }
 
+    return $plan;
+  }
+
+  /**
+   * Plans concrete changes for one access-checked subsite target.
+   */
+  public function planSubsiteAction($message, array $subsite_context, array $uploaded_assets = [], ?callable $stream_callback = NULL) {
+    $messages = [
+      [
+        'role' => 'system',
+        'content' => "You are the dedicated Moody subsite action planner.\n\n"
+          . "Return valid JSON only with this structure:\n"
+          . "{\n"
+          . "  \"summary\": \"one sentence summary\",\n"
+          . "  \"settings\": {\"display_name\": \"only requested allowlisted setting values\"},\n"
+          . "  \"replace_menu\": false,\n"
+          . "  \"menu_items\": [{\"title\": \"Link title\", \"link\": \"/path\", \"is_child\": false}],\n"
+          . "  \"replace_logo\": false,\n"
+          . "  \"logo_media_id\": 0,\n"
+          . "  \"logo_size\": \"short_logo|medium_logo|tall_logo|empty string\",\n"
+          . "  \"new_page\": {\"title\": \"page title or empty string\", \"directory_term_id\": 0}\n"
+          . "}\n\n"
+          . "Rules:\n"
+          . "- Include only changes explicitly requested by the user. Settings keys must come from subsite_context.settings.\n"
+          . "- Never change status, ownership, directory assignments, default hero, info bars, or social account values.\n"
+          . "- For any menu change, set replace_menu=true and return the complete intended menu in order, preserving every unrequested current item.\n"
+          . "- is_child=true represents one submenu level beneath the nearest preceding parent. The first item cannot be a child.\n"
+          . "- Internal menu links begin with /. External links must be full http or https URLs.\n"
+          . "- For a logo change, set replace_logo=true and use only an image media_id present in uploaded_assets. Never invent an ID.\n"
+          . "- For a new page, use an exact directory_term_id from subsite_context.directory_terms and only when can_create_page is true. The page will be created unpublished.\n"
+          . "- Leave every unrelated object, array, flag, or ID empty or false.\n"
+          . "- Never wrap JSON in markdown fences.\n\n"
+          . "Subsite context JSON:\n" . json_encode($subsite_context, JSON_PRETTY_PRINT)
+          . "\n\nUploaded assets JSON:\n" . json_encode($uploaded_assets, JSON_PRETTY_PRINT),
+      ],
+      [
+        'role' => 'user',
+        'content' => $message,
+      ],
+    ];
+
+    $response = $this->requestChatCompletion($messages, 0.1, $stream_callback);
+    $plan = $this->parseJsonMessage($response);
+    $plan['subsite_id'] = (int) ($subsite_context['id'] ?? 0);
+    $plan['summary'] = trim((string) ($plan['summary'] ?? ''));
+    $plan['settings'] = !empty($plan['settings']) && is_array($plan['settings']) ? $plan['settings'] : [];
+    foreach (['name', 'display_name', 'base_url', 'title_display_option'] as $required_setting) {
+      if (array_key_exists($required_setting, $plan['settings']) && trim((string) $plan['settings'][$required_setting]) === '') {
+        unset($plan['settings'][$required_setting]);
+      }
+    }
+    $plan['replace_menu'] = !empty($plan['replace_menu']);
+    $plan['menu_items'] = isset($plan['menu_items']) && is_array($plan['menu_items']) ? array_values($plan['menu_items']) : [];
+    $plan['replace_logo'] = !empty($plan['replace_logo']);
+    $plan['logo_media_id'] = (int) ($plan['logo_media_id'] ?? 0);
+    $plan['logo_size'] = (string) ($plan['logo_size'] ?? '');
+    $plan['new_page'] = !empty($plan['new_page']) && is_array($plan['new_page']) ? $plan['new_page'] : [];
+    if (trim((string) ($plan['new_page']['title'] ?? '')) === '' && empty($plan['new_page']['directory_term_id'])) {
+      $plan['new_page'] = [];
+    }
     return $plan;
   }
 
@@ -255,6 +332,7 @@ class AssistantPlanner {
   public function planStructuredBuild($message, array $page_context, array $recent_messages, array $page_options, array $blockData, ?callable $stream_callback = NULL) {
     $build_on_current_page = $this->shouldBuildOnCurrentPage($message, $page_context);
     $available_block_types = $this->getStructuredPlanBlockTypes($message, $page_context, $blockData);
+    $block_guidance = $this->buildBlockPurposeCatalog($available_block_types, $blockData);
     $messages = [
       [
         'role' => 'system',
@@ -307,6 +385,7 @@ class AssistantPlanner {
           . "\n\nAvailable page types JSON:\n" . json_encode($page_options, JSON_PRETTY_PRINT)
           . "\n\nAvailable block types JSON:\n" . json_encode($available_block_types, JSON_PRETTY_PRINT)
           . "\n\nInstalled Moody plugin block schemas JSON (availability still comes only from page_context.available_block_references):\n" . json_encode($this->buildMoodyPluginCatalog($blockData), JSON_PRETTY_PRINT)
+          . "\n\nAvailable block guidance JSON:\n" . json_encode($block_guidance, JSON_PRETTY_PRINT)
           . $this->getConfiguredContextPrompt(TRUE),
       ],
       [
@@ -649,6 +728,8 @@ class AssistantPlanner {
       }
       $catalog[$block_type] = [
         'label' => (string) ($definition['label'] ?? $block_type),
+        'description' => (string) ($definition['description'] ?? ''),
+        'best_for' => (string) ($definition['best_for'] ?? ''),
         'fields' => $fields,
       ];
     }
@@ -672,6 +753,22 @@ class AssistantPlanner {
         'defaults' => $definition['configuration'] ?? [],
         'schema' => $definition['configuration_schema'] ?? [],
       ], static fn ($value): bool => $value !== '' && $value !== []);
+    }
+    return $catalog;
+  }
+
+  /**
+   * Builds compact capability guidance for multi-block page planning.
+   */
+  protected function buildBlockPurposeCatalog(array $available_types, array $blockData) {
+    $catalog = [];
+    foreach ($available_types as $block_type) {
+      $definition = $blockData['content_blocks'][$block_type] ?? [];
+      $catalog[$block_type] = array_filter([
+        'label' => (string) ($definition['label'] ?? $block_type),
+        'description' => (string) ($definition['description'] ?? ''),
+        'best_for' => (string) ($definition['best_for'] ?? ''),
+      ]);
     }
     return $catalog;
   }

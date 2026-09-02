@@ -35,6 +35,15 @@ function moody_ai_assistant_theme($existing, $type, $theme, $path): array {
  * Implements hook_page_bottom().
  */
 function moody_ai_assistant_page_bottom(array &$page_bottom): void {
+  // The page already owns the global assistant. Injecting it into an AJAX
+  // response or its modal iframe creates a second launcher inside dialogs.
+  $request = \Drupal::request();
+  $is_layout_builder_modal = $request->query->get('destination')
+    === '/layout_builder_iframe_modal/redirect';
+  if ($request->isXmlHttpRequest() || $is_layout_builder_modal) {
+    return;
+  }
+
   $account = \Drupal::currentUser();
   if (!$account->isAuthenticated() || !$account->hasPermission('use moody ai assistant')) {
     return;

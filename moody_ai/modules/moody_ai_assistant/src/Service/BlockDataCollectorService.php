@@ -10,7 +10,37 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
 class BlockDataCollectorService {
-  const DATA_SCHEMA_VERSION = 2;
+  const DATA_SCHEMA_VERSION = 3;
+
+  private const BLOCK_SELECTION_GUIDANCE = [
+    'ambient_video' => 'Use for an intentional video-led page introduction when motion adds meaning; prefer Moody Hero when a still image is sufficient.',
+    'basic' => 'Use for pure text, semantic formatted copy, or small chunks of safe custom markup that do not need a specialized visual component.',
+    'call_to_action' => 'Use for one focused next-step link, not as a substitute for a full content section.',
+    'moody_accordion' => 'Use for FAQs or grouped details with clear, predictable panel titles.',
+    'moody_contact_info' => 'Use for a concise contact or next-step panel with structured copy and a call to action.',
+    'moody_flex_color_blocks' => 'Use for up to four short, parallel choices or topics distinguished by approved color treatments.',
+    'moody_flex_grid' => 'Use for responsive cards representing programs, topics, resources, people, or destinations.',
+    'moody_flex_tabs' => 'Use for a small set of parallel content panels whose labels remain understandable out of context.',
+    'moody_focus_areas' => 'Use for a small, intentional set of mission areas, disciplines, or high-level topic destinations.',
+    'moody_hero' => 'Use as the primary visual introduction at the top of a page; normally use no more than one per page.',
+    'moody_impact_facts' => 'Use for a concise set of verified headline statistics, outcomes, or short data points; use a Chart for comparative datasets.',
+    'moody_newsletter' => 'Use for a compact newsletter-signup promotion with one clear destination.',
+    'moody_promotion' => 'Use for one image-led event, announcement, opportunity, or campaign.',
+    'moody_quotation' => 'Use for one verified quotation with an accurate attribution, never for invented testimonial copy.',
+    'moody_resource_group' => 'Use for a clearly labeled, structured group of related resource links.',
+    'moody_showcase' => 'Use for editorial image-or-video storytelling paired with substantial copy; prefer Flex Grid for independent cards.',
+    'social_links' => 'Use for an official set of social-network destinations, not general-purpose links.',
+    'utexas_featured_highlight' => 'Use for one timely or important in-page item with optional media, date, summary, and destination.',
+    'utexas_flex_content_area' => 'Use for one or more media-and-copy rows; prefer Basic for prose-only content and Showcase for a more editorial treatment.',
+    'utexas_flex_list' => 'Use for repeated heading-and-content pairs displayed as a list, accordion, or tabs.',
+    'utexas_image_link' => 'Use for one compact linked image; use Promo List or Flex Grid for a collection.',
+    'utexas_photo_content_area' => 'Use for image-led content with supporting copy when the Photo Content Area is offered by the site.',
+    'utexas_promo_list' => 'Use for several compact related promotions with square imagery.',
+    'utexas_promo_unit' => 'Use for a prominent group of larger promotional items.',
+    'utexas_quick_links' => 'Use for a short, scannable set of important destination links.',
+    'utexas_resources' => 'Use for related resources that may combine a group heading, image, and multiple links.',
+  ];
+
   protected $entityTypeManager;
   protected $blockManager;
   protected $state;
@@ -291,8 +321,11 @@ class BlockDataCollectorService {
           }
         }
 
-        $blocks[$type->id()] = [
+        $block_type = (string) $type->id();
+        $blocks[$block_type] = [
           'label' => $type->label(),
+          'description' => trim((string) $type->get('description')),
+          'best_for' => self::BLOCK_SELECTION_GUIDANCE[$block_type] ?? '',
           'fields' => $field_data,
         ];
       }
@@ -393,7 +426,8 @@ class BlockDataCollectorService {
   }
 
   public function getStoredData() {
-    return $this->state->get('moody_ai_assistant.block_data', []);
+    $data = $this->state->get('moody_ai_assistant.block_data', []);
+    return ($data['schema_version'] ?? 0) === static::DATA_SCHEMA_VERSION ? $data : [];
   }
 
   public function exportJson() {

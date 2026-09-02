@@ -115,9 +115,16 @@ class AIChatManager {
   protected $csrfToken;
 
   /**
+   * The optional Moody subsite action tool.
+   *
+   * @var object|null
+   */
+  protected $subsiteActionManager;
+
+  /**
    * Constructs the manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory, AIInstructionGenerator $instruction_generator, BlockParser $block_parser, LayoutContextCollector $layout_context_collector, BlockReferenceCatalog $block_reference_catalog, UserCapabilityCollector $user_capability_collector, LayoutPlacementManager $layout_placement_manager, AssistantPlanner $planner, LanguageManagerInterface $language_manager, AIAssetCreator $asset_creator, AIUsageTracker $usage_tracker, AIBlockInspector $block_inspector, CsrfTokenGenerator $csrf_token) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory, AIInstructionGenerator $instruction_generator, BlockParser $block_parser, LayoutContextCollector $layout_context_collector, BlockReferenceCatalog $block_reference_catalog, UserCapabilityCollector $user_capability_collector, LayoutPlacementManager $layout_placement_manager, AssistantPlanner $planner, LanguageManagerInterface $language_manager, AIAssetCreator $asset_creator, AIUsageTracker $usage_tracker, AIBlockInspector $block_inspector, CsrfTokenGenerator $csrf_token, $subsite_action_manager = NULL) {
     $this->entityTypeManager = $entity_type_manager;
     $this->logger = $logger_factory->get('moody_ai_assistant');
     $this->instructionGenerator = $instruction_generator;
@@ -132,6 +139,7 @@ class AIChatManager {
     $this->usageTracker = $usage_tracker;
     $this->blockInspector = $block_inspector;
     $this->csrfToken = $csrf_token;
+    $this->subsiteActionManager = $subsite_action_manager;
   }
 
   /**
@@ -301,6 +309,9 @@ class AIChatManager {
       }
       if (($top_level_plan['action'] ?? 'block') === 'redirect') {
         return $this->prepareRedirectPreview($thread, $top_level_plan, $account);
+      }
+      if (($top_level_plan['action'] ?? 'block') === 'subsite') {
+        return $this->prepareSubsitePreview($thread, $message, $top_level_plan, $account, $uploaded_assets);
       }
       if (($top_level_plan['action'] ?? 'block') === 'create_page') {
         $structured_plan = $this->instructionGenerator->planStructuredBuild($message, $context, array_slice($thread->getMessages(), -8), $page_options);
@@ -626,6 +637,18 @@ class AIChatManager {
       return $result;
     }
 
+    if (($top_level_plan['action'] ?? 'block') === 'subsite') {
+      $emit('Preparing subsite changes for review...');
+      $result = $this->prepareSubsitePreview($thread, $message, $top_level_plan, $account, $uploaded_assets, function () use ($ping) {
+        $ping();
+      });
+      $event_callback('complete', [
+        'reload_url' => $this->buildAssistantCompletionUrl($entity, $runtime_context),
+        'status_message' => (string) $result['status_message'],
+      ]);
+      return $result;
+    }
+
     if (($top_level_plan['action'] ?? 'block') === 'create_page') {
       $emit('Preparing page creation options...');
       $structured_plan = $this->instructionGenerator->planStructuredBuild($message, $context, array_slice($thread->getMessages(), -8), $page_options, function () use ($ping) {
@@ -823,7 +846,8 @@ class AIChatManager {
     if (!$entity) {
       throw new \Exception('The target page for this conversation could not be loaded.');
     }
-    if (!$entity->access('update', $account)) {
+    $pending_type = (string) ($pending['pending_action']['type'] ?? '');
+    if ($pending_type !== 'manage_subsite' && !$entity->access('update', $account)) {
       throw new \Exception('You no longer have permission to update the target page.');
     }
 
@@ -837,6 +861,9 @@ class AIChatManager {
       }
       elseif (($pending['pending_action']['type'] ?? '') === 'place_existing_blocks') {
         $dismiss_message = 'Dismissed the pending layout placement. No blocks were attached to the page.';
+      }
+      elseif (($pending['pending_action']['type'] ?? '') === 'manage_subsite') {
+        $dismiss_message = 'Dismissed the proposed subsite changes. No subsite settings, navigation, or pages were changed.';
       }
 
       $thread->resolvePendingAction($action_id, 'rejected', ['resolved_at' => time()]);
@@ -853,6 +880,9 @@ class AIChatManager {
     $action = $pending['pending_action'];
     if (($action['type'] ?? '') === 'create_redirect') {
       return $this->handleRedirectApproval($thread, $action_id, $action, $entity, $account);
+    }
+    if (($action['type'] ?? '') === 'manage_subsite') {
+      return $this->handleSubsiteApproval($thread, $action_id, $action, $entity, $account);
     }
     if (($action['type'] ?? '') === 'place_existing_blocks') {
       return $this->handleDeferredPlacementApproval($thread, $action_id, $action, $entity);
@@ -1947,6 +1977,56 @@ class AIChatManager {
   }
 
   /**
+   * Prepares an access-checked subsite action for explicit approval.
+   */
+  protected function prepareSubsitePreview(AIChatThread $thread, $message, array $top_level_plan, AccountInterface $account, array $uploaded_assets = [], ?callable $stream_callback = NULL) {
+    if (!$this->subsiteActionManager) {
+      throw new \Exception('The Moody subsite assistant tool is not available on this site.');
+    }
+
+    $target_id = (int) ($top_level_plan['subsite']['subsite_id'] ?? 0);
+    $subsite_context = $this->subsiteActionManager->actionContext($target_id, $account);
+    $action_plan = $this->planner->planSubsiteAction($message, $subsite_context, $uploaded_assets, $stream_callback);
+    if (empty($action_plan['summary']) && !empty($top_level_plan['subsite']['summary'])) {
+      $action_plan['summary'] = (string) $top_level_plan['subsite']['summary'];
+    }
+    $proposal = $this->subsiteActionManager->prepareAction($action_plan, $account, $uploaded_assets);
+    $action_id = bin2hex(random_bytes(8));
+    $thread->addMessage('assistant', $proposal['summary'], [
+      'pending_action' => [
+        'id' => $action_id,
+        'status' => 'pending',
+        'type' => 'manage_subsite',
+        'title' => 'Preview subsite changes',
+        'target_component' => [
+          'block_label' => $proposal['subsite_label'],
+        ],
+        'summary' => $proposal['summary'],
+        'changes' => $proposal['changes'],
+        'approve_label' => 'Yes, apply subsite changes',
+        'reject_label' => 'No, dismiss',
+        'approve_url' => Url::fromRoute('moody_ai_assistant.chat_thread_action', [
+          'moody_ai_chat_thread' => $thread->id(),
+          'action_id' => $action_id,
+          'decision' => 'approve',
+        ])->toString(),
+        'reject_url' => Url::fromRoute('moody_ai_assistant.chat_thread_action', [
+          'moody_ai_chat_thread' => $thread->id(),
+          'action_id' => $action_id,
+          'decision' => 'reject',
+        ])->toString(),
+        'subsite_action' => $proposal['payload'],
+      ],
+    ]);
+    $thread->save();
+
+    return [
+      'thread' => $thread,
+      'status_message' => t('AI prepared a subsite preview. Review it below and approve or dismiss it in the conversation.'),
+    ];
+  }
+
+  /**
    * Prepares page creation guidance with bundle choices.
    */
   protected function preparePageCreationGuide(AIChatThread $thread, array $top_level_plan, array $page_options, array $structured_plan = []) {
@@ -2599,6 +2679,38 @@ class AIChatManager {
           'label' => 'View redirect',
         ],
       ],
+    ]);
+    $thread->save();
+
+    return $entity;
+  }
+
+  /**
+   * Rechecks access and executes an approved subsite action.
+   */
+  protected function handleSubsiteApproval(AIChatThread $thread, $action_id, array $action, ContentEntityInterface $entity, AccountInterface $account) {
+    if (!$this->subsiteActionManager) {
+      throw new \Exception('The Moody subsite assistant tool is not available on this site.');
+    }
+    if (empty($action['subsite_action']) || !is_array($action['subsite_action'])) {
+      throw new \Exception('The subsite preview is missing the reviewed action details.');
+    }
+
+    $result = $this->subsiteActionManager->executeAction($action['subsite_action'], $account);
+    $resolution = [
+      'id' => $action_id,
+      'decision' => 'approve',
+      'subsite_id' => (int) ($result['subsite_id'] ?? 0),
+      'created_page_id' => (int) ($result['created_page_id'] ?? 0),
+      'result_link' => $result['result_link'] ?? [],
+    ];
+    $thread->resolvePendingAction($action_id, 'approved', [
+      'resolved_at' => time(),
+      'subsite_id' => $resolution['subsite_id'],
+      'created_page_id' => $resolution['created_page_id'],
+    ]);
+    $thread->addMessage('assistant', (string) $result['message'], [
+      'action_resolution' => $resolution,
     ]);
     $thread->save();
 

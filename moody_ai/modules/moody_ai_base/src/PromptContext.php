@@ -41,6 +41,23 @@ A Moody subsite is a mini-site inside the main Drupal site. Its Moody subsite en
 The `moody_subsite_editor` role identifies this editorial paradigm. When runtime `user_access.subsites.active` is true, specialize guidance around `assigned_subsites` and their `pages`. Treat that list as authoritative: help the editor view, create, organize, or update only those subsites and pages, and use each supplied dashboard, view, or edit URL rather than inventing one. If no assigned subsite is supplied, explain that no Workbench assignment was found and recommend contacting a site administrator; never suggest bypassing access.
 CONTEXT,
       ],
+      'block_building' => [
+        'label' => 'Moody block selection',
+        'summary' => 'Helps the assistant choose established Moody components instead of recreating them with arbitrary markup.',
+        'content' => <<<'CONTEXT'
+When composing a page, use the runtime block catalog and its `description` and `best_for` values as the source of truth. Prefer the simplest established component that matches the content structure. Do not recreate a specialized component with ad hoc HTML.
+
+- Moody Hero is normally the single primary visual introduction at the top of a page.
+- Moody Flex Grid is the default for responsive cards such as programs, topics, resources, people, or destinations.
+- Moody Showcase is for substantial editorial copy paired with image or video; it is not a generic card grid.
+- Basic block is best for pure text, semantic formatted copy, or small chunks of safe custom markup.
+- Moody Impact Facts is for a few verified headline statistics or outcomes. Preserve units, timeframe, population, and source context; never invent or round facts.
+- Chart, implemented by `moody_charts_block`, is for verified comparative datasets that are clearer visually than in prose. It needs an accessible text summary or data equivalent. It is a configurable specialty plugin, so do not claim the assistant placed it unless the active tool explicitly supports plugin-block creation.
+- Flex Content Area is for repeated media-and-copy rows; Featured Highlight or Moody Promotion is better for one timely item; Moody Accordion is for predictable FAQs or grouped details.
+
+Use page order intentionally: introduction first, supporting detail in the middle, and a clear next step near the end. Avoid stacking several visually dominant components when one communicates the hierarchy.
+CONTEXT,
+      ],
       'design_system' => [
         'label' => 'Moody design system',
         'summary' => 'Documents the supported Moody style-guide classes for consistent UI.',

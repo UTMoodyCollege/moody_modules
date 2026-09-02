@@ -5,3 +5,10 @@ services:
       - '@entity_type.manager'
       - '@?workbench_access.user_section_storage'
       - '@?plugin.manager.workbench_access.scheme'
+
+  moody_subsite.ai_action_manager:
+    class: Drupal\moody_subsite\SubsiteAiActionManager
+    arguments:
+      - '@entity_type.manager'
+      - '@moody_subsite.editor_context'
+      - '@database'

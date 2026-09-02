@@ -175,7 +175,7 @@ function moody_subsite_toolbar() {
  */
 function moody_subsite_moody_ai_user_capabilities_alter(array &$capabilities, AccountInterface $account) {
   $context = \Drupal::service('moody_subsite.editor_context')->collect($account);
-  if ($context['active']) {
+  if ($context['active'] || !empty($context['manage_tool']['available'])) {
     $capabilities['subsites'] = $context;
   }
 }

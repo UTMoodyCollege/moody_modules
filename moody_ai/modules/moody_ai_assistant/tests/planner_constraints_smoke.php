@@ -17,6 +17,20 @@ $identifier_catalog = $catalog_method->invoke($planner, $block_data);
 if (strlen(json_encode($identifier_catalog, JSON_PRETTY_PRINT)) >= 100000 || empty($identifier_catalog['basic']['fields']['body'])) {
   throw new RuntimeException('The block identifier catalog is too large or omitted the Basic body field.');
 }
+foreach (['basic', 'moody_hero', 'moody_flex_grid', 'moody_showcase', 'moody_impact_facts'] as $guided_type) {
+  if (empty($identifier_catalog[$guided_type]['description']) || empty($identifier_catalog[$guided_type]['best_for'])) {
+    throw new RuntimeException($guided_type . ' is missing block-selection context.');
+  }
+}
+$purpose_catalog_method = new ReflectionMethod($planner, 'buildBlockPurposeCatalog');
+$purpose_catalog = $purpose_catalog_method->invoke($planner, ['basic', 'moody_hero'], $block_data);
+if (
+  array_keys($purpose_catalog) !== ['basic', 'moody_hero']
+  || empty($purpose_catalog['basic']['best_for'])
+  || empty($purpose_catalog['moody_hero']['best_for'])
+) {
+  throw new RuntimeException('The compact multi-block purpose catalog is incomplete.');
+}
 $default_types = $method->invoke($planner, 'Build a faculty and upcoming events section.', [], $block_data);
 foreach (['feed_block', 'utprof_profile_listing'] as $dynamic_type) {
   if (in_array($dynamic_type, $default_types, TRUE)) {
@@ -193,6 +207,7 @@ if (array_column($selected_plugins, 'plugin_id') !== ['moody_charts_block']) {
 print json_encode([
   'structured_block_limit' => AssistantPlanner::MAX_STRUCTURED_BLOCKS,
   'identifier_catalog_characters' => strlen(json_encode($identifier_catalog, JSON_PRETTY_PRINT)),
+  'guided_block_types' => ['basic', 'moody_hero', 'moody_flex_grid', 'moody_showcase', 'moody_impact_facts'],
   'invalid_block_type_fallback' => 'basic',
   'default_dynamic_types_excluded' => ['feed_block', 'utprof_profile_listing'],
   'browser_enabled_inline_types_enforced' => TRUE,

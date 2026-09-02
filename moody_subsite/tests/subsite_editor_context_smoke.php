@@ -35,4 +35,15 @@ foreach ($context['assigned_subsites'] ?? [] as $subsite) {
   }
 }
 
+foreach ($context['manage_tool']['targets'] ?? [] as $target) {
+  $subsite = \Drupal::entityTypeManager()->getStorage('moody_subsite')->load($target['id'] ?? 0);
+  if (!$subsite || !$subsite->access('update', $account) || empty($target['label']) || isset($target['menu_items'])) {
+    throw new RuntimeException('The AI manage tool exposed an inaccessible or incomplete subsite target.');
+  }
+  $details = \Drupal::service('moody_subsite.ai_action_manager')->actionContext($target['id'], $account);
+  if (!isset($details['settings'], $details['menu_items'], $details['logo'], $details['directory_terms'])) {
+    throw new RuntimeException('The detailed AI subsite context is incomplete.');
+  }
+}
+
 print json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";

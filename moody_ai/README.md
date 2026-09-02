@@ -231,6 +231,14 @@ downloaded by the server.
 New-page and site-administration requests intentionally continue through
 Drupal's standard forms so existing field validation, editorial workflow, and
 route access checks stay in force. Redirects require explicit preview approval.
+When `moody_subsite` is enabled, a dedicated subsite tool is the narrow
+exception: it can preview allowlisted subsite settings, a complete nested menu,
+an attached-image logo, and an unpublished `moody_subsite_page` with an exact
+assigned Moody URL Generator term. The tool sends only a compact subsite index
+to the top-level planner, loads details for the selected target, and rechecks
+entity access plus a Subsite Editor's Workbench assignment at approval time.
+Approved actions also require the subsite to match its previewed state, avoiding
+silent overwrites when another editor changed it in the meantime.
 Block creation and existing-inline-block edits run as individual queued jobs in
 Layout Builder. Each completed job is written only to Layout Builder tempstore
 and replaces the visible layout through Drupal's native AJAX commands, so the
@@ -272,7 +280,12 @@ ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai
 ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/planner_constraints_smoke.php
 ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/layout_streaming_smoke.php
 ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_base/tests/usage_dashboard_smoke.php
+ddev exec env MOODY_SUBSITE_TEST_ID=48 drush php:script /var/www/html/web/modules/custom/moody_modules/moody_subsite/tests/subsite_ai_action_smoke.php
 ```
+
+Use only a disposable local subsite ID for the subsite smoke test. It exercises
+and then restores a scalar setting, nested menu, image logo, concurrency guard,
+and draft-page creation; the temporary page is deleted before the script exits.
 
 For a representative pilot pass, use separate unpublished pages for: a 10–12
 component build, recovery after a forced partial failure, a two-component
