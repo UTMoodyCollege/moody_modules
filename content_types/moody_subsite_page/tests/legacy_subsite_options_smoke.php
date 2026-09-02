@@ -26,4 +26,13 @@ foreach (['field_hide_default_hero', 'field_hide_default_infobar'] as $field_nam
   }
 }
 
+$standard_page = Node::create(['type' => 'moody_standard_page']);
+$standard_form_object = \Drupal::entityTypeManager()->getFormObject('node', 'default');
+$standard_form_object->setEntity($standard_page);
+$standard_form = \Drupal::formBuilder()->buildForm($standard_form_object, new FormState());
+
+if (isset($standard_form['legacy_subsite_options'])) {
+  throw new RuntimeException('Legacy Subsite Options must not appear on other content types.');
+}
+
 print "Legacy subsite options are grouped and new-page defaults are enabled.\n";

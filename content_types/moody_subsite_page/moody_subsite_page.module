@@ -253,6 +253,10 @@ function moody_subsite_preprocess_page_title(&$variables)
  */
 function moody_subsite_page_form_node_form_alter(&$form, FormStateInterface $form_state)
 {
+  if ($form_state->getFormObject()->getEntity()->bundle() !== 'moody_subsite_page') {
+    return;
+  }
+
   $form['#validate'][] = '_moody_subsite_page_node_form_validate';
 
   $form['legacy_subsite_options'] = [
