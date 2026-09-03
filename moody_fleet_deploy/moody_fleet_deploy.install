@@ -149,6 +149,14 @@ function moody_fleet_deploy_update_9016() {
 }
 
 /**
+ * Restores Moody Nice Letter on Flex HTML after configuration drift.
+ */
+function moody_fleet_deploy_update_9017() {
+  _moody_fleet_deploy_enable_nice_letter_on_flex_html();
+  _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
+}
+
+/**
  * Enables Masquerade without granting it to any role.
  */
 function _moody_fleet_deploy_enable_masquerade() {

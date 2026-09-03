@@ -5,8 +5,10 @@ namespace Drupal\moody_page_launch\Form;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\moody_page_launch\PageLauncher;
 use Drupal\node\NodeInterface;
+use Drupal\views\ViewEntityInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -45,30 +47,83 @@ final class PageLaunchForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $preview = $form_state->get('moody_page_launch_preview');
     $node_storage = $this->entityTypeManager->getStorage('node');
-
-    $form['description'] = [
-      '#markup' => '<p>' . $this->t('Choose the currently live page and its finished replacement. Nothing changes until you review the exact plan and click Launch replacement.') . '</p>',
+    $type_options = [
+      'node' => $this->t('Content page'),
+      'view' => $this->t('Views page display'),
     ];
 
-    $form['current'] = [
+    $form['description'] = [
+      '#markup' => '<p>' . $this->t('Choose the currently live page and its finished replacement. Either side may be a content page or one fixed Views page display. Nothing changes until you review the exact plan and click Launch replacement.') . '</p>',
+    ];
+
+    $form['current_type'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Current live page type'),
+      '#options' => $type_options,
+      '#default_value' => $preview['current']['type'] ?? 'node',
+      '#required' => TRUE,
+    ];
+    $form['current_node'] = [
       '#type' => 'entity_autocomplete',
-      '#title' => $this->t('Current live page'),
+      '#title' => $this->t('Current content page'),
       '#description' => $this->t('This page will be unpublished and moved to an unused -old-vN URL.'),
       '#target_type' => 'node',
       '#selection_handler' => 'moody_page_launch:node_alias',
       '#selection_settings' => ['match_limit' => 20],
-      '#required' => TRUE,
-      '#default_value' => $preview ? $node_storage->load($preview['current']['id']) : NULL,
+      '#default_value' => ($preview['current']['type'] ?? NULL) === 'node'
+        ? $node_storage->load($preview['current']['id'])
+        : NULL,
+      '#states' => [
+        'visible' => [':input[name="current_type"]' => ['value' => 'node']],
+      ],
     ];
-    $form['replacement'] = [
+    $form['current_view'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Current Views page display'),
+      '#description' => $this->t('Only this page display will be disabled; the View and its other displays remain enabled.'),
+      '#options' => $this->launcher->viewPageOptions(TRUE),
+      '#empty_option' => $this->t('- Select a Views page -'),
+      '#default_value' => ($preview['current']['type'] ?? NULL) === 'view'
+        ? $preview['current']['view_id'] . ':' . $preview['current']['display_id']
+        : '',
+      '#states' => [
+        'visible' => [':input[name="current_type"]' => ['value' => 'view']],
+      ],
+    ];
+
+    $form['replacement_type'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Replacement page type'),
+      '#options' => $type_options,
+      '#default_value' => $preview['replacement']['type'] ?? 'node',
+      '#required' => TRUE,
+    ];
+    $form['replacement_node'] = [
       '#type' => 'entity_autocomplete',
-      '#title' => $this->t('Replacement page'),
-      '#description' => $this->t('This page will be published at the current page URL.'),
+      '#title' => $this->t('Replacement content page'),
+      '#description' => $this->t('This page will be published at the current live URL.'),
       '#target_type' => 'node',
       '#selection_handler' => 'moody_page_launch:node_alias',
       '#selection_settings' => ['match_limit' => 20],
-      '#required' => TRUE,
-      '#default_value' => $preview ? $node_storage->load($preview['replacement']['id']) : NULL,
+      '#default_value' => ($preview['replacement']['type'] ?? NULL) === 'node'
+        ? $node_storage->load($preview['replacement']['id'])
+        : NULL,
+      '#states' => [
+        'visible' => [':input[name="replacement_type"]' => ['value' => 'node']],
+      ],
+    ];
+    $form['replacement_view'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Replacement Views page display'),
+      '#description' => $this->t('This display will be enabled at the current live URL. Its other View displays remain unchanged.'),
+      '#options' => $this->launcher->viewPageOptions(FALSE),
+      '#empty_option' => $this->t('- Select a Views page -'),
+      '#default_value' => ($preview['replacement']['type'] ?? NULL) === 'view'
+        ? $preview['replacement']['view_id'] . ':' . $preview['replacement']['display_id']
+        : '',
+      '#states' => [
+        'visible' => [':input[name="replacement_type"]' => ['value' => 'view']],
+      ],
     ];
 
     if ($preview) {
@@ -98,7 +153,7 @@ final class PageLaunchForm extends FormBase {
             fn(array $redirect): array => [
               $redirect['id'],
               $redirect['source'],
-              '/node/' . $preview['replacement']['id'],
+              $preview['replacement_destination'],
             ],
             $preview['retarget_redirects'],
           ),
@@ -110,7 +165,7 @@ final class PageLaunchForm extends FormBase {
       ];
       $form['confirm'] = [
         '#type' => 'checkbox',
-        '#title' => $this->t('I reviewed this plan and understand that it publishes the replacement, unpublishes the current page, and changes redirects and aliases.'),
+        '#title' => $this->t('I reviewed this plan and understand that it can publish or unpublish content, enable or disable a Views page display, and change redirects and aliases.'),
       ];
     }
 
@@ -137,33 +192,19 @@ final class PageLaunchForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $storage = $this->entityTypeManager->getStorage('node');
-    $current = $storage->load($form_state->getValue('current'));
-    $replacement = $storage->load($form_state->getValue('replacement'));
-
-    if (!$current instanceof NodeInterface) {
-      $form_state->setErrorByName('current', $this->t('Select a valid current page.'));
-    }
-    elseif (!$current->access('update', $this->currentUser())) {
-      $form_state->setErrorByName('current', $this->t('You do not have permission to update the current page.'));
-    }
-    if (!$replacement instanceof NodeInterface) {
-      $form_state->setErrorByName('replacement', $this->t('Select a valid replacement page.'));
-    }
-    elseif (!$replacement->access('update', $this->currentUser())) {
-      $form_state->setErrorByName('replacement', $this->t('You do not have permission to update the replacement page.'));
-    }
-    if ($form_state->hasAnyErrors()) {
+    $current_target = $this->targetFromForm($form_state, 'current');
+    $replacement_target = $this->targetFromForm($form_state, 'replacement');
+    if (!$current_target || !$replacement_target || $form_state->hasAnyErrors()) {
       return;
     }
 
     try {
-      $plan = $this->launcher->buildPlan($current, $replacement);
-      $form_state->set('moody_page_launch_nodes', [$current, $replacement]);
+      $plan = $this->launcher->buildPlan($current_target, $replacement_target);
+      $form_state->set('moody_page_launch_targets', [$current_target, $replacement_target]);
       $form_state->set('moody_page_launch_current_plan', $plan);
     }
     catch (\InvalidArgumentException $exception) {
-      $form_state->setErrorByName('replacement', $exception->getMessage());
+      $form_state->setErrorByName('replacement_type', $exception->getMessage());
       return;
     }
 
@@ -173,7 +214,7 @@ final class PageLaunchForm extends FormBase {
       }
       $preview_fingerprint = (string) $form_state->getValue('plan_fingerprint');
       if (!hash_equals($preview_fingerprint, $this->launcher->fingerprint($plan))) {
-        $form_state->setErrorByName('replacement', $this->t('The launch plan changed. Refresh the preview and review it again.'));
+        $form_state->setErrorByName('replacement_type', $this->t('The launch plan changed. Refresh the preview and review it again.'));
       }
     }
   }
@@ -190,21 +231,21 @@ final class PageLaunchForm extends FormBase {
    * Executes the confirmed launch.
    */
   public function launchSubmit(array &$form, FormStateInterface $form_state): void {
-    [$current, $replacement] = $form_state->get('moody_page_launch_nodes');
+    [$current_target, $replacement_target] = $form_state->get('moody_page_launch_targets');
 
     try {
       $plan = $this->launcher->launch(
-        $current,
-        $replacement,
+        $current_target,
+        $replacement_target,
         (string) $form_state->getValue('plan_fingerprint'),
       );
     }
     catch (\Throwable $exception) {
       $this->getLogger('moody_page_launch')->error(
-        'Page launch failed for nodes @current and @replacement: @message',
+        'Page launch failed for @current and @replacement: @message',
         [
-          '@current' => $current->id(),
-          '@replacement' => $replacement->id(),
+          '@current' => json_encode($current_target),
+          '@replacement' => json_encode($replacement_target),
           '@message' => $exception->getMessage(),
         ],
       );
@@ -215,15 +256,26 @@ final class PageLaunchForm extends FormBase {
       return;
     }
 
+    $retired = $plan['current']['type'] === 'node'
+      ? $this->t('The unpublished former page is available to editors at %archive.', [
+        '%archive' => $plan['archive_path'],
+      ])
+      : $this->t('The former Views page display is disabled; its other displays are unchanged.');
     $this->messenger()->addStatus($this->t(
-      'Launched %replacement at %alias. The unpublished former page is now at %archive for editors, and its node URL redirects to the replacement.',
+      'Launched %replacement at %path. @retired',
       [
         '%replacement' => $plan['replacement']['title'],
-        '%alias' => $plan['current']['alias'],
-        '%archive' => $plan['archive_alias'],
+        '%path' => $plan['current']['path'],
+        '@retired' => $retired,
       ],
     ));
-    $form_state->setRedirect('entity.node.canonical', ['node' => $replacement->id()]);
+
+    if ($plan['replacement']['type'] === 'node') {
+      $form_state->setRedirect('entity.node.canonical', ['node' => $plan['replacement']['id']]);
+    }
+    else {
+      $form_state->setRedirectUrl(Url::fromUserInput($plan['current']['path']));
+    }
   }
 
   /**
@@ -232,52 +284,115 @@ final class PageLaunchForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {}
 
   /**
+   * Converts one pair of type-specific fields into a launch target.
+   */
+  protected function targetFromForm(FormStateInterface $form_state, string $prefix): ?array {
+    $type = (string) $form_state->getValue($prefix . '_type');
+    if ($type === 'node') {
+      $node = $this->entityTypeManager->getStorage('node')->load($form_state->getValue($prefix . '_node'));
+      if (!$node instanceof NodeInterface) {
+        $form_state->setErrorByName($prefix . '_node', $this->t('Select a valid content page.'));
+        return NULL;
+      }
+      if (!$node->access('update', $this->currentUser())) {
+        $form_state->setErrorByName($prefix . '_node', $this->t('You do not have permission to update this content page.'));
+        return NULL;
+      }
+      return ['type' => 'node', 'id' => (int) $node->id()];
+    }
+
+    if ($type === 'view') {
+      $selection = (string) $form_state->getValue($prefix . '_view');
+      [$view_id, $display_id] = array_pad(explode(':', $selection, 2), 2, '');
+      $view = $this->entityTypeManager->getStorage('view')->load($view_id);
+      if (!$view instanceof ViewEntityInterface || !$display_id) {
+        $form_state->setErrorByName($prefix . '_view', $this->t('Select a valid Views page display.'));
+        return NULL;
+      }
+      if (!$view->access('update', $this->currentUser())) {
+        $form_state->setErrorByName($prefix . '_view', $this->t('You do not have permission to update this View.'));
+        return NULL;
+      }
+      return [
+        'type' => 'view',
+        'view_id' => $view_id,
+        'display_id' => $display_id,
+      ];
+    }
+
+    $form_state->setErrorByName($prefix . '_type', $this->t('Select a valid page type.'));
+    return NULL;
+  }
+
+  /**
    * Builds the human-readable before/after table.
    */
   protected function previewRows(array $plan): array {
-    $current_status = $plan['current']['published'] ? $this->t('Published') : $this->t('Unpublished');
-    $replacement_status = $plan['replacement']['published'] ? $this->t('Published') : $this->t('Unpublished');
-
-    return [
+    $current = $plan['current'];
+    $replacement = $plan['replacement'];
+    $rows = [
       [
         $this->t('Current page'),
-        $this->t('@title (node @id), @status', [
-          '@title' => $plan['current']['title'],
-          '@id' => $plan['current']['id'],
-          '@status' => $current_status,
-        ]),
-        $this->t('Unpublished with a new revision'),
+        $this->targetBeforeLabel($current),
+        $current['type'] === 'node'
+          ? $this->t('Unpublished with a new revision')
+          : $this->t('Page display disabled; other View displays unchanged'),
       ],
       [
         $this->t('Current page URL'),
-        $plan['current']['alias'],
-        $plan['archive_alias'],
+        $current['path'],
+        $current['type'] === 'node'
+          ? $plan['archive_path']
+          : $this->t('Served by the replacement; retained on the disabled display for rollback'),
       ],
       [
         $this->t('Replacement page'),
-        $this->t('@title (node @id), @status', [
-          '@title' => $plan['replacement']['title'],
-          '@id' => $plan['replacement']['id'],
-          '@status' => $replacement_status,
-        ]),
-        $this->t('Published with a new revision'),
+        $this->targetBeforeLabel($replacement),
+        $replacement['type'] === 'node'
+          ? $this->t('Published with a new revision')
+          : $this->t('Page display enabled; other View displays unchanged'),
       ],
       [
         $this->t('Replacement page URL'),
-        $plan['replacement']['alias'],
-        $plan['current']['alias'],
-      ],
-      [
-        $this->t('Legacy redesign URL'),
-        $plan['replacement']['alias'],
-        $this->t('301 redirect to @alias', ['@alias' => $plan['current']['alias']]),
-      ],
-      [
-        $this->t('Former node URL'),
-        '/node/' . $plan['current']['id'],
-        $this->t('301 redirect to replacement node @id', ['@id' => $plan['replacement']['id']]),
+        $replacement['path'],
+        $current['path'],
       ],
     ];
+
+    if ($plan['replacement_legacy_path']) {
+      $rows[] = [
+        $this->t('Legacy replacement URL'),
+        $plan['replacement_legacy_path'],
+        $this->t('301 redirect to @path', ['@path' => $current['path']]),
+      ];
+    }
+    if ($current['type'] === 'node') {
+      $rows[] = [
+        $this->t('Former node URL'),
+        '/node/' . $current['id'],
+        $this->t('301 redirect to @destination', [
+          '@destination' => $plan['replacement_destination'],
+        ]),
+      ];
+    }
+    return $rows;
+  }
+
+  /**
+   * Formats a target's current state for the preview.
+   */
+  protected function targetBeforeLabel(array $target) {
+    if ($target['type'] === 'node') {
+      return $this->t('@title (node @id), @status', [
+        '@title' => $target['title'],
+        '@id' => $target['id'],
+        '@status' => $target['published'] ? $this->t('Published') : $this->t('Unpublished'),
+      ]);
+    }
+    return $this->t('@title, @status', [
+      '@title' => $target['title'],
+      '@status' => $target['enabled'] ? $this->t('Enabled') : $this->t('Disabled'),
+    ]);
   }
 
 }

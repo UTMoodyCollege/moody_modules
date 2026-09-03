@@ -10,6 +10,7 @@ services:
       - '@logger.channel.moody_page_launch'
       - '@path_alias.manager'
       - '@cache_tags.invalidator'
+      - '@router.builder'
 
   logger.channel.moody_page_launch:
     parent: logger.channel_base

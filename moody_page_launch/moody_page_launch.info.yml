@@ -6,4 +6,5 @@ package: Moody
 dependencies:
   - drupal:node
   - drupal:path
+  - drupal:views
   - redirect:redirect
