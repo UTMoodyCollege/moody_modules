@@ -195,6 +195,65 @@ final class AiGenerationServiceTest extends UnitTestCase {
   }
 
   /**
+   * Tests the expanded structured context guard and default limits.
+   */
+  public function testStructuredRequestsAllowExpandedContext(): void {
+    $config = $this->createMock(ImmutableConfig::class);
+    $config->method('get')->willReturnMap([
+      ['openai.models', [['id' => 'test-model', 'label' => 'Test model']]],
+      ['openai.default_model', 'test-model'],
+      ['openai.secret_name', 'moody_ai_test_key'],
+      ['max_prompt_characters', NULL],
+      ['max_output_tokens', NULL],
+      ['context.site_identity', ''],
+      ['context.terminology', ''],
+      ['context.editorial_design', ''],
+      ['additional_context', NULL],
+    ]);
+    $config_factory = $this->createMock(ConfigFactoryInterface::class);
+    $config_factory->method('get')->with('moody_ai_base.settings')->willReturn($config);
+
+    $history = [];
+    $stack = HandlerStack::create(new MockHandler([
+      new Response(200, [], json_encode([
+        'output_text' => '{"action":"guide"}',
+      ], JSON_THROW_ON_ERROR)),
+    ]));
+    $stack->push(Middleware::history($history));
+
+    $logger_factory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $logger_factory->method('get')->willReturn(new NullLogger());
+    putenv('MOODY_AI_TEST_KEY=test-key');
+
+    try {
+      $service = new AiGenerationService(
+        $config_factory,
+        new Client(['handler' => $stack]),
+        new SecretResolver(),
+        new PromptContext(),
+        new HtmlSanitizer(),
+        $logger_factory,
+      );
+      $service->generateStructured([
+        ['role' => 'system', 'content' => str_repeat('x', 210250)],
+        ['role' => 'user', 'content' => 'Create a page.'],
+      ]);
+
+      $payload = json_decode((string) $history[0]['request']->getBody(), TRUE, flags: JSON_THROW_ON_ERROR);
+      $this->assertSame(10000, $service->maxPromptCharacters());
+      $this->assertSame(4000, $payload['max_output_tokens']);
+      $this->expectException(\InvalidArgumentException::class);
+      $this->expectExceptionMessage('The structured request is empty or too large.');
+      $service->generateStructured([
+        ['role' => 'user', 'content' => str_repeat('x', 400001)],
+      ]);
+    }
+    finally {
+      putenv('MOODY_AI_TEST_KEY');
+    }
+  }
+
+  /**
    * Tests that private attachment data becomes stateless request input.
    */
   public function testAttachmentsAreIncludedInRequest(): void {

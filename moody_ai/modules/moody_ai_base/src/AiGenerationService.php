@@ -46,6 +46,8 @@ final class AiGenerationService {
 
   public const MAX_TOTAL_ATTACHMENT_BYTES = 10485760;
 
+  private const MAX_STRUCTURED_TEXT_CHARACTERS = 400000;
+
   private const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses';
 
   private const OPENAI_IMAGES_URL = 'https://api.openai.com/v1/images/generations';
@@ -105,7 +107,7 @@ final class AiGenerationService {
    */
   public function maxPromptCharacters(): int {
     $value = (int) $this->configFactory->get('moody_ai_base.settings')->get('max_prompt_characters');
-    return max(200, min($value ?: 2000, 10000));
+    return max(200, min($value ?: 10000, 10000));
   }
 
   /**
@@ -284,7 +286,7 @@ final class AiGenerationService {
       ];
     }
 
-    if ($input === [] || $text_characters > 200000) {
+    if ($input === [] || $text_characters > self::MAX_STRUCTURED_TEXT_CHARACTERS) {
       $this->logger->warning('Rejected structured AI request with @messages messages and @characters text characters.', [
         '@messages' => count($messages),
         '@characters' => $text_characters,
@@ -309,7 +311,7 @@ final class AiGenerationService {
           'model' => $model,
           'instructions' => implode("\n\n", $instructions),
           'input' => $input,
-          'max_output_tokens' => max(200, min((int) $config->get('max_output_tokens') ?: 1800, 4000)),
+          'max_output_tokens' => max(200, min((int) $config->get('max_output_tokens') ?: 4000, 4000)),
           'text' => [
             'format' => ['type' => 'json_object'],
           ],
@@ -512,7 +514,7 @@ final class AiGenerationService {
       throw new \RuntimeException('The AI provider is not configured.');
     }
 
-    $max_tokens = max(200, min((int) $config->get('max_output_tokens') ?: 1800, 4000));
+    $max_tokens = max(200, min((int) $config->get('max_output_tokens') ?: 4000, 4000));
     $content = [['type' => 'input_text', 'text' => $prompt]];
     foreach ($attachments as $index => $attachment) {
       $content[] = [

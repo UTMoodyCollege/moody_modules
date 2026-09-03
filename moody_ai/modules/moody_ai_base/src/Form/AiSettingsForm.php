@@ -193,7 +193,7 @@ final class AiSettingsForm extends ConfigFormBase {
     $form['limits']['max_prompt_characters'] = [
       '#type' => 'number',
       '#title' => $this->t('Maximum prompt characters'),
-      '#default_value' => $config->get('max_prompt_characters') ?: 2000,
+      '#default_value' => $config->get('max_prompt_characters') ?: 10000,
       '#min' => 200,
       '#max' => 10000,
       '#required' => TRUE,
@@ -201,7 +201,7 @@ final class AiSettingsForm extends ConfigFormBase {
     $form['limits']['max_output_tokens'] = [
       '#type' => 'number',
       '#title' => $this->t('Maximum output tokens'),
-      '#default_value' => $config->get('max_output_tokens') ?: 1800,
+      '#default_value' => $config->get('max_output_tokens') ?: 4000,
       '#min' => 200,
       '#max' => 4000,
       '#required' => TRUE,

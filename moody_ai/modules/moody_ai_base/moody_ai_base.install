@@ -180,3 +180,19 @@ function moody_ai_base_update_10002() {
 
   return t('Added shared Moody AI operation and outcome reporting.');
 }
+
+/**
+ * Raises the default request limits while preserving custom values.
+ */
+function moody_ai_base_update_10003() {
+  $config = \Drupal::configFactory()->getEditable('moody_ai_base.settings');
+  if ($config->get('max_prompt_characters') === NULL || (int) $config->get('max_prompt_characters') === 2000) {
+    $config->set('max_prompt_characters', 10000);
+  }
+  if ($config->get('max_output_tokens') === NULL || (int) $config->get('max_output_tokens') === 1800) {
+    $config->set('max_output_tokens', 4000);
+  }
+  $config->save(TRUE);
+
+  return t('Raised the default Moody AI prompt and output limits.');
+}

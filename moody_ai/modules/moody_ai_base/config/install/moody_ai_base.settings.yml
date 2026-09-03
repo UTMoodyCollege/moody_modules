@@ -16,6 +16,6 @@ context:
   site_identity: ''
   terminology: ''
   editorial_design: ''
-max_prompt_characters: 2000
-max_output_tokens: 1800
+max_prompt_characters: 10000
+max_output_tokens: 4000
 hourly_request_limit: 20
