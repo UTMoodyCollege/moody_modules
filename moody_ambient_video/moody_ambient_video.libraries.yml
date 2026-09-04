@@ -1,22 +1,25 @@
 ambient-video:
-  version: 1.x
+  version: 1.1.0
   css:
     theme:
       css/ambient-video.css: {}
   js:
     js/ambient-video.js: {}
   dependencies:
-    - core/drupalSettings
+    - core/drupal
+    - core/once
 
 ambient-video-natural-height:
-  version: 1.x
+  version: 1.1.0
   css:
     theme:
       css/ambient-video.css: {}
   js:
     js/ambient-video-natural-height.js: {}
   dependencies:
-    - core/drupalSettings
+    - core/drupal
+    - core/jquery
+    - core/once
 
 ambient-video-fixed-scroll:
   version: 1.x

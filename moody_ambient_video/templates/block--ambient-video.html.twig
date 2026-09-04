@@ -51,15 +51,19 @@
   {% block content %}
     <div class="homepage-hero__video {{ text_position }}" id="hidden-overflow-container">
       <div id="video-wrapper">
-        <video autoplay id="moody-video" loop muted playsinline poster={{ file_url(poster) }} preload="auto" title="Moody College of Communication">
+        {% if vimeo_url %}
+          <iframe id="moody-video" data-vimeo-player data-src="{{ vimeo_url }}" title="Moody College of Communication" allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" loading="lazy" frameborder="0" allowfullscreen></iframe>
+        {% else %}
+        <video autoplay id="moody-video" data-src="{{ video_url }}" loop muted playsinline poster={{ file_url(poster) }} preload="auto" title="Moody College of Communication">
         {% if descriptions %}
           <track kind="descriptions" srclang="en" src={{ descriptions }} default="">
         {% endif %}
         </video>
+        {% endif %}
         <div id="video-overlay" style="opacity:{{ opacity }};background-color:{{ mask }};"></div>
       </div>
       <div id="video-controls">
-        <button id="play-pause" type="button">
+        <button id="play-pause" type="button" aria-label="Pause video">
           <p class="sr-only">Pause button</p>
           <svg height="50" viewbox="0 0 50 50" width="50" xmlns="http://www.w3.org/2000/svg">
             <path d="M25,50A25.007,25.007,0,0,1,15.269,1.965,25.006,25.006,0,0,1,34.731,48.035,24.844,24.844,0,0,1,25,50Zm3.907-37.5a.71.71,0,0,0-.781.6V36.9a.71.71,0,0,0,.781.6h4.688a.71.71,0,0,0,.781-.6V13.1a.71.71,0,0,0-.781-.6Zm-12.5,0a.71.71,0,0,0-.781.6V36.9a.71.71,0,0,0,.781.6h4.688a.71.71,0,0,0,.781-.6V13.1a.71.71,0,0,0-.781-.6Z"/>
@@ -80,7 +84,7 @@
         {% endif %}
       </div>
       <div class="homepage-hero__fallback-image">
-        <img id="fallback-image"/>
+        <img id="fallback-image" data-src="{{ fallback_url }}"/>
       </div>
     </div>
 

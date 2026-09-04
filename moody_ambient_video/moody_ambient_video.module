@@ -78,11 +78,10 @@ function moody_ambient_video_preprocess_block(&$variables)
       $text_position = isset($variables['content']['field_mav_text_position']['0']) ? $variables['content']['field_mav_text_position']['0']['#markup'] : FALSE;
       $variables['text_position'] = $text_position;
 
-      // Variables to pass to drupalSettings. //
-      //----------------------------//
       // Pass video URL.
       $video_url = !empty($variables['content']['field_mav_url']['0']['#url']) ? $variables['content']['field_mav_url']['0']['#url']->getUri() : FALSE;
-      $variables['#attached']['drupalSettings']['ambientVideo']['ambientVideoUrl'] = $video_url;
+      $variables['video_url'] = $video_url;
+      $variables['vimeo_url'] = $video_url ? moody_ambient_video_vimeo_url($video_url) : NULL;
 
       // Pass the fallback image URL.
       if ($mid = $block_content->get('field_mav_fallback')->getString()) {
@@ -94,13 +93,25 @@ function moody_ambient_video_preprocess_block(&$variables)
 
 
       }
-      $variables['#attached']['drupalSettings']['ambientVideo']['ambientVideoFallback'] = isset($fallback_url) ? $fallback_url : '';
+      $variables['fallback_url'] = $fallback_url ?? '';
 
       // Pass which js file to add via the template.
       $library = $variables['content']['field_mav_height']['#items']->getValue();
       $variables['js_library'] = isset($library[0]['value']) ? $library[0]['value'] : 0;
     }
   }
+}
+
+/**
+ * Converts an embeddable Vimeo player URL to ambient background mode.
+ */
+function moody_ambient_video_vimeo_url(string $video_url): ?string
+{
+  if (preg_match('~^https://player\.vimeo\.com/video/\d+/?(?:\?[^#]*)?$~i', $video_url) !== 1) {
+    return NULL;
+  }
+
+  return $video_url . (str_contains($video_url, '?') ? '&' : '?') . 'background=1&dnt=1';
 }
 
 
