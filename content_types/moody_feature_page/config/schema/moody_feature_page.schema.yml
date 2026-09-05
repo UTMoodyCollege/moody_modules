@@ -8,6 +8,36 @@ block.settings.moody_feature_page_feature_pages_editors_picks:
       sequence:
         type: string
         label: 'Node ID'
+    items:
+      type: sequence
+      label: "Ordered Editor's Picks items"
+      sequence:
+        type: mapping
+        mapping:
+          type:
+            type: string
+            label: 'Item type'
+          node:
+            type: string
+            label: 'Feature Page node ID'
+          image:
+            type: string
+            label: 'Custom image media ID'
+          subhead_1:
+            type: string
+            label: 'Custom first subhead'
+          subhead_2:
+            type: string
+            label: 'Custom second subhead'
+          title:
+            type: string
+            label: 'Custom title'
+          body:
+            type: text
+            label: 'Custom body'
+          url:
+            type: string
+            label: 'Custom link URL'
     image_style:
       type: string
       label: 'Image style override'

@@ -92,6 +92,19 @@ div.news-view.latest-news-block .news-categories a {
   text-decoration: none !important;
 }
 
+div.news-view.latest-news-block .editors-picks-custom-subhead {
+  color: var(--news-card-accent-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+div.news-view.latest-news-block .editors-picks-custom-body {
+  white-space: pre-line;
+}
+
 div.news-view.latest-news-block .news-categories a:hover,
 div.news-view.latest-news-block .news-categories a:focus,
 div.news-view.latest-news-block .news-categories a:active {

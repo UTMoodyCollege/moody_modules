@@ -1,0 +1,23 @@
+<div class="latest-news-block editors-picks-custom-item">
+  <div class="latest-news-block-text-fields">
+    {% if item.image_render %}
+      <a class="latest-news-block-image-link" href="{{ item.url }}">
+        <div class="latest-news-block-image-field">
+          {{ item.image_render }}
+        </div>
+      </a>
+    {% endif %}
+    {% if item.subhead_1 %}
+      <div class="news-categories editors-picks-custom-subhead">{{ item.subhead_1 }}</div>
+    {% endif %}
+    <a class="latest-news-block-story-link" href="{{ item.url }}">
+      {% if item.subhead_2 %}
+        <div class="views-field-created">{{ item.subhead_2 }}</div>
+      {% endif %}
+      <h3 class="views-field-title">{{ item.title }}</h3>
+      {% if item.body %}
+        <h4 class="views-field-field-moody-subtitle editors-picks-custom-body">{{ item.body }}</h4>
+      {% endif %}
+    </a>
+  </div>
+</div>

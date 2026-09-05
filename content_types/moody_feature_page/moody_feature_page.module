@@ -35,6 +35,18 @@ function moody_feature_page_theme($existing, $type, $theme, $path)
       ],
       'template' => 'moody-feature-page-editors-picks',
     ],
+    'moody_feature_page_editors_picks_mixed' => [
+      'variables' => [
+        'items' => [],
+      ],
+      'template' => 'moody-feature-page-editors-picks-mixed',
+    ],
+    'moody_feature_page_editors_picks_custom' => [
+      'variables' => [
+        'item' => [],
+      ],
+      'template' => 'moody-feature-page-editors-picks-custom',
+    ],
     'moody_media_mentions' => [
       'variables' => [
         'items' => NULL,
@@ -48,6 +60,60 @@ function moody_feature_page_theme($existing, $type, $theme, $path)
       'template' => 'moody-news-and-announcements',
     ],
   ];
+}
+
+/**
+ * Normalizes ordered Editor's Picks form rows or stored items.
+ */
+function _moody_feature_page_normalize_editors_picks_items(array $rows, bool $keep_empty = FALSE): array
+{
+  $rows = array_values($rows);
+  usort($rows, static fn(array $left, array $right): int =>
+    ((int) ($left['weight'] ?? 0)) <=> ((int) ($right['weight'] ?? 0))
+  );
+
+  $items = [];
+  foreach ($rows as $row) {
+    $values = $row['details'] ?? $row;
+    $type = ($values['type'] ?? 'node') === 'custom' ? 'custom' : 'node';
+    if ($type === 'node') {
+      $node = $values['node'] ?? '';
+      $node = is_array($node) ? ($node['target_id'] ?? '') : $node;
+      if (is_string($node) && preg_match('/\((\d+)\)$/', $node, $matches)) {
+        $node = $matches[1];
+      }
+      $nid = ctype_digit((string) $node) && (int) $node > 0 ? (string) $node : '';
+      if ($keep_empty || $nid !== '') {
+        $items[] = ['type' => 'node', 'node' => $nid];
+      }
+      continue;
+    }
+
+    $custom = $values['custom'] ?? $values;
+    $image = $custom['image'] ?? '';
+    if (is_array($image)) {
+      $image = $image['media_library_selection'] ?? $image['target_id'] ?? '';
+    }
+    $image = ctype_digit((string) $image) && (int) $image > 0 ? (string) $image : '';
+    $item = [
+      'type' => 'custom',
+      'image' => $image,
+      'subhead_1' => trim((string) ($custom['subhead_1'] ?? '')),
+      'subhead_2' => trim((string) ($custom['subhead_2'] ?? '')),
+      'title' => trim((string) ($custom['title'] ?? '')),
+      'body' => trim((string) ($custom['body'] ?? '')),
+      'url' => trim((string) ($custom['url'] ?? '')),
+    ];
+    $has_content = array_filter(
+      array_diff_key($item, ['type' => TRUE]),
+      static fn(string $value): bool => $value !== ''
+    );
+    if ($keep_empty || $has_content) {
+      $items[] = $item;
+    }
+  }
+
+  return $items;
 }
 
 /**

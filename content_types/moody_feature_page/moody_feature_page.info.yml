@@ -45,6 +45,7 @@ dependencies:
   - 'layout_builder_restrictions:layout_builder_restrictions'
   - 'layout_builder_styles:layout_builder_styles'
   - 'linkit:linkit'
+  - 'media_library_form_element:media_library_form_element'
   - 'metatag:metatag'
   - 'moody_events:moody_events'
   - 'moody_feature_credit:moody_feature_credit'
