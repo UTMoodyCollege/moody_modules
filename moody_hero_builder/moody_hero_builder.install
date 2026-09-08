@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Updates for the Moody Hero Builder.
+ */
+
+/**
+ * Move an existing Hero Builder browser entry into Specialty Blocks.
+ */
+function moody_hero_builder_update_9001(): void {
+  $factory = \Drupal::configFactory();
+  $entry = $factory->getEditable('layout_builder_browser.layout_builder_browser_block.moody_hero_builder');
+  // Sites without Layout Builder Browser have no catalog entry to migrate.
+  if ($entry->isNew()) {
+    return;
+  }
+  if ($entry->get('block_id') !== 'moody_hero_builder') {
+    throw new \Drupal\Core\Utility\UpdateException('The Hero Builder catalog ID belongs to another block. Review it before retrying.');
+  }
+  if ($factory->get('layout_builder_browser.layout_builder_browser_blockcat.specialty_blocks')->isNew()) {
+    throw new \Drupal\Core\Utility\UpdateException('Create the Specialty Blocks browser category before moving Hero Builder.');
+  }
+  if ($entry->get('category') !== 'specialty_blocks' || $entry->get('weight') !== 0) {
+    // Preserve the site's UUID, label, thumbnail, dependencies and enabled state.
+    $entry->set('category', 'specialty_blocks')->set('weight', 0)->save(TRUE);
+  }
+}

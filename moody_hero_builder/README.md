@@ -5,7 +5,12 @@ Uses Drupal's block form, Media Library, Twig and native DOM APIs. No build step
 or client-side framework. Public output needs CSS only.
 
 Enable `moody_hero_builder` on a local prototype site. Optional configuration adds
-the block to the Moody Layout Builder Browser when that module is installed.
+the block to **Specialty Blocks** in the Moody Layout Builder Browser when that
+module and category are installed. Its normal list weight is `0`; the category's
+existing open/closed setting is preserved. Update `9001` moves an already-enabled
+entry without changing its label, thumbnail or enabled state. The native Drupal
+block picker also uses Specialty Blocks; sites without the contributed browser
+need no catalog configuration.
 Fleet enablement/publication is a separate, explicitly authorized release step.
 
 The configuration contract is bounded and rejects arbitrary layout values, unsafe
@@ -13,7 +18,8 @@ links, oversized input and compositions without exactly one heading. Twig escape
 all editor text. Media access and cache dependencies are retained. Composition
 arrays replace Drupal's defaults rather than being deep-merged into them.
 
-Run standalone validation with `php tests/contract.php`. With the module enabled
+Run standalone validation with `php tests/contract.php` and
+`php tests/catalog-update.php`. With the module enabled
 on a local site, run `drush php:script <module-path>/tests/drupal.php` for read-only
 plugin, form, rendering and schema checks. `tests/builder.preview.html` is a
 standalone editor/state specimen for visual and browser regression checks.

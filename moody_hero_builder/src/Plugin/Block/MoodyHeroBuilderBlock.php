@@ -15,7 +15,7 @@ use Drupal\moody_hero_builder\HeroConfiguration;
  * @Block(
  *   id = "moody_hero_builder",
  *   admin_label = @Translation("Moody Hero Builder"),
- *   category = @Translation("Moody")
+ *   category = @Translation("Specialty Blocks")
  * )
  */
 final class MoodyHeroBuilderBlock extends BlockBase {
