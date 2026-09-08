@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - layout_builder_browser.layout_builder_browser_blockcat.moody_site_building
+  module:
+    - moody_hero_builder
+    - layout_builder_browser
+id: moody_hero_builder
+block_id: moody_hero_builder
+category: moody_site_building
+label: 'Moody Hero Builder'
+image_path: /themes/custom/moody/moody_components_images/hero.jpg
+image_alt: 'Hero with image, heading and call to action'
+weight: -110

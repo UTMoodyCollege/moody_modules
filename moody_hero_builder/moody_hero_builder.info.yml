@@ -1,0 +1,10 @@
+name: Moody Hero Builder
+type: module
+description: 'A visual, responsive hero composer with UT brand and accessibility guardrails.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:block
+  - drupal:media
+  - drupal:image
+  - media_library_form_element:media_library_form_element

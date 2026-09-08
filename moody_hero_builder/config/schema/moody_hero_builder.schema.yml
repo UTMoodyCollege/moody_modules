@@ -1,0 +1,86 @@
+block.settings.moody_hero_builder:
+  type: block_settings
+  label: Moody Hero Builder
+  mapping:
+    image:
+      type: integer
+      label: Image media ID
+    hero:
+      type: mapping
+      label: Hero composition
+      mapping:
+        layout:
+          type: string
+          label: Layout
+        scheme:
+          type: string
+          label: Brand palette
+        surface:
+          type: string
+          label: Content surface
+        position:
+          type: string
+          label: Content position
+        alignment:
+          type: string
+          label: Text alignment
+        height:
+          type: string
+          label: Minimum hero height
+        width:
+          type: string
+          label: Content width
+        overlay:
+          type: string
+          label: Image overlay
+        overlay_strength:
+          type: integer
+          label: Overlay opacity percent
+        focal_x:
+          type: integer
+          label: Image focal point horizontal percent
+        focal_y:
+          type: integer
+          label: Image focal point vertical percent
+        mobile_focal_x:
+          type: integer
+          label: Mobile focal point horizontal percent
+        mobile_focal_y:
+          type: integer
+          label: Mobile focal point vertical percent
+        decorative:
+          type: boolean
+          label: Decorative image
+        image_alt:
+          type: label
+          label: Image alternative text
+        heading_level:
+          type: string
+          label: Heading level
+        elements:
+          type: sequence
+          label: Content in reading order
+          sequence:
+            type: mapping
+            mapping:
+              id:
+                type: string
+                label: Element ID
+              type:
+                type: string
+                label: Element type
+              text:
+                type: text
+                label: Text
+              size:
+                type: string
+                label: Type size
+              font:
+                type: string
+                label: Brand font
+              url:
+                type: string
+                label: Button destination
+              style:
+                type: string
+                label: Button style

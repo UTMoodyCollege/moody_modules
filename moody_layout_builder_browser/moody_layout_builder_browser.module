@@ -204,6 +204,11 @@ function _moody_layout_builder_browser_add_live_preview(array &$form, FormStateI
     }
   }
 
+  // Hero Builder already provides an interactive, responsive composition canvas.
+  if (isset($form['settings']['hero_builder']['#attributes']['data-moody-hero-builder'])) {
+    return;
+  }
+
   $result = [
     'state' => 'waiting',
     'message' => new TranslatableMarkup('Preview will appear when the required fields are complete.'),

@@ -1,0 +1,25 @@
+/* Hallmark · component: hero composer · genre: editorial · theme: existing UT/Moody
+ * Audience: site editors · use: compose page heroes · tone: focused, brand-led.
+ * Preserve the shipped UT palette and fonts rather than introduce a new theme.
+ */
+.mhb-hero, .mhb-builder {
+  --mhb-white: #fff;
+  --mhb-ink: #333f48;
+  --mhb-orange: #bf5700;
+  --mhb-orange-dark: #a04400;
+  --mhb-paper: #f2f1ed;
+  --mhb-line: #858c91;
+  --mhb-muted: #56544e;
+  --mhb-focus: #005f86;
+  --mhb-error: #a31f23;
+  --mhb-success: #27613a;
+  --mhb-transparent: transparent;
+  --mhb-sans: "LibreFrank", Arial, Helvetica, sans-serif;
+  --mhb-serif: "CharisSil", Georgia, serif;
+  --mhb-space-xs: .25rem;
+  --mhb-space-sm: .5rem;
+  --mhb-space-md: 1rem;
+  --mhb-space-lg: 1.5rem;
+  --mhb-space-xl: 2rem;
+  --mhb-space-xxl: 3rem;
+}

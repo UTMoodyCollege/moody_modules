@@ -1,0 +1,15 @@
+hero:
+  css:
+    theme:
+      css/tokens.css: {}
+      css/hero.css: {}
+builder:
+  css:
+    theme:
+      css/builder.css: {}
+  js:
+    js/builder.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - moody_hero_builder/hero

@@ -1,0 +1,25 @@
+{# All class/style values are allowlisted or bounded by HeroConfiguration. #}
+<div class="mhb-hero">
+  <section class="mhb-scene mhb-layout--{{ hero.layout }} mhb-scheme--{{ hero.scheme }} mhb-surface--{{ hero.surface }} mhb-position--{{ hero.position }} mhb-align--{{ hero.alignment }} mhb-height--{{ hero.height }} mhb-width--{{ hero.width }} mhb-overlay--{{ hero.overlay }}{{ image ? ' mhb-has-image' : '' }}"
+    style="--mhb-focal-x: {{ hero.focal_x }}%; --mhb-focal-y: {{ hero.focal_y }}%; --mhb-mobile-focal-x: {{ hero.mobile_focal_x }}%; --mhb-mobile-focal-y: {{ hero.mobile_focal_y }}%; --mhb-overlay-opacity: {{ hero.overlay_strength / 100 }};">
+    {% if image and hero.layout != 'text' %}
+      <div class="mhb-media">
+        <img src="{{ image.url }}" {% if image.srcset %}srcset="{{ image.srcset }}" sizes="(min-width: 900px) {{ hero.layout starts with 'split' ? '55vw' : '100vw' }}, 100vw"{% endif %}
+          width="{{ image.width }}" height="{{ image.height }}" alt="{{ hero.decorative ? '' : hero.image_alt }}" loading="eager" fetchpriority="high">
+      </div>
+    {% endif %}
+    <div class="mhb-content">
+      {% for element in hero.elements %}
+        <div class="mhb-element mhb-element--{{ element.type }} mhb-size--{{ element.size }} mhb-font--{{ element.font }}">
+          {% if element.type == 'heading' %}
+            <{{ heading_tag }}>{{ element.text }}</{{ heading_tag }}>
+          {% elseif element.type == 'button' %}
+            <a class="mhb-button mhb-button--{{ element.style }}" href="{{ element.url }}">{{ element.text }}</a>
+          {% else %}
+            <p>{{ element.text }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>

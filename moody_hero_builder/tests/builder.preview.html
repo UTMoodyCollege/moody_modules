@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moody Hero Builder — local test specimen</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/hero.css">
+<link rel="stylesheet" href="../css/builder.css">
+<style>
+  html, body { overflow-x: clip; }
+  body { margin: 0; }
+  main { padding: var(--mhb-space-md); }
+  .states > div { display: grid; gap: var(--mhb-space-sm); margin-block: var(--mhb-space-md); justify-items: start; }
+  .states { border-top: 1px solid var(--mhb-line); margin-top: var(--mhb-space-xl); }
+</style>
+<main class="mhb-builder">
+  <h1>Hero Builder test specimen</h1>
+  <p>Development only. Media selection is a fixture; use Drupal to test Media Library and saving.</p>
+  <form data-moody-hero-builder class="mhb-builder">
+    <div class="form-item"><label>Hero configuration<textarea data-hero-source></textarea></label></div>
+    <div data-hero-media data-hero-image-url="" data-hero-image-alt="Test image"><p>Media Library fixture</p></div>
+  </form>
+  <section class="states" data-hero-editor aria-label="Eight interaction states">
+    <h2>Eight interaction states</h2>
+    <div>Default <button type="button">Add element</button></div>
+    <div>Hover <button type="button" class="is-hover">Add element</button></div>
+    <div>Focus <button type="button" class="is-focus">Add element</button></div>
+    <div>Active <button type="button" class="is-active">Add element</button></div>
+    <div>Disabled <button type="button" disabled>Undo</button></div>
+    <div>Loading <p class="mhb-status" data-state="loading" role="status" aria-busy="true">Loading selected image…</p></div>
+    <div>Error <p class="mhb-status" data-state="error" role="alert">Add an image description, or mark it decorative.</p></div>
+    <div>Success <p class="mhb-status" data-state="success" role="status">Composition restored.</p></div>
+  </section>
+</main>
+<script>
+  // Minimal Drupal lifecycle fixture, not shipped as application code.
+  window.Drupal = { behaviors: {}, t: (text, args = {}) => Object.entries(args).reduce((s, [key, value]) => s.replaceAll(key, value), text) };
+  window.once = (id, selector, context) => [...context.querySelectorAll(selector)].filter(n => !n.dataset.testOnce && (n.dataset.testOnce = id));
+  once.remove = (id, selector, context) => [...context.querySelectorAll(selector)].filter(n => n.dataset.testOnce === id && delete n.dataset.testOnce);
+  document.querySelector('[data-hero-source]').value = JSON.stringify({
+    layout:'split', scheme:'light', surface:'solid', position:'center-left', alignment:'left', height:'standard', width:'medium', overlay:'none', overlay_strength:35,
+    focal_x:50, focal_y:50, mobile_focal_x:50, mobile_focal_y:50, decorative:true, image_alt:'', heading_level:'h2',
+    elements:[
+      {id:'heading',type:'heading',text:'Your story starts here',size:'large',font:'sans',url:'',style:'primary'},
+      {id:'intro',type:'text',text:'Add your supporting text.',size:'medium',font:'sans',url:'',style:'primary'}
+    ]
+  });
+</script>
+<script src="../js/builder.js"></script>
+<script>Drupal.behaviors.moodyHeroBuilder.attach(document);</script>
+</html>

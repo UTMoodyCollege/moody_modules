@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Theme registration for the Moody Hero Builder.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function moody_hero_builder_theme(): array {
+  return [
+    'moody_hero_builder' => [
+      'variables' => ['hero' => [], 'image' => [], 'heading_tag' => 'h2'],
+    ],
+  ];
+}

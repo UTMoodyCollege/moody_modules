@@ -1,0 +1,59 @@
+/* Hallmark · component: visual hero editor · existing UT palette
+ * States: default, hover, focus, active, disabled, loading, error, success.
+ * Pre-emit critique: P5 H4 E4 S5 R4 V4 · contrast: verified UT token pairs.
+ * Scoped important text colors counter the existing theme's button hover rule.
+ */
+.mhb-builder { color: var(--mhb-ink); font: 400 1rem/1.5 var(--mhb-sans); min-width: 0; }
+.mhb-builder *, .mhb-builder *::before, .mhb-builder *::after { box-sizing: border-box; }
+.mhb-builder [hidden] { display: none !important; }
+.mhb-builder .mhb-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--mhb-space-sm); padding: var(--mhb-space-md) 0; border-bottom: 1px solid var(--mhb-line); }
+.mhb-builder .mhb-title { font-size: 1.25rem; font-weight: 700; margin-right: auto; }
+.mhb-builder .mhb-toolbar-group { display: flex; flex-wrap: wrap; gap: var(--mhb-space-xs); }
+.mhb-builder [data-hero-editor] button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: .5rem .75rem; border: 1px solid var(--mhb-line); border-radius: 2px; background: var(--mhb-white); color: var(--mhb-ink) !important; font: 600 .875rem/1.3 var(--mhb-sans); cursor: pointer; white-space: nowrap; }
+.mhb-builder [data-hero-editor] button:hover, .mhb-builder [data-hero-editor] button.is-hover { background: var(--mhb-paper); }
+.mhb-builder [data-hero-editor] button:active, .mhb-builder [data-hero-editor] button.is-active { transform: translateY(1px); }
+.mhb-builder [data-hero-editor] button[aria-pressed="true"] { background: var(--mhb-ink); color: var(--mhb-white) !important; border-color: var(--mhb-ink); }
+.mhb-builder [data-hero-editor] button:disabled { color: var(--mhb-muted) !important; background: var(--mhb-paper); cursor: not-allowed; border-style: dashed; }
+.mhb-builder :is(button, input, textarea, select, summary):focus-visible, .mhb-builder .is-focus { outline: 3px solid var(--mhb-focus); outline-offset: 3px; }
+.mhb-builder .mhb-workspace { display: grid; gap: var(--mhb-space-lg); margin-block: var(--mhb-space-lg); min-width: 0; }
+.mhb-builder .mhb-inspector { min-width: 0; }
+.mhb-builder .mhb-tabs { display: flex; flex-wrap: wrap; gap: var(--mhb-space-xs); margin-bottom: var(--mhb-space-md); }
+.mhb-builder .mhb-fields { display: grid; gap: var(--mhb-space-md); }
+.mhb-builder .mhb-control { display: grid; gap: var(--mhb-space-xs); margin: 0; }
+.mhb-builder .mhb-control > span { font-size: .875rem; font-weight: 700; }
+.mhb-builder .mhb-control :is(input:not([type="checkbox"]), textarea, select) { width: 100%; max-width: 100%; min-width: 0; min-height: 44px; padding: .5rem; border: 1px solid var(--mhb-line); background: var(--mhb-white); color: var(--mhb-ink); font: 400 1rem/1.4 var(--mhb-sans); }
+.mhb-builder .mhb-control textarea { resize: vertical; min-height: 7rem; }
+.mhb-builder .mhb-control :is(input, textarea, select):hover { border-color: var(--mhb-ink); }
+.mhb-builder .mhb-control :is(input, textarea, select):disabled { color: var(--mhb-muted); background: var(--mhb-paper); cursor: not-allowed; }
+.mhb-builder input[type="range"] { accent-color: var(--mhb-orange-dark); padding-inline: 0; }
+.mhb-builder input[type="checkbox"] { accent-color: var(--mhb-orange-dark); width: 22px; height: 22px; }
+.mhb-builder .mhb-check { display: flex; align-items: center; gap: var(--mhb-space-sm); min-height: 44px; }
+.mhb-builder .mhb-note { color: var(--mhb-muted); font-size: .875rem; margin: .5rem 0; }
+.mhb-builder .mhb-preview-area { min-width: 0; background: var(--mhb-paper); padding: var(--mhb-space-md); }
+.mhb-builder .mhb-preview-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--mhb-space-sm); margin-bottom: var(--mhb-space-sm); font-size: .875rem; }
+.mhb-builder .mhb-viewport { width: 100%; position: relative; min-width: 0; overflow: clip; }
+.mhb-builder .mhb-stage { transform-origin: top left; }
+.mhb-builder .mhb-stage .mhb-element { cursor: pointer; outline: 2px solid var(--mhb-transparent); outline-offset: 4px; }
+.mhb-builder .mhb-stage .mhb-element:hover, .mhb-builder .mhb-stage .mhb-element.is-selected { outline-color: currentColor; outline-style: dashed; }
+.mhb-builder .mhb-stage .mhb-element:focus-visible { outline: 3px solid currentColor; outline-offset: 5px; }
+.mhb-builder .mhb-stage .mhb-move { position: absolute; top: 0; right: 0; border: 2px solid var(--mhb-white); background: var(--mhb-ink); color: var(--mhb-white) !important; cursor: grab; z-index: 1; touch-action: none; }
+.mhb-builder .mhb-stage .mhb-move:active { cursor: grabbing; }
+.mhb-builder .mhb-position-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--mhb-space-xs); }
+.mhb-builder .mhb-position-grid button { padding: .25rem; }
+.mhb-builder .mhb-order { list-style: none; padding: 0; margin: var(--mhb-space-md) 0; }
+.mhb-builder .mhb-row { display: flex; align-items: center; gap: var(--mhb-space-xs); padding: .375rem 0; border-bottom: 1px solid var(--mhb-line); }
+.mhb-builder .mhb-row > button[data-select] { min-width: 0; flex: 1; justify-content: start; white-space: normal; text-align: start; overflow-wrap: anywhere; }
+.mhb-builder .mhb-row .mhb-drag { min-width: 44px; padding: .25rem; cursor: grab; touch-action: none; }
+.mhb-builder .mhb-row.is-drop-target { outline: 3px dashed var(--mhb-orange-dark); outline-offset: 2px; }
+.mhb-builder .mhb-add { display: flex; flex-wrap: wrap; align-items: end; gap: var(--mhb-space-sm); }
+.mhb-builder .mhb-status { padding: var(--mhb-space-sm) var(--mhb-space-md); border: 1px solid var(--mhb-line); margin-top: var(--mhb-space-md); font-size: .875rem; }
+.mhb-builder .mhb-status[data-state="error"] { border-color: var(--mhb-error); color: var(--mhb-error); }
+.mhb-builder .mhb-status[data-state="success"] { border-color: var(--mhb-success); color: var(--mhb-success); }
+.mhb-builder .mhb-status[data-state="loading"] { border-style: dashed; }
+.mhb-builder [aria-invalid="true"] { border-color: var(--mhb-error); }
+.mhb-builder .mhb-media-panel .media-library-widget { max-width: 100%; }
+.mhb-builder .mhb-media-panel img { max-width: 100%; height: auto; }
+.mhb-builder .mhb-reading-title { font-size: 1rem; font-weight: 700; margin: var(--mhb-space-lg) 0 0; }
+.mhb-builder .mhb-fields > h3 { font: 700 1rem/1.4 var(--mhb-sans); margin: 0; }
+@media (min-width: 60rem) { .mhb-builder .mhb-workspace { grid-template-columns: minmax(240px, 290px) minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .mhb-builder * { transition: none; animation: none; } }
