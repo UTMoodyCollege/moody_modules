@@ -1,0 +1,57 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_form_FORM_ID_alter() for Diff's node revision overview.
+ */
+function moody_revision_details_form_revision_overview_form_alter(array &$form, FormStateInterface $form_state): void {
+  $node = $form_state->getBuildInfo()['args'][0] ?? NULL;
+  if (!$node instanceof NodeInterface || !isset($form['node_revisions_table'])) {
+    return;
+  }
+  foreach (Element::children($form['node_revisions_table']) as $key) {
+    $row = &$form['node_revisions_table'][$key];
+    if (!isset($row['revision'])) {
+      continue;
+    }
+    // Diff omits its comparison radios when only one revision exists.
+    $vid = $row['select_column_two']['#return_value'] ?? NULL;
+    if (!$vid) {
+      $pager = \Drupal::service('pager.manager')->getPager();
+      $offset = $pager ? $pager->getCurrentPage() * $pager->getLimit() : 0;
+      $ids = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+        ->accessCheck(FALSE)->allRevisions()->condition('nid', $node->id())
+        ->condition('langcode', $node->language()->getId())
+        ->condition('revision_translation_affected', 1)
+        ->sort('vid', 'DESC')->range($offset, 1)->execute();
+      $vid = array_key_first($ids);
+    }
+    if (!$vid) {
+      continue;
+    }
+    $row['revision'] = [
+      'information' => $row['revision'],
+      'details' => [
+        '#type' => 'container',
+        '#attributes' => ['id' => "moody-revision-details-{$node->id()}-$vid"],
+        'link' => [
+          '#type' => 'link',
+          '#title' => t('Show details'),
+          '#url' => Url::fromRoute('moody_revision_details.show', [
+            'node' => $node->id(),
+            'node_revision' => $vid,
+          ], ['language' => $node->language()]),
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'aria-label' => t('Show saved changes for revision @revision', ['@revision' => $vid]),
+          ],
+          '#attached' => ['library' => ['core/drupal.ajax']],
+        ],
+      ],
+    ];
+  }
+}

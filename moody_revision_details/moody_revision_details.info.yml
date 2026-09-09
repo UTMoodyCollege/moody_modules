@@ -1,0 +1,8 @@
+name: Moody Revision Details
+type: module
+description: 'On-demand summaries of saved page and Layout Builder changes in the revision history.'
+package: Moody
+core_version_requirement: '^10.3 || ^11'
+dependencies:
+  - drupal:node
+  - diff:diff

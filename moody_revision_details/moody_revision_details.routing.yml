@@ -1,0 +1,17 @@
+moody_revision_details.show:
+  path: '/node/{node}/revisions/{node_revision}/moody-details'
+  defaults:
+    _controller: '\Drupal\moody_revision_details\Controller\RevisionDetailsController::show'
+    _title: 'Saved revision changes'
+  requirements:
+    _entity_access: 'node_revision.view revision'
+    node: '\d+'
+    node_revision: '\d+'
+  options:
+    _node_operation_route: TRUE
+    no_cache: TRUE
+    parameters:
+      node:
+        type: entity:node
+      node_revision:
+        type: entity_revision:node

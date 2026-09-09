@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implements hook_entity_field_access() for an isolated CLI test request.
+ */
+function moody_revision_details_test_entity_field_access($operation, $definition) {
+  if ($operation === 'view' && \Drupal::request()->attributes->get('_revision_details_hidden_field') === $definition->getName()) {
+    return \Drupal\Core\Access\AccessResult::forbidden()->setCacheMaxAge(0);
+  }
+  return \Drupal\Core\Access\AccessResult::neutral();
+}

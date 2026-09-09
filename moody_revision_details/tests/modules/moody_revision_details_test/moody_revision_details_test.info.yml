@@ -1,0 +1,7 @@
+name: Moody Revision Details Test
+type: module
+package: Testing
+hidden: true
+core_version_requirement: '^10.3 || ^11'
+dependencies:
+  - moody_revision_details:moody_revision_details
