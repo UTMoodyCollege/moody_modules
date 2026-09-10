@@ -6,13 +6,13 @@ namespace Drupal\moody_block_clone;
 
 use Drupal\block_content\BlockContentInterface;
 use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
-use Drupal\layout_builder\Field\LayoutSectionItemList;
 use Drupal\layout_builder\InlineBlockUsageInterface;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\layout_builder\SectionStorageInterface;
@@ -63,7 +63,7 @@ final class BlockCloneManager {
   /**
    * Constructs a new block clone manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $bundle_info, InlineBlockUsageInterface $inline_block_usage, UuidInterface $uuid) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $bundle_info, InlineBlockUsageInterface $inline_block_usage, UuidInterface $uuid, protected Connection $database) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
     $this->bundleInfo = $bundle_info;
@@ -92,7 +92,7 @@ final class BlockCloneManager {
    * Determines if a node can provide cloneable Layout Builder blocks.
    */
   public function isCloneableNode(NodeInterface $node): bool {
-    return $node->isPublished() && $node->hasField('layout_builder__layout') && !$node->get('layout_builder__layout')->isEmpty();
+    return $node->isPublished() && $node->access('view') && $node->hasField('layout_builder__layout') && !$node->get('layout_builder__layout')->isEmpty();
   }
 
   /**
@@ -113,7 +113,12 @@ final class BlockCloneManager {
     /** @var \Drupal\layout_builder\Field\LayoutSectionItemList $sections */
     $sections = $node->get('layout_builder__layout');
     foreach ($sections->getSections() as $section_delta => $section) {
-      foreach ($section->getComponents() as $component_uuid => $component) {
+      // Follow the rendered region and weight order, not insertion order.
+      $components = [];
+      foreach ($section->getLayout()->getPluginDefinition()->getRegionNames() as $region) {
+        $components += $section->getComponentsByRegion($region);
+      }
+      foreach ($components as $component_uuid => $component) {
         $configuration = (array) $component->get('configuration');
         $plugin_id = (string) ($configuration['id'] ?? '');
         if (!str_starts_with($plugin_id, 'inline_block:')) {
@@ -151,37 +156,64 @@ final class BlockCloneManager {
    *   The appended component.
    */
   public function cloneComponentToSection(SectionStorageInterface $section_storage, int $delta, string $region, NodeInterface $source_node, string $source_component_uuid): SectionComponent {
+    return $this->cloneComponentsToSection($section_storage, $delta, $region, $source_node, [$source_component_uuid])[0];
+  }
+
+  /**
+   * Copies a selection in source-page order, validating it before any writes.
+   *
+   * @return \Drupal\layout_builder\SectionComponent[]
+   *   The appended components. The caller persists Layout Builder tempstore.
+   */
+  public function cloneComponentsToSection(SectionStorageInterface $section_storage, int $delta, string $region, NodeInterface $source_node, array $source_component_uuids): array {
     if (!$this->isCloneableNode($source_node)) {
       throw new AccessDeniedHttpException('The selected source page is not available for cloning.');
     }
-
     $placements = $this->getCloneableBlocks($source_node);
-    if (empty($placements[$source_component_uuid])) {
-      throw new NotFoundHttpException('The selected source block could not be found.');
+    if ($source_component_uuids === []) {
+      throw new \InvalidArgumentException('Select at least one block to copy.');
     }
-
-    $source = $placements[$source_component_uuid];
-    /** @var \Drupal\block_content\BlockContentInterface $duplicate */
-    $duplicate = $source['block']->createDuplicate();
-    $duplicate->save();
-
-    $configuration = $source['configuration'];
-    $configuration['block_id'] = $duplicate->id();
-    $configuration['block_revision_id'] = $duplicate->getRevisionId();
-    $configuration['label'] = $this->resolvePlacementLabel($configuration, $duplicate);
-    unset($configuration['block_serialized']);
-
-    $component = new SectionComponent($this->uuid->generate(), $region, $configuration);
-    $section_storage->getSection($delta)->appendComponent($component);
-
-    if ($section_storage instanceof ContextAwarePluginInterface) {
-      $entity = $section_storage->getContextValue('entity');
-      if ($entity instanceof EntityInterface) {
-        $this->inlineBlockUsage->addUsage((int) $duplicate->id(), $entity);
+    foreach ($source_component_uuids as $uuid) {
+      if (!is_string($uuid) || !isset($placements[$uuid])) {
+        throw new NotFoundHttpException('A selected source block is no longer available. Reload the blocks and try again.');
       }
     }
+    $sections = $section_storage->getSections();
+    if (!isset($sections[$delta]) || !in_array($region, $sections[$delta]->getLayout()->getPluginDefinition()->getRegionNames(), TRUE)) {
+      throw new NotFoundHttpException('The destination section or region is no longer available.');
+    }
+    $entity = NULL;
+    if ($section_storage instanceof ContextAwarePluginInterface) {
+      $entity = $section_storage->getContextValue('entity');
+    }
 
-    return $component;
+    $components = [];
+    $transaction = $this->database->startTransaction();
+    try {
+      foreach (array_intersect_key($placements, array_fill_keys($source_component_uuids, TRUE)) as $source) {
+        /** @var \Drupal\block_content\BlockContentInterface $duplicate */
+        $duplicate = $source['block']->createDuplicate();
+        $duplicate->save();
+        $configuration = $source['configuration'];
+        $configuration['block_id'] = $duplicate->id();
+        $configuration['block_revision_id'] = $duplicate->getRevisionId();
+        $configuration['label'] = $this->resolvePlacementLabel($configuration, $duplicate);
+        unset($configuration['block_serialized']);
+        $components[] = new SectionComponent($this->uuid->generate(), $region, $configuration);
+        if ($entity instanceof EntityInterface) {
+          $this->inlineBlockUsage->addUsage((int) $duplicate->id(), $entity);
+        }
+      }
+    }
+    catch (\Throwable $exception) {
+      $transaction->rollBack();
+      throw $exception;
+    }
+    // Do not partially modify the draft if any of the copies fails to save.
+    foreach ($components as $component) {
+      $sections[$delta]->appendComponent($component);
+    }
+    return $components;
   }
 
   /**

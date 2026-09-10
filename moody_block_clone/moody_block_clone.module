@@ -130,7 +130,7 @@ function moody_block_clone_layout_builder_browser_alter(array &$build, array $co
   $build['moody_block_clone_action'] = [
     '#type' => 'details',
     '#weight' => -20,
-    '#title' => t('Clone block from other page'),
+    '#title' => t('Clone blocks from other page'),
     '#open' => FALSE,
     '#attributes' => [
       'class' => ['moody-block-clone__browser-action'],
@@ -141,7 +141,7 @@ function moody_block_clone_layout_builder_browser_alter(array &$build, array $co
         'class' => ['moody-block-clone__browser-description'],
       ],
       'text' => [
-        '#markup' => t('Browse published pages, preview their inline blocks, and duplicate one into this section.'),
+        '#markup' => t('Browse published pages, preview their inline blocks, and copy one or more into this section.'),
       ],
     ],
     'link' => [
@@ -180,6 +180,10 @@ function moody_block_clone_dialog_attributes(): array {
     'class' => ['button', 'button--primary', 'use-ajax', 'moody-block-clone__browser-link'],
     'data-dialog-type' => 'dialog',
     'data-dialog-renderer' => 'off_canvas',
+    'data-dialog-options' => Json::encode([
+      'width' => 560,
+      'dialogClass' => 'moody-block-clone-dialog',
+    ]),
   ];
 }
 

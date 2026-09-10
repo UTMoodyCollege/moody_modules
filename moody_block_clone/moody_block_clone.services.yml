@@ -7,3 +7,4 @@ services:
       - '@entity_type.bundle.info'
       - '@inline_block.usage'
       - '@uuid'
+      - '@database'
