@@ -1,0 +1,5 @@
+services:
+  moody_feature_page.external_story:
+    class: Drupal\moody_feature_page\EventSubscriber\ExternalStorySubscriber
+    tags:
+      - { name: event_subscriber }

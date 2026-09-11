@@ -95,6 +95,9 @@ class FeaturePageRedirectSubscriber implements EventSubscriberInterface {
    *   The controller event.
    */
   public function onController(ControllerEvent $event) {
+    if ($event->getRequest()->attributes->get('_moody_external_story')) {
+      return;
+    }
     // Only process the main request.
     if (!$event->isMainRequest()) {
       return;

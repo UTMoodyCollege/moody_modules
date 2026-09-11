@@ -1,0 +1,14 @@
+<article class="moody-external-story" data-moody-external-story{{ automatic ? ' data-auto-redirect' : '' }}>
+  <h2>{{ 'Read the full story'|t }}</h2>
+  <p>{{ 'This story is hosted on one of our affiliated sites.'|t }}</p>
+  <p>{{ 'Continue to @host to read the full story.'|t({'@host': host}) }}</p>
+  <p><a class="button" data-story-link href="{{ destination }}">{{ 'Read the story'|t }}</a></p>
+  {% if automatic %}
+    <div data-redirect-controls hidden>
+      <p data-redirect-status role="status">{{ 'We will take you there in 20 seconds. You can stop automatic forwarding below.'|t }}</p>
+      <button type="button" data-stop-redirect>{{ 'Stay on this page'|t }}</button>
+    </div>
+  {% else %}
+    <p>{{ 'Automatic forwarding is paused while you review this page.'|t }}</p>
+  {% endif %}
+</article>

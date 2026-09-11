@@ -5,6 +5,86 @@
  * Install and update hooks for Moody Feature Page.
  */
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Implements hook_install().
+ */
+function moody_feature_page_install() {
+  _moody_feature_page_install_external_fields();
+}
+
+/**
+ * Adds opt-in external stories without rewriting existing content or displays.
+ */
+function moody_feature_page_update_11002() {
+  _moody_feature_page_install_external_fields();
+}
+
+/**
+ * Installs revisionable fields on new and existing Feature Page sites.
+ */
+function _moody_feature_page_install_external_fields() {
+  $definitions = [
+    'field_feature_external' => [
+      'type' => 'boolean',
+      'label' => 'External redirect feature page',
+      'description' => 'Keep this Feature Page in local news listings, but send readers to the story on an affiliated site. Keep its title, thumbnail, categories and summary up to date for cards.',
+      'settings' => [],
+      'default_value' => [['value' => 0]],
+      'widget' => 'boolean_checkbox',
+    ],
+    'field_feature_external_url' => [
+      'type' => 'string',
+      'label' => 'External story URL',
+      'description' => 'Enter the complete https:// URL of the story on the affiliated site. Visitors will see a notice with a link and an option to stop automatic forwarding. Do not link back to this site.',
+      'settings' => ['max_length' => 2048],
+      'default_value' => [],
+      'widget' => 'string_textfield',
+    ],
+  ];
+  foreach ($definitions as $name => $definition) {
+    if (!FieldStorageConfig::loadByName('node', $name)) {
+      FieldStorageConfig::create([
+        'field_name' => $name,
+        'entity_type' => 'node',
+        'type' => $definition['type'],
+        'cardinality' => 1,
+        'settings' => $definition['settings'],
+      ])->save();
+    }
+    if (!FieldConfig::loadByName('node', 'moody_feature_page', $name)) {
+      FieldConfig::create([
+        'field_name' => $name,
+        'entity_type' => 'node',
+        'bundle' => 'moody_feature_page',
+        'label' => $definition['label'],
+        'description' => $definition['description'],
+        'default_value' => $definition['default_value'],
+        'translatable' => TRUE,
+      ])->save();
+    }
+  }
+  $displays = EntityFormDisplay::loadMultiple();
+  foreach ($displays as $display) {
+    if ($display->getTargetEntityTypeId() !== 'node' || $display->getTargetBundle() !== 'moody_feature_page') {
+      continue;
+    }
+    foreach ($definitions as $name => $definition) {
+      if (!$display->getComponent($name)) {
+        $display->setComponent($name, [
+          'type' => $definition['widget'],
+          'weight' => 1,
+          'settings' => $definition['type'] === 'boolean' ? ['display_label' => TRUE] : [],
+        ]);
+      }
+    }
+    $display->save();
+  }
+}
+
 /**
  * Use a high-resolution 16:9 derivative for shared news listings.
  */

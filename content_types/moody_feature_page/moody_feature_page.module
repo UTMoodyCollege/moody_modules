@@ -17,6 +17,9 @@ use Drupal\taxonomy\Entity\Term;
 function moody_feature_page_theme($existing, $type, $theme, $path)
 {
   return [
+    'moody_feature_external_story' => [
+      'variables' => ['destination' => '', 'host' => '', 'automatic' => FALSE],
+    ],
     'moody_feature_page_hero' => [
       'variables' => [
         'feature_node' => NULL,
@@ -60,6 +63,32 @@ function moody_feature_page_theme($existing, $type, $theme, $path)
       'template' => 'moody-news-and-announcements',
     ],
   ];
+}
+
+/**
+ * Implements hook_entity_bundle_field_info_alter().
+ */
+function moody_feature_page_entity_bundle_field_info_alter(&$fields, $entity_type, $bundle) {
+  if ($entity_type->id() === 'node' && $bundle === 'moody_feature_page' && isset($fields['field_feature_external_url'])) {
+    $fields['field_feature_external_url']->addConstraint('MoodyExternalStoryUrl');
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function moody_feature_page_form_node_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $node = $form_state->getFormObject()->getEntity();
+  if ($node->bundle() !== 'moody_feature_page' || !isset($form['field_feature_external_url']['widget'][0]['value'])) {
+    return;
+  }
+  $form['field_feature_external']['#weight'] = 1;
+  $form['field_feature_external_url']['#weight'] = 2;
+  $input = &$form['field_feature_external_url']['widget'][0]['value'];
+  $input['#type'] = 'url';
+  $input['#placeholder'] = 'https://';
+  $input['#states']['required'] = [':input[name="field_feature_external[value]"]' => ['checked' => TRUE]];
+  $form['field_feature_external_url']['#states']['visible'] = [':input[name="field_feature_external[value]"]' => ['checked' => TRUE]];
 }
 
 /**
