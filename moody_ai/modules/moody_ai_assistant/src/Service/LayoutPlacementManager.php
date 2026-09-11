@@ -149,7 +149,9 @@ class LayoutPlacementManager {
    *   Update metadata.
    */
   public function updateInlineBlockComponent(ContentEntityInterface $entity, $component_uuid, BlockContentInterface $block, array $runtime_context = []) {
-    [$section_storage, $has_tempstore] = $this->getEditableSectionStorage($entity, $runtime_context);
+    [$section_storage, $has_tempstore] = !empty($runtime_context['edit_component_uuid'])
+      ? [$this->layoutContextCollector->getResolvedSectionStorage($entity, $runtime_context), TRUE]
+      : $this->getEditableSectionStorage($entity, $runtime_context);
     if (!$section_storage) {
       throw new \Exception('Could not load Layout Builder overrides storage for this page.');
     }
@@ -161,6 +163,9 @@ class LayoutPlacementManager {
         }
 
         $configuration = $component->get('configuration');
+        if (isset($runtime_context['expected_component_hash']) && !hash_equals($runtime_context['expected_component_hash'], hash('sha256', serialize($configuration)))) {
+          throw new \InvalidArgumentException('This block changed while AI was working. The layout was not overwritten; retry against the current block.');
+        }
         $configuration['block_revision_id'] = $block->getRevisionId();
         $configuration['label'] = $block->label();
         $component->setConfiguration($configuration);

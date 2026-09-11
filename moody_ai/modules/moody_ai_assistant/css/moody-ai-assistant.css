@@ -1,8 +1,6 @@
-/* Hallmark · macrostructure: Workbench · genre: modern-minimal · theme: Coral · tone: technical/utilitarian · anchor hue: Moody burnt orange · enrichment: none
- * Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4
- * Hallmark · contrast: pass (40–41) · nav: n/a · footer: n/a · slop: pass (42–45)
- * Hallmark · honest: pass (46) · chrome: pass (47) · tokens: pass (48) · responsive: pass (49) · icons: pass (30)
- * Hallmark · mobile: pass (34, 49, 50–57) · slop test: 58/58
+/* Hallmark · component: assistant composer · genre: modern-minimal
+ * Existing Moody tokens; prompt-first surface with a unified control row.
+ * Pre-emit critique: P5 H5 E4 S5 R5 V4. No added motion or dependencies.
  */
 
 html,
@@ -925,27 +923,127 @@ body {
   overflow: visible;
 }
 
-.ai-moody-assistant__form:has(.ai-moody-assistant__utility-links > .ai-moody-assistant__help[open]) {
-  flex-shrink: 1;
+.ai-moody-assistant__form form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-xs);
+  min-width: 0;
+  margin: 0;
 }
 
-.ai-moody-assistant__form form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-2xs) var(--space-xs);
+.ai-moody-assistant__composer {
   min-width: 0;
   border: var(--rule-hairline) solid var(--color-rule-strong);
   border-radius: var(--radius-lg);
   background: var(--color-paper);
+  color: var(--color-ink);
   padding: var(--space-xs);
   outline: var(--rule-focus) solid transparent;
   outline-offset: var(--rule-hairline);
 }
 
-.ai-moody-assistant__form form:focus-within {
-  border-color: var(--color-ink);
+.ai-moody-assistant__composer:has(.ai-moody-assistant__composer-editor:focus) {
   outline-color: var(--color-focus);
+}
+
+.ai-moody-assistant__composer-toolbar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__composer-controls {
+  display: contents;
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__composer-actions {
+  margin-inline-start: auto;
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__token-counter {
+  border: 0;
+  padding: 0;
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__image-preference-toggle,
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__token-counter-button {
+  min-height: 2.75rem;
+}
+
+.ai-moody-assistant .ai-moody-assistant__composer-toolbar .ai-moody-assistant__dropzone,
+.ai-moody-assistant .ai-moody-assistant__composer-toolbar .ai-moody-assistant__previous-uploads-trigger {
+  display: inline-flex;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
+  justify-content: center;
+  border-color: transparent;
+  padding: 0;
+  font-size: 0;
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__dropzone-copy {
+  display: none;
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__dropzone-head {
+  flex: 0;
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__dropzone-count {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  min-width: 1rem;
+  height: 1rem;
+  font-size: var(--text-xs);
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__dropzone::before,
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__previous-uploads-trigger::before {
+  content: "";
+  display: block;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: currentColor;
+  mask: var(--composer-icon) center / contain no-repeat;
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__dropzone {
+  --composer-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.4 11.6-9.2 9.2a6 6 0 0 1-8.5-8.5l10-10a4 4 0 0 1 5.7 5.7l-10 10a2 2 0 0 1-2.8-2.8l9.2-9.2'/%3E%3C/svg%3E");
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__previous-uploads-trigger {
+  --composer-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2Z'/%3E%3C/svg%3E");
+}
+
+.ai-moody-assistant__composer-toolbar .ai-moody-assistant__previous-uploads-trigger::after {
+  content: none;
+}
+
+.ai-moody-assistant__composer .ai-moody-assistant__utility-links {
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-block-start: var(--space-2xs);
+  overflow: visible;
+}
+
+.ai-moody-assistant .ai-moody-assistant__composer .ai-moody-assistant__utility-links .ai-moody-assistant__tool-trigger {
+  border-color: transparent;
+  background: transparent;
+  padding-inline: var(--space-xs);
+}
+
+.ai-moody-assistant__composer:has(.ai-moody-assistant__dropzone.is-error) > .ai-moody-assistant__dropzone-hint {
+  display: block;
+  color: var(--color-error);
+  padding: var(--space-xs);
 }
 
 .ai-moody-assistant__usage-budget {
@@ -1298,9 +1396,9 @@ body {
 }
 
 .ai-moody-assistant__composer-editor {
-  flex: 1 1 15rem;
+  flex: 1 1 100%;
   min-width: 0;
-  min-height: 3.25rem;
+  min-height: 4.5rem;
   max-height: 9rem;
   overflow-y: auto;
   color: var(--color-ink);
@@ -1491,6 +1589,7 @@ body {
 }
 
 .ai-moody-assistant__selected-block-chip-mode {
+  white-space: nowrap;
   border-radius: var(--radius-pill);
   background: var(--color-ink-2);
   color: var(--color-paper);
@@ -1505,19 +1604,43 @@ body {
   display: none;
 }
 
-.ai-moody-assistant__selected-block-chip-remove {
+.ai-moody-assistant .ai-moody-assistant__selected-block-chip-remove {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 2rem;
-  height: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--color-paper);
   color: var(--color-error);
   cursor: pointer;
+  padding: 0;
   font-size: var(--text-sm);
   font-weight: 700;
+}
+
+@container (max-width: 28rem) {
+  .ai-moody-assistant__selected-block-chip {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    border-radius: var(--radius-md);
+  }
+
+  .ai-moody-assistant__selected-block-chip-mode,
+  .ai-moody-assistant__selected-block-chip-title {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .ai-moody-assistant__selected-block-chip-mode {
+    letter-spacing: 0;
+  }
+
+  .ai-moody-assistant__selected-block-chip-remove {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
 }
 
 .ai-moody-assistant__composer-files {
@@ -2037,51 +2160,6 @@ body {
 
 .ai-moody-assistant .ai-moody-assistant__composer-editor:focus-visible {
   outline-color: transparent;
-}
-
-@container (min-width: 44rem) {
-  .ai-moody-assistant__form {
-    max-height: 52%;
-  }
-
-  .ai-moody-assistant__form form {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-    padding: var(--space-sm);
-  }
-
-  .ai-moody-assistant__usage-budget,
-  .ai-moody-assistant__composer-surface,
-  .ai-moody-assistant__privacy-notice {
-    grid-column: 1 / -1;
-  }
-
-  .ai-moody-assistant__utility-links {
-    grid-column: 1;
-  }
-
-  .ai-moody-assistant__composer-controls {
-    order: 60;
-    grid-column: 1 / 3;
-    justify-content: flex-start;
-    margin-block-end: 0;
-  }
-
-  .ai-moody-assistant__composer-files {
-    grid-column: 2 / -1;
-    grid-template-columns: minmax(7rem, max-content) minmax(0, 1fr);
-    border-block-start: 0;
-    padding-block-start: 0;
-  }
-
-  .ai-moody-assistant__composer-actions {
-    order: 60;
-    grid-column: 3;
-  }
-
-  .ai-moody-assistant__composer-actions .button--primary,
-  .ai-moody-assistant__composer-actions input[type="submit"] {
-    min-height: 2.75rem;
-  }
 }
 
 @media (hover: hover) and (pointer: fine) {

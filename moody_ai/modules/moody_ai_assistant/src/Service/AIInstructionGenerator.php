@@ -73,6 +73,13 @@ class AIInstructionGenerator {
    */
   public function generateForExistingBlock($prompt, $block_type, array $existing_instruction, array $context = [], ?callable $stream_callback = NULL) {
     $blockData = $this->getBlockData();
+    if (!$this->hasCompoundPropertyMetadata($blockData['content_blocks'][$block_type] ?? [])) {
+      $blockData = $this->blockDataCollector->collectBlockData();
+    }
+    if (empty($blockData['content_blocks'][$block_type])) {
+      throw new \InvalidArgumentException('The selected block has no available editing schema. Use its traditional Edit form.');
+    }
+    $blockData = ['content_blocks' => [$block_type => $blockData['content_blocks'][$block_type]]];
 
     $plan = [
       'selected_block_type' => $block_type,

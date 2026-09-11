@@ -71,6 +71,60 @@ drush config:set moody_ai_base.settings enabled 1 -y
 drush cache:rebuild
 ```
 
+## Focused block editing
+
+In Layout Builder, supported inline content blocks offer **Edit with AI** directly
+after **Edit** in their contextual menu. It opens the existing assistant composer
+with an **Edit only this block** token. Files, previous uploads, Media references,
+image preferences, provider/model controls, progress, and change summaries reuse
+the normal assistant interface. Remove the token to return to page-wide work.
+
+This path bypasses page-wide routing, block discovery, and conversation planning.
+It sends the selected block's schema/current values and the requested references
+through the existing compact editor contract. There is one block-generation call
+(requested image/asset processing can require additional calls), and omitted
+fields remain unchanged. Updates stay in the Layout Builder draft until the
+editor saves the layout. The server resolves the UUID against the current draft,
+checks layout/block access, and rejects missing or changed targets rather than
+creating a replacement block. Unsupported reusable and configuration-only plugin
+blocks retain the traditional Edit form; this feature does not edit a shared
+reusable block across its usages.
+
+Blocks whose manual form changes still exist only as serialized draft data need
+a saved block revision before this editor can operate; the server explains this
+instead of silently replacing their pending edits.
+
+Local checks, with no provider calls:
+
+```bash
+ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/focused_block_edit_smoke.php
+node moody_ai/modules/moody_ai_assistant/tests/focused_block_edit_ui.cjs
+```
+
+The PHP check creates and removes disposable local fixtures. The UI check uses
+an already-installed Playwright runtime and headless Chrome, not a new production
+dependency. It tests the actual picker code against an asynchronous menu fixture.
+
+### Assistant composer
+
+The prompt is followed by one wrapping toolbar: attach files (paperclip),
+previous private uploads (folder), Create image, context estimate, and Send.
+Add block, Edit block, and AI options remain secondary controls; Help and Ideas
+are no longer shown. Icon controls retain accessible names, keyboard access,
+attachment counts, and visible validation feedback.
+
+The local Drupal browser check creates and deletes an unpublished Basic-block
+fixture, exercises composer controls without sending a provider request, and
+checks desktop plus 320/375/414/768-pixel layouts:
+
+```bash
+MOODY_AI_QA_SITE_DIR=/path/to/moody-core-2 node moody_ai/modules/moody_ai_assistant/tests/composer_ui.cjs
+```
+
+Use an already-installed Playwright runtime (via `NODE_PATH` if needed) and
+Chrome. This check targets `https://2moody-core.ddev.site` and writes QA
+screenshots to `/tmp/moody-ai-*.png`; never run it against a remote environment.
+
 ## Security defaults
 
 No API key is stored in Drupal configuration or sent to the browser. The base

@@ -1141,12 +1141,13 @@
     const input = composer.editor;
     const shell = composer.shell;
     const hiddenInput = wrapper.querySelector('[data-ai-assistant-selected-block-input]');
+    const editScopeInput = wrapper.querySelector('[data-ai-assistant-edit-component]');
     const selectedContainer = wrapper.querySelector('[data-ai-assistant-selected-blocks]');
     const selectedList = wrapper.querySelector('[data-ai-assistant-selected-block-list]');
     const blockLibraries = Array.from(wrapper.querySelectorAll('[data-ai-assistant-block-picker]'));
     const blockButtons = Array.from(wrapper.querySelectorAll('[data-ai-assistant-block-ref]'));
 
-    if (!input || !shell || !hiddenInput || !selectedContainer || !selectedList || !blockLibraries.length || !blockButtons.length) {
+    if (!input || !shell || !hiddenInput || !selectedContainer || !selectedList) {
       return {
         getSelected() {
           return [];
@@ -1189,6 +1190,9 @@
     };
 
     const renderSelected = () => {
+      if (editScopeInput && !selected.some(item => item.uuid === editScopeInput.value && item.selectionMode === 'edit')) {
+        editScopeInput.value = '';
+      }
       selectedList.innerHTML = '';
       selectedContainer.classList.toggle('has-selected-blocks', selected.length > 0);
 
@@ -1199,7 +1203,7 @@
         if (item.selectionMode === 'edit') {
           const mode = document.createElement('span');
           mode.className = 'ai-moody-assistant__selected-block-chip-mode';
-          mode.textContent = 'Edit';
+          mode.textContent = editScopeInput && editScopeInput.value === item.uuid ? 'Edit only this block' : 'Edit';
           chip.appendChild(mode);
         }
 
@@ -1210,7 +1214,7 @@
         const remove = document.createElement('button');
         remove.type = 'button';
         remove.className = 'ai-moody-assistant__selected-block-chip-remove';
-        remove.setAttribute('aria-label', 'Remove ' + item.label + ' from chat');
+        remove.setAttribute('aria-label', editScopeInput && editScopeInput.value === item.uuid ? 'Exit focused editing of ' + item.label : 'Remove ' + item.label + ' from chat');
         remove.textContent = 'x';
         remove.addEventListener('click', () => {
           selected.splice(index, 1);
@@ -1229,6 +1233,10 @@
 
     const addReference = (reference, sourceElement = null) => {
       if (!reference || !reference.referenceId) {
+        return;
+      }
+      if (editScopeInput && editScopeInput.value && reference.uuid !== editScopeInput.value) {
+        Drupal.announce('Exit focused block editing using the selected block’s remove button before choosing other components.');
         return;
       }
 
@@ -1300,14 +1308,28 @@
     const targetSelector = '.layout-builder-block[data-layout-block-uuid]';
     const directButtonSelector = '[data-ai-assistant-layout-edit]';
     let selectLayoutBlock = () => false;
+    const referenceForBlock = (block) => {
+      const uuid = block?.getAttribute('data-layout-block-uuid') || '';
+      const button = editableReferencesByUuid.get(uuid);
+      if (button) {
+        return hydrateReference(button);
+      }
+      const type = block?.getAttribute('data-ai-assistant-edit-block-type') || '';
+      return uuid && type ? {
+        referenceId: 'existing:' + uuid, uuid,
+        label: block.getAttribute('data-ai-assistant-edit-block-label') || 'Selected block',
+        typeLabel: type, blockType: type, pluginId: 'inline_block:' + type,
+        selectionMode: 'edit', canEdit: true, existingCount: 1, groupLabel: 'Existing blocks'
+      } : null;
+    };
 
     syncDirectEditTargets = (isOpen) => {
       document.querySelectorAll(targetSelector).forEach((block) => {
         const uuid = block.getAttribute('data-layout-block-uuid') || '';
-        const referenceButton = editableReferencesByUuid.get(uuid);
+        const reference = referenceForBlock(block);
         const existingButton = Array.from(block.children).find((child) => child.matches && child.matches(directButtonSelector));
 
-        if (!isOpen || !referenceButton) {
+        if (!isOpen || !reference) {
           block.classList.remove('ai-moody-assistant-edit-target', 'is-ai-moody-assistant-edit-target-selected');
           if (existingButton) {
             existingButton.remove();
@@ -1315,7 +1337,6 @@
           return;
         }
 
-        const reference = hydrateReference(referenceButton);
         const isSelected = selectedById.has(reference.referenceId);
         block.classList.add('ai-moody-assistant-edit-target');
         block.classList.toggle('is-ai-moody-assistant-edit-target-selected', isSelected);
@@ -1340,21 +1361,75 @@
     };
 
     selectLayoutBlock = (block) => {
+      if (wrapper.querySelector('[data-ai-assistant-composer-source]')?.readOnly) {
+        Drupal.announce('Wait for the current AI request to finish before switching blocks.');
+        return false;
+      }
       const uuid = block ? block.getAttribute('data-layout-block-uuid') || '' : '';
-      const referenceButton = editableReferencesByUuid.get(uuid);
-      if (!referenceButton) {
+      const reference = referenceForBlock(block);
+      if (!reference) {
         return false;
       }
 
-      const reference = hydrateReference(referenceButton);
+      if (editScopeInput) {
+        editScopeInput.value = reference.uuid;
+      }
       if (selected.length !== 1 || !selectedById.has(reference.referenceId)) {
         selected.length = 0;
         selectedById.clear();
       }
+      const wasEmpty = getComposerText(wrapper).trim() === '';
+      setOpenState(wrapper, true);
       addReference(reference);
+      renderSelected();
+      if (wasEmpty) {
+        setComposerText(wrapper, '');
+      }
       Drupal.announce('Editing ' + reference.label + ' with Moody AI. Describe the change, then send your request.');
       return true;
     };
+
+    // Contextual menus arrive asynchronously. Reuse the accessible native Edit
+    // link as a no-JS fallback, but open the existing composer when activated.
+    const syncContextualEditLinks = () => {
+      document.querySelectorAll(targetSelector).forEach((block) => {
+        const uuid = block.getAttribute('data-layout-block-uuid') || '';
+        if (!referenceForBlock(block)) {
+          return;
+        }
+        const edit = block.querySelector('.contextual-links a[href*="/layout_builder/update/block/"]');
+        if (!edit || block.querySelector('[data-ai-assistant-contextual-edit]')) {
+          return;
+        }
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = edit.href;
+        link.textContent = 'Edit with AI';
+        link.setAttribute('data-ai-assistant-contextual-edit', uuid);
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          selectLayoutBlock(block);
+        });
+        item.appendChild(link);
+        edit.closest('li').after(item);
+      });
+    };
+    const layoutRoot = document.querySelector('#layout-builder');
+    if (layoutRoot) {
+      let menuFrame = null;
+      const menuObserver = new MutationObserver(() => {
+        if (menuFrame === null) {
+          menuFrame = window.requestAnimationFrame(() => {
+            menuFrame = null;
+            syncContextualEditLinks();
+          });
+        }
+      });
+      // The layout root itself is replaced by streamed block updates.
+      menuObserver.observe(layoutRoot.parentElement, {childList: true, subtree: true});
+      syncContextualEditLinks();
+    }
 
     document.addEventListener('click', (event) => {
       if (!wrapper.classList.contains('is-open')) {
@@ -1393,7 +1468,10 @@
       getSelected() {
         return selected.slice();
       },
-      clear() {
+      clear(preserveScope = false) {
+        if (preserveScope && editScopeInput && editScopeInput.value) {
+          return;
+        }
         selected.length = 0;
         selectedById.clear();
         renderSelected();
@@ -1660,7 +1738,10 @@
     const selected = new Set(Array.from(list.querySelectorAll('input[type="checkbox"]:checked')).map(input => String(input.value)));
     const trigger = wrapper.querySelector('[data-ai-assistant-previous-upload-trigger]');
     if (trigger) {
-      trigger.textContent = 'Previous uploads (' + uploads.length + ')';
+      const label = 'Previous uploads (' + uploads.length + ')';
+      trigger.textContent = label;
+      trigger.setAttribute('aria-label', label);
+      trigger.setAttribute('title', label);
     }
 
     list.innerHTML = '';
@@ -1855,6 +1936,8 @@
       }
 
       const count = selectedFiles.length;
+      dropzone.setAttribute('aria-label', count ? 'Attach files (' + count + ' ready)' : 'Attach files');
+      dropzone.setAttribute('title', dropzone.getAttribute('aria-label'));
       countBadge.hidden = count === 0;
       countBadge.textContent = String(count);
 
@@ -1885,6 +1968,7 @@
     };
 
     const refresh = () => {
+      dropzone.classList.remove('is-error');
       renderSelectedFiles(fileList, selectedFiles, (index) => {
         selectedFiles.splice(index, 1);
         refresh();
@@ -2320,7 +2404,7 @@
           checkbox.checked = false;
         });
         if (blockReferences) {
-          blockReferences.clear();
+          blockReferences.clear(true);
         }
         if (imagePreference) {
           imagePreference.clear();

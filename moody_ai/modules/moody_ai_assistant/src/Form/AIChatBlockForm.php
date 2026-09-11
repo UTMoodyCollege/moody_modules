@@ -168,7 +168,6 @@ class AIChatBlockForm extends FormBase {
       return $form;
     }
 
-    $starter_prompts = $this->getStarterPrompts();
     $is_layout_builder_context = $entity ? $this->layoutContextCollector->isLayoutBuilderContext($entity) : FALSE;
     $picker_context = ['is_layout_builder_context' => $is_layout_builder_context];
     $block_reference_groups = $entity ? $this->blockReferenceCatalog->getGroupedReferences($entity, $picker_context) : [];
@@ -204,35 +203,6 @@ class AIChatBlockForm extends FormBase {
           ? '<p>' . $this->t('@remaining usage tokens remaining.', ['@remaining' => number_format($remaining)]) . '</p>'
           : '<p>' . $this->t('You have insufficient usage tokens.') . '</p>',
       ];
-    }
-
-    $form['utility_links']['help'] = $this->buildToolTrigger('help', $this->t('Help'));
-    $form['tool_dialogs']['help'] = $this->buildToolDialog('help', $this->t('Help'));
-    $form['tool_dialogs']['help']['body']['content'] = [
-      '#markup' => '<p>' . $this->t('Ask AI to create or revise a block for this page. Example: <em>Create a new block on this page promoting our graduate program with an editorial image of students in class.</em> You can also attach one or more files and tell the assistant to use them in the generated block.') . '</p>',
-    ];
-
-    if ($starter_prompts) {
-      $form['utility_links']['prompts'] = $this->buildToolTrigger('prompts', $this->t('Ideas'));
-      $form['tool_dialogs']['prompts'] = $this->buildToolDialog('prompts', $this->t('Ideas'));
-
-      $form['tool_dialogs']['prompts']['body']['content'] = [
-        '#type' => 'container',
-        '#attributes' => [
-          'class' => ['ai-moody-assistant__prompt-list'],
-        ],
-      ];
-
-      foreach ($starter_prompts as $index => $starter_prompt) {
-        $form['tool_dialogs']['prompts']['body']['content']['prompt_' . $index] = [
-          '#type' => 'button',
-          '#value' => $starter_prompt['label'],
-          '#attributes' => [
-            'class' => ['ai-moody-assistant__prompt-button'],
-            'data-ai-assistant-prompt' => $starter_prompt['prompt'],
-          ],
-        ];
-      }
     }
 
     if ($block_reference_groups) {
@@ -384,6 +354,12 @@ class AIChatBlockForm extends FormBase {
     $form['is_layout_builder_context'] = [
       '#type' => 'hidden',
       '#value' => $entity ? (int) $is_layout_builder_context : 0,
+    ];
+
+    $form['edit_component_uuid'] = [
+      '#type' => 'hidden',
+      '#default_value' => '',
+      '#attributes' => ['data-ai-assistant-edit-component' => TRUE],
     ];
 
     $form['selected_block_references_json'] = [
@@ -601,7 +577,8 @@ class AIChatBlockForm extends FormBase {
         'role' => 'button',
         'tabindex' => '0',
         'aria-controls' => $upload_input_id,
-        'aria-label' => $this->t('Add files by dragging them here or browsing your computer.'),
+        'aria-label' => $this->t('Attach files'),
+        'title' => $this->t('Attach files'),
       ],
     ];
 
@@ -613,6 +590,8 @@ class AIChatBlockForm extends FormBase {
         'class' => ['ai-moody-assistant__composer-file-input'],
         'type' => 'file',
         'name' => 'attachments[]',
+        'tabindex' => '-1',
+        'aria-label' => $this->t('Attach files'),
         'multiple' => 'multiple',
         'accept' => implode(',', array_map(static fn(string $extension): string => '.' . $extension, AIAssetCreator::ALLOWED_UPLOAD_EXTENSIONS)),
         'data-max-files' => AiGenerationService::MAX_ATTACHMENTS,
@@ -740,7 +719,7 @@ class AIChatBlockForm extends FormBase {
       '#tag' => 'p',
       '#value' => $ui['privacyNotice'],
       '#attributes' => [
-        'class' => ['ai-moody-assistant__privacy-notice', 'moody-ai-ui__privacy'],
+        'class' => ['ai-moody-assistant__privacy-notice'],
       ],
     ];
 
@@ -757,6 +736,33 @@ class AIChatBlockForm extends FormBase {
       '#button_type' => 'primary',
       '#disabled' => !empty($budget_summary['is_exhausted']),
     ];
+
+    // Keep visual and keyboard order together; containers do not alter values.
+    $form['composer'] = [
+      '#type' => 'container',
+      '#weight' => 20,
+      '#attributes' => ['class' => ['ai-moody-assistant__composer']],
+      'prompt' => $form['selected_block_references'],
+      'toolbar' => [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['ai-moody-assistant__composer-toolbar']],
+        'attach' => $form['attachments']['input']['dropzone'],
+        'uploads' => $form['attachments']['previous_uploads'],
+        'controls' => $form['composer_controls'],
+        'actions' => $form['actions'],
+      ],
+      'files' => $form['attachments']['input']['file_list'],
+      'tools' => $form['utility_links'],
+    ];
+    $form['composer']['toolbar']['uploads']['#attributes']['aria-label'] = $this->t('Previous uploads (@count)', ['@count' => count($previous_uploads)]);
+    $form['composer']['toolbar']['uploads']['#attributes']['title'] = $this->t('Previous uploads');
+    // Keep upload validation feedback outside the compact icon target.
+    $form['composer']['upload_hint'] = $form['composer']['toolbar']['attach']['hint'];
+    $form['composer']['upload_hint']['#attributes']['role'] = 'status';
+    $form['composer']['upload_hint']['#attributes']['aria-live'] = 'polite';
+    unset($form['composer']['toolbar']['attach']['hint']);
+    $form['privacy_notice']['#weight'] = 30;
+    unset($form['selected_block_references'], $form['attachments'], $form['composer_controls'], $form['actions'], $form['utility_links']);
 
     return $form;
   }
@@ -916,6 +922,7 @@ class AIChatBlockForm extends FormBase {
     $model = (string) $form_state->getValue('model');
     $runtime_context = [
       'is_layout_builder_context' => (bool) $form_state->getValue('is_layout_builder_context'),
+      'edit_component_uuid' => trim((string) $form_state->getValue('edit_component_uuid')),
       'selected_block_references' => $this->extractSelectedBlockReferences((string) $form_state->getValue('selected_block_references_json')),
       'prefer_ai_images' => (bool) $form_state->getValue('prefer_ai_images'),
       'provider' => $provider,

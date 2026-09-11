@@ -95,10 +95,15 @@ class LayoutContextCollector {
    */
   public function collectEntityContext(ContentEntityInterface $entity, array $runtime_context = []) {
     $components = [];
+    $edit_uuid = (string) ($runtime_context['edit_component_uuid'] ?? '');
     $section_storage = $this->getResolvedSectionStorage($entity, $runtime_context);
     if ($section_storage && $section_storage->count() > 0) {
       foreach ($section_storage->getSections() as $section_delta => $section) {
         foreach ($section->getComponents() as $component) {
+          // A directed edit never loads the other blocks into its context.
+          if ($edit_uuid !== '' && $component->getUuid() !== $edit_uuid) {
+            continue;
+          }
           $configuration = (array) $component->get('configuration');
           $component_data = [
             'uuid' => $component->getUuid(),
@@ -107,6 +112,12 @@ class LayoutContextCollector {
             'plugin_id' => $configuration['id'] ?? '',
             'label' => $configuration['label'] ?? '',
           ];
+          if ($edit_uuid !== '') {
+            if (!empty($configuration['block_serialized'])) {
+              throw new \InvalidArgumentException('Save the layout first so this new or manually edited block has a stored revision, then choose Edit with AI.');
+            }
+            $component_data['configuration_hash'] = hash('sha256', serialize($configuration));
+          }
 
           if (!empty($configuration['block_revision_id']) && str_starts_with((string) ($configuration['id'] ?? ''), 'inline_block:')) {
             $block_revision = $this->entityTypeManager->getStorage('block_content')->loadRevision($configuration['block_revision_id']);
@@ -144,6 +155,38 @@ class LayoutContextCollector {
       'selected_block_references' => $selected_references,
       'selected_existing_block_references' => $this->resolveSelectedBlockReferences($components, array_values(array_unique($selected_ids))),
     ];
+  }
+
+  /**
+   * Resolves one editable inline placement from trusted, current draft data.
+   */
+  public function collectBlockEditContext(ContentEntityInterface $entity, array $runtime_context, \Drupal\Core\Session\AccountInterface $account): array {
+    $uuid = (string) ($runtime_context['edit_component_uuid'] ?? '');
+    if (!\Drupal\Component\Uuid\Uuid::isValid($uuid) || empty($runtime_context['is_layout_builder_context'])) {
+      throw new \InvalidArgumentException('Choose Edit with AI from a block in Layout Builder.');
+    }
+    $storage = $this->getResolvedSectionStorage($entity, $runtime_context);
+    if (!$account->hasPermission('use moody ai assistant') || !$entity->access('update', $account) || !$storage || !$storage->access('update', $account)) {
+      throw new \InvalidArgumentException('You do not have permission to edit this layout with AI.');
+    }
+    $context = $this->collectEntityContext($entity, $runtime_context);
+    $target = $context['existing_components'][0] ?? [];
+    if (empty($target['block_revision_id']) || empty($target['block_type'])) {
+      throw new \InvalidArgumentException('This block is no longer available for AI editing. Use its traditional Edit form.');
+    }
+    $block = $this->entityTypeManager->getStorage('block_content')->loadRevision($target['block_revision_id']);
+    $block->setAccessDependency($entity);
+    if (!$block->access('update', $account)) {
+      throw new \InvalidArgumentException('You do not have permission to edit this block.');
+    }
+    // Ignore client-supplied labels, bundles, additional tokens and revisions.
+    $context['selected_existing_block_references'] = [$target];
+    $context['selected_block_references'] = [$target + [
+      'reference_id' => $uuid,
+      'selection_mode' => 'edit',
+      'can_edit' => TRUE,
+    ]];
+    return $context;
   }
 
   /**
@@ -298,8 +341,13 @@ class LayoutContextCollector {
       return NULL;
     }
 
-    if ($this->layoutTempstoreRepository->has($section_storage)) {
-      return $this->layoutTempstoreRepository->get($section_storage);
+    // A model request can outlive another browser's draft update. Do not use
+    // LayoutTempstoreRepository's per-request cache for focused edits.
+    $repository = !empty($runtime_context['edit_component_uuid'])
+      ? new \Drupal\layout_builder\LayoutTempstoreRepository(\Drupal::service('tempstore.shared'))
+      : $this->layoutTempstoreRepository;
+    if ($repository->has($section_storage)) {
+      return $repository->get($section_storage);
     }
 
     return $section_storage;

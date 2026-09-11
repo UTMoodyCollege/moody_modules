@@ -57,3 +57,19 @@ function moody_ai_assistant_page_bottom(array &$page_bottom): void {
 
   $page_bottom['moody_ai_assistant'] = $assistant->build();
 }
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function moody_ai_assistant_preprocess_block(array &$variables): void {
+  $element = $variables['elements'] ?? [];
+  $configuration = $element['#configuration'] ?? [];
+  $plugin_id = (string) ($configuration['id'] ?? '');
+  if (empty($element['#contextual_links']['layout_builder_block']) || !str_starts_with($plugin_id, 'inline_block:') || empty($configuration['block_revision_id']) || !empty($configuration['block_serialized'])) {
+    return;
+  }
+  // Include newly added placements without rebuilding the assistant's picker.
+  // These are presentation hints only; the server resolves and authorizes UUIDs.
+  $variables['attributes']['data-ai-assistant-edit-block-type'] = substr($plugin_id, strlen('inline_block:'));
+  $variables['attributes']['data-ai-assistant-edit-block-label'] = (string) ($configuration['label'] ?? t('Selected block'));
+}

@@ -299,6 +299,11 @@ class AIChatManager {
       if ($uploaded_assets) {
         $context['uploaded_assets'] = $uploaded_assets;
       }
+      if (($runtime_context['edit_component_uuid'] ?? '') !== '') {
+        return $this->executeBlockEditStream($entity, $thread, $message, $context, [
+          'target_component_uuid' => $runtime_context['edit_component_uuid'],
+        ], static function () {}, static function () {}, $runtime_context, $uploaded_assets);
+      }
       if ($plugin_references = $this->getSelectedNewPluginReferences($context)) {
         return $this->preparePluginComponentGuide($thread, $plugin_references);
       }
@@ -592,6 +597,17 @@ class AIChatManager {
     $context = $this->collectPageContext($entity, $account, $runtime_context);
     if ($uploaded_assets) {
       $context['uploaded_assets'] = $uploaded_assets;
+    }
+    if (($runtime_context['edit_component_uuid'] ?? '') !== '') {
+      $emit('Editing the selected block...');
+      $result = $this->executeBlockEditStream($entity, $thread, $message, $context, [
+        'target_component_uuid' => $runtime_context['edit_component_uuid'],
+      ], $event_callback, $ping, $runtime_context, $uploaded_assets);
+      $event_callback('complete', [
+        'status_message' => (string) $result['status_message'],
+        'preserve_page' => TRUE,
+      ]);
+      return $result;
     }
     if ($plugin_references = $this->getSelectedNewPluginReferences($context)) {
       $emit('Preparing the selected component guidance...');
@@ -1036,6 +1052,9 @@ class AIChatManager {
    * Collects page layout and current-user access context for one request.
    */
   protected function collectPageContext(ContentEntityInterface $entity, AccountInterface $account, array $runtime_context = []) {
+    if (($runtime_context['edit_component_uuid'] ?? '') !== '') {
+      return $this->layoutContextCollector->collectBlockEditContext($entity, $runtime_context, $account);
+    }
     $context = $this->layoutContextCollector->collectEntityContext($entity, $runtime_context);
     $context['available_block_references'] = $this->blockReferenceCatalog->getAvailableReferences($entity, $runtime_context);
     $context['user_access'] = $this->userCapabilityCollector->collect($account, $entity);
@@ -1654,6 +1673,13 @@ class AIChatManager {
         'block_tools' => $context['block_tools'] ?? [],
       ], $stream_callback);
       $changes = $this->buildInstructionChangePreview($block, $existing_instruction, $instructions);
+      if (!empty($runtime_context['edit_component_uuid'])) {
+        $current = $this->layoutContextCollector->collectBlockEditContext($entity, $runtime_context, \Drupal::currentUser());
+        if (($current['existing_components'][0]['configuration_hash'] ?? '') !== ($target_component['configuration_hash'] ?? '')) {
+          throw new \InvalidArgumentException('This block changed while AI was working. No edit was applied; retry against the current block.');
+        }
+        $runtime_context['expected_component_hash'] = $target_component['configuration_hash'];
+      }
       $updated_block = $this->blockParser->updateBlockFromInstructions($block, $instructions, $entity);
       $placement = $this->layoutPlacementManager->updateInlineBlockComponent($entity, $target_component['uuid'], $updated_block, $runtime_context);
 

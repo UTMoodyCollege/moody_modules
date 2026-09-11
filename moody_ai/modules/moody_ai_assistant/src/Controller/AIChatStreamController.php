@@ -137,6 +137,7 @@ class AIChatStreamController extends ControllerBase {
     $runtime_context = [
       'site_host' => $request->getHost(),
       'is_layout_builder_context' => $this->toBoolean($request->request->get('is_layout_builder_context')),
+      'edit_component_uuid' => trim((string) $request->request->get('edit_component_uuid', '')),
       'prefer_ai_images' => $this->toBoolean($request->request->get('prefer_ai_images')),
       'selected_block_references' => $this->extractSelectedBlockReferences((string) $request->request->get('selected_block_references_json', '[]')),
       'provider' => $provider,
