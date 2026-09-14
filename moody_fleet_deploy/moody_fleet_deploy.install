@@ -157,6 +157,13 @@ function moody_fleet_deploy_update_9017() {
 }
 
 /**
+ * Enable scheduled publishing UI and Drush processor (no automatic Live runs).
+ */
+function moody_fleet_deploy_update_9018() {
+  \Drupal::service('module_installer')->install(['moody_scheduled_publishing'], TRUE);
+}
+
+/**
  * Enables Masquerade without granting it to any role.
  */
 function _moody_fleet_deploy_enable_masquerade() {

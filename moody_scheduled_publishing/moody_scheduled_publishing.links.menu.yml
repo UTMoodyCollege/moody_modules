@@ -1,0 +1,6 @@
+moody_scheduled_publishing.dashboard:
+  title: 'Scheduled Publishing'
+  description: 'Manage publication schedules and review publishing history.'
+  route_name: moody_scheduled_publishing.dashboard
+  parent: system.admin_content
+  weight: 15

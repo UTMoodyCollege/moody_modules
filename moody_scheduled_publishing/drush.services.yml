@@ -1,0 +1,6 @@
+services:
+  drush.commands.moody_scheduled_publishing:
+    class: Drupal\moody_scheduled_publishing\Commands\ScheduledPublishingCommands
+    arguments: ['@moody_scheduled_publishing.scheduler']
+    tags:
+      - { name: drush.command }

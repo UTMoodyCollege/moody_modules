@@ -1,0 +1,126 @@
+<?php
+
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function moody_scheduled_publishing_form_node_form_alter(array &$form, FormStateInterface $form_state): void {
+  $node = $form_state->getFormObject()->getEntity();
+  $scheduler = \Drupal::service('moody_scheduled_publishing.scheduler');
+  if (!$node instanceof NodeInterface || !$scheduler->canSchedule($node, \Drupal::currentUser())) {
+    return;
+  }
+  $schedule = $node->isNew() ? NULL : $scheduler->get((int) $node->id());
+  if (!$form_state->has('moody_schedule_token')) {
+    $form_state->set('moody_schedule_token', $scheduler->token((int) $node->id()));
+  }
+  $active = $schedule && in_array($schedule->state, ['pending', 'blocked'], TRUE);
+  $timezone = date_default_timezone_get();
+  $form['moody_schedule'] = [
+    '#type' => 'details', '#title' => t('Scheduled publishing'), '#tree' => TRUE, '#group' => 'footer',
+    '#open' => (bool) $active, '#weight' => ($form['status']['#weight'] ?? 100) + 0.1,
+    '#description' => t('Leave Published unchecked to schedule this page. The latest saved default revision will be published on the next processing run after this time. Unsaved Layout Builder changes are not included. Times use @zone.', ['@zone' => $timezone]),
+  ];
+  $form['moody_schedule']['enabled'] = [
+    '#type' => 'checkbox', '#title' => t('Schedule publication'), '#default_value' => (bool) $active,
+    '#description' => t('Uncheck and save to cancel an existing schedule.'),
+  ];
+  $form['moody_schedule']['at'] = [
+    '#type' => 'datetime', '#title' => t('Publish on'), '#date_timezone' => $timezone,
+    '#default_value' => $active ? DrupalDateTime::createFromTimestamp((int) $schedule->publish_at, $timezone) : NULL,
+    '#states' => ['visible' => [':input[name="moody_schedule[enabled]"]' => ['checked' => TRUE]]],
+  ];
+  if ($active && $schedule->state === 'blocked') {
+    $form['moody_schedule']['blocked'] = ['#markup' => '<p>' . t('This schedule needs attention. Check access and revisions, choose a new future time, and save to retry.') . '</p>'];
+  }
+  // Preserve unrelated saves: only normal Save actions that actually save nodes.
+  foreach ($form['actions'] as &$action) {
+    if (is_array($action) && in_array('::save', $action['#submit'] ?? [], TRUE)) {
+      $action['#validate'] = $action['#validate'] ?? $form['#validate'] ?? [];
+      $action['#validate'][] = 'moody_scheduled_publishing_validate';
+      $action['#submit'][] = 'moody_scheduled_publishing_submit';
+    }
+  }
+}
+
+/**
+ * Validate scheduling before the content save.
+ */
+function moody_scheduled_publishing_validate(array &$form, FormStateInterface $form_state): void {
+  $node = $form_state->getFormObject()->buildEntity($form, $form_state);
+  $scheduler = \Drupal::service('moody_scheduled_publishing.scheduler');
+  if (!$node->isNew() && $form_state->get('moody_schedule_token') !== $scheduler->token((int) $node->id())) {
+    $form_state->setError($form['moody_schedule'], t('The schedule changed since you opened this form. Reload before saving.'));
+  }
+  $values = $form_state->getValue('moody_schedule', []);
+  if (empty($values['enabled'])) {
+    return;
+  }
+  $at = $values['at'] ?? NULL;
+  if (!$at instanceof DrupalDateTime || $at->hasErrors() || $at->getTimestamp() <= time()) {
+    $form_state->setError($form['moody_schedule']['at'], t('Choose a valid future publication date and time.'));
+  }
+  if ($node->isPublished()) {
+    $form_state->setError($form['moody_schedule']['enabled'], t('Uncheck Published before scheduling publication.'));
+  }
+  if (!\Drupal::service('moody_scheduled_publishing.scheduler')->canSchedule($node, \Drupal::currentUser())) {
+    $form_state->setError($form['moody_schedule'], t('You do not have access to schedule this content.'));
+  }
+}
+
+/**
+ * Persist only after Drupal has successfully saved the node.
+ */
+function moody_scheduled_publishing_submit(array &$form, FormStateInterface $form_state): void {
+  $node = $form_state->getFormObject()->getEntity();
+  $values = $form_state->getValue('moody_schedule', []);
+  try {
+    \Drupal::service('moody_scheduled_publishing.scheduler')->schedule(
+      (int) $node->id(), empty($values['enabled']) ? NULL : $values['at']->getTimestamp(), \Drupal::currentUser(), $form_state->get('moody_schedule_token'),
+    );
+  }
+  catch (\RuntimeException | \InvalidArgumentException $e) {
+    \Drupal::messenger()->addError(t('Content saved, but the publication schedule was not changed: @reason', ['@reason' => $e->getMessage()]));
+  }
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function moody_scheduled_publishing_node_update(NodeInterface $node): void {
+  \Drupal::service('moody_scheduled_publishing.scheduler')->reconcile($node);
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function moody_scheduled_publishing_node_delete(NodeInterface $node): void {
+  \Drupal::service('moody_scheduled_publishing.scheduler')->reconcile($node, TRUE);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_trash_delete() for sites using soft deletion.
+ */
+function moody_scheduled_publishing_node_trash_delete(NodeInterface $node): void {
+  \Drupal::service('moody_scheduled_publishing.scheduler')->reconcile($node, TRUE);
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function moody_scheduled_publishing_toolbar(): array {
+  return ['moody_scheduled_publishing' => [
+    '#type' => 'toolbar_item', '#weight' => 102,
+    '#access' => \Drupal::currentUser()->hasPermission('access content overview'),
+    '#cache' => ['contexts' => ['user.permissions']],
+    'tab' => [
+      '#type' => 'link', '#title' => t('Scheduled Publishing'),
+      '#url' => Url::fromRoute('moody_scheduled_publishing.dashboard'),
+      '#attributes' => ['class' => ['toolbar-icon', 'toolbar-icon-system-admin-content']],
+    ],
+  ]];
+}

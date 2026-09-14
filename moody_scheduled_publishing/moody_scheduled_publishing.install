@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function moody_scheduled_publishing_schema(): array {
+  $integer = ['type' => 'int', 'not null' => TRUE, 'default' => 0];
+  return [
+    'moody_publish_schedule' => [
+      'description' => 'One current publication schedule per node.',
+      'fields' => [
+        'nid' => $integer,
+        'uid' => $integer,
+        'publish_at' => $integer,
+        'changed' => $integer,
+        'state' => ['type' => 'varchar', 'length' => 20, 'not null' => TRUE],
+      ],
+      'primary key' => ['nid'],
+      'indexes' => ['due' => ['state', 'publish_at']],
+    ],
+    'moody_publish_event' => [
+      'description' => 'Append-only scheduling history; no copied page content.',
+      'fields' => [
+        'id' => ['type' => 'serial', 'not null' => TRUE],
+        'nid' => $integer,
+        'uid' => $integer,
+        'created' => $integer,
+        'publish_at' => $integer,
+        'revision_id' => $integer,
+        'event' => ['type' => 'varchar', 'length' => 32, 'not null' => TRUE],
+      ],
+      'primary key' => ['id'],
+      'indexes' => ['node_history' => ['nid', 'id'], 'event_time' => ['event', 'created']],
+    ],
+  ];
+}

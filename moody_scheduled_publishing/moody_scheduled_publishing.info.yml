@@ -1,0 +1,8 @@
+name: Moody Scheduled Publishing
+type: module
+description: 'Schedule content publication using normal editing access, with an audit history.'
+package: Moody
+core_version_requirement: '^10.3 || ^11'
+dependencies:
+  - drupal:node
+  - drupal:toolbar

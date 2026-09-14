@@ -1,0 +1,3 @@
+services:
+  moody_scheduled_publishing.scheduler:
+    class: Drupal\moody_scheduled_publishing\Scheduler

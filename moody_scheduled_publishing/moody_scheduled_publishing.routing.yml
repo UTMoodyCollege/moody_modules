@@ -1,0 +1,9 @@
+moody_scheduled_publishing.dashboard:
+  path: '/admin/content/scheduled-publishing'
+  defaults:
+    _controller: '\Drupal\moody_scheduled_publishing\Controller\Dashboard::build'
+    _title: 'Scheduled Publishing'
+  requirements:
+    _permission: 'access content overview'
+  options:
+    _admin_route: true
