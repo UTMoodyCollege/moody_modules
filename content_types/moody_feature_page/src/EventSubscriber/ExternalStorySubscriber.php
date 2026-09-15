@@ -3,6 +3,7 @@
 namespace Drupal\moody_feature_page\EventSubscriber;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\moody_feature_page\ExternalStory;
 use Drupal\node\NodeInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Shows the external story notice only on the accessible canonical HTML page.
+ * Redirects visitors from accessible canonical HTML pages to external stories.
  */
 class ExternalStorySubscriber implements EventSubscriberInterface {
 
@@ -37,16 +38,24 @@ class ExternalStorySubscriber implements EventSubscriberInterface {
       return;
     }
 
-    // The legacy Redirect-record subscriber must not replace this opt-in notice.
+    // The legacy Redirect-record subscriber must not replace this opt-in flow.
     $request->attributes->set('_moody_external_story', TRUE);
-    $event->setController(static function () use ($node, $url): array {
+    $event->setController(static function () use ($node, $url) {
       $edit_access = $node->access('update', NULL, TRUE);
+      if ($node->isPublished() && !$edit_access->isAllowed()) {
+        // Only the saved destination may control this redirect, not ?destination=.
+        \Drupal::service('redirect_response_subscriber')->setIgnoreDestination();
+        $response = new TrustedRedirectResponse($url, 302);
+        $response->addCacheableDependency($node);
+        $response->addCacheableDependency($edit_access);
+        $response->getCacheableMetadata()->addCacheContexts(['url.site']);
+        return $response;
+      }
       $build = [
         '#theme' => 'moody_feature_external_story',
         '#title' => $node->label(),
         '#destination' => $url,
         '#host' => parse_url($url, PHP_URL_HOST),
-        '#automatic' => $node->isPublished() && !$edit_access->isAllowed(),
         '#attached' => ['library' => ['moody_feature_page/external_story']],
         '#cache' => ['contexts' => ['url.site']],
       ];

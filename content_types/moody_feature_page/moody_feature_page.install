@@ -39,7 +39,7 @@ function _moody_feature_page_install_external_fields() {
     'field_feature_external_url' => [
       'type' => 'string',
       'label' => 'External story URL',
-      'description' => 'Enter the complete https:// URL of the story on the affiliated site. Visitors will see a notice with a link and an option to stop automatic forwarding. Do not link back to this site.',
+      'description' => 'Enter the complete https:// URL of the story on the affiliated site. Published stories redirect visitors immediately; editor previews remain here. Do not link back to this site.',
       'settings' => ['max_length' => 2048],
       'default_value' => [],
       'widget' => 'string_textfield',

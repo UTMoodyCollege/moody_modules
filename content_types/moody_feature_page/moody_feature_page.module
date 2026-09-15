@@ -18,7 +18,7 @@ function moody_feature_page_theme($existing, $type, $theme, $path)
 {
   return [
     'moody_feature_external_story' => [
-      'variables' => ['destination' => '', 'host' => '', 'automatic' => FALSE],
+      'variables' => ['destination' => '', 'host' => ''],
     ],
     'moody_feature_page_hero' => [
       'variables' => [
@@ -85,6 +85,7 @@ function moody_feature_page_form_node_form_alter(&$form, \Drupal\Core\Form\FormS
   $form['field_feature_external']['#weight'] = 1;
   $form['field_feature_external_url']['#weight'] = 2;
   $input = &$form['field_feature_external_url']['widget'][0]['value'];
+  $input['#description'] = t('Enter the complete https:// URL of the affiliated story. Published stories redirect visitors immediately; editor previews remain here. Do not link back to this site.');
   $input['#type'] = 'url';
   $input['#placeholder'] = 'https://';
   $input['#states']['required'] = [':input[name="field_feature_external[value]"]' => ['checked' => TRUE]];

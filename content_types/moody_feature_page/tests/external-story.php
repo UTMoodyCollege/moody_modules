@@ -55,12 +55,23 @@ try {
   $event = $eventFor();
   $subscriber->onController($event);
   $build = ($event->getController())();
-  $check($build['#automatic'] === TRUE, 'Published visitor notice should forward.');
+  $check($build instanceof \Drupal\Core\Routing\TrustedRedirectResponse, 'Published visitors need an HTTP redirect.');
+  $check($build->getStatusCode() === 302 && $build->getTargetUrl() === 'https://news.utexas.edu/story', 'Immediate destination or status incorrect.');
+  $request = $event->getRequest();
+  $request->query->set('destination', '/node/123');
+  $response_event = new \Symfony\Component\HttpKernel\Event\ResponseEvent(\Drupal::service('http_kernel'), $request, HttpKernelInterface::MAIN_REQUEST, $build);
+  \Drupal::service('redirect_response_subscriber')->checkRedirectUrl($response_event);
+  $check($response_event->getResponse()->getTargetUrl() === 'https://news.utexas.edu/story', 'Query parameter replaced saved destination.');
+  $check(in_array('url.site', $build->getCacheableMetadata()->getCacheContexts(), TRUE), 'Redirect cache must vary by site.');
+  $node->set('field_feature_external_url', 'https://news.utexas.edu/story?a=1&b=2#section');
+  $event = $eventFor();
+  $subscriber->onController($event);
+  $check(($event->getController())()->getTargetUrl() === 'https://news.utexas.edu/story?a=1&b=2#section', 'Destination query or fragment changed.');
   $check($event->getRequest()->attributes->get('_moody_external_story'), 'Legacy redirect guard missing.');
   $node->setUnpublished();
   $event = $eventFor();
   $subscriber->onController($event);
-  $check(($event->getController())()['#automatic'] === FALSE, 'Unpublished preview must not forward.');
+  $check(is_array(($event->getController())()), 'Unpublished preview must not forward.');
   $node->set('field_feature_external', 0);
   $event = $eventFor();
   $subscriber->onController($event);
@@ -69,6 +80,17 @@ try {
   $event = $eventFor();
   $subscriber->onController($event);
   $check($event->getController() === $original, 'Same-site loop must not forward.');
+}
+finally {
+  \Drupal::service('redirect_response_subscriber')->setIgnoreDestination(FALSE);
+  $switcher->switchBack();
+}
+$switcher->switchTo(\Drupal\user\Entity\User::load(1));
+try {
+  $node->setPublished()->set('field_feature_external_url', 'https://news.utexas.edu/story');
+  $event = $eventFor();
+  $subscriber->onController($event);
+  $check(is_array(($event->getController())()), 'Editor preview must not redirect.');
 }
 finally {
   $switcher->switchBack();

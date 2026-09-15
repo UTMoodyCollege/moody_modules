@@ -3,11 +3,6 @@ external_story:
   css:
     theme:
       css/external-story.css: {}
-  js:
-    js/external-story.js: {}
-  dependencies:
-    - core/drupal
-    - core/once
 
 moody_feature_hero:
   version: 1.x

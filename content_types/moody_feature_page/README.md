@@ -7,11 +7,11 @@ on an affiliated site. Keep the local title, thumbnail, categories, date and
 body summary for existing news Views, Editors Picks and other cards. They still
 link to the local node; no listing changes or separate Redirect record are needed.
 
-The canonical HTML page shows a friendly destination notice and **Read the
-story** link. Published pages automatically forward visitors after 20 seconds;
-**Stay on this page** stops forwarding. Backgrounding the tab also stops it.
-Without JavaScript the link remains usable. Editors with update access and
-unpublished previews do not automatically forward. Edit, Layout, revisions,
+Published canonical HTML pages immediately redirect visitors with an HTTP 302;
+there is no countdown or JavaScript dependency. Destination URLs are preserved
+unchanged, including query strings and fragments. Editors with update access and
+unpublished previews retain the destination notice and **Read the story** link
+without automatically forwarding. Edit, Layout, revisions,
 API responses and embedded node rendering retain their normal behavior.
 
 Both settings belong to the node and follow its revisions/translations. The
@@ -30,5 +30,4 @@ After updating a local Drupal site, run the read-only smoke check:
 
 ```sh
 ddev drush php:script web/modules/custom/moody_modules/content_types/moody_feature_page/tests/external-story.php
-node web/modules/custom/moody_modules/content_types/moody_feature_page/tests/external-story-js.cjs
 ```
