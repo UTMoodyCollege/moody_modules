@@ -1,0 +1,57 @@
+core.entity_view_display.*.*.*.third_party.moody_layout_restrictions:
+  type: sequence
+  label: 'Layout Builder Restrictions plugin configuration'
+  sequence:
+    type: moody_layout_restrictions.[%key]
+
+moody_layout_restrictions.entity_view_mode_restriction:
+  type: mapping
+  label: 'Per-view-mode Layout Builder Restrictions settings'
+  mapping:
+    whitelisted_blocks:
+      type: ignore
+      label: 'Inert pre-3.x allowlist, retained without reactivating'
+    blacklisted_blocks:
+      type: ignore
+      label: 'Inert pre-3.x denylist, retained without reactivating'
+    allowed_blocks:
+      type: ignore
+      label: 'Inert historical rules, retained without reactivating'
+    allowed_layouts:
+      type: sequence
+      label: 'Allowed layouts'
+      sequence:
+        type: string
+        label: 'Layout ID'
+    denylisted_blocks:
+      type: sequence
+      label: 'Denylisted blocks by category'
+      sequence:
+        type: sequence
+        label: 'Denylisted blocks'
+        sequence:
+          type: string
+          label: 'Block ID'
+    allowlisted_blocks:
+      type: sequence
+      label: 'Allowlisted blocks by category'
+      sequence:
+        type: sequence
+        label: 'Allowlisted blocks'
+        sequence:
+          type: string
+          label: 'Block ID'
+    restricted_categories:
+      type: sequence
+      label: 'Categories which disallow all blocks'
+      sequence:
+        type: string
+        label: 'Category ID'
+
+
+moody_layout_restrictions.allowed_block_categories:
+  type: sequence
+  label: 'Categories which have no block restrictions'
+  sequence:
+    type: string
+    label: 'Category machine name'

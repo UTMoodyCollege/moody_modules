@@ -20,7 +20,7 @@ dependencies:
   - 'drupal:user'
   - 'drupal:views'
   - 'faculty_bio_content_type:faculty_bio_content_type'
-  - 'layout_builder_restrictions:layout_builder_restrictions'
+  - 'moody_layout_restrictions:moody_layout_restrictions'
   - 'moody_grad_profile:moody_grad_profile'
   - 'page_title_visibility:page_title_visibility'
   - 'pathauto:pathauto'

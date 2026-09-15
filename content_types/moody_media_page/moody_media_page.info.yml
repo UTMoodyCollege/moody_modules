@@ -19,7 +19,7 @@ dependencies:
   - 'drupal:user'
   - 'drupal:views'
   - 'faculty_bio_content_type:faculty_bio_content_type'
-  - 'layout_builder_restrictions:layout_builder_restrictions'
+  - 'moody_layout_restrictions:moody_layout_restrictions'
   - 'moody_landing_page:moody_landing_page'
   - 'moody_media_page:moody_media_page'
   - 'moody_multimedia_directors:moody_multimedia_directors'

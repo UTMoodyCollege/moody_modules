@@ -14,7 +14,7 @@ dependencies:
   - 'drupal:path'
   - 'drupal:text'
   - 'drupal:user'
-  - 'layout_builder_restrictions:layout_builder_restrictions'
+  - 'moody_layout_restrictions:moody_layout_restrictions'
   - 'metatag:metatag'
   - 'moody_landing_page:moody_landing_page'
   - 'moody_standard_page:moody_standard_page'

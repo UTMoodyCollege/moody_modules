@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function moody_layout_restrictions_install(): void {
+  \Drupal\moody_layout_restrictions\Restrictions::migrate();
+}

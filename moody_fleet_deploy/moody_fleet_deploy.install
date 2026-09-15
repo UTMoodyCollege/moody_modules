@@ -9,6 +9,7 @@
  * Implements hook_install().
  */
 function moody_fleet_deploy_install() {
+  \Drupal::service('module_installer')->install(['moody_layout_restrictions']);
   _moody_fleet_deploy_enable_inner_rail_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_on_flex_html();
   _moody_fleet_deploy_enable_nice_letter_toolbar_on_flex_html();
@@ -25,6 +26,14 @@ function moody_fleet_deploy_install() {
   _moody_fleet_deploy_install_speedway_theme();
   _moody_fleet_deploy_place_moody_required_links_block();
   _moody_fleet_deploy_enable_masquerade();
+}
+
+/**
+ * Preserve active Layout Builder rules before Drupal Kit retires Restrictions.
+ */
+function moody_fleet_deploy_update_9019() {
+  \Drupal::service('module_installer')->install(['moody_layout_restrictions']);
+  \Drupal\moody_layout_restrictions\Restrictions::migrate();
 }
 
 /**

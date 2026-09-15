@@ -1,0 +1,7 @@
+name: Moody Layout Restrictions
+type: module
+description: Preserves per-display Layout Builder rules using Drupal core hooks.
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:layout_builder

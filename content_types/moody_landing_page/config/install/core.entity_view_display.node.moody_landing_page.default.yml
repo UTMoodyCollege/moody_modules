@@ -9,7 +9,7 @@ dependencies:
     - node.type.moody_landing_page
   module:
     - layout_builder
-    - layout_builder_restrictions
+    - moody_layout_restrictions
     - layout_discovery
     - metatag
     - user
@@ -50,7 +50,7 @@ third_party_settings:
             weight: 2
             additional: {  }
         third_party_settings: {  }
-  layout_builder_restrictions:
+  moody_layout_restrictions:
     allowed_block_categories: {  }
     entity_view_mode_restriction:
       allowed_layouts:

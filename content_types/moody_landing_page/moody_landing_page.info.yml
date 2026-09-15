@@ -15,7 +15,7 @@ dependencies:
   - 'drupal:taxonomy'
   - 'drupal:text'
   - 'drupal:user'
-  - 'layout_builder_restrictions:layout_builder_restrictions'
+  - 'moody_layout_restrictions:moody_layout_restrictions'
   - 'metatag:metatag'
   - 'moody_landing_page:moody_landing_page'
   - 'page_title_visibility:page_title_visibility'

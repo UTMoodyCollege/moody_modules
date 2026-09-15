@@ -1,0 +1,5 @@
+services:
+  drush.commands.moody_layout_restrictions:
+    class: Drupal\moody_layout_restrictions\Commands\RestrictionCommands
+    tags:
+      - { name: drush.command }

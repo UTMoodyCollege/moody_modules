@@ -42,7 +42,7 @@ dependencies:
   - 'google_tag:google_tag'
   - 'iframe_title_filter:iframe_title_filter'
   - 'layout_builder_iframe_modal:layout_builder_iframe_modal'
-  - 'layout_builder_restrictions:layout_builder_restrictions'
+  - 'moody_layout_restrictions:moody_layout_restrictions'
   - 'layout_builder_styles:layout_builder_styles'
   - 'linkit:linkit'
   - 'media_library_form_element:media_library_form_element'
