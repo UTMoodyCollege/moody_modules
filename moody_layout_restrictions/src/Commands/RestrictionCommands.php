@@ -24,7 +24,7 @@ final class RestrictionCommands extends DrushCommands {
         throw new \RuntimeException('Unmigrated display: ' . $id);
       }
       $migrated += (bool) $display->getThirdPartySettings('moody_layout_restrictions');
-      $before[$id] = $display->toArray();
+      $before[$id] = \Drupal::config('core.entity_view_display.' . $id)->getRawData();
     }
     $legacy = 'layout_builder_restrictions';
     if ($options['uninstall-legacy'] && \Drupal::moduleHandler()->moduleExists($legacy)) {
@@ -36,11 +36,10 @@ final class RestrictionCommands extends DrushCommands {
       if (!\Drupal::service('module_installer')->uninstall([$legacy], FALSE)) {
         throw new \RuntimeException('Legacy uninstall did not succeed.');
       }
-      $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
-      $storage->resetCache();
+      \Drupal::configFactory()->reset();
       foreach ($before as $id => $data) {
-        // Section objects are reloaded instances; compare their values, not identity.
-        if ($storage->load($id)?->toArray() != $data) {
+        // Compare persisted config, not hydrated entities with plugin caches.
+        if (\Drupal::config('core.entity_view_display.' . $id)->getRawData() !== $data) {
           throw new \RuntimeException('Display changed during uninstall: ' . $id);
         }
       }
