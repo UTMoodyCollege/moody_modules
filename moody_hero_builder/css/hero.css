@@ -18,6 +18,11 @@
 .mhb-scheme--orange { --mhb-bg: var(--mhb-orange-dark); --mhb-fg: var(--mhb-white); --mhb-cta-bg: var(--mhb-white); --mhb-cta-fg: var(--mhb-orange-dark); }
 .mhb-media { position: relative; min-width: 0; min-height: 0; aspect-ratio: 16 / 9; overflow: clip; }
 .mhb-media img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--mhb-mobile-focal-x, 50%) var(--mhb-mobile-focal-y, 50%); }
+.mhb-media iframe { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 0; pointer-events: none; max-width: none; }
+.mhb-hero .mhb-video-toggle { position: absolute; bottom: .75rem; right: .75rem; z-index: 2; min-height: 44px; padding: .5rem .75rem; border: 2px solid white; background: #222; color: white; font: 700 1rem/1.4 var(--mhb-sans); }
+.mhb-hero .mhb-video-toggle:is(:hover, :focus) { background: #000; color: #fff; }
+.mhb-hero .mhb-video-toggle:focus-visible { outline: 3px solid #bf5700; outline-offset: 3px; }
+.mhb-hero .mhb-video-toggle[hidden] { display: none; }
 .mhb-media::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: var(--mhb-overlay-opacity, .35); }
 .mhb-overlay--charcoal .mhb-media::after { background: var(--mhb-ink); }
 .mhb-overlay--orange .mhb-media::after { background: var(--mhb-orange); }

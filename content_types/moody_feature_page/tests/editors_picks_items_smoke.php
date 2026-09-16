@@ -63,4 +63,18 @@ if (($rebuild[0]['image'] ?? '') !== '42' || ($rebuild[1]['node'] ?? '') !== '77
   throw new RuntimeException('Raw AJAX media and autocomplete values were not preserved.');
 }
 
+foreach ([
+  '"Sales team ""Rookie of the year"" (2237)"',
+  'Sales team "Rookie of the year" (2237)',
+  '"A title, with a comma (2237)"',
+  'A title (2026) and another number (2237)',
+] as $label) {
+  $normalized = _moody_feature_page_normalize_editors_picks_items([
+    ['details' => ['type' => 'node', 'node' => $label]],
+  ]);
+  if ($normalized !== [['type' => 'node', 'node' => '2237']]) {
+    throw new RuntimeException('Quoted autocomplete selection was lost: ' . $label);
+  }
+}
+
 print "Editor's Picks item smoke test passed.\n";

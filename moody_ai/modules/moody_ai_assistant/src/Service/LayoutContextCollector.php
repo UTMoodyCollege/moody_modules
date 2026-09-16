@@ -129,6 +129,13 @@ class LayoutContextCollector {
             }
           }
 
+          if (($configuration['id'] ?? '') === 'moody_hero_builder') {
+            $component_data['block_type'] = 'moody_hero_builder';
+            $component_data['block_label'] = $configuration['label'] ?? 'Moody Hero Builder';
+            $component_data['configuration_hash'] = hash('sha256', serialize($configuration));
+            // Full composition is loaded only for a directed edit.
+            if ($edit_uuid !== '') { $component_data['hero_configuration'] = array_intersect_key($configuration, array_flip(['hero', 'image'])); }
+          }
           $components[] = $component_data;
         }
       }
@@ -171,6 +178,11 @@ class LayoutContextCollector {
     }
     $context = $this->collectEntityContext($entity, $runtime_context);
     $target = $context['existing_components'][0] ?? [];
+    if (($target['plugin_id'] ?? '') === 'moody_hero_builder') {
+      $context['selected_existing_block_references'] = [$target];
+      $context['selected_block_references'] = [$target + ['reference_id' => $uuid, 'selection_mode' => 'edit', 'can_edit' => TRUE]];
+      return $context;
+    }
     if (empty($target['block_revision_id']) || empty($target['block_type'])) {
       throw new \InvalidArgumentException('This block is no longer available for AI editing. Use its traditional Edit form.');
     }

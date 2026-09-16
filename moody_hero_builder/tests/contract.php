@@ -27,7 +27,7 @@ $base = Hero::defaults();
 $check(Hero::decode(json_encode($base)) == $base, 'Defaults survive JSON round trip');
 foreach (Hero::OPTIONS as $key => $options) {
   foreach ($options as $option) {
-    $check(Hero::validate(array_replace($base, [$key => $option]))[$key] === $option, "Allowed $key");
+    $check(Hero::validate(array_replace($base, [$key => $option, 'video_url' => 'https://vimeo.com/123456789']))[$key] === $option, "Allowed $key");
   }
   $reject(array_replace($base, [$key => 'not-allowed']), "Reject unknown $key");
 }
@@ -67,3 +67,13 @@ foreach (['', '[]', 'null', '{', str_repeat(' ', 32769)] as $json) {
   }
 }
 print "Hero configuration: {$checks} checks passed.\n";
+foreach (['https://vimeo.com/123456789', 'https://player.vimeo.com/video/123456789?h=abc123', 'https://vimeo.com/123456789/abc123', 'https://www.youtube.com/watch?v=M7lc1UVf-VE', 'https://youtu.be/M7lc1UVf-VE', 'https://www.youtube-nocookie.com/embed/M7lc1UVf-VE'] as $url) {
+  $check(Hero::videoEmbed($url) !== NULL, 'Supported video URL');
+}
+foreach (['https://evil.test/video/123', 'https://vimeo.com.evil.test/123', 'javascript:alert(1)', 'https://user@vimeo.com/123', 'https://vimeo.com:444/123', 'https://youtube.com/watch?v[]=M7lc1UVf-VE', 'https://vimeo.com/123?h[]=bad', '//vimeo.com/123'] as $url) {
+  $check(Hero::videoEmbed($url) === NULL, 'Reject unsafe video URL');
+}
+$legacy = $base; unset($legacy['background'], $legacy['video_url']);
+$check(Hero::validate($legacy)['background'] === 'image', 'Legacy heroes retain image background');
+$check(Hero::aiContract()['options'] === Hero::OPTIONS, 'AI uses live option contract');
+print "Hero/video configuration: {$checks} checks passed.\n";

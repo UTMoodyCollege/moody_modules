@@ -23,6 +23,38 @@ This directory is the shared home for opt-in AI features that ship with
   authoring reference used by the Assistant planner. It is not sent with
   CKEditor requests.
 
+### Assistant content discovery
+
+The assistant can request up to three read-only lookups per message, each capped
+at 20 results. Nodes (including faculty/person content), Media, taxonomy terms,
+and permitted user profiles expose only IDs, labels, canonical links, bundle,
+and creation date. Results are published/active only, checked against the active
+editor's entity and label-field access; account lookup additionally requires
+`access user profiles`. Bodies, email addresses, roles, and credentials are not
+returned. Newest means creation date descending, with entity ID as a stable tie
+breaker (taxonomy terms use ID order).
+
+For example, “Build a hero, then Editors Picks with the six latest published
+Feature Pages” resolves real node IDs before planning. Editors Picks placement
+rechecks those IDs, publication/view access, Layout Builder restrictions and
+update access, and writes only to the editor's layout draft. Hero Builder also
+supports contract-validated AI creation and focused editing, including optional
+Vimeo/YouTube backgrounds with a required poster. Other configurable
+plugins still use their normal forms; inline blocks retain their installed field
+schemas. Administrative writes remain limited to existing approved action paths,
+with links to access-controlled Drupal forms for other tasks.
+
+Local regression check (creates and removes a disposable draft):
+
+```bash
+ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/content_discovery_smoke.php
+```
+
+Prefix the Drush invocation with `ddev exec env MOODY_AI_DISCOVERY_PROVIDER_CHECK=1`
+instead of `ddev` to also check the real provider's hero/latest-six plan. This
+optional check sends the test prompt and published lookup metadata to the configured
+provider and consumes API usage; the default check does not call an AI provider.
+
 Both editor experiences consume the same UI contract from `moody_ai_base`.
 They share the configured provider and model choices, prompt ideas and token
 estimates, image-generation preference, file upload/drag/drop/clipboard paste,

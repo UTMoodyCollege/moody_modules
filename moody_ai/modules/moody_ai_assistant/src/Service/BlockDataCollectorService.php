@@ -10,7 +10,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
 class BlockDataCollectorService {
-  const DATA_SCHEMA_VERSION = 3;
+  const DATA_SCHEMA_VERSION = 4;
 
   private const BLOCK_SELECTION_GUIDANCE = [
     'ambient_video' => 'Use for an intentional video-led page introduction when motion adds meaning; prefer Moody Hero when a still image is sufficient.',

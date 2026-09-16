@@ -291,6 +291,7 @@ class AIChatManager {
         $this->assetCreator->prepareUploadedAssets($uploaded_files),
       );
       $context = $this->collectPageContext($entity, $account, $runtime_context);
+      $context = $this->addContentLookups($message, $context, $account);
       $runtime_context['selected_block_references'] = $context['selected_block_references'] ?? [];
       $runtime_context['selected_block_reference_ids'] = array_values(array_unique(array_filter(array_map(function (array $reference) {
         return !empty($reference['uuid']) ? (string) $reference['uuid'] : '';
@@ -595,6 +596,8 @@ class AIChatManager {
 
     $emit('Understanding request...');
     $context = $this->collectPageContext($entity, $account, $runtime_context);
+    $emit('Finding relevant content...');
+    $context = $this->addContentLookups($message, $context, $account, $ping);
     if ($uploaded_assets) {
       $context['uploaded_assets'] = $uploaded_assets;
     }
@@ -951,6 +954,7 @@ class AIChatManager {
       'selected_block_references',
       'selected_existing_block_references',
       'uploaded_assets',
+      'content_lookup_results',
     ]));
     $recent_messages = array_map(static function (array $item) {
       return [
@@ -1061,6 +1065,13 @@ class AIChatManager {
     return $context;
   }
 
+  protected function addContentLookups(string $message, array $context, AccountInterface $account, ?callable $stream_callback = NULL): array {
+    $lookup = new ContentLookup($this->entityTypeManager);
+    $queries = $this->planner->planContentLookups($message, $lookup->catalog(), $stream_callback);
+    $context['content_lookup_results'] = $lookup->lookup($queries, $account);
+    return $context;
+  }
+
   /**
    * Returns inline block bundles editors can add through Layout Builder.
    */
@@ -1085,6 +1096,7 @@ class AIChatManager {
     return array_values(array_filter($context['selected_block_references'] ?? [], static function (array $reference): bool {
       return ($reference['selection_mode'] ?? 'new') === 'new'
         && trim((string) ($reference['plugin_id'] ?? '')) !== ''
+        && !in_array($reference['plugin_id'] ?? '', ['moody_feature_page_feature_pages_editors_picks', 'moody_hero_builder'], TRUE)
         && trim((string) ($reference['block_type'] ?? '')) === '';
     }));
   }
@@ -1284,6 +1296,26 @@ class AIChatManager {
       }
 
       try {
+        if (($plan_item['selected_block_type'] ?? '') === 'moody_hero_builder') {
+          $configuration = $this->composeHero($message . "\nComponent goal: " . ($plan_item['goal'] ?? ''), $context, $uploaded_assets, [], $stream_callback);
+          $placement = $this->layoutPlacementManager->saveHeroBuilder($entity, $configuration, $runtime_context, $this->buildPlacementTarget($plan_item));
+          $blocks[] = NULL;
+          $placements[] = $placement;
+          if ($event_callback) {
+            $event_callback('block', ['id' => 'component-' . ($index + 1), 'operation' => 'create', 'label' => $component_label, 'block_type' => 'moody_hero_builder', 'status' => 'complete', 'position' => $index + 1, 'total' => $total, 'placement' => $placement]);
+          }
+          continue;
+        }
+        if (($plan_item['selected_block_type'] ?? '') === 'moody_feature_page_feature_pages_editors_picks') {
+          $placement = $this->layoutPlacementManager->placeEditorsPicks($entity, $plan_item['node_ids'] ?? [], $context['content_lookup_results'] ?? [], $runtime_context, $this->buildPlacementTarget($plan_item));
+          // Keep placement indices aligned with inline block metadata.
+          $blocks[] = NULL;
+          $placements[] = $placement;
+          if ($event_callback) {
+            $event_callback('block', ['id' => 'component-' . ($index + 1), 'operation' => 'create', 'label' => $component_label, 'block_type' => $plan_item['selected_block_type'], 'status' => 'complete', 'position' => $index + 1, 'total' => $total, 'placement' => $placement]);
+          }
+          continue;
+        }
         $component_prompt = $this->buildStructuredPlanPrompt($message, $context, $plan_item, $index + 1, $total);
         $instructions = $this->instructionGenerator->generateFromStructuredPlanItem($component_prompt, $plan_item, [
           'uploaded_assets' => $uploaded_assets,
@@ -1396,6 +1428,7 @@ class AIChatManager {
    */
   protected function buildStructuredPlanPrompt($message, array $context, array $plan_item, $position, $total) {
     $component_context = array_intersect_key($context, array_flip([
+      'content_lookup_results',
       'entity_type',
       'entity_id',
       'bundle',
@@ -1635,6 +1668,9 @@ class AIChatManager {
    */
   protected function executeBlockEditStream(ContentEntityInterface $entity, AIChatThread $thread, $message, array $context, array $action_plan, callable $event_callback, callable $stream_callback, array $runtime_context = [], array $uploaded_assets = []) {
     $target_component = $this->findContextComponentByUuid($context, (string) ($action_plan['target_component_uuid'] ?? ''));
+    if (($target_component['plugin_id'] ?? '') === 'moody_hero_builder') {
+      return $this->editHeroBuilder($entity, $thread, $message, $context, $target_component, $runtime_context, $uploaded_assets, $stream_callback);
+    }
     if (!$target_component || empty($target_component['block_type']) || empty($target_component['block_revision_id'])) {
       throw new \Exception('Select one existing block to edit so the assistant can update it safely.');
     }
@@ -1668,6 +1704,7 @@ class AIChatManager {
 
       $existing_instruction = $this->blockParser->exportBlockToInstruction($block);
       $instructions = $this->instructionGenerator->generateForExistingBlock($message, $target_component['block_type'], $existing_instruction, [
+        'content_lookup_results' => $context['content_lookup_results'] ?? [],
         'uploaded_assets' => $uploaded_assets,
         'prefer_ai_images' => !empty($context['prefer_ai_images']),
         'block_tools' => $context['block_tools'] ?? [],
@@ -1751,6 +1788,9 @@ class AIChatManager {
 
     $target_component = $this->findContextComponentByUuid($context, (string) ($action_plan['target_component_uuid'] ?? ''));
     if (!$target_component || empty($target_component['block_type']) || empty($target_component['block_revision_id'])) {
+      if (($target_component['plugin_id'] ?? '') === 'moody_hero_builder') {
+        return $this->editHeroBuilder($entity, $thread, $message, $context, $target_component, $runtime_context, $uploaded_assets);
+      }
       $instructions = $this->instructionGenerator->generate($this->buildPrompt($message, $context, $thread), [
         'uploaded_assets' => $uploaded_assets,
         'prefer_ai_images' => !empty($context['prefer_ai_images']),
@@ -1792,6 +1832,7 @@ class AIChatManager {
 
     $existing_instruction = $this->blockParser->exportBlockToInstruction($block);
     $instructions = $this->instructionGenerator->generateForExistingBlock($message, $target_component['block_type'], $existing_instruction, [
+      'content_lookup_results' => $context['content_lookup_results'] ?? [],
       'uploaded_assets' => $uploaded_assets,
       'prefer_ai_images' => !empty($context['prefer_ai_images']),
       'block_tools' => $context['block_tools'] ?? [],
@@ -1848,6 +1889,9 @@ class AIChatManager {
 
     $target_component = $this->findContextComponentByUuid($context, (string) ($action_plan['target_component_uuid'] ?? ''));
     if (!$target_component || empty($target_component['block_type']) || empty($target_component['block_revision_id'])) {
+      if (($target_component['plugin_id'] ?? '') === 'moody_hero_builder') {
+        return $this->editHeroBuilder($entity, $thread, $message, $context, $target_component, $runtime_context, $uploaded_assets, $stream_callback);
+      }
       $instructions = $this->instructionGenerator->generate($this->buildPrompt($message, $context, $thread), [
         'uploaded_assets' => $uploaded_assets,
         'prefer_ai_images' => !empty($context['prefer_ai_images']),
@@ -1889,6 +1933,7 @@ class AIChatManager {
 
     $existing_instruction = $this->blockParser->exportBlockToInstruction($block);
     $instructions = $this->instructionGenerator->generateForExistingBlock($message, $target_component['block_type'], $existing_instruction, [
+      'content_lookup_results' => $context['content_lookup_results'] ?? [],
       'uploaded_assets' => $uploaded_assets,
       'prefer_ai_images' => !empty($context['prefer_ai_images']),
       'block_tools' => $context['block_tools'] ?? [],
@@ -2153,6 +2198,13 @@ class AIChatManager {
     }
 
     $summary = trim((string) ($guide_plan['summary'] ?? ''));
+    foreach ($context['content_lookup_results'] ?? [] as $result) {
+      foreach ($result['items'] ?? [] as $item) {
+        if (!empty($item['url'])) {
+          $options[] = ['label' => $item['label'], 'url' => $item['url']];
+        }
+      }
+    }
     if (!$options) {
       $summary = 'Your account does not appear to have access to this administration area.';
     }
@@ -2333,6 +2385,9 @@ class AIChatManager {
 
     foreach ($blocks as $delta => $block) {
       $placement = $placements[$delta] ?? [];
+      if ($block === NULL) {
+        continue;
+      }
       $created_blocks[] = [
         'block_id' => (int) $block->id(),
         'block_revision_id' => (int) $block->getRevisionId(),
@@ -2561,11 +2616,51 @@ class AIChatManager {
     }
 
     $candidate = $selected[0];
-    if (empty($candidate['block_revision_id']) || empty($candidate['block_type']) || empty($candidate['uuid'])) {
+    if ((empty($candidate['block_revision_id']) && ($candidate['plugin_id'] ?? '') !== 'moody_hero_builder') || empty($candidate['block_type']) || empty($candidate['uuid'])) {
       return NULL;
     }
 
     return $candidate;
+  }
+
+  protected function composeHero(string $message, array $context, array $assets, array $existing = [], ?callable $stream_callback = NULL): array {
+    $allowed = !empty($existing['image']) ? [(int) $existing['image']] : [];
+    foreach ($assets as $asset) {
+      if (($asset['media_bundle'] ?? '') === 'utexas_image' && !empty($asset['target_id']) && ($asset['intent'] ?? 'content') === 'content') { $allowed[] = (int) $asset['target_id']; }
+    }
+    foreach ($context['content_lookup_results'] ?? [] as $result) {
+      foreach ($result['items'] ?? [] as $item) {
+        if (($item['entity_type'] ?? '') === 'media' && ($item['bundle'] ?? '') === 'utexas_image') { $allowed[] = (int) $item['id']; }
+      }
+    }
+    $configuration = $this->planner->composeHeroBuilder($message, [
+      'allowed_image_ids' => array_values(array_unique($allowed)),
+      'uploaded_assets' => $assets, 'content_lookup_results' => $context['content_lookup_results'] ?? [],
+      'prefer_ai_images' => !empty($context['prefer_ai_images']),
+    ], $existing, $stream_callback);
+    $video_url = $configuration['hero']['video_url'];
+    if ($video_url !== '' && $video_url !== ($existing['hero']['video_url'] ?? '') && !str_contains($message, $video_url)) {
+      throw new \InvalidArgumentException('Provide the exact background video URL; AI cannot invent one.');
+    }
+    if (!empty($configuration['image_prompt'])) {
+      if (!$this->entityTypeManager->getAccessControlHandler('media')->createAccess('utexas_image', \Drupal::currentUser())) {
+        throw new \RuntimeException('You do not have permission to create image Media.');
+      }
+      $media = $this->assetCreator->createMediaImageFromFieldData(['image_prompt' => $configuration['image_prompt'], 'alt' => $configuration['hero']['image_alt'], 'title' => 'Hero Builder image']);
+      $configuration['image'] = (int) $media->id();
+    }
+    return array_intersect_key($configuration, array_flip(['hero', 'image']));
+  }
+
+  protected function editHeroBuilder(ContentEntityInterface $entity, AIChatThread $thread, string $message, array $context, array $target, array $runtime, array $assets, ?callable $stream_callback = NULL): array {
+    $runtime['edit_component_uuid'] = $target['uuid'];
+    $fresh = $this->layoutContextCollector->collectBlockEditContext($entity, $runtime, \Drupal::currentUser());
+    $current = $fresh['existing_components'][0];
+    $configuration = $this->composeHero($message, $context, $assets, $current['hero_configuration'], $stream_callback);
+    $placement = $this->layoutPlacementManager->saveHeroBuilder($entity, $configuration, $runtime, [], $target['uuid'], $current['configuration_hash']);
+    $thread->addMessage('assistant', 'Updated Moody Hero Builder in the working layout draft. Review it and save the layout when ready.', ['placements' => [$placement]]);
+    $thread->save();
+    return ['thread' => $thread, 'status_message' => t('Hero Builder updated in the working draft; the saved page is unchanged.')];
   }
 
   /**

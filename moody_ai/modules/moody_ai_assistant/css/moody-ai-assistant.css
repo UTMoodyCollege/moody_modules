@@ -2137,6 +2137,12 @@ body {
   font-size: var(--text-xs);
 }
 
+.ai-moody-assistant .ai-moody-assistant__composer .ai-moody-assistant__tool-trigger:is(:hover, :focus, :active),
+.ai-moody-assistant .ai-moody-assistant__composer .ai-moody-assistant__token-counter-button:is(:hover, :focus, :active) {
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+
 .ai-moody-assistant .ai-moody-assistant__token-counter-button {
   border: var(--rule-hairline) solid transparent;
   border-radius: var(--radius-pill);

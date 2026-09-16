@@ -3,6 +3,12 @@ hero:
     theme:
       css/tokens.css: {}
       css/hero.css: {}
+video:
+  js:
+    js/video.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 builder:
   css:
     theme:

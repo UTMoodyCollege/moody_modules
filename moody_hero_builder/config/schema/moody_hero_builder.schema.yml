@@ -9,6 +9,12 @@ block.settings.moody_hero_builder:
       type: mapping
       label: Hero composition
       mapping:
+        background:
+          type: string
+          label: Background type
+        video_url:
+          type: string
+          label: Vimeo or YouTube background URL
         layout:
           type: string
           label: Layout

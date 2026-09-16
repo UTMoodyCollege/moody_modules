@@ -97,6 +97,7 @@ class AIInstructionGenerator {
       'uploaded_assets' => $context['uploaded_assets'] ?? [],
       'prefer_ai_images' => !empty($context['prefer_ai_images']),
       'block_tools' => $context['block_tools'] ?? [],
+      'content_lookup_results' => $context['content_lookup_results'] ?? [],
     ], $stream_callback);
     return $this->messageSuppressesMedia($prompt)
       ? $this->suppressMediaInstructions($payload, $blockData)

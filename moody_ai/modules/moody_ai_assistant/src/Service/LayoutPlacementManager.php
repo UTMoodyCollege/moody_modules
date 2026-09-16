@@ -19,6 +19,8 @@ use Drupal\block_content\BlockContentInterface;
 
 class LayoutPlacementManager {
 
+  use \Drupal\layout_builder\Context\LayoutBuilderContextTrait;
+
   /**
    * The UUID generator.
    *
@@ -236,6 +238,103 @@ class LayoutPlacementManager {
     }
 
     return [$section_storage, FALSE];
+  }
+
+  /** Places the supported record-driven plugin in the editor's draft only. */
+  public function saveHeroBuilder(ContentEntityInterface $entity, array $configuration, array $runtime_context, array $target = [], string $uuid = '', string $expected_hash = ''): array {
+    if (!is_int($configuration['image'] ?? NULL) || $configuration['image'] < 0) { throw new \InvalidArgumentException('Invalid hero image reference.'); }
+    $account = \Drupal::currentUser();
+    [$storage, $draft] = $this->getEditableSectionStorage($entity, $runtime_context);
+    if (!$account->hasPermission('use moody ai assistant') || !$entity->access('update', $account) || !$storage || !$draft || !$storage->access('update', $account)) {
+      throw new \RuntimeException('Open an editable Layout Builder draft to compose a hero.');
+    }
+    $configuration['hero'] = \Drupal\moody_hero_builder\HeroConfiguration::decode(json_encode($configuration['hero'] ?? NULL, JSON_THROW_ON_ERROR));
+    $plugin = \Drupal::service('plugin.manager.block')->createInstance('moody_hero_builder', array_intersect_key($configuration, array_flip(['hero', 'image'])) + ['label' => 'Moody Hero Builder', 'label_display' => FALSE]);
+    $state = new \Drupal\Core\Form\FormState();
+    $state->setValues(['hero_builder' => ['source' => json_encode($configuration['hero']), 'image' => $configuration['image'] ?? 0]]);
+    $form = $plugin->blockForm([], $state);
+    $form['hero_builder']['source']['#parents'] = ['hero_builder', 'source'];
+    $form['hero_builder']['image']['#parents'] = ['hero_builder', 'image'];
+    $plugin->blockValidate($form, $state);
+    if ($state->hasAnyErrors() || !$plugin->access($account)) {
+      throw new \InvalidArgumentException('The hero composition or selected media is unavailable. Choose an accessible image/poster and valid hero settings.');
+    }
+    if ($uuid !== '') {
+      foreach ($storage->getSections() as $delta => $section) {
+        foreach ($section->getComponents() as $component) {
+          if ($component->getUuid() !== $uuid) { continue; }
+          $current = (array) $component->get('configuration');
+          if (($current['id'] ?? '') !== 'moody_hero_builder' || $expected_hash === '' || !hash_equals($expected_hash, hash('sha256', serialize($current)))) {
+            throw new \RuntimeException('The hero changed while AI was working. Retry against its current draft.');
+          }
+          $component->setConfiguration(array_replace($current, array_intersect_key($configuration, array_flip(['hero', 'image']))));
+          $this->layoutTempstoreRepository->set($storage);
+          return ['section_delta' => $delta, 'region' => $component->getRegion(), 'component_uuid' => $uuid, 'plugin_id' => 'moody_hero_builder'];
+        }
+      }
+      throw new \RuntimeException('The selected hero no longer exists.');
+    }
+    if (!$storage->count()) { $storage->appendSection(new Section('layout_onecol')); }
+    $delta = $this->resolveSectionDelta($storage, $target);
+    $section = $storage->getSection($delta);
+    $region = $this->resolveRegion($section, $target);
+    $definitions = \Drupal::service('plugin.manager.block')->getFilteredDefinitions('layout_builder', $this->getPopulatedContexts($storage), ['section_storage' => $storage, 'delta' => $delta, 'region' => $region]);
+    if (!isset($definitions['moody_hero_builder'])) { throw new \RuntimeException('Hero Builder is not allowed in this layout.'); }
+    $component = new SectionComponent($this->uuid->generate(), $region, $plugin->getConfiguration());
+    $section->appendComponent($component);
+    $this->layoutTempstoreRepository->set($storage);
+    return ['section_delta' => $delta, 'region' => $region, 'component_uuid' => $component->getUuid(), 'plugin_id' => 'moody_hero_builder'];
+  }
+
+  /** Places the supported record-driven plugin in the editor's draft only. */
+  public function placeEditorsPicks(ContentEntityInterface $entity, array $node_ids, array $lookup_results, array $runtime_context, array $target = []): array {
+    $account = \Drupal::currentUser();
+    [$storage, $draft] = $this->getEditableSectionStorage($entity, $runtime_context);
+    if (!$account->hasPermission('use moody ai assistant') || !$entity->access('update', $account) || !$storage || !$draft || !$storage->access('update', $account)) {
+      throw new \RuntimeException('Open an editable Layout Builder draft before adding Editors Picks.');
+    }
+    $allowed = [];
+    foreach ($lookup_results as $result) {
+      foreach ($result['items'] ?? [] as $item) {
+        if (($item['entity_type'] ?? '') === 'node' && ($item['bundle'] ?? '') === 'moody_feature_page') {
+          $allowed[(string) $item['id']] = TRUE;
+        }
+      }
+    }
+    if (!$node_ids || count($node_ids) > 20 || count(array_unique($node_ids)) !== count($node_ids)) {
+      throw new \InvalidArgumentException('Editors Picks needs 1–20 distinct, discovered Feature Pages.');
+    }
+    foreach ($node_ids as $id) {
+      if ((!is_int($id) && !is_string($id)) || !ctype_digit((string) $id) || !isset($allowed[(string) $id])) {
+        throw new \InvalidArgumentException('Editors Picks referenced a page outside the verified lookup.');
+      }
+      $node = \Drupal::entityTypeManager()->getStorage('node')->loadUnchanged($id);
+      if (!$node || $node->bundle() !== 'moody_feature_page' || !$node->isPublished() || !$node->access('view', $account)) {
+        throw new \RuntimeException('A selected Feature Page is no longer available.');
+      }
+    }
+    $plugin_id = 'moody_feature_page_feature_pages_editors_picks';
+    if (!$storage->count()) {
+      $storage->appendSection(new Section('layout_onecol'));
+    }
+    $delta = $this->resolveSectionDelta($storage, $target);
+    $section = $storage->getSection($delta);
+    $region = $this->resolveRegion($section, $target);
+    $manager = \Drupal::service('plugin.manager.block');
+    $definitions = $manager->getFilteredDefinitions('layout_builder', $this->getPopulatedContexts($storage), [
+      'section_storage' => $storage, 'delta' => $delta, 'region' => $region,
+    ]);
+    if (!isset($definitions[$plugin_id])) {
+      throw new \RuntimeException('Editors Picks is not allowed in this layout.');
+    }
+    $plugin = $manager->createInstance($plugin_id, ['selected_nodes' => array_map('intval', $node_ids), 'label_display' => FALSE]);
+    if (!$plugin->access($account)) {
+      throw new \RuntimeException('Editors Picks is not accessible.');
+    }
+    $component = new SectionComponent($this->uuid->generate(), $region, $plugin->getConfiguration());
+    $section->appendComponent($component);
+    $this->layoutTempstoreRepository->set($storage);
+    return ['section_delta' => $delta, 'region' => $region, 'component_uuid' => $component->getUuid(), 'plugin_id' => $plugin_id];
   }
 
   /**

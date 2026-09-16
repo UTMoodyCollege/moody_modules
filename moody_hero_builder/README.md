@@ -2,7 +2,32 @@
 
 An opt-in Layout Builder block; existing hero fields and blocks are unchanged.
 Uses Drupal's block form, Media Library, Twig and native DOM APIs. No build step
-or client-side framework. Public output needs CSS only.
+or client-side framework. Image-only public output needs CSS only.
+
+## AI composition and background video
+
+The Moody AI Assistant can create this block and edit an existing placement via
+**Edit with AI**. The model receives the validator's options for layouts, palettes,
+fonts, reading order, buttons and image positioning. Media must come from permitted
+references or explicitly requested AI generation. Writes remain in the editable
+layout draft; stale edits fail instead of overwriting newer changes.
+
+In the Image panel, choose **Vimeo / YouTube video**, enter its URL and select a
+Media Library poster. Vimeo public/player/unlisted links and YouTube watch, short,
+and embed links are allowlisted. Arbitrary hosts and iframe markup are rejected.
+Video is decorative, muted, looping and center-cropped; keep essential information
+in visible text. Image focal controls affect the poster. The editor canvas previews
+the poster without contacting the provider; review playback on the page.
+
+Desktop may autoplay; mobile, reduced-motion and Save-Data visitors initially see
+the poster with a Play control. Pause unloads the embed and restores the poster;
+Play restarts it. Hiding the tab stops playback. Without JavaScript only the poster
+appears. Provider privacy settings, consent tools and browser autoplay policies may
+prevent playback. Embeds contact Vimeo or YouTube when playback starts.
+
+Checks: `node tests/video_smoke.cjs` and the Assistant's
+`tests/hero_builder_ai_smoke.php` (local Drush, disposable draft). Set
+`MOODY_AI_HERO_PROVIDER_CHECK=1` for the optional paid real-provider contract test.
 
 Enable `moody_hero_builder` on a local prototype site. Optional configuration adds
 the block to **Specialty Blocks** in the Moody Layout Builder Browser when that

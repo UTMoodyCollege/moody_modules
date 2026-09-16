@@ -1,4 +1,13 @@
 # Define a moody_feature_hero library that brings in the feature-page-hero css.
+editors_picks_form:
+  js:
+    js/editors-picks-form.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once
+    - core/drupal.autocomplete
+
 external_story:
   css:
     theme:

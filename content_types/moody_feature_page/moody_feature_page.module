@@ -109,6 +109,11 @@ function _moody_feature_page_normalize_editors_picks_items(array $rows, bool $ke
     if ($type === 'node') {
       $node = $values['node'] ?? '';
       $node = is_array($node) ? ($node['target_id'] ?? '') : $node;
+      // Drupal autocomplete CSV-escapes labels containing commas or quotes.
+      if (is_string($node) && str_starts_with($node, '"') && str_ends_with($node, '"')) {
+        $labels = str_getcsv($node, ',', '"', '');
+        $node = count($labels) === 1 ? $labels[0] : '';
+      }
       if (is_string($node) && preg_match('/\((\d+)\)$/', $node, $matches)) {
         $node = $matches[1];
       }

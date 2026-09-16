@@ -11,7 +11,7 @@
 function moody_hero_builder_theme(): array {
   return [
     'moody_hero_builder' => [
-      'variables' => ['hero' => [], 'image' => [], 'heading_tag' => 'h2'],
+      'variables' => ['hero' => [], 'image' => [], 'heading_tag' => 'h2', 'video_url' => NULL],
     ],
   ];
 }

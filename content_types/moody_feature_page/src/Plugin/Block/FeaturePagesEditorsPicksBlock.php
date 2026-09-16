@@ -107,6 +107,21 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
     ];
 
     $node_storage = $this->entityTypeManager->getStorage('node');
+    $recent_ids = $node_storage->getQuery()
+      ->accessCheck(TRUE)
+      ->condition('type', 'moody_feature_page')
+      ->condition('status', 1)
+      ->sort('created', 'DESC')
+      ->sort('nid', 'DESC')
+      ->range(0, 20)
+      ->execute();
+    $recent_options = [];
+    foreach ($node_storage->loadMultiple($recent_ids) as $recent_node) {
+      if ($recent_node->access('view')) {
+        $recent_options[$recent_node->id()] = $recent_node->label();
+      }
+    }
+    $form['#attached']['library'][] = 'moody_feature_page/editors_picks_form';
     foreach (array_values($items) as $delta => $item) {
       $type = ($item['type'] ?? 'node') === 'custom' ? 'custom' : 'node';
       $nid = (string) ($item['node'] ?? '');
@@ -124,6 +139,7 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
           '@label' => $label,
         ]),
         '#open' => TRUE,
+        '#attributes' => ['class' => ['editors-picks-item-form']],
       ];
       $form['items']['rows'][$delta]['details']['type'] = [
         '#type' => 'select',
@@ -134,6 +150,17 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
         ],
         '#default_value' => $type,
       ];
+      $form['items']['rows'][$delta]['details']['recent'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Recent published Feature Pages'),
+        '#description' => $this->t('The latest 20 published stories, newest first. Select one to fill the Feature Page field, or search below for an older story.'),
+        '#options' => $recent_options,
+        '#empty_option' => $this->t('- Choose a recent story -'),
+        '#attributes' => ['class' => ['editors-picks-recent']],
+        '#states' => [
+          'visible' => [$type_selector => ['value' => 'node']],
+        ],
+      ];
       $form['items']['rows'][$delta]['details']['node'] = [
         '#type' => 'entity_autocomplete',
         '#title' => $this->t('Feature Page'),
@@ -142,6 +169,7 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
           'target_bundles' => ['moody_feature_page'],
         ],
         '#default_value' => $node,
+        '#attributes' => ['class' => ['editors-picks-node']],
         '#states' => [
           'visible' => [$type_selector => ['value' => 'node']],
         ],

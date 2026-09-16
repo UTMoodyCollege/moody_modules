@@ -9,7 +9,21 @@ namespace Drupal\moody_hero_builder;
  */
 final class HeroConfiguration {
 
+  public const ELEMENT_OPTIONS = ['type' => ['heading', 'text', 'eyebrow', 'button'], 'size' => ['small', 'medium', 'large'], 'font' => ['sans', 'serif'], 'style' => ['primary', 'secondary']];
+
+  public static function aiContract(): array {
+    return ['options' => self::OPTIONS, 'element_options' => self::ELEMENT_OPTIONS, 'defaults' => self::defaults(), 'rules' => [
+      '1–12 elements in reading order; exactly one heading; unique IDs start with a letter, then letters/digits/underscore/hyphen, at most 49 characters.',
+      'Plain text only. Text elements max 1200 characters, buttons 40, headings/eyebrows 160, image_alt 300. Button destinations max 2048: /site-path, #anchor, or https:// without credentials.',
+      'Focal points and overlay_strength are integers 0–100. Desktop/mobile focal points can differ. Heading level is independent of visual size.',
+      'decorative is boolean; meaningful images need image_alt. Use only offered palettes, fonts and sizes; no raw HTML or CSS.',
+      'Video backgrounds require an existing accessible poster image, decorative=true, and a user-supplied Vimeo or YouTube HTTPS URL. Never invent a video URL. The background is muted; essential information belongs in visible text.',
+      'Preserve unrelated settings, image and element IDs when editing. Responsive previews and reduced-motion fallback use the normal renderer.',
+    ]];
+  }
+
   public const OPTIONS = [
+    'background' => ['image', 'video'],
     'layout' => ['overlay', 'split', 'split-right', 'text'],
     'scheme' => ['light', 'dark', 'orange'],
     'surface' => ['solid', 'soft'],
@@ -23,6 +37,7 @@ final class HeroConfiguration {
 
   public static function defaults(): array {
     return [
+      'background' => 'image', 'video_url' => '',
       'layout' => 'split', 'scheme' => 'light', 'surface' => 'solid',
       'position' => 'center-left', 'alignment' => 'left',
       'height' => 'standard', 'width' => 'medium',
@@ -76,6 +91,10 @@ final class HeroConfiguration {
       throw new \InvalidArgumentException('Choose whether the image is decorative.');
     }
     $result['decorative'] = $data['decorative'];
+    $result['video_url'] = self::plainText($data['video_url'], 2048);
+    if ($data['background'] === 'video' && (!self::videoEmbed($result['video_url']) || !$data['decorative'] || $data['layout'] === 'text')) {
+      throw new \InvalidArgumentException('A background video needs a Vimeo or YouTube HTTPS URL, a visual layout, and decorative media.');
+    }
     $result['image_alt'] = self::plainText($data['image_alt'], 300);
     if (!$data['decorative'] && $result['image_alt'] === '') {
       throw new \InvalidArgumentException('Describe the image, or mark it as decorative if its meaning is already in the text.');
@@ -91,7 +110,7 @@ final class HeroConfiguration {
         throw new \InvalidArgumentException('Each hero element needs a unique, valid ID.');
       }
       $ids[$element['id']] = TRUE;
-      foreach (['type' => ['heading', 'text', 'eyebrow', 'button'], 'size' => ['small', 'medium', 'large'], 'font' => ['sans', 'serif'], 'style' => ['primary', 'secondary']] as $key => $options) {
+      foreach (self::ELEMENT_OPTIONS as $key => $options) {
         if (!in_array($element[$key] ?? NULL, $options, TRUE)) {
           throw new \InvalidArgumentException('Choose supported element type, size, font and button style.');
         }
@@ -125,6 +144,29 @@ final class HeroConfiguration {
     }
     return (bool) preg_match('/^#[A-Za-z][A-Za-z0-9_:.\-]*$/D', $url)
       || (str_starts_with($url, 'https://') && filter_var($url, FILTER_VALIDATE_URL) !== FALSE && parse_url($url, PHP_URL_USER) === NULL && parse_url($url, PHP_URL_PASS) === NULL);
+  }
+
+  /** Canonical provider embeds only; never forward arbitrary query parameters. */
+  public static function videoEmbed(string $url): ?string {
+    if (!self::validUrl($url) || !str_starts_with($url, 'https://')) { return NULL; }
+    $parts = parse_url($url);
+    if (isset($parts['port'])) { return NULL; }
+    $host = strtolower($parts['host'] ?? '');
+    $path = $parts['path'] ?? '';
+    parse_str($parts['query'] ?? '', $query);
+    if (in_array($host, ['vimeo.com', 'www.vimeo.com', 'player.vimeo.com'], TRUE) && preg_match('~^/(?:video/)?([0-9]+)/?(?:([a-zA-Z0-9]+))?$~D', $path, $match)) {
+      $hash = $query['h'] ?? ($match[2] ?? '');
+      if (!is_string($hash) || ($hash !== '' && !preg_match('/^[a-zA-Z0-9]+$/D', $hash))) { return NULL; }
+      return 'https://player.vimeo.com/video/' . $match[1] . '?background=1&muted=1&autoplay=1&loop=1&dnt=1' . ($hash !== '' ? '&h=' . $hash : '');
+    }
+    $id = '';
+    if ($host === 'youtu.be') { $id = trim($path, '/'); }
+    elseif (in_array($host, ['youtube.com', 'www.youtube.com', 'www.youtube-nocookie.com'], TRUE)) {
+      if ($path === '/watch') { $id = $query['v'] ?? ''; }
+      elseif (preg_match('~^/(?:embed|shorts)/([^/]+)/?$~D', $path, $match)) { $id = $match[1]; }
+    }
+    return is_string($id) && preg_match('/^[a-zA-Z0-9_-]{11}$/D', $id)
+      ? 'https://www.youtube-nocookie.com/embed/' . $id . '?autoplay=1&mute=1&loop=1&playlist=' . $id . '&controls=0&playsinline=1&rel=0' : NULL;
   }
 
   private static function plainText(mixed $value, int $limit): string {

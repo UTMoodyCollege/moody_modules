@@ -1,6 +1,6 @@
 /**
  * Native-DOM hero editor. The JSON field is submitted through Drupal's form.
- * Public heroes use the same scoped CSS and need no JavaScript.
+ * Public image heroes use the same scoped CSS without JavaScript.
  */
 (function (Drupal, once) {
   'use strict';
@@ -34,6 +34,8 @@
     let state;
     try {
       state = JSON.parse(source.value);
+      state.background ??= 'image';
+      state.video_url ??= '';
       if (!Array.isArray(state.elements) || !state.elements.length) throw new Error('Missing elements');
     } catch (_) {
       root.prepend(make('p', { role: 'alert' }, Drupal.t('The visual editor could not read this hero. Correct the configuration below before saving.')));
@@ -143,6 +145,7 @@
     }
     function check() {
       let issue = '';
+      if (state.background === 'video' && (!state.video_url || !imageUrl || !state.decorative || state.layout === 'text')) issue = Drupal.t('Video needs a Vimeo/YouTube URL, a poster image, a visual layout, and decorative media.');
       if (!state.decorative && !state.image_alt.trim()) issue = Drupal.t('Add an image description, or mark the image as decorative.');
       if (state.elements.some((item) => !item.text.trim())) issue = Drupal.t('An element is empty. Add text or remove it before saving.');
       if (state.elements.some((item) => item.type === 'button' && !validUrl(item.url))) issue = Drupal.t('A button needs a /site-path, #anchor, or complete https:// URL.');
@@ -217,6 +220,11 @@
         }));
         else fields.append(make('p', { class: 'mhb-note' }, Drupal.t('Every hero keeps one heading. Set its semantic level in Design, independently of its font size.')));
       } else {
+        fields.append(control('Background type', 'background', { image: 'Image', video: 'Vimeo / YouTube video' }));
+        if (state.background === 'video') {
+          fields.append(control('Video URL', 'video_url', null, state, 'url', { maxlength: 2048, placeholder: 'https://vimeo.com/123456789' }));
+          fields.append(make('p', { class: 'mhb-note' }, Drupal.t('Choose a poster image below. Video is decorative, muted and looping. The canvas previews the poster; check playback on the page. Mobile, reduced-motion and data-saving visitors see the poster until they press Play. Pausing restores the poster; playing restarts the video.')));
+        }
         const checkLabel = make('label', { class: 'mhb-check' });
         const checkBox = make('input', { type: 'checkbox' });
         checkBox.checked = state.decorative;

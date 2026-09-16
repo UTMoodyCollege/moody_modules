@@ -79,10 +79,10 @@ final class MoodyHeroBuilderBlock extends BlockBase {
 
   public function blockValidate($form, FormStateInterface $form_state): void {
     try {
-      HeroConfiguration::decode((string) $form_state->getValue(['hero_builder', 'source'], ''));
+      $hero = HeroConfiguration::decode((string) $form_state->getValue(['hero_builder', 'source'], ''));
       $image_id = self::mediaId($form_state->getValue(['hero_builder', 'image'], 0));
       $cache = new CacheableMetadata();
-      if ($image_id && !self::imageData($image_id, $cache)) {
+      if (($image_id || $hero['background'] === 'video') && !self::imageData($image_id, $cache)) {
         $form_state->setError($form['hero_builder']['image'], $this->t('Choose an accessible image from the Media Library, or remove the unavailable image.'));
       }
     }
@@ -112,8 +112,10 @@ final class MoodyHeroBuilderBlock extends BlockBase {
     $build = [
       '#theme' => 'moody_hero_builder', '#hero' => $hero,
       '#image' => $image, '#heading_tag' => $hero['heading_level'],
+      '#video_url' => $hero['background'] === 'video' && $image ? HeroConfiguration::videoEmbed($hero['video_url']) : NULL,
       '#attached' => ['library' => ['moody_hero_builder/hero']],
     ];
+    if ($build['#video_url']) { $build['#attached']['library'][] = 'moody_hero_builder/video'; }
     $cache->applyTo($build);
     return $build;
   }
