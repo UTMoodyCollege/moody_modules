@@ -1,0 +1,73 @@
+block.settings.moody_card_builder:
+  type: block_settings
+  label: 'Moody Card Builder'
+  mapping:
+    images:
+      type: sequence
+      label: 'Selected media library images'
+      sequence:
+        type: integer
+    collection:
+      type: mapping
+      label: 'Card collection'
+      mapping:
+        columns:
+          type: mapping
+          label: 'Cards per row'
+          mapping:
+            mobile: { type: integer, label: Mobile }
+            tablet: { type: integer, label: Tablet }
+            desktop: { type: integer, label: Desktop }
+        gap: { type: string, label: Gap }
+        radius: { type: string, label: 'Corner rounding' }
+        heading_level: { type: string, label: 'Heading level' }
+        cards:
+          type: sequence
+          label: 'Cards in reading order'
+          sequence:
+            type: mapping
+            mapping:
+              id: { type: string, label: ID }
+              scheme: { type: string, label: Palette }
+              image: { type: integer, label: 'Media ID' }
+              alt: { type: label, label: 'Image description' }
+              decorative: { type: boolean, label: 'Decorative image' }
+              responsive:
+                type: mapping
+                label: 'Responsive image layout'
+                mapping:
+                  mobile: { type: moody_card_builder.viewport, label: Mobile }
+                  tablet: { type: moody_card_builder.viewport, label: Tablet }
+                  desktop: { type: moody_card_builder.viewport, label: Desktop }
+              rows:
+                type: sequence
+                label: Rows
+                sequence:
+                  type: mapping
+                  mapping:
+                    id: { type: string, label: ID }
+                    split: { type: string, label: 'Column proportions' }
+                    stack_mobile: { type: boolean, label: 'Stack on mobile' }
+                    divider: { type: boolean, label: Divider }
+                    bottom: { type: boolean, label: 'Push toward bottom' }
+                    cells:
+                      type: sequence
+                      label: Cells
+                      sequence:
+                        type: mapping
+                        mapping:
+                          type: { type: string, label: 'Element type' }
+                          text: { type: text, label: Text }
+                          url: { type: string, label: Destination }
+                          align: { type: string, label: Alignment }
+                          size: { type: string, label: Size }
+                          font: { type: string, label: Font }
+                          style: { type: string, label: 'Link style' }
+moody_card_builder.viewport:
+  type: mapping
+  mapping:
+    layout: { type: string, label: 'Image position' }
+    share: { type: integer, label: 'Image percentage' }
+    height: { type: integer, label: 'Minimum card height' }
+    focal_x: { type: integer, label: 'Horizontal focal point' }
+    focal_y: { type: integer, label: 'Vertical focal point' }

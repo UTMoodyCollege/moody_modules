@@ -1,0 +1,16 @@
+cards:
+  css:
+    theme:
+      css/cards.css: {}
+  dependencies:
+    - moody_hero_builder/hero
+builder:
+  css:
+    theme:
+      css/builder.css: {}
+  js:
+    js/builder.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - moody_card_builder/cards

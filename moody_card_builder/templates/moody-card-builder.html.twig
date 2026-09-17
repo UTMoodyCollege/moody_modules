@@ -1,0 +1,25 @@
+<div class="mcb-collection mhb-hero mcb-gap--{{ collection.gap }} mcb-radius--{{ collection.radius }}" style="{% for device, columns in collection.columns %}--mcb-cols-{{ device }}:{{ columns }};{% endfor %}">
+  <ul class="mcb-grid">
+    {% for card in collection.cards %}
+      {% set image = images[card.image]|default(null) %}
+      <li class="mcb-item">
+        <article class="mcb-card mcb-scheme--{{ card.scheme }} {% for device, settings in card.responsive %}mcb-{{ device }}--{{ settings.layout }} {% endfor %}{{ image ? 'mcb-has-image' : '' }}" style="{% for device, settings in card.responsive %}--mcb-share-{{ device }}:{{ settings.share }}%;--mcb-height-{{ device }}:{{ settings.height }}px;--mcb-image-height-{{ device }}:{{ settings.height * settings.share / 100 }}px;--mcb-x-{{ device }}:{{ settings.focal_x }}%;--mcb-y-{{ device }}:{{ settings.focal_y }}%;{% endfor %}">
+          {% if image %}<div class="mcb-image"><img src="{{ image.url }}" {% if image.srcset %}srcset="{{ image.srcset }}" sizes="(max-width: 599px) 100vw, (max-width: 899px) 50vw, 33vw"{% endif %} alt="{{ card.decorative ? '' : card.alt }}" width="{{ image.width }}" height="{{ image.height }}" loading="lazy" decoding="async"></div>{% endif %}
+          <div class="mcb-content">
+            {% for row in card.rows %}
+              <div class="mcb-content-row mcb-split--{{ row.split }} {{ row.stack_mobile ? 'mcb-stack-mobile' : '' }} {{ row.divider ? 'mcb-divider' : '' }} {{ row.bottom ? 'mcb-bottom' : '' }}">
+                {% for cell in row.cells %}
+                  <div class="mcb-cell mcb-align--{{ cell.align }} mcb-size--{{ cell.size }} mcb-font--{{ cell.font }}">
+                    {% if cell.type == 'heading' %}<{{ collection.heading_level }} class="mcb-heading">{{ cell.text }}</{{ collection.heading_level }}>
+                    {% elseif cell.type == 'button' %}<a class="mcb-link mcb-link--{{ cell.style }}" href="{{ cell.url }}">{{ cell.text }}</a>
+                    {% else %}<p class="mcb-{{ cell.type }}">{{ cell.text }}</p>{% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        </article>
+      </li>
+    {% endfor %}
+  </ul>
+</div>

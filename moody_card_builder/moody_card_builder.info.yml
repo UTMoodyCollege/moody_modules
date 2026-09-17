@@ -1,0 +1,7 @@
+name: Moody Card Builder
+type: module
+description: 'Responsive card collections with a visual editor and UT brand guardrails.'
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - moody_hero_builder:moody_hero_builder

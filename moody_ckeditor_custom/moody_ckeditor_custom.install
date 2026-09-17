@@ -15,6 +15,51 @@ function moody_ckeditor_custom_update_9001() {
 }
 
 /**
+ * Implements hook_install().
+ */
+function moody_ckeditor_custom_install() {
+  moody_ckeditor_custom_update_9002();
+}
+
+/**
+ * Restore production Moody controls on existing Flex HTML editors.
+ */
+function moody_ckeditor_custom_update_9002() {
+  foreach (['flex_html', 'moody_flex_html'] as $id) {
+    $editor = \Drupal::configFactory()->getEditable("editor.editor.$id");
+    $format = \Drupal::configFactory()->getEditable("filter.format.$id");
+    if ($editor->isNew() || $format->isNew() || $editor->get('editor') !== 'ckeditor5') {
+      continue;
+    }
+
+    \Drupal::service('module_installer')->install(['moody_nice_letter'], TRUE);
+    $items = $editor->get('settings.toolbar.items') ?? [];
+    // moodyContentBlocks is a demo, not a production editing control.
+    foreach (['style', 'moodyNiceLetter', 'moodyReadableText', 'moodyImageCaption'] as $item) {
+      if (!in_array($item, $items, TRUE)) {
+        $items[] = $item;
+      }
+    }
+    $modules = $editor->get('dependencies.module') ?? [];
+    $modules[] = 'moody_ckeditor_custom';
+    $editor->set('settings.toolbar.items', $items)
+      ->set('dependencies.module', array_values(array_unique($modules)))->save(TRUE);
+    _moody_ckeditor_custom_append_style_definitions("editor.editor.$id");
+
+    $filter = $format->get('filters.moody_nice_letter') ?? [
+      'id' => 'moody_nice_letter', 'provider' => 'moody_nice_letter',
+      'weight' => 1, 'settings' => [],
+    ];
+    $filter['status'] = TRUE;
+    $modules = $format->get('dependencies.module') ?? [];
+    $modules[] = 'moody_nice_letter';
+    $format->set('filters.moody_nice_letter', $filter)
+      ->set('dependencies.module', array_values(array_unique($modules)))->save(TRUE);
+  }
+  return 'Restored supported Moody CKEditor controls on existing Flex HTML formats; other formats and permissions are unchanged.';
+}
+
+/**
  * Appends Moody utility style definitions to a CKEditor 5 editor config.
  */
 function _moody_ckeditor_custom_append_style_definitions(string $config_name): void {

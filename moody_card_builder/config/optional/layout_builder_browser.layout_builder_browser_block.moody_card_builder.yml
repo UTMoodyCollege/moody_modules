@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - layout_builder_browser.layout_builder_browser_blockcat.specialty_blocks
+  module:
+    - moody_card_builder
+    - layout_builder_browser
+id: moody_card_builder
+block_id: moody_card_builder
+category: specialty_blocks
+label: 'Moody Card Builder'
+image_path: ''
+image_alt: 'Responsive collection of cards'
+weight: 1

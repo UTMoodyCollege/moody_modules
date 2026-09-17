@@ -1,0 +1,6 @@
+<?php
+
+/** Implements hook_theme(). */
+function moody_card_builder_theme(): array {
+  return ['moody_card_builder' => ['variables' => ['collection' => [], 'images' => []]]];
+}

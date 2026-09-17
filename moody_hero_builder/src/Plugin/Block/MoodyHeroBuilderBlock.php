@@ -123,7 +123,7 @@ final class MoodyHeroBuilderBlock extends BlockBase {
   /**
    * Resolves media through its source field and retains access/cache metadata.
    */
-  private static function imageData(int $id, CacheableMetadata $cache): array {
+  public static function imageData(int $id, CacheableMetadata $cache): array {
     if (!$id) {
       return [];
     }
