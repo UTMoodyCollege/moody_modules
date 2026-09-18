@@ -32,6 +32,20 @@ final class CardConfiguration {
     return ['columns' => ['mobile' => 1, 'tablet' => 2, 'desktop' => 3], 'gap' => 'medium', 'radius' => 'rounded', 'heading_level' => 'h3', 'cards' => [self::card()]];
   }
 
+  /** Complete bounded contract for the assistant; validate() remains authoritative. */
+  public static function aiContract(): array {
+    return [
+      'example' => self::defaults(),
+      'collection' => ['columns' => ['mobile' => 'integer 1–2', 'tablet' => 'integer 1–4', 'desktop' => 'integer 1–4'], 'gap' => ['small', 'medium', 'large'], 'radius' => ['square', 'soft', 'rounded'], 'heading_level' => ['h2', 'h3', 'h4']],
+      'cards' => '1–12 cards in display order. Preserve IDs on edits; unique IDs match ^[a-zA-Z][a-zA-Z0-9_-]{0,48}$.',
+      'card' => ['scheme' => ['light', 'paper', 'dark', 'orange'], 'image' => '0 or allowed image ID', 'alt' => 'up to 300 characters; required for meaningful images', 'decorative' => 'boolean'],
+      'responsive' => ['devices' => self::DEVICES, 'layout' => ['top', 'left', 'right', 'none'], 'share' => 'integer 20–80, image percentage', 'height' => 'integer 240–800 pixels', 'focal_x' => 'integer 0–100', 'focal_y' => 'integer 0–100'],
+      'rows' => ['count' => '1–8 per card, ordered, unique IDs within card', 'split' => self::SPLITS, 'stack_mobile' => 'boolean', 'divider' => 'boolean', 'bottom' => 'boolean, pushes row to card bottom'],
+      'cells' => ['count' => 'must match split; exactly one heading per card', 'type' => ['heading', 'text', 'eyebrow', 'badge', 'button'], 'text' => 'nonempty plain text: text 1200, badge 8, button 60, other 160 characters maximum', 'url' => 'buttons only: /site-path, #anchor, or HTTPS URL; otherwise empty', 'align' => ['left', 'center', 'right'], 'size' => ['small', 'medium', 'large'], 'font' => ['sans', 'serif'], 'style' => ['link', 'primary', 'secondary']],
+      'rules' => 'Return every field shown in example. No HTML, CSS, arbitrary colors, remote image URLs or video. Use approved palettes for contrast. Never invent links or media IDs. Use mobile stacking where appropriate.',
+    ];
+  }
+
   public static function decode(string $json): array {
     if ($json === '' || strlen($json) > 131072) {
       throw new \InvalidArgumentException('Card data is missing or too large (maximum 12 cards).');

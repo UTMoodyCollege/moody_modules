@@ -242,48 +242,65 @@ class LayoutPlacementManager {
 
   /** Places the supported record-driven plugin in the editor's draft only. */
   public function saveHeroBuilder(ContentEntityInterface $entity, array $configuration, array $runtime_context, array $target = [], string $uuid = '', string $expected_hash = ''): array {
-    if (!is_int($configuration['image'] ?? NULL) || $configuration['image'] < 0) { throw new \InvalidArgumentException('Invalid hero image reference.'); }
+    return $this->saveBuilder('moody_hero_builder', $entity, $configuration, $runtime_context, $target, $uuid, $expected_hash);
+  }
+
+  public function saveBuilder(string $plugin_id, ContentEntityInterface $entity, array $configuration, array $runtime_context, array $target = [], string $uuid = '', string $expected_hash = ''): array {
+    if (!in_array($plugin_id, ['moody_hero_builder', 'moody_card_builder'], TRUE)) { throw new \InvalidArgumentException('Unsupported builder.'); }
+    $card = $plugin_id === 'moody_card_builder';
+    $key = $card ? 'collection' : 'hero';
+    $media_key = $card ? 'images' : 'image';
+    $form_key = $card ? 'card_builder' : 'hero_builder';
+    $keys = [$key, $media_key];
+    if (!$card && (!is_int($configuration['image'] ?? NULL) || $configuration['image'] < 0)) { throw new \InvalidArgumentException('Invalid hero image reference.'); }
     $account = \Drupal::currentUser();
     [$storage, $draft] = $this->getEditableSectionStorage($entity, $runtime_context);
     if (!$account->hasPermission('use moody ai assistant') || !$entity->access('update', $account) || !$storage || !$draft || !$storage->access('update', $account)) {
-      throw new \RuntimeException('Open an editable Layout Builder draft to compose a hero.');
+      throw new \RuntimeException('Open an editable Layout Builder draft to compose a builder block.');
     }
-    $configuration['hero'] = \Drupal\moody_hero_builder\HeroConfiguration::decode(json_encode($configuration['hero'] ?? NULL, JSON_THROW_ON_ERROR));
-    $plugin = \Drupal::service('plugin.manager.block')->createInstance('moody_hero_builder', array_intersect_key($configuration, array_flip(['hero', 'image'])) + ['label' => 'Moody Hero Builder', 'label_display' => FALSE]);
+    $configuration[$key] = $card
+      ? \Drupal\moody_card_builder\CardConfiguration::decode(json_encode($configuration[$key] ?? NULL, JSON_THROW_ON_ERROR))
+      : \Drupal\moody_hero_builder\HeroConfiguration::decode(json_encode($configuration[$key] ?? NULL, JSON_THROW_ON_ERROR));
+    if ($card) {
+      $images = $configuration['images'] ?? [];
+      if (!is_array($images) || !array_is_list($images) || count(array_filter($images, fn($id) => is_int($id) && $id > 0)) !== count($images)) { throw new \InvalidArgumentException('Invalid card media library.'); }
+      $configuration['images'] = \Drupal\moody_card_builder\Plugin\Block\MoodyCardBuilderBlock::imageIds(implode(',', $images));
+    }
+    $plugin = \Drupal::service('plugin.manager.block')->createInstance($plugin_id, array_intersect_key($configuration, array_flip($keys)) + ['label' => $card ? 'Moody Card Builder' : 'Moody Hero Builder', 'label_display' => FALSE]);
     $state = new \Drupal\Core\Form\FormState();
-    $state->setValues(['hero_builder' => ['source' => json_encode($configuration['hero']), 'image' => $configuration['image'] ?? 0]]);
+    $state->setValues([$form_key => ['source' => json_encode($configuration[$key]), $media_key => $card ? implode(',', $configuration[$media_key]) : $configuration[$media_key]]]);
     $form = $plugin->blockForm([], $state);
-    $form['hero_builder']['source']['#parents'] = ['hero_builder', 'source'];
-    $form['hero_builder']['image']['#parents'] = ['hero_builder', 'image'];
+    $form[$form_key]['source']['#parents'] = [$form_key, 'source'];
+    $form[$form_key][$media_key]['#parents'] = [$form_key, $media_key];
     $plugin->blockValidate($form, $state);
     if ($state->hasAnyErrors() || !$plugin->access($account)) {
-      throw new \InvalidArgumentException('The hero composition or selected media is unavailable. Choose an accessible image/poster and valid hero settings.');
+      throw new \InvalidArgumentException('The builder composition or selected media is unavailable. Choose an accessible image/poster and valid builder settings.');
     }
     if ($uuid !== '') {
       foreach ($storage->getSections() as $delta => $section) {
         foreach ($section->getComponents() as $component) {
           if ($component->getUuid() !== $uuid) { continue; }
           $current = (array) $component->get('configuration');
-          if (($current['id'] ?? '') !== 'moody_hero_builder' || $expected_hash === '' || !hash_equals($expected_hash, hash('sha256', serialize($current)))) {
-            throw new \RuntimeException('The hero changed while AI was working. Retry against its current draft.');
+          if (($current['id'] ?? '') !== $plugin_id || $expected_hash === '' || !hash_equals($expected_hash, hash('sha256', serialize($current)))) {
+            throw new \RuntimeException('The builder changed while AI was working. Retry against its current draft.');
           }
-          $component->setConfiguration(array_replace($current, array_intersect_key($configuration, array_flip(['hero', 'image']))));
+          $component->setConfiguration(array_replace($current, array_intersect_key($configuration, array_flip($keys))));
           $this->layoutTempstoreRepository->set($storage);
-          return ['section_delta' => $delta, 'region' => $component->getRegion(), 'component_uuid' => $uuid, 'plugin_id' => 'moody_hero_builder'];
+          return ['section_delta' => $delta, 'region' => $component->getRegion(), 'component_uuid' => $uuid, 'plugin_id' => $plugin_id];
         }
       }
-      throw new \RuntimeException('The selected hero no longer exists.');
+      throw new \RuntimeException('The selected builder no longer exists.');
     }
     if (!$storage->count()) { $storage->appendSection(new Section('layout_onecol')); }
     $delta = $this->resolveSectionDelta($storage, $target);
     $section = $storage->getSection($delta);
     $region = $this->resolveRegion($section, $target);
     $definitions = \Drupal::service('plugin.manager.block')->getFilteredDefinitions('layout_builder', $this->getPopulatedContexts($storage), ['section_storage' => $storage, 'delta' => $delta, 'region' => $region]);
-    if (!isset($definitions['moody_hero_builder'])) { throw new \RuntimeException('Hero Builder is not allowed in this layout.'); }
+    if (!isset($definitions[$plugin_id])) { throw new \RuntimeException('This builder is not allowed in this layout.'); }
     $component = new SectionComponent($this->uuid->generate(), $region, $plugin->getConfiguration());
     $section->appendComponent($component);
     $this->layoutTempstoreRepository->set($storage);
-    return ['section_delta' => $delta, 'region' => $region, 'component_uuid' => $component->getUuid(), 'plugin_id' => 'moody_hero_builder'];
+    return ['section_delta' => $delta, 'region' => $region, 'component_uuid' => $component->getUuid(), 'plugin_id' => $plugin_id];
   }
 
   /** Places the supported record-driven plugin in the editor's draft only. */

@@ -3,6 +3,8 @@
 namespace Drupal\moody_quotation\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\moody_quotation\QuotationStyle;
 use Drupal\Core\Url;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -103,6 +105,8 @@ class MoodyQuotationFormatter extends FormatterBase implements ContainerFactoryP
       $cache_tags = Cache::mergeTags($cache_tags, $image_style->getCacheTags());
     }
     foreach ($items as $item) {
+      $presentation = QuotationStyle::decode($item->style);
+      $cache = new CacheableMetadata();
       $cta = [];
       if (!empty($item->link_uri) && !empty($item->link_text)) {
         $link_item['link']['uri'] = $item->link_uri;
@@ -112,30 +116,44 @@ class MoodyQuotationFormatter extends FormatterBase implements ContainerFactoryP
       }
       $image_render_array = [];
       if (!empty($item->media) && $media = $this->entityTypeManager->getStorage('media')->load($item->media)) {
-        $media_attributes = $media->get('field_utexas_media_image')->getValue();
-        if ($file = $this->entityTypeManager->getStorage('file')->load($media_attributes[0]['target_id'])) {
-          $image = new \stdClass();
-          $image->title = NULL;
-          $image->alt = $media_attributes[0]['alt'];
-          $image->entity = $file;
-          $image->uri = $file->getFileUri();
-          $image->width = NULL;
-          $image->height = NULL;
-          $image_render_array = [
-            '#theme' => 'responsive_image_formatter',
-            '#item' => $image,
-            '#item_attributes' => [],
-            '#responsive_image_style_id' => $responsive_image_style_name,
-            '#cache' => [
-              'tags' => $cache_tags,
-            ],
-          ];
+        $access = $media->access('view', NULL, TRUE);
+        $cache->addCacheableDependency($media)->addCacheableDependency($access);
+        if ($access->isAllowed() && $media->hasField('field_utexas_media_image') && !$media->get('field_utexas_media_image')->isEmpty()) {
+          $media_attributes = $media->get('field_utexas_media_image')->getValue();
+          if ($file = $this->entityTypeManager->getStorage('file')->load($media_attributes[0]['target_id'])) {
+            $cache->addCacheableDependency($file);
+            $image = new \stdClass();
+            $image->title = NULL;
+            $image->alt = $media_attributes[0]['alt'];
+            $image->entity = $file;
+            $image->uri = $file->getFileUri();
+            $image->width = NULL;
+            $image->height = NULL;
+            $image_render_array = [
+              '#theme' => 'responsive_image_formatter',
+              '#item' => $image,
+              '#item_attributes' => [],
+              '#responsive_image_style_id' => $responsive_image_style_name,
+              '#cache' => [
+                'tags' => $cache_tags,
+              ],
+            ];
+            if ($presentation['style'] === 'split') {
+              $image_render_array = [
+                '#theme' => 'image',
+                '#uri' => $image->uri,
+                '#alt' => $image->alt,
+                '#attributes' => ['loading' => 'lazy'],
+              ];
+            }
+          }
         }
       }
       $elements[] = [
         '#theme' => 'moody_quotation',
         '#quote' => $item->quote,
-        '#style' => $item->style,
+        '#style' => $presentation['style'],
+        '#presentation' => $presentation,
         '#author' => $item->author,
         '#attribution' => $item->attribution,
         '#media' => $image_render_array,
@@ -146,6 +164,7 @@ class MoodyQuotationFormatter extends FormatterBase implements ContainerFactoryP
           ],
         ],
       ];
+      $cache->applyTo($elements[array_key_last($elements)]);
     }
 
     return $elements;

@@ -1,3 +1,16 @@
+{% if layout == 'mosaic' %}
+  {% if headline %}<h2>{{ headline }}</h2>{% endif %}
+  <div class="moody-photo-mosaic gap-{{ gap }}">
+    {% for item in items %}
+      <figure class="moody-photo-mosaic__item size-{{ item.size }}">
+        {% if item.link_url %}<a href="{{ item.link_url }}" aria-label="{{ item.headline ?: item.alt ?: 'View image'|t }}">{% endif %}
+        <img src="{{ item.image_url }}" alt="{{ item.alt }}" loading="lazy">
+        {% if item.link_url %}</a>{% endif %}
+        {% if item.headline %}<figcaption>{{ item.headline }}</figcaption>{% endif %}
+      </figure>
+    {% endfor %}
+  </div>
+{% else %}
 <div class="moody-image-grid-container ut-pt-8">
 	<div class="container">
 		{% if headline %}
@@ -22,3 +35,4 @@
 		</div>
 	</div>
 </div>
+{% endif %}

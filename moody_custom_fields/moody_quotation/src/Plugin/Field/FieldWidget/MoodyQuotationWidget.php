@@ -5,6 +5,7 @@ namespace Drupal\moody_quotation\Plugin\Field\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\moody_quotation\QuotationStyle;
 
 /**
  * Plugin implementation of the 'moody_quotation_widget' widget.
@@ -24,6 +25,7 @@ class MoodyQuotationWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+    $presentation = QuotationStyle::decode($items[$delta]->style);
     $element['quote'] = [
       '#title' => $this->t('Quote'),
       '#type' => 'textarea',
@@ -47,7 +49,7 @@ class MoodyQuotationWidget extends WidgetBase {
       '#cardinality' => 1,
       '#title' => $this->t('Image'),
       '#default_value' => !empty($items[$delta]->media) ? $items[$delta]->media : NULL,
-      '#description' => $this->t('Upload an image of 500 x 500 pixels to maintain resolution & avoid cropping.'),
+      '#description' => $this->t('For a split quote, choose a large image (at least 1200 pixels wide). The image fills its half of the block and may be cropped.'),
     ];
     $element['style'] = [
       '#title' => $this->t('Style'),
@@ -57,9 +59,24 @@ class MoodyQuotationWidget extends WidgetBase {
         'orange' => $this->t('Orange background with white text'),
         'grey' => $this->t('Gray background with white text'),
         'feature' => $this->t('Feature quote with large orange text'),
+        'split' => $this->t('Split quote with full-height image'),
       ],
-      '#default_value' => $items[$delta]->style ?? 'default',
+      '#default_value' => $presentation['style'],
     ];
+    $element['presentation'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Split quote appearance'),
+      '#open' => TRUE,
+      '#description' => $this->t('These options apply to the split quote style. Color pairs maintain readable contrast. The image stacks above the quote on narrow screens.'),
+    ];
+    foreach (QuotationStyle::OPTIONS as $key => $options) {
+      $element['presentation'][$key] = [
+        '#type' => 'select',
+        '#title' => ['palette' => $this->t('Text and background color'), 'size' => $this->t('Text size'), 'alignment' => $this->t('Text alignment'), 'position' => $this->t('Image position')][$key],
+        '#options' => $options,
+        '#default_value' => $presentation[$key],
+      ];
+    }
     $element['cta_wrapper'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Link'),
@@ -81,6 +98,8 @@ class MoodyQuotationWidget extends WidgetBase {
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     // This loop is through (potential) field instances.
     foreach ($values as &$value) {
+      $value['style'] = QuotationStyle::encode(['style' => $value['style'] ?? 'default'] + ($value['presentation'] ?? []));
+      unset($value['presentation']);
       if (empty($value['media'])) {
         // A null media value should be saved as 0.
         $value['media'] = 0;

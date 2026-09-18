@@ -31,8 +31,8 @@ runtime and therefore excludes `photo_content_area`.
 
 - Use `browser_id` to identify a browser entry and `plugin_id` to identify the
   Drupal block implementation. Labels are presentation text and may change.
-- Recommend only components listed below. Never infer availability from an
-  installed module or block type alone.
+- Runtime available_block_references and the current schema override this
+  historical catalog. Never infer availability from an installed module alone.
 - Treat media, links, taxonomy terms, and existing content as references that
   must be resolved in Drupal. Do not invent entity IDs, UUIDs, file IDs, paths,
   people, claims, dates, statistics, or testimonials.

@@ -259,6 +259,10 @@ class BlockDataCollectorService {
               $field_record['guidance'] = 'Use media, heading, subheading, caption, credit, link_uri, link_title, link_options, disable_image_styles, and these exact option tokens when needed: text_position=centered|top-left|top-right|bottom-left|bottom-right, text_color=white-text|orange-text|charcoal-text, overlay=no-overlay|orange-overlay|charcoal-overlay|heavy-orange-overlay|heavy-charcoal-overlay.';
             }
 
+            if ($field->getType() === 'moody_quotation') {
+              $field_record['guidance'] = 'Use only a supplied or verified quotation and attribution. Preserve existing default/orange/grey/feature styles unless asked to change them. For a full-height photo and quotation panel use style split:PALETTE:SIZE:ALIGN:POSITION, where PALETTE is blue|orange|gray|light, SIZE small|medium|large, ALIGN left|center|right, POSITION left|right. Example split:blue:medium:center:left. Use an accessible media reference; never invent an image ID, quote or attribution.';
+            }
+
             if ($field->getType() === 'moody_impact_facts') {
               $field_record['properties'] = [
                 'headline' => [
@@ -366,6 +370,7 @@ class BlockDataCollectorService {
           'category' => $definition['category'] ?? 'Other',
           'configuration' => $configuration,
           'configuration_schema' => $configuration_schema,
+          'guidance' => $plugin_id === 'moody_image_grid_image_grid' ? 'Photo grid: layout legacy preserves existing appearance; mosaic is borderless with gap none|small|medium. Each item size is small (one tile), medium (one column/two rows), or large (two columns/two rows); mobile stacks. image_style original avoids a predefined crop. Use the traditional block form for configuration; automatic plugin editing is not supported.' : '',
         ];
       }
       catch (\Exception $e) {

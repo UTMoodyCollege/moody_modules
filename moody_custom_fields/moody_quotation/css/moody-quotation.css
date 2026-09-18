@@ -1,3 +1,60 @@
+.quotation-wrapper .moody-quotation-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #005f86;
+  color: #fff;
+}
+.moody-quotation-split.palette-orange { background: #bf5700; }
+.moody-quotation-split.palette-gray { background: #333f48; }
+.moody-quotation-split.palette-light { background: #fff; color: #333f48; }
+.moody-quotation-split__media { min-width: 0; position: relative; }
+.moody-quotation-split__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 18rem;
+  object-fit: cover;
+}
+.moody-quotation-split__text {
+  align-self: center;
+  min-width: 0;
+  padding: clamp(1.5rem, 4vw, 4rem);
+  overflow-wrap: anywhere;
+}
+.quotation-wrapper .moody-quotation-split blockquote {
+  color: inherit;
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  font-weight: 400;
+  line-height: 1.5;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+.quotation-wrapper .moody-quotation-split blockquote::before,
+.quotation-wrapper .moody-quotation-split blockquote::after { content: none; }
+.quotation-wrapper .moody-quotation-split.size-small blockquote { font-size: 1.125rem; }
+.quotation-wrapper .moody-quotation-split.size-large blockquote { font-size: clamp(1.5rem, 3vw, 2.5rem); }
+.moody-quotation-split.quote-align-left { text-align: left; }
+.moody-quotation-split.quote-align-center { text-align: center; }
+.moody-quotation-split.quote-align-right { text-align: right; }
+.moody-quotation-split figcaption,
+.moody-quotation-split__cta { margin-top: 1.5rem; }
+.moody-quotation-split figcaption { display: block; width: auto; color: inherit; font-size: 1rem; line-height: 1.5; }
+.moody-quotation-split a,
+.moody-quotation-split a:hover,
+.moody-quotation-split a:focus { color: inherit; text-decoration: underline; }
+@media (min-width: 768px) {
+  .quotation-wrapper .moody-quotation-split { grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 26rem; }
+  .moody-quotation-split__media img { position: absolute; inset: 0; }
+  .moody-quotation-split.image-right .moody-quotation-split__media { grid-column: 2; grid-row: 1; }
+  .moody-quotation-split.image-right .moody-quotation-split__text { grid-column: 1; grid-row: 1; }
+  .quotation-wrapper .moody-quotation-split.no-image { grid-template-columns: minmax(0, 1fr); }
+}
+
 .quotation-wrapper.feature {
   margin: 2rem auto;
   max-width: 74rem;

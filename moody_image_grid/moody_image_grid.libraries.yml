@@ -4,7 +4,7 @@ moody_image_grid:
   css:
     theme:
       css/moody-image-grid.css: {}
+      css/moody-photo-mosaic.css: {}
   dependencies:
     - core/drupal
     - core/jquery
-    - core/jquery.once

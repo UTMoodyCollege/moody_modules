@@ -38,6 +38,8 @@ function moody_image_grid_theme($existing, $type, $theme, $path)
             'variables' => [
                 'items' => [],
                 'headline' => '',
+                'layout' => 'legacy',
+                'gap' => 'small',
             ],
         ],
     ];

@@ -1318,7 +1318,7 @@
       return uuid && type ? {
         referenceId: 'existing:' + uuid, uuid,
         label: block.getAttribute('data-ai-assistant-edit-block-label') || 'Selected block',
-        typeLabel: type, blockType: type, pluginId: type === 'moody_hero_builder' ? type : 'inline_block:' + type,
+        typeLabel: type, blockType: type, pluginId: ['moody_hero_builder', 'moody_card_builder'].includes(type) ? type : 'inline_block:' + type,
         selectionMode: 'edit', canEdit: true, existingCount: 1, groupLabel: 'Existing blocks'
       } : null;
     };

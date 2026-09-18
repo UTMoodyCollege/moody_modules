@@ -21,8 +21,14 @@ blocks are unchanged. No fleet enablement or deployment is performed here.
 
 Reuses Hero Builder's brand tokens and access/cache-aware image resolver through
 an explicit module dependency. All card styles are module-scoped; no theme patch
-or new frontend dependency is needed. Typed configuration makes the block
-discoverable to the AI catalog; automated AI composition is not enabled yet.
+or new frontend dependency is needed. With Moody AI Assistant enabled, the
+assistant can compose cards or use **Edit with AI** from a card block's menu.
+Its contract covers rows, cells, responsive layouts, images and brand options.
+Attachments and permission-checked media lookups supply image references;
+generating new images requires the editor's Create image option and Media-create
+permission. All compositions pass the same server validator as the visual form.
+AI changes only the working layout draft; the editor still saves the layout.
+Concurrent changes are rejected rather than overwritten.
 
 Checks:
 
@@ -30,7 +36,16 @@ Checks:
 php moody_card_builder/tests/contract.php
 node --check moody_card_builder/js/builder.js
 ddev drush php:script web/modules/custom/moody_modules/moody_card_builder/tests/drupal.php
+ddev drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/card_builder_ai_smoke.php
 ```
+
+Optional paid-provider creation/edit check (uses the configured provider):
+
+```sh
+ddev exec env MOODY_AI_CARD_PROVIDER_CHECK=1 drush php:script web/modules/custom/moody_modules/moody_ai/modules/moody_ai_assistant/tests/card_builder_ai_smoke.php
+```
+
+The AI smoke check creates and removes an unpublished test node and its draft.
 
 The editor keeps semantic reading order while changing image placement. Check
 the three previews, heading level and descriptive link wording before publishing.

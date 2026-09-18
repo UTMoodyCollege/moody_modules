@@ -1,6 +1,17 @@
 {% set style_class = style|default('default') %}
 <div class="quotation-wrapper {{ style_class }}">
-  {% if style_class == 'feature' %}
+  {% if style_class == 'split' %}
+    <figure class="moody-quotation-split palette-{{ presentation.palette }} size-{{ presentation.size }} quote-align-{{ presentation.alignment }} image-{{ presentation.position }}{% if not media %} no-image{% endif %}">
+      {% if media %}<div class="moody-quotation-split__media">{{ media }}</div>{% endif %}
+      <div class="moody-quotation-split__text">
+        <blockquote>{{ quote }}</blockquote>
+        {% if author or attribution %}
+          <figcaption>{% if author %}<strong>{{ author }}</strong>{% endif %}{% if author and attribution %}, {% endif %}{{ attribution }}</figcaption>
+        {% endif %}
+        {% if cta %}<div class="moody-quotation-split__cta">{{ cta }}</div>{% endif %}
+      </div>
+    </figure>
+  {% elseif style_class == 'feature' %}
     <figure class="moody-quotation-feature">
       {% if media %}
         <div class="moody-quotation-feature__media">

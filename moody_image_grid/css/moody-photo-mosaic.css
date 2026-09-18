@@ -1,0 +1,37 @@
+.moody-photo-mosaic {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+}
+.moody-photo-mosaic.gap-none { gap: 0; }
+.moody-photo-mosaic.gap-medium { gap: 1rem; }
+.moody-photo-mosaic__item {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  aspect-ratio: 3 / 2;
+}
+.moody-photo-mosaic__item a { display: block; width: 100%; height: 100%; }
+.moody-photo-mosaic__item img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.moody-photo-mosaic__item figcaption {
+  display: block;
+  width: auto;
+  position: absolute;
+  inset: auto 0 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.moody-photo-mosaic__item a:focus-visible { outline: 3px solid #fff; outline-offset: -6px; box-shadow: inset 0 0 0 9px #333f48; }
+@media (min-width: 768px) {
+  .moody-photo-mosaic { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: clamp(8rem, 15vw, 14rem); }
+  .moody-photo-mosaic__item { aspect-ratio: auto; }
+  .moody-photo-mosaic__item.size-medium { grid-row: span 2; }
+  .moody-photo-mosaic__item.size-large { grid-column: span 2; grid-row: span 2; }
+}

@@ -23,3 +23,12 @@ block.settings.moody_image_grid_image_grid:
           link_url:
             type: string
             label: 'Link URL'
+          size:
+            type: string
+            label: 'Mosaic photo size'
+    layout:
+      type: string
+      label: 'Grid layout'
+    gap:
+      type: string
+      label: 'Mosaic spacing'

@@ -253,7 +253,7 @@ class BlockReferenceCatalog {
       'type_label' => $type_label !== '' ? $type_label : $display_label,
       'region' => (string) ($component['region'] ?? ''),
       'section' => isset($component['section']) ? (int) $component['section'] : 0,
-      'can_edit' => $plugin_id === 'moody_hero_builder' || (!empty($component['block_revision_id']) && !empty($component['block_type'])),
+      'can_edit' => in_array($plugin_id, ['moody_hero_builder', 'moody_card_builder'], TRUE) || (!empty($component['block_revision_id']) && !empty($component['block_type'])),
       'group_id' => (string) ($browser_category['id'] ?? $this->normalizeGroupId($category_label)),
       'group_label' => $category_label,
       'group_weight' => isset($browser_category['weight']) && $browser_category['weight'] !== NULL ? (int) $browser_category['weight'] : 999,

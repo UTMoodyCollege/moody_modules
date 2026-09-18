@@ -48,7 +48,7 @@ class AIBlockInspector {
     $blocks = [];
 
     foreach ($context['existing_components'] ?? [] as $component) {
-      if (empty($component['uuid']) || empty($component['block_type']) || (empty($component['block_revision_id']) && ($component['plugin_id'] ?? '') !== 'moody_hero_builder')) {
+      if (empty($component['uuid']) || empty($component['block_type']) || (empty($component['block_revision_id']) && !in_array(($component['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder'], TRUE))) {
         continue;
       }
 
@@ -85,9 +85,9 @@ class AIBlockInspector {
         continue;
       }
 
-      if ($component['plugin_id'] === 'moody_hero_builder') {
+      if (in_array($component['plugin_id'], ['moody_hero_builder', 'moody_card_builder'], TRUE)) {
         $focused = $this->layoutContextCollector->collectBlockEditContext($entity, array_replace($runtime_context, ['edit_component_uuid' => $component['component_uuid']]), \Drupal::currentUser());
-        $contents[] = $component + ['content' => $focused['existing_components'][0]['hero_configuration']];
+        $contents[] = $component + ['content' => ($focused['existing_components'][0]['card_configuration'] ?? $focused['existing_components'][0]['hero_configuration'])];
         continue;
       }
       $block = $this->entityTypeManager->getStorage('block_content')->loadRevision($component['block_revision_id']);
