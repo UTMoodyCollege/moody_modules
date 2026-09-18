@@ -13,6 +13,7 @@ function moody_image_gallery_theme($existing, $type, $theme, $path) {
     'moody_image_gallery' => [
       'variables' => [
         'headline' => '',
+        'layout' => 'legacy',
         'items' => [],
         'gallery_id' => '',
         'gutter' => '1.25',

@@ -2,6 +2,9 @@ block.settings.moody_image_gallery_block:
   type: block_settings
   label: 'Moody Image Gallery block'
   mapping:
+    layout:
+      type: string
+      label: 'Gallery layout'
     headline:
       type: string
       label: 'Headline'
@@ -14,6 +17,9 @@ block.settings.moody_image_gallery_block:
       sequence:
         type: mapping
         mapping:
+          size:
+            type: string
+            label: 'Mosaic image size'
           media:
             type: integer
             label: 'Image media ID'

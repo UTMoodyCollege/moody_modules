@@ -57,6 +57,7 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
   public function defaultConfiguration(): array {
     return [
       'headline' => '',
+      'layout' => 'legacy',
       'gutter' => '1.25',
       'items' => [],
     ];
@@ -76,10 +77,17 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
       '#default_value' => $config['headline'] ?? '',
     ];
 
+    $form['layout'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Gallery layout'),
+      '#options' => ['legacy' => $this->t('Original (60/40/full-width)'), 'mosaic' => $this->t('Borderless mosaic')],
+      '#default_value' => $config['layout'] ?? 'legacy',
+    ];
     $form['gutter'] = [
       '#type' => 'select',
       '#title' => $this->t('Gutter size'),
       '#options' => [
+        '0' => $this->t('None (flush images)'),
         '0.75' => $this->t('Tight'),
         '1.25' => $this->t('Standard'),
         '1.75' => $this->t('Large'),
@@ -89,8 +97,9 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
 
     $form['items'] = [
       '#type' => 'fieldset',
+      '#tree' => TRUE,
       '#title' => $this->t('Gallery Images'),
-      '#description' => $this->t('Add up to 12 images. The layout repeats in a 60/40/full-width pattern on larger screens. Drag the focal point marker to choose the crop anchor for each image. Leave unused slots empty.'),
+      '#description' => $this->t('Add up to 12 images. Original layout repeats a 60/40/full-width pattern. Mosaic uses each image size below and stacks on mobile. Drag the focal point marker to choose the crop anchor. Leave unused slots empty.'),
     ];
 
     for ($i = 0; $i < 12; $i++) {
@@ -106,6 +115,13 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
         '#title' => $this->t('Image'),
         '#cardinality' => 1,
         '#default_value' => $this->extractMediaId($item_config['media'] ?? NULL),
+      ];
+      $form['items'][$i]['size'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Mosaic image size'),
+        '#options' => ['small' => $this->t('Small (1 tile)'), 'medium' => $this->t('Medium (1 column, 2 rows)'), 'large' => $this->t('Large (2 columns, 2 rows)')],
+        '#default_value' => $item_config['size'] ?? 'small',
+        '#description' => $this->t('Used only by the borderless mosaic layout.'),
       ];
       $preview_url = $this->getPreviewImageUrl($this->extractMediaId($item_config['media'] ?? NULL));
       $focus_parts = $this->getFocusParts($item_config);
@@ -171,6 +187,7 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
    */
   public function blockSubmit($form, FormStateInterface $form_state): void {
     $this->configuration['headline'] = $form_state->getValue('headline');
+    $this->configuration['layout'] = $form_state->getValue('layout');
     $this->configuration['gutter'] = $form_state->getValue('gutter');
     $this->configuration['items'] = $form_state->getValue('items');
   }
@@ -211,6 +228,7 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
         'caption' => $caption,
         'focus_position' => $this->getFocusParts($item)['x'] . ' ' . $this->getFocusParts($item)['y'],
         'index' => count($items),
+        'size' => in_array($item['size'] ?? '', ['small', 'medium', 'large'], TRUE) ? $item['size'] : 'small',
       ];
     }
 
@@ -223,9 +241,10 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
     return [
       '#theme' => 'moody_image_gallery',
       '#headline' => $config['headline'] ?? '',
+      '#layout' => ($config['layout'] ?? '') === 'mosaic' ? 'mosaic' : 'legacy',
       '#items' => $items,
       '#gallery_id' => $gallery_id,
-      '#gutter' => $config['gutter'] ?? '1.25',
+      '#gutter' => in_array($config['gutter'] ?? '', ['0', '0.75', '1.25', '1.75'], TRUE) ? $config['gutter'] : '1.25',
       '#attached' => [
         'library' => [
           'moody_image_gallery/moody_image_gallery',
