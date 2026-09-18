@@ -19,6 +19,20 @@ Launch then revalidates that plan and applies it in one database transaction:
 Both page saves create revisions. Redirect and alias recovery still relies on
 the platform backup after a successful launch.
 
+Choose **Keep published / enabled at an archive URL** to retain the former
+content publicly instead of retiring it. Optionally enter an unused local
+archive URL, such as `/archive/program-2025`; blank uses the first free
+`-old-vN` URL. This also supports moving a former Views page display while
+leaving its other displays unchanged. Existing behavior remains the default.
+
+The replacement owns the original public URL (no redirect is needed there).
+The replacement's former URL and existing legacy redirects lead to the new
+page. In public-archive mode the old `/node/N` continues serving the archive:
+redirecting that canonical path would also redirect archive-alias visitors.
+Archive URLs cannot collide with aliases, redirects, Views paths, or routes.
+The preview fingerprints these choices and execution rechecks them under the
+existing lock and transaction. No content is copied or deleted.
+
 Both page pickers search titles, node IDs, active aliases, pasted URLs, and
 humanized alias text. Suggestions display the current alias beside the title.
 Views page displays use explicit selects that show their current paths and

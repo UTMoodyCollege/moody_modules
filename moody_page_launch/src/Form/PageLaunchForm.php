@@ -66,7 +66,7 @@ final class PageLaunchForm extends FormBase {
     $form['current_node'] = [
       '#type' => 'entity_autocomplete',
       '#title' => $this->t('Current content page'),
-      '#description' => $this->t('This page will be unpublished and moved to an unused -old-vN URL.'),
+      '#description' => $this->t('Choose below whether to unpublish this page or keep it published at an archive URL.'),
       '#target_type' => 'node',
       '#selection_handler' => 'moody_page_launch:node_alias',
       '#selection_settings' => ['match_limit' => 20],
@@ -80,7 +80,7 @@ final class PageLaunchForm extends FormBase {
     $form['current_view'] = [
       '#type' => 'select',
       '#title' => $this->t('Current Views page display'),
-      '#description' => $this->t('Only this page display will be disabled; the View and its other displays remain enabled.'),
+      '#description' => $this->t('Choose below whether to disable this display or keep it enabled at an archive URL. Other displays remain unchanged.'),
       '#options' => $this->launcher->viewPageOptions(TRUE),
       '#empty_option' => $this->t('- Select a Views page -'),
       '#default_value' => ($preview['current']['type'] ?? NULL) === 'view'
@@ -89,6 +89,25 @@ final class PageLaunchForm extends FormBase {
       '#states' => [
         'visible' => [':input[name="current_type"]' => ['value' => 'view']],
       ],
+    ];
+
+    $form['disposition'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('What happens to the former page?'),
+      '#options' => [
+        'retire' => $this->t('Unpublish the content page / disable the Views page display (existing behavior)'),
+        'archive' => $this->t('Keep published / enabled at an archive URL'),
+      ],
+      '#default_value' => $preview['disposition'] ?? 'retire',
+      '#required' => TRUE,
+      '#description' => $this->t('The replacement takes over the original public URL. A published archive remains accessible through its new URL and its node address; legacy redirects still go to the replacement.'),
+    ];
+    $form['archive_path'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Archive URL (optional)'),
+      '#maxlength' => 255,
+      '#default_value' => $preview['archive_path'] ?? '',
+      '#description' => $this->t('For example /archive/old-page. Leave blank to select the first unused -old-vN URL. Applies to content pages, and to Views displays kept enabled as archives.'),
     ];
 
     $form['replacement_type'] = [
@@ -199,7 +218,7 @@ final class PageLaunchForm extends FormBase {
     }
 
     try {
-      $plan = $this->launcher->buildPlan($current_target, $replacement_target);
+      $plan = $this->launcher->buildPlan($current_target, $replacement_target, $this->optionsFromForm($form_state));
       $form_state->set('moody_page_launch_targets', [$current_target, $replacement_target]);
       $form_state->set('moody_page_launch_current_plan', $plan);
     }
@@ -238,6 +257,7 @@ final class PageLaunchForm extends FormBase {
         $current_target,
         $replacement_target,
         (string) $form_state->getValue('plan_fingerprint'),
+        $this->optionsFromForm($form_state),
       );
     }
     catch (\Throwable $exception) {
@@ -256,11 +276,13 @@ final class PageLaunchForm extends FormBase {
       return;
     }
 
-    $retired = $plan['current']['type'] === 'node'
+    $retired = $plan['disposition'] === 'archive'
+      ? $this->t('The former page remains published/enabled at %archive.', ['%archive' => $plan['archive_path']])
+      : ($plan['current']['type'] === 'node'
       ? $this->t('The unpublished former page is available to editors at %archive.', [
         '%archive' => $plan['archive_path'],
       ])
-      : $this->t('The former Views page display is disabled; its other displays are unchanged.');
+      : $this->t('The former Views page display is disabled; its other displays are unchanged.'));
     $this->messenger()->addStatus($this->t(
       'Launched %replacement at %path. @retired',
       [
@@ -282,6 +304,16 @@ final class PageLaunchForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {}
+
+  /**
+   * Uses the same options for preview validation and locked execution.
+   */
+  protected function optionsFromForm(FormStateInterface $form_state): array {
+    return [
+      'disposition' => $form_state->getValue('disposition') ?? 'retire',
+      'archive_path' => $form_state->getValue('archive_path') ?? '',
+    ];
+  }
 
   /**
    * Converts one pair of type-specific fields into a launch target.
@@ -334,14 +366,16 @@ final class PageLaunchForm extends FormBase {
       [
         $this->t('Current page'),
         $this->targetBeforeLabel($current),
-        $current['type'] === 'node'
+        $plan['disposition'] === 'archive'
+          ? $this->t('Remains published/enabled at the archive URL')
+          : ($current['type'] === 'node'
           ? $this->t('Unpublished with a new revision')
-          : $this->t('Page display disabled; other View displays unchanged'),
+          : $this->t('Page display disabled; other View displays unchanged')),
       ],
       [
         $this->t('Current page URL'),
         $current['path'],
-        $current['type'] === 'node'
+        $plan['archive_path']
           ? $plan['archive_path']
           : $this->t('Served by the replacement; retained on the disabled display for rollback'),
       ],
@@ -370,7 +404,9 @@ final class PageLaunchForm extends FormBase {
       $rows[] = [
         $this->t('Former node URL'),
         '/node/' . $current['id'],
-        $this->t('301 redirect to @destination', [
+        $plan['disposition'] === 'archive'
+          ? $this->t('Continues serving the published archive (no redirect)')
+          : $this->t('301 redirect to @destination', [
           '@destination' => $plan['replacement_destination'],
         ]),
       ];

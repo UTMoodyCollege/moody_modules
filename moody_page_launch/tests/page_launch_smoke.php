@@ -262,7 +262,77 @@ try {
   }
   $assert($destination_route_found, 'The new Views path was not rebuilt into the router.');
 
-  print "Moody Page Launch smoke test passed.\n";
+  // Keep a former page publicly accessible without redirecting its archive.
+  $archive_current = Node::create([
+    'type' => 'article', 'title' => 'Public archive current', 'status' => TRUE,
+    'path' => ['alias' => $live_alias . '-public', 'pathauto' => 0],
+  ]);
+  $archive_current->save();
+  $archive_replacement = Node::create([
+    'type' => 'article', 'title' => 'Public archive replacement', 'status' => FALSE,
+    'path' => ['alias' => $live_alias . '-new', 'pathauto' => 0],
+  ]);
+  $archive_replacement->save();
+  $a = ['type' => 'node', 'id' => (int) $archive_current->id()];
+  $b = ['type' => 'node', 'id' => (int) $archive_replacement->id()];
+  $options = ['disposition' => 'archive', 'archive_path' => '/archive' . $live_alias];
+  $archive_plan = $launcher->buildPlan($a, $b, $options);
+  $account_switcher->switchTo(new \Drupal\Core\Session\AnonymousUserSession());
+  try {
+    try {
+      $launcher->buildPlan($a, $b, $options);
+      throw new RuntimeException('Anonymous user could plan a launch.');
+    }
+    catch (InvalidArgumentException) {
+    }
+  }
+  finally {
+    $account_switcher->switchBack();
+  }
+  foreach (['//example.test', '/node/1', '/user/login', $live_alias, $preview_alias, $view_source_path, '/bad?query=1'] as $bad_path) {
+    try {
+      $launcher->buildPlan($a, $b, ['disposition' => 'archive', 'archive_path' => $bad_path]);
+      throw new RuntimeException('Accepted occupied/unsafe archive: ' . $bad_path);
+    }
+    catch (InvalidArgumentException) {
+    }
+  }
+  try {
+    $launcher->launch($a, $b, $launcher->fingerprint($archive_plan), ['disposition' => 'retire']);
+    throw new RuntimeException('Changed archive choices bypassed stale preview protection.');
+  }
+  catch (RuntimeException $exception) {
+    $assert(str_contains($exception->getMessage(), 'changed after the preview'), 'Unexpected stale-plan error.');
+  }
+  $archive_legacy = Redirect::create();
+  $archive_legacy->setSource($live_alias . '-legacy-public');
+  $archive_legacy->setRedirect('/node/' . $archive_current->id());
+  $archive_legacy->save();
+  $archive_plan = $launcher->buildPlan($a, $b, $options);
+  $launcher->launch($a, $b, $launcher->fingerprint($archive_plan), $options);
+  $node_storage->resetCache();
+  $assert($node_storage->load($a['id'])->isPublished() && $node_storage->load($b['id'])->isPublished(), 'Archive and replacement must both stay published.');
+  $assert($load_alias($a['id'])->getAlias() === $options['archive_path'], 'Custom archive alias not persisted.');
+  $assert($load_alias($b['id'])->getAlias() === $live_alias . '-public', 'Replacement lost the original public URL.');
+  $assert($get_redirect('/node/' . $a['id']) === NULL && $get_redirect($options['archive_path']) === NULL, 'Public archive must not redirect.');
+  $assert($get_redirect($live_alias . '-legacy-public')->getRedirect()['uri'] === 'internal:/node/' . $b['id'], 'Legacy visitors must reach the replacement.');
+  $archive_request = Request::create($options['archive_path']);
+  $route_provider->getRouteCollectionForRequest($archive_request);
+  $assert($current_path->getPath($archive_request) === '/node/' . $a['id'], 'Archive URL does not resolve to the original page.');
+
+  // An archived Views page moves without disabling its sibling block display.
+  $archive_view_id = 'moody_page_launch_archive_' . $suffix;
+  $create_view($archive_view_id, 'Public archive View', $live_alias . '-archive-view', TRUE);
+  $view_a = ['type' => 'view', 'view_id' => $archive_view_id, 'display_id' => 'page_1'];
+  $view_options = ['disposition' => 'archive'];
+  $view_plan = $launcher->buildPlan($view_a, $a, $view_options);
+  $launcher->launch($view_a, $a, $launcher->fingerprint($view_plan), $view_options);
+  $archived_display = $view_display($archive_view_id);
+  $assert($archived_display['display_options']['enabled'] === TRUE, 'Archived Views page was disabled.');
+  $assert('/' . $archived_display['display_options']['path'] === $view_plan['archive_path'], 'Views archive path was not updated.');
+  $assert($view_storage->load($archive_view_id)->get('display')['block_1']['display_options']['enabled'] === TRUE, 'Views sibling changed.');
+
+  print "Moody Page Launch smoke test passed, including public archives and stale/unsafe URL rejection.\n";
 }
 finally {
   $transaction->rollBack();

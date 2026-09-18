@@ -76,7 +76,14 @@ final class PageLauncher {
   /**
    * Builds the exact launch plan without changing content or configuration.
    */
-  public function buildPlan(array $current_target, array $replacement_target): array {
+  public function buildPlan(array $current_target, array $replacement_target, array $options = []): array {
+    if (!$this->currentUser->hasPermission('administer moody page launches')) {
+      throw new \InvalidArgumentException('You do not have permission to launch pages.');
+    }
+    $disposition = $options['disposition'] ?? 'retire';
+    if (!in_array($disposition, ['retire', 'archive'], TRUE)) {
+      throw new \InvalidArgumentException('Select a valid former-page action.');
+    }
     $current = $this->targetSnapshot($current_target, 'current');
     $replacement = $this->targetSnapshot($replacement_target, 'replacement');
 
@@ -99,12 +106,32 @@ final class PageLauncher {
     $this->assertNoOtherPathOwner($current['path'], $allowed_owners);
     $this->assertNoOtherPathOwner($replacement['path'], $allowed_owners);
 
+    $archive_path = NULL;
+    if ($current['type'] === 'node' || $disposition === 'archive') {
+      $archive_path = trim((string) ($options['archive_path'] ?? ''));
+      if ($archive_path !== '') {
+        if (!preg_match('@^/(?!/)[a-zA-Z0-9/_-]+$@D', $archive_path)
+          || mb_strlen($archive_path) > 255
+          || preg_match('@^/(admin|node|user|system)(/|$)@i', $archive_path)
+          || str_contains($archive_path, '//')
+          || str_ends_with($archive_path, '/')) {
+          throw new \InvalidArgumentException('Use an archive URL such as /archive/old-page, with letters, numbers, hyphens, underscores and slashes only.');
+        }
+        if ($archive_path === $current['path'] || $archive_path === $replacement['path']
+          || $this->sourcePathExists($archive_path)) {
+          throw new \InvalidArgumentException('The archive URL is already in use. Choose an unused URL.');
+        }
+      }
+      else {
+        $archive_path = $this->nextArchiveAlias($current['path']);
+      }
+    }
+
     return [
+      'disposition' => $disposition,
       'current' => $current,
       'replacement' => $replacement,
-      'archive_path' => $current['type'] === 'node'
-        ? $this->nextArchiveAlias($current['path'])
-        : NULL,
+      'archive_path' => $archive_path,
       'replacement_legacy_path' => $replacement['path'] !== $current['path']
         ? $replacement['path']
         : NULL,
@@ -127,7 +154,7 @@ final class PageLauncher {
   /**
    * Executes a previously previewed plan.
    */
-  public function launch(array $current_target, array $replacement_target, string $expected_fingerprint): array {
+  public function launch(array $current_target, array $replacement_target, string $expected_fingerprint, array $options = []): array {
     $lock_name = 'moody_page_launch.launch';
     if (!$this->lock->acquire($lock_name, 30.0)) {
       throw new \RuntimeException('Another page launch is currently running. Try again shortly.');
@@ -140,7 +167,7 @@ final class PageLauncher {
 
     try {
       $this->resetTargetCaches($current_target, $replacement_target);
-      $plan = $this->buildPlan($current_target, $replacement_target);
+      $plan = $this->buildPlan($current_target, $replacement_target, $options);
       if (!hash_equals($expected_fingerprint, $this->fingerprint($plan))) {
         throw new \RuntimeException('The pages, aliases, Views displays, or redirects changed after the preview. Refresh the preview before launching.');
       }
@@ -154,7 +181,7 @@ final class PageLauncher {
           }
           $this->prepareRevision(
             $current,
-            FALSE,
+            $plan['disposition'] === 'archive',
             sprintf('Archived by Moody Page Launch for %s.', $plan['replacement']['key']),
           );
           $current->set('path', [
@@ -166,7 +193,7 @@ final class PageLauncher {
           $current->save();
         }
         else {
-          $this->updateViewDisplay($plan['current'], FALSE);
+          $this->updateViewDisplay($plan['current'], $plan['disposition'] === 'archive', $plan['archive_path']);
         }
 
         if ($plan['replacement']['type'] === 'node') {
@@ -212,10 +239,16 @@ final class PageLauncher {
           );
         }
         if ($plan['current']['type'] === 'node') {
-          $this->replaceRedirect(
-            '/node/' . $plan['current']['id'],
-            $plan['replacement_destination'],
-          );
+          // A canonical-node redirect also catches the public archive alias.
+          if ($plan['disposition'] === 'archive') {
+            $this->deleteRedirectsBySource('/node/' . $plan['current']['id']);
+          }
+          else {
+            $this->replaceRedirect(
+              '/node/' . $plan['current']['id'],
+              $plan['replacement_destination'],
+            );
+          }
         }
 
         unset($transaction);
@@ -290,6 +323,9 @@ final class PageLauncher {
     if (!$node instanceof NodeInterface) {
       throw new \InvalidArgumentException(sprintf('Select a valid %s content page.', $role));
     }
+    if (!$node->access('update', $this->currentUser)) {
+      throw new \InvalidArgumentException('You do not have permission to update this content page.');
+    }
     if ($role === 'current' && !$node->isPublished()) {
       throw new \InvalidArgumentException('The current content page must be published before it can be replaced.');
     }
@@ -326,6 +362,9 @@ final class PageLauncher {
     $view = $this->entityTypeManager->getStorage('view')->load($view_id);
     if (!$view instanceof ViewEntityInterface || !$view->status()) {
       throw new \InvalidArgumentException(sprintf('The %s View must exist and be enabled.', $role));
+    }
+    if (!$view->access('update', $this->currentUser)) {
+      throw new \InvalidArgumentException('You do not have permission to update this View.');
     }
     $display = $view->get('display')[$display_id] ?? NULL;
     if (!is_array($display) || ($display['display_plugin'] ?? '') !== 'page') {
@@ -505,7 +544,7 @@ final class PageLauncher {
         }
       }
     }
-    return FALSE;
+    return (bool) \Drupal::service('path.validator')->getUrlIfValidWithoutAccessCheck($path);
   }
 
   /**
