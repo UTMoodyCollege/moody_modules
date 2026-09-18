@@ -68,7 +68,7 @@ Use Moody style-guide classes only when they help communicate the requested pres
 - Links: ut-link; ut-link--darker; ut-cta-link; ut-cta-link--darker. Apply link utilities only to anchor elements and keep link text descriptive.
 - Color: text-ut-{black,charcoal,white,burntorange,bluebonnet,turquoise,turtlepond,cactus,shade,tangerine,limestone,sunshine,moody-peach,moody-gray,moody-blue,error-red,bluebonnet--s20}; bg-ut-{the same values}; border-ut-{the same values}.
 - Spacing: ut-{p,pt,pb,pl,pr,m,mt,mb,ml,mr}-{1,2,4,8,16}.
-- Borders: ut-border-width-{none,thin,medium,thick}; ut-border-radius-{none,sm,md,lg,xl,2xl,full}.
+- Borders: ut-border-width-{none,thin,medium,thick}; use square corners only (ut-border-radius-none). Do not add rounded corners.
 - Tables: ut-fit-table; ut-50-50-table.
 - Responsive type, weight, spacing, border-width, and border-radius utilities may be prefixed md:, lg:, or xl:.
 - Legacy background classes remain supported: utexas-bg-{074d6a,138791,f9fafb,e6ebed,c4cdd4,7d8a92,5e686e,3e4549,487d39,9d4700,ebeced,c2c5c8,858c91,1f262b,fbfbf9,f2f1ed,e6e4dc,aba89e,807e76,56544e}.

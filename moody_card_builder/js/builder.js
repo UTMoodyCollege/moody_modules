@@ -21,6 +21,7 @@
     let state;
     try { state = JSON.parse(source.value); if (!state.cards?.length) throw new Error('Missing cards'); }
     catch (_) { root.prepend(el('p', { role: 'alert' }, Drupal.t('Unable to load the visual editor. Correct the JSON below.'))); return; }
+    state.radius = 'square';
     (source.closest('.form-item') || source).hidden = true;
     let selected = state.cards[0].id, device = 'desktop', tab = 'collection', images = {};
     const history = [], future = [];
@@ -114,7 +115,7 @@
       tabs.querySelectorAll('button').forEach((node) => node.setAttribute('aria-pressed', String(node.dataset.tab === tab)));
       const card = state.cards.find((item) => item.id === selected);
       if (tab === 'collection') {
-        fields.append(control(`Cards per row · ${device}`, state.columns, device, null, 'number', { min: 1, max: device === 'mobile' ? 2 : 4, step: 1 }), control('Gap', state, 'gap', { small: 'Small', medium: 'Medium', large: 'Large' }), control('Corner rounding', state, 'radius', { square: 'Square', soft: 'Soft · 8px', rounded: 'Rounded · 24px' }), control('Card heading level', state, 'heading_level', { h2: 'H2', h3: 'H3', h4: 'H4' }));
+        fields.append(control(`Cards per row · ${device}`, state.columns, device, null, 'number', { min: 1, max: device === 'mobile' ? 2 : 4, step: 1 }), control('Gap', state, 'gap', { small: 'Small', medium: 'Medium', large: 'Large' }), control('Card heading level', state, 'heading_level', { h2: 'H2', h3: 'H3', h4: 'H4' }));
         fields.append(el('p', { class: 'mcb-note' }, Drupal.t('Select a card below or on the canvas to edit its content and image. New cards inherit the selected card’s design.')));
         return;
       }

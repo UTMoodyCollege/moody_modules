@@ -46,10 +46,8 @@ class MoodyFlexGridWidget extends WidgetBase {
       '#default_value' => isset($items[$delta]->style) ? $items[$delta]->style : 'three',
     ];
     $element['rounded_edges'] = [
-      '#title' => $this->t('Rounded Edges'),
-      '#type' => 'checkbox',
-      '#default_value' => !empty($items[$delta]->rounded_edges),
-      '#description' => $this->t('Apply rounded corners to the Flex Grid cards and media.'),
+      '#type' => 'value',
+      '#value' => 0,
     ];
     $element['overlay_text'] = [
       '#title' => $this->t('Overlay Text'),

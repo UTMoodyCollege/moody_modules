@@ -526,7 +526,7 @@ class BlockParser {
     return array_filter([
       'headline' => $headline,
       'style' => $style,
-      'rounded_edges' => !empty($field_data['rounded_edges']) ? 1 : 0,
+      'rounded_edges' => 0,
       'overlay_text' => !empty($field_data['overlay_text']) ? 1 : 0,
       'flex_grid_items' => $normalized_items ? serialize($normalized_items) : NULL,
     ], function ($item_value) {

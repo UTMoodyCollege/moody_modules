@@ -53,7 +53,7 @@ try {
   $types = (new ReflectionMethod($planner, 'getStructuredPlanBlockTypes'))->invoke($planner, 'Create cards', ['available_block_references' => [['plugin_id' => 'moody_card_builder', 'is_available_block' => TRUE]]], $data);
   card_check(in_array('moody_card_builder', $types, TRUE), 'Card Builder absent from automated types');
   if (getenv('MOODY_AI_CARD_PROVIDER_CHECK') === '1') {
-    $configuration = $planner->composeCardBuilder('Create three text-only cards titled Speech, Language, and Hearing. Three desktop columns, two tablet columns, one mobile column; rounded corners. Each card has one short supporting sentence and an Explore button linking to /news, aligned right beside a left-aligned News label in a 50/50 footer row. No images.', ['allowed_image_ids' => [], 'prefer_ai_images' => FALSE]);
+    $configuration = $planner->composeCardBuilder('Create three text-only cards titled Speech, Language, and Hearing. Three desktop columns, two tablet columns, one mobile column; square corners. Each card has one short supporting sentence and an Explore button linking to /news, aligned right beside a left-aligned News label in a 50/50 footer row. No images.', ['allowed_image_ids' => [], 'prefer_ai_images' => FALSE]);
     $configuration['images'] = [];
     card_check(count($configuration['collection']['cards']) === 3, 'Provider missed three cards');
     card_check($configuration['collection']['columns'] === ['mobile' => 1, 'tablet' => 2, 'desktop' => 3], 'Provider missed responsive columns');

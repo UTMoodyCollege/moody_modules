@@ -4,6 +4,13 @@ Provides an administrator-only, two-step tool at
 `/admin/content/moody-page-launch` for replacing a published content page or
 fixed Views page display with a redesigned page.
 
+Update 10001 grants `administer moody page launches` to the existing
+`standard_content_manager` role (Standard Content Manager), matching RTF's
+approved role policy. It preserves other permissions and skips sites without
+that exact role; it never creates a role or grants access to similarly named
+roles. The fleet's role exports include this permission and module dependency.
+Page Launch still checks update access on both selected pages/Views.
+
 The preview identifies every planned publication, alias, and redirect change.
 Launch then revalidates that plan and applies it in one database transaction:
 

@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Updates for Moody Page Launch.
+ */
+
+/**
+ * Grant Page Launch access to the existing Standard Content Manager role.
+ */
+function moody_page_launch_update_10001(): string {
+  $role = \Drupal\user\Entity\Role::load('standard_content_manager');
+  if (!$role) {
+    return 'Skipped: standard_content_manager role is absent; no role was created.';
+  }
+  if (!$role->hasPermission('administer moody page launches')) {
+    $role->grantPermission('administer moody page launches')->save();
+  }
+  return 'Standard Content Manager has Page Launch permission; other permissions preserved.';
+}

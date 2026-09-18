@@ -5,7 +5,7 @@
 .moody-focal-point {
   --fp-accent: #bf5700;
   --fp-caption-bg: rgba(255, 255, 255, 0.94);
-  --fp-caption-radius: 0.5rem;
+  --fp-caption-radius: 0;
   --fp-caption-padding: clamp(1rem, 2vw, 1.5rem);
   --fp-arrow-size: 1.25rem;
   margin: 0 auto;

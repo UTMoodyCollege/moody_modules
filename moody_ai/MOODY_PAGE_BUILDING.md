@@ -251,8 +251,8 @@ Category ID: `moody_site_building`. It is open by default in the browser.
 - `kind`: inline block content; bundle `moody_flex_grid`
 - Use for: a responsive collection of cards, topics, programs, resources, or
   destinations.
-- Inputs: section headline; one through six items per row; rounded-edge and
-  overlay-text toggles; repeatable cards with image, headline, approved headline
+- Inputs: section headline; one through six items per row; square corners and
+  overlay-text toggle; repeatable cards with image, headline, approved headline
   color and alignment, formatted copy, URL, optional button text, and button
   alignment.
 - Rules: default images are 1:1 at about 500x500; rectangular treatment uses
@@ -268,8 +268,7 @@ Category ID: `moody_site_building`. It is open by default in the browser.
 - Use for: a guided, step-by-step inspection of important regions in one image.
 - Inputs: one required image; optional slide counter; up to 10 focal points with
   caption title, formatted caption body, focus square visibility/color, arrow
-  visibility, and caption border (`none`, `thin`, `thick`, `rounded`, or
-  `rounded-thick`).
+  visibility, and square caption border (`none`, `thin`, or `thick`).
 - Rules: every focal detail must also be explained in text. Drag positioning
   cannot be the only way to understand or configure the sequence.
 

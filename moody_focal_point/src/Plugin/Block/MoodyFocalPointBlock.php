@@ -197,8 +197,6 @@ final class MoodyFocalPointBlock extends BlockBase implements ContainerFactoryPl
           'none' => $this->t('None'),
           'thin' => $this->t('Thin'),
           'thick' => $this->t('Thick'),
-          'rounded' => $this->t('Rounded'),
-          'rounded-thick' => $this->t('Rounded thick'),
         ],
         '#default_value' => $this->normalizeCaptionBorder((string) ($point['caption_border'] ?? 'thin')),
       ];
@@ -336,7 +334,10 @@ final class MoodyFocalPointBlock extends BlockBase implements ContainerFactoryPl
    * Normalizes a caption border style value.
    */
   private function normalizeCaptionBorder(string $border): string {
-    return in_array($border, ['none', 'thin', 'thick', 'rounded', 'rounded-thick'], TRUE) ? $border : 'thin';
+    if ($border === 'rounded-thick') {
+      return 'thick';
+    }
+    return in_array($border, ['none', 'thin', 'thick'], TRUE) ? $border : 'thin';
   }
 
   /**

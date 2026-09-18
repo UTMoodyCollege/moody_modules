@@ -29,14 +29,14 @@ final class CardConfiguration {
   }
 
   public static function defaults(): array {
-    return ['columns' => ['mobile' => 1, 'tablet' => 2, 'desktop' => 3], 'gap' => 'medium', 'radius' => 'rounded', 'heading_level' => 'h3', 'cards' => [self::card()]];
+    return ['columns' => ['mobile' => 1, 'tablet' => 2, 'desktop' => 3], 'gap' => 'medium', 'radius' => 'square', 'heading_level' => 'h3', 'cards' => [self::card()]];
   }
 
   /** Complete bounded contract for the assistant; validate() remains authoritative. */
   public static function aiContract(): array {
     return [
       'example' => self::defaults(),
-      'collection' => ['columns' => ['mobile' => 'integer 1–2', 'tablet' => 'integer 1–4', 'desktop' => 'integer 1–4'], 'gap' => ['small', 'medium', 'large'], 'radius' => ['square', 'soft', 'rounded'], 'heading_level' => ['h2', 'h3', 'h4']],
+      'collection' => ['columns' => ['mobile' => 'integer 1–2', 'tablet' => 'integer 1–4', 'desktop' => 'integer 1–4'], 'gap' => ['small', 'medium', 'large'], 'radius' => ['square'], 'heading_level' => ['h2', 'h3', 'h4']],
       'cards' => '1–12 cards in display order. Preserve IDs on edits; unique IDs match ^[a-zA-Z][a-zA-Z0-9_-]{0,48}$.',
       'card' => ['scheme' => ['light', 'paper', 'dark', 'orange'], 'image' => '0 or allowed image ID', 'alt' => 'up to 300 characters; required for meaningful images', 'decorative' => 'boolean'],
       'responsive' => ['devices' => self::DEVICES, 'layout' => ['top', 'left', 'right', 'none'], 'share' => 'integer 20–80, image percentage', 'height' => 'integer 240–800 pixels', 'focal_x' => 'integer 0–100', 'focal_y' => 'integer 0–100'],
@@ -61,6 +61,8 @@ final class CardConfiguration {
     foreach (['gap' => ['small', 'medium', 'large'], 'radius' => ['square', 'soft', 'rounded'], 'heading_level' => ['h2', 'h3', 'h4']] as $key => $options) {
       $result[$key] = self::choice($data[$key] ?? NULL, $options, $key);
     }
+    // Accept legacy settings without discarding the saved composition.
+    $result['radius'] = 'square';
     foreach (self::DEVICES as $device) {
       $result['columns'][$device] = self::integer($data['columns'][$device] ?? NULL, 1, $device === 'mobile' ? 2 : 4, 'columns');
     }

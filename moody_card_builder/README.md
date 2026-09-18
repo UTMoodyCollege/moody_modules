@@ -16,7 +16,8 @@ blocks are unchanged. No fleet enablement or deployment is performed here.
   not a crop of the text. Cards expand for long content and text zoom.
 - Media Library supplies access-checked images. Add images to the shared card
   image library, then assign them to cards. Meaningful images need descriptions.
-- Brand palettes, approved fonts, square/8px/24px corners. No arbitrary HTML,
+- Brand palettes, approved fonts, square corners. Saved rounded settings render
+  square without losing card content or responsive settings. No arbitrary HTML,
   colors or CSS; server validation remains authoritative. Public output needs no JS.
 
 Reuses Hero Builder's brand tokens and access/cache-aware image resolver through

@@ -5,6 +5,12 @@ use Drupal\moody_card_builder\CardConfiguration as Cards;
 function check($value, $message) { if (!$value) { throw new RuntimeException($message); } }
 $default = Cards::defaults();
 check(Cards::decode(json_encode($default)) == $default, 'Default round trip');
+check($default['radius'] === 'square', 'Square defaults');
+check(Cards::aiContract()['collection']['radius'] === ['square'], 'AI only offers square corners');
+foreach (['soft', 'rounded'] as $radius) {
+  $legacy = $default; $legacy['radius'] = $radius;
+  check(Cards::decode(json_encode($legacy)) == $default, 'Legacy corners normalize without losing composition');
+}
 foreach (Cards::DEVICES as $device) {
   foreach (['top', 'left', 'right', 'none'] as $layout) {
     $data = $default; $data['cards'][0]['responsive'][$device]['layout'] = $layout;

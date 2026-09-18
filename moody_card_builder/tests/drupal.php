@@ -4,6 +4,15 @@ use Drupal\Core\Form\FormState;
 use Drupal\moody_card_builder\CardConfiguration as Cards;
 use Drupal\moody_card_builder\Plugin\Block\MoodyCardBuilderBlock;
 $data = Cards::defaults();
+$legacy = $data;
+$legacy['radius'] = 'rounded';
+$legacy_block = \Drupal::service('plugin.manager.block')->createInstance('moody_card_builder', ['collection' => $legacy]);
+if ($legacy_block->build()['#collection']['radius'] !== 'square') { throw new RuntimeException('Legacy card corners not normalized.'); }
+$focal = \Drupal::service('plugin.manager.block')->createInstance('moody_focal_point_block');
+$normalize = new ReflectionMethod($focal, 'normalizeCaptionBorder');
+foreach (['rounded' => 'thin', 'rounded-thick' => 'thick', 'none' => 'none'] as $old => $expected) {
+  if ($normalize->invoke($focal, $old) !== $expected) { throw new RuntimeException('Legacy focal border not normalized.'); }
+}
 $data['cards'][0]['rows'][0]['cells'][0]['text'] = '<script>alert("escaped")</script>';
 $manager = \Drupal::service('plugin.manager.block');
 $block = $manager->createInstance('moody_card_builder', ['collection' => $data]);
