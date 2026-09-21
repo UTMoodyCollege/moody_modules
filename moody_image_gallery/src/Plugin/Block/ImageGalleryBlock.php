@@ -59,6 +59,7 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
       'headline' => '',
       'layout' => 'legacy',
       'gutter' => '1.25',
+      'gutter_color' => 'inherit',
       'items' => [],
     ];
   }
@@ -88,11 +89,19 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
       '#title' => $this->t('Gutter size'),
       '#options' => [
         '0' => $this->t('None (flush images)'),
+        '0.25' => $this->t('Extra tight'),
         '0.75' => $this->t('Tight'),
         '1.25' => $this->t('Standard'),
         '1.75' => $this->t('Large'),
       ],
       '#default_value' => $config['gutter'] ?? '1.25',
+    ];
+    $form['gutter_color'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Gutter color'),
+      '#options' => ['inherit' => $this->t('Use page background'), 'white' => $this->t('White')],
+      '#default_value' => $config['gutter_color'] ?? 'inherit',
+      '#description' => $this->t('White keeps the space between images white, even on a colored section. Choose a nonzero gutter size to show it.'),
     ];
 
     $form['items'] = [
@@ -189,6 +198,7 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
     $this->configuration['headline'] = $form_state->getValue('headline');
     $this->configuration['layout'] = $form_state->getValue('layout');
     $this->configuration['gutter'] = $form_state->getValue('gutter');
+    $this->configuration['gutter_color'] = $form_state->getValue('gutter_color') === 'white' ? 'white' : 'inherit';
     $this->configuration['items'] = $form_state->getValue('items');
   }
 
@@ -244,7 +254,8 @@ final class ImageGalleryBlock extends BlockBase implements ContainerFactoryPlugi
       '#layout' => ($config['layout'] ?? '') === 'mosaic' ? 'mosaic' : 'legacy',
       '#items' => $items,
       '#gallery_id' => $gallery_id,
-      '#gutter' => in_array($config['gutter'] ?? '', ['0', '0.75', '1.25', '1.75'], TRUE) ? $config['gutter'] : '1.25',
+      '#gutter' => in_array($config['gutter'] ?? '', ['0', '0.25', '0.75', '1.25', '1.75'], TRUE) ? $config['gutter'] : '1.25',
+      '#gutter_color' => ($config['gutter_color'] ?? '') === 'white' ? 'white' : 'inherit',
       '#attached' => [
         'library' => [
           'moody_image_gallery/moody_image_gallery',

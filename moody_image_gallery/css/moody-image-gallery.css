@@ -69,6 +69,10 @@
   grid-template-columns: 1fr;
 }
 
+.moody-image-gallery__grid--white-gutters {
+  background-color: #fff;
+}
+
 /* Lightbox triggers are image tiles, not themed action buttons. */
 .moody-image-gallery button.moody-image-gallery__tile,
 .moody-image-gallery button.moody-image-gallery__tile:hover,

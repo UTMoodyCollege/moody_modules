@@ -36,12 +36,19 @@ const { chromium } = require('playwright');
           if (state === 'active') await page.mouse.up();
         }
       }
-      for (const gap of ['0', '0.75', '1.25', '1.75']) {
+      for (const gap of ['0', '0.25', '0.75', '1.25', '1.75']) {
         const actual = await page.locator('.moody-image-gallery').first().evaluate((el, gap) => {
           el.style.setProperty('--moody-image-gallery-gap', `${gap}rem`);
           return parseFloat(getComputedStyle(el.querySelector('.moody-image-gallery__grid')).gap) / parseFloat(getComputedStyle(document.documentElement).fontSize);
         }, gap);
         assert.equal(actual, Number(gap));
+      }
+      for (const grid of await page.locator('.moody-image-gallery__grid').all()) {
+        await grid.evaluate(el => { el.closest('section').style.backgroundColor = '#bf5700'; });
+        assert.equal(await grid.evaluate(el => getComputedStyle(el).backgroundColor), 'rgba(0, 0, 0, 0)');
+        await grid.evaluate(el => el.classList.add('moody-image-gallery__grid--white-gutters'));
+        assert.equal(await grid.evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(255, 255, 255)');
+        await grid.evaluate(el => el.classList.remove('moody-image-gallery__grid--white-gutters'));
       }
     }
     console.log('PASS: gallery tiles are unframed in all interaction states; gutter options preserved.');

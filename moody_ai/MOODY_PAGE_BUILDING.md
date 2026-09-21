@@ -309,7 +309,9 @@ Category ID: `moody_site_building`. It is open by default in the browser.
 - `plugin_id`: `moody_image_gallery_block`
 - `kind`: configurable block plugin from `moody_image_gallery`
 - Use for: a curated set of images that belong together as a visual collection.
-- Inputs: optional headline; gutter (`tight`, `standard`, `large`); up to 12
+- Inputs: optional headline; gutter size (`0` none, `0.25` extra tight, `0.75`
+  tight, `1.25` standard, `1.75` large, in rem); `gutter_color` (`inherit`
+  uses the page background, `white` forces white between images); up to 12
   images, each with keyboard-adjustable crop focal point and optional caption.
 - Rules: desktop layout repeats a 60/40/full-width pattern. Alternative text
   comes from each image media entity; verify it independently from the caption.

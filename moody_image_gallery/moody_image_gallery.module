@@ -17,6 +17,7 @@ function moody_image_gallery_theme($existing, $type, $theme, $path) {
         'items' => [],
         'gallery_id' => '',
         'gutter' => '1.25',
+        'gutter_color' => 'inherit',
       ],
     ],
   ];

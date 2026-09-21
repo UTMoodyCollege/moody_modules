@@ -5,7 +5,7 @@
     </header>
   {% endif %}
 
-  <div class="moody-image-gallery__grid">
+  <div class="moody-image-gallery__grid{% if gutter_color == 'white' %} moody-image-gallery__grid--white-gutters{% endif %}">
     {% if layout == 'mosaic' %}
       {% for item in items %}
         <button class="moody-image-gallery__tile moody-image-gallery__tile--{{ item.size }}" type="button" data-gallery-trigger data-gallery-index="{{ item.index }}"

@@ -11,6 +11,9 @@ block.settings.moody_image_gallery_block:
     gutter:
       type: string
       label: 'Gutter size'
+    gutter_color:
+      type: string
+      label: 'Gutter color'
     items:
       type: sequence
       label: 'Gallery images'
