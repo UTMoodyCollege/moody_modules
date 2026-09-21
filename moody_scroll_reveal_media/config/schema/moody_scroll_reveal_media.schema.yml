@@ -41,9 +41,54 @@ block.settings.moody_scroll_reveal_media_block:
           title_position:
             type: string
             label: 'Normalized overlay position'
+          text_layout:
+            type: mapping
+            label: 'Independent responsive overlay layout'
+            mapping:
+              enabled:
+                type: boolean
+                label: 'Use visual layout'
+              mobile:
+                type: moody_scroll_reveal_media.text_pair
+                label: 'Mobile'
+              tablet:
+                type: moody_scroll_reveal_media.text_pair
+                label: 'Tablet'
+              desktop:
+                type: moody_scroll_reveal_media.text_pair
+                label: 'Desktop'
           body:
             type: text_format
             label: 'Body'
           direction:
             type: string
             label: 'Reveal direction'
+
+moody_scroll_reveal_media.text_pair:
+  type: mapping
+  mapping:
+    title:
+      type: moody_scroll_reveal_media.text_box
+      label: 'Heading'
+    body:
+      type: moody_scroll_reveal_media.text_box
+      label: 'Subheading'
+
+moody_scroll_reveal_media.text_box:
+  type: mapping
+  mapping:
+    x:
+      type: float
+      label: 'Left percentage'
+    y:
+      type: float
+      label: 'Top percentage'
+    width:
+      type: float
+      label: 'Width percentage'
+    size:
+      type: float
+      label: 'Font size'
+    align:
+      type: string
+      label: 'Alignment'

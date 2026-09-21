@@ -248,6 +248,40 @@
   margin: 0;
 }
 
+/* Opt-in independent text boxes; legacy overlays retain their original layout. */
+.moody-scroll-reveal-media__overlay--visual { padding: 0; }
+.moody-scroll-reveal-media__overlay--visual .moody-scroll-reveal-media__overlay-copy {
+  display: contents;
+}
+.moody-scroll-reveal-media__overlay--visual .moody-scroll-reveal-media__overlay-copy > * {
+  position: absolute;
+  left: var(--reveal-mobile-x);
+  top: var(--reveal-mobile-y);
+  width: var(--reveal-mobile-width);
+  font-size: var(--reveal-mobile-size);
+  text-align: var(--reveal-mobile-align);
+  max-width: none;
+  margin: 0;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.moody-scroll-reveal-media__overlay--visual .moody-scroll-reveal-media__body :where(p, ul, ol, blockquote) {
+  font-size: inherit;
+  line-height: inherit;
+}
+@media (min-width: 768px) {
+  .moody-scroll-reveal-media__overlay--visual .moody-scroll-reveal-media__overlay-copy > * {
+    left: var(--reveal-tablet-x); top: var(--reveal-tablet-y);
+    width: var(--reveal-tablet-width); font-size: var(--reveal-tablet-size); text-align: var(--reveal-tablet-align);
+  }
+}
+@media (min-width: 1200px) {
+  .moody-scroll-reveal-media__overlay--visual .moody-scroll-reveal-media__overlay-copy > * {
+    left: var(--reveal-desktop-x); top: var(--reveal-desktop-y);
+    width: var(--reveal-desktop-width); font-size: var(--reveal-desktop-size); text-align: var(--reveal-desktop-align);
+  }
+}
+
 @media (min-width: 900px) {
   .moody-scroll-reveal-media__slide {
     grid-template-columns: minmax(0, 1.1fr) minmax(22rem, 0.9fr);

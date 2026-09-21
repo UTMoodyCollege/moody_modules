@@ -9,6 +9,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\moody_scroll_reveal_media\TextLayout;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -85,6 +86,7 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
 
     $form['slides'] = [
       '#type' => 'fieldset',
+      '#tree' => TRUE,
       '#title' => $this->t('Reveal slides'),
       '#description' => $this->t('Add up to 6 slides. When the block reaches the viewport, it pins while each next slide reveals as the user scrolls.'),
     ];
@@ -199,6 +201,26 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
         ],
         '#default_value' => $slide['direction'] ?? ($i === 0 ? 'top' : 'right'),
       ];
+
+      $layout = TextLayout::normalize($slide['text_layout'] ?? []);
+      $editor = [
+        '#type' => 'details', '#title' => $this->t('Visual heading and subheading layout'),
+        '#open' => $layout['enabled'], '#attributes' => ['data-reveal-editor' => 'true'],
+        '#description' => $this->t('For Overlay text. Title is the heading; Body is the subheading. Choose a device, then drag each text box to move it or its right edge to change wrapping. No line clamp is applied. Preview height is approximate; check for overflow on the page at each size.'),
+        'enabled' => ['#type' => 'checkbox', '#title' => $this->t('Use independent responsive text positions'), '#default_value' => $layout['enabled']],
+        'preview' => ['#type' => 'container', '#attributes' => ['data-reveal-preview' => 'true']],
+      ];
+      foreach (['mobile' => 'Mobile', 'tablet' => 'Tablet', 'desktop' => 'Desktop'] as $device => $label) {
+        $editor[$device] = ['#type' => 'fieldset', '#title' => $this->t($label), '#attributes' => ['data-reveal-device-fields' => $device]];
+        foreach (['title' => 'Heading (Title)', 'body' => 'Subheading (Body)'] as $element => $element_label) {
+          $editor[$device][$element] = ['#type' => 'fieldset', '#title' => $this->t($element_label)];
+          foreach (['x' => ['Left (%)', 0, 90], 'y' => ['Top (%)', 0, 90], 'width' => ['Width (%)', 10, 100], 'size' => ['Font size (px at default zoom)', 16, 120]] as $key => [$title, $min, $max]) {
+            $editor[$device][$element][$key] = ['#type' => 'number', '#title' => $this->t($title), '#min' => $min, '#max' => $max, '#step' => 1, '#default_value' => $layout[$device][$element][$key], '#attributes' => ['data-reveal-field' => "$device:$element:$key"]];
+          }
+          $editor[$device][$element]['align'] = ['#type' => 'select', '#title' => $this->t('Alignment'), '#options' => ['left' => $this->t('Left'), 'center' => $this->t('Center'), 'right' => $this->t('Right')], '#default_value' => $layout[$device][$element]['align'], '#attributes' => ['data-reveal-field' => "$device:$element:align"]];
+        }
+      }
+      $form['slides'][$i]['text_layout'] = $editor;
     }
 
     return $form;
@@ -221,6 +243,7 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
         (string) ($slide['title_position_y'] ?? 'center'),
         (string) ($slide['title_position_x'] ?? 'center'),
       );
+      $slides[$delta]['text_layout'] = TextLayout::normalize($slide['text_layout'] ?? []);
     }
 
     $this->configuration['slides'] = $slides;
@@ -275,6 +298,9 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
         'direction' => $this->normalizeDirection($slide['direction'] ?? 'right'),
         'title_display' => $title_display,
         'title_position' => $title_position,
+        'text_layout' => TextLayout::normalize($slide['text_layout'] ?? []),
+        'title_style' => TextLayout::style(TextLayout::normalize($slide['text_layout'] ?? []), 'title'),
+        'body_style' => TextLayout::style(TextLayout::normalize($slide['text_layout'] ?? []), 'body'),
         'media' => $media_render,
         'video' => $video,
       ];

@@ -352,6 +352,13 @@ Category ID: `moody_site_building`. It is open by default in the browser.
   eyebrow, title, formatted body, inline or overlay text, 3x3 overlay position,
   and reveal direction (`top`, `right`, `bottom`, `left`). A Vimeo URL overrides
   selected media for that slide.
+- Optional `slides[].text_layout.enabled` enables independent overlay Title
+  (heading) and Body (subheading) placement. Each `mobile`, `tablet`, and
+  `desktop` setting contains `title` and `body` boxes with `x`, `y`, `width`
+  percentages, `size` (16–120px, rendered as rem), and `align`
+  (`left`, `center`, `right`). Breakpoints are 768px and 1200px.
+  Keep it disabled for legacy layouts. Use box width and font size to control
+  wrapping, not truncation. Check each viewport for overlap and overflow.
 - Rules: content order must remain understandable without pinning or animation.
   Avoid autoplay with sound. Verify captions, reduced motion, keyboard access,
   live motion-preference changes, and small-screen reading order.

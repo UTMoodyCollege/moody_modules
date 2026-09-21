@@ -41,13 +41,13 @@
               {% endif %}
 
               {% if slide.has_overlay_content %}
-                <div class="moody-scroll-reveal-media__overlay moody-scroll-reveal-media__overlay--{{ slide.title_position }}">
+                <div class="moody-scroll-reveal-media__overlay moody-scroll-reveal-media__overlay--{{ slide.title_position }}{{ slide.text_layout.enabled ? ' moody-scroll-reveal-media__overlay--visual' : '' }}">
                   <div class="moody-scroll-reveal-media__overlay-copy">
                     {% if slide.title %}
-                      <h3 class="moody-scroll-reveal-media__title moody-scroll-reveal-media__title--overlay">{{ slide.title }}</h3>
+                      <h3 class="moody-scroll-reveal-media__title moody-scroll-reveal-media__title--overlay"{% if slide.text_layout.enabled %} style="{{ slide.title_style }}"{% endif %}>{{ slide.title }}</h3>
                     {% endif %}
                     {% if slide.body %}
-                      <div class="moody-scroll-reveal-media__body moody-scroll-reveal-media__body--overlay{{ slide.use_overlay_body_defaults ? ' moody-scroll-reveal-media__body--overlay-default' : '' }}">{{ slide.body }}</div>
+                      <div class="moody-scroll-reveal-media__body moody-scroll-reveal-media__body--overlay{{ slide.use_overlay_body_defaults ? ' moody-scroll-reveal-media__body--overlay-default' : '' }}"{% if slide.text_layout.enabled %} style="{{ slide.body_style }}"{% endif %}>{{ slide.body }}</div>
                     {% endif %}
                   </div>
                 </div>
