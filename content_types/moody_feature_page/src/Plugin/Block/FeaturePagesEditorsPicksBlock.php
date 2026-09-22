@@ -163,6 +163,8 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
       ];
       $form['items']['rows'][$delta]['details']['node'] = [
         '#type' => 'entity_autocomplete',
+        // This is a title plus entity ID, not a stored 128-character text field.
+        '#maxlength' => NULL,
         '#title' => $this->t('Feature Page'),
         '#target_type' => 'node',
         '#selection_settings' => [

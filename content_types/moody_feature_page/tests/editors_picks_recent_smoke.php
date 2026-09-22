@@ -8,6 +8,14 @@ $plugin = \Drupal::service('plugin.manager.block')->createInstance(
   ['items' => [['type' => 'node', 'node' => '']]],
 );
 $form = $plugin->blockForm([], new FormState());
+$selector = $form['items']['rows'][0]['details']['node'];
+if (!array_key_exists('#maxlength', $selector) || $selector['#maxlength'] !== NULL) {
+  throw new RuntimeException('Feature Page labels must override the inherited 128-character limit.');
+}
+$label = str_repeat('Long story title ', 20) . '(2237)';
+if (\Drupal\Core\Entity\Element\EntityAutocomplete::extractEntityIdFromAutocompleteInput($label) !== '2237') {
+  throw new RuntimeException('Long labels must still resolve to the original entity ID.');
+}
 $options = $form['items']['rows'][0]['details']['recent']['#options'];
 if (count($options) > 20 || !isset($form['items']['rows'][0]['details']['node'])) {
   throw new RuntimeException('Recent choices exceeded 20 or removed autocomplete.');
