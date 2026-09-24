@@ -9,6 +9,16 @@ block_type_labels:
     - core/drupal.announce
     - core/once
 
+page_shortcuts:
+  css:
+    theme:
+      css/page-shortcuts.css: {}
+  js:
+    js/page-shortcuts.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
 editor_toolbar:
   version: 1.6.4
   css:

@@ -118,6 +118,7 @@ function moody_layout_builder_browser_form_alter(array &$form, FormStateInterfac
 
   $form['actions']['#attributes']['class'][] = 'moody-layout-builder-toolbar';
   $form['actions']['#attributes']['data-moody-layout-builder-toolbar'] = TRUE;
+  \Drupal\moody_layout_builder_browser\PageShortcuts::build($form, $form_state);
   $form['actions']['mobile_toggle'] = [
     '#type' => 'html_tag',
     '#tag' => 'button',

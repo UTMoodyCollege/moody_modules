@@ -1,0 +1,84 @@
+.moody-page-shortcuts {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+  flex: 1 1 100%;
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.moody-page-shortcuts .moody-page-shortcut {
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+.moody-page-shortcuts .moody-page-shortcut--title { flex: 1 1 15rem; }
+.moody-page-shortcuts summary {
+  min-height: 44px;
+  padding: .6rem .75rem;
+  box-sizing: border-box;
+  font-size: .9rem;
+  color: #333f48;
+  background: #fff;
+  border: 1px solid #c5c5c5;
+  overflow-wrap: anywhere;
+}
+.moody-page-shortcuts .details-wrapper { padding: .5rem; }
+.moody-page-shortcuts .form-item { margin: .25rem 0; }
+.moody-page-shortcuts .form-text { width: 100%; min-height: 44px; }
+.moody-page-shortcut__note { font-size: .8rem; margin: .5rem 0; }
+.moody-page-shortcuts .button { margin: .25rem 0; min-height: 44px; }
+.moody-page-shortcuts summary:focus-visible { outline: 3px solid #005f86; outline-offset: 2px; }
+.moody-page-shortcuts summary:hover { color: #333f48; background: #f5f5f5; }
+.moody-page-alias-dialog {
+  width: min(32rem, calc(100vw - 3rem));
+  max-height: calc(100dvh - 3rem);
+  overflow: auto;
+  padding: 1.25rem;
+  border: 1px solid #c5c5c5;
+  border-top: 4px solid #bf5700;
+  color: #333f48;
+  background: #fff;
+}
+.moody-page-alias-dialog::backdrop { background: rgb(0 0 0 / .45); }
+.moody-page-alias-dialog h2 { margin: 0 0 1rem; font-size: 1.25rem; }
+.moody-page-alias-dialog .details-wrapper { margin: 0; padding: 0; }
+.moody-page-alias-dialog input { box-sizing: border-box; max-width: 100%; }
+.moody-page-shortcuts input.button,
+.moody-page-shortcuts button.button {
+  color: #fff;
+  background: #005f86;
+  border: 2px solid #005f86;
+  padding: .5rem .75rem;
+}
+.moody-page-shortcuts .button:hover { color: #fff; background: #333f48; }
+/* Reuse the toolbar's live height, including expanded controls on phones. */
+body:has(.moody-page-shortcuts) .ai-moody-assistant {
+  --ai-moody-assistant-bottom-clearance: calc(var(--moody-layout-builder-toolbar-height, 8rem) + .5rem) !important;
+}
+form.layout-builder-form .moody-page-shortcut--title[open] > summary { display: none; }
+form.layout-builder-form .moody-page-title-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem;
+}
+form.layout-builder-form .moody-page-shortcut--title .form-item { margin: 0; }
+form.layout-builder-form .moody-page-shortcut--title .form-item label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+form.layout-builder-form .moody-page-shortcut--title input[type="submit"] { grid-column: 2; grid-row: 1; }
+.moody-page-shortcut--title .moody-page-shortcut__cancel { grid-column: 3; grid-row: 1; }
+.moody-page-shortcut--title .moody-page-shortcut__note { grid-column: 1 / -1; grid-row: 2; margin: 0; }
+@media (max-width: 39.999rem) {
+  form.layout-builder-form .moody-page-title-editor { grid-template-columns: 1fr 1fr; }
+  form.layout-builder-form .moody-page-shortcut--title .form-item { grid-column: 1 / -1; }
+  form.layout-builder-form .moody-page-shortcut--title input[type="submit"] { grid-column: 1; grid-row: 2; }
+  .moody-page-shortcut--title .moody-page-shortcut__cancel { grid-column: 2; grid-row: 2; }
+  .moody-page-shortcut--title .moody-page-shortcut__note { grid-row: 3; }
+}
