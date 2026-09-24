@@ -646,6 +646,13 @@ form.layout-builder-form #edit-revision-log-0-value:disabled {
 }
 
 .ui-dialog--lbim {
+  /* Contrib reserves 180px even when another editor opens inside its iframe. */
+  position: fixed !important;
+  top: calc(var(--drupal-displace-offset-top, 0px) + 0.5rem) !important;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--drupal-displace-offset-top, 0px) - 1rem) !important;
+  max-height: calc(100dvh - var(--drupal-displace-offset-top, 0px) - 1rem);
   inset-inline-start: max(0.5rem, calc((100vw - 68.75rem) / 2)) !important;
   inset-inline-end: auto !important;
   box-sizing: border-box;
@@ -654,13 +661,23 @@ form.layout-builder-form #edit-revision-log-0-value:disabled {
   margin-inline: 0;
 }
 
+.ui-dialog--lbim > #drupal-lbim-modal {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto !important;
+  max-height: none !important;
+  overflow: hidden;
+}
+
 .ui-dialog--lbim .lbim-dialog-iframe {
+  display: block;
   box-sizing: border-box;
   width: 100% !important;
   max-width: 100%;
 }
 
 .ui-dialog--lbim .ui-dialog-titlebar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -686,12 +703,15 @@ form.layout-builder-form #edit-revision-log-0-value:disabled {
 }
 
 .ui-dialog--lbim .ui-dialog-titlebar-close {
+  position: relative;
+  inset: auto;
+  transform: none;
   flex: 0 0 2.75rem;
   width: 2.75rem;
   min-width: 2.75rem;
   height: 2.75rem;
   min-height: 2.75rem;
-  margin-inline-start: auto;
+  margin: 0 0 0 auto;
 }
 
 .ui-dialog--lbim .ui-dialog-titlebar-close:focus-visible {

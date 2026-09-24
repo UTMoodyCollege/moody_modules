@@ -42,6 +42,12 @@ body {
   pointer-events: auto;
 }
 
+/* Native Drupal modals own focus; keep the floating assistant out of their way.
+ * Visibility preserves conversation state and restores it when the backdrop exits. */
+body:has(.ui-widget-overlay) .ai-moody-assistant {
+  visibility: hidden;
+}
+
 .ai-moody-assistant.is-minimized {
   inset-inline-start: auto;
   width: 3rem;

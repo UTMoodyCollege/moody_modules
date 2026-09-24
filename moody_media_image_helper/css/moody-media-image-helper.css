@@ -7,7 +7,7 @@
 .moody-media-image-helper__widget,
 .moody-media-image-helper__form,
 .moody-media-image-helper__edit-panel,
-.media-library-widget-modal {
+.ui-dialog.media-library-widget-modal {
   --mmih-burnt-orange: #bf5700;
   --mmih-burnt-orange-dark: #9d4700;
   --mmih-charcoal: #333f48;
@@ -20,8 +20,67 @@
   --mmih-overlay-strong: rgba(20, 19, 23, 0.85);
 }
 
-.media-library-widget-modal .ui-dialog-title {
+.media-library-widget-modal {
+  position: fixed !important;
+  top: calc(var(--drupal-displace-offset-top, 0px) + 0.5rem) !important;
+  left: 0.5rem !important;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: calc(100vw - 1rem) !important;
+  max-width: none !important;
+  height: calc(100dvh - var(--drupal-displace-offset-top, 0px) - 1rem) !important;
+  max-height: calc(100dvh - var(--drupal-displace-offset-top, 0px) - 1rem);
+}
+
+.ui-dialog.media-library-widget-modal > .ui-dialog-titlebar {
+  flex-shrink: 0;
+  padding: 0.5rem 3.5rem 0.5rem 1rem;
+  min-height: 2.75rem;
+}
+
+.ui-dialog.media-library-widget-modal .ui-dialog-title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.4;
   color: var(--mmih-white);
+}
+
+.ui-dialog.media-library-widget-modal .ui-dialog-titlebar-close {
+  width: 2.75rem;
+  height: 2.75rem;
+  top: 50%;
+  margin: 0 0.5rem;
+  transform: translateY(-50%);
+}
+
+.media-library-widget-modal > .ui-dialog-content {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.ui-dialog.media-library-widget-modal > .ui-dialog-buttonpane {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+}
+
+.ui-dialog.media-library-widget-modal .ui-dialog-buttonset {
+  margin: 0;
+}
+
+.media-library-widget-modal .ui-dialog-buttonpane .button {
+  min-height: 2.75rem;
+  margin-block: 0;
+  padding-block: 0.5rem;
+}
+
+.media-library-widget-modal .js-media-library-add-form .form-item {
+  margin-block: 0.5rem;
 }
 
 /* Keep the most-used Media Library controls compact without changing Drupal's
