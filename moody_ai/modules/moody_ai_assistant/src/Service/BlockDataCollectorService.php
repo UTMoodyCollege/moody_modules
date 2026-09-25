@@ -259,6 +259,12 @@ class BlockDataCollectorService {
               $field_record['guidance'] = 'Use media, heading, subheading, caption, credit, link_uri, link_title, link_options, disable_image_styles, and these exact option tokens when needed: text_position=centered|top-left|top-right|bottom-left|bottom-right, text_color=white-text|orange-text|charcoal-text, overlay=no-overlay|orange-overlay|charcoal-overlay|heavy-orange-overlay|heavy-charcoal-overlay.';
             }
 
+            if (in_array($field->getType(), ['moody_flex_color_blocks', 'moody_newsletter', 'resource_group'], TRUE)) {
+              $color_property = $field->getType() === 'moody_flex_color_blocks' ? 'color_scheme' : 'style';
+              $field_record['properties'][$color_property]['allowed_values'] = ['gray', 'orange'];
+              $field_record['guidance'] = 'Use only gray or orange for ' . $color_property . '; default to gray. Blue and green are retired choices.';
+            }
+
             if ($field->getType() === 'moody_quotation') {
               $field_record['guidance'] = 'Use only a supplied or verified quotation and attribution. Preserve existing default/orange/grey/feature styles unless asked to change them. For a full-height photo and quotation panel use style split:PALETTE:SIZE:ALIGN:POSITION, where PALETTE is blue|orange|gray|light, SIZE small|medium|large, ALIGN left|center|right, POSITION left|right. Example split:blue:medium:center:left. Use an accessible media reference; never invent an image ID, quote or attribution.';
             }

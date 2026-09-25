@@ -55,12 +55,11 @@ class MoodyFlexColorBlocksWidget extends WidgetBase {
       '#type' => 'select',
       '#title' => $this->t('Color Scheme'),
       '#options' => [
-        'blue' => $this->t('Blue'),
         'gray' => $this->t('Gray'),
-        'green' => $this->t('Green'),
         'orange' => $this->t('Orange'),
       ],
-      '#default_value' => isset($items[$delta]->color_scheme) ? $items[$delta]->color_scheme : 'blue',
+      '#default_value' => in_array($items[$delta]->color_scheme ?? '', ['gray', 'orange'], TRUE) ? $items[$delta]->color_scheme : 'gray',
+      '#description' => in_array($items[$delta]->color_scheme ?? '', ['blue', 'green'], TRUE) ? $this->t('This item uses a retired color. Saving will change it to Gray unless you choose Orange.') : '',
     ];
 
     return $element;

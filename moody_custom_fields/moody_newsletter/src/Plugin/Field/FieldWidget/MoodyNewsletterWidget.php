@@ -36,12 +36,11 @@ class MoodyNewsletterWidget extends WidgetBase {
       '#title' => $this->t('Background Color'),
       '#type' => 'radios',
       '#options' => [
-        'blue' => $this->t('Blue'),
         'gray' => $this->t('Gray'),
-        'green' => $this->t('Green'),
         'orange' => $this->t('Orange'),
       ],
-      '#default_value' => isset($item->style) ? $item->style : 'gray',
+      '#default_value' => in_array($item->style ?? '', ['gray', 'orange'], TRUE) ? $item->style : 'gray',
+      '#description' => in_array($item->style ?? '', ['blue', 'green'], TRUE) ? $this->t('This item uses a retired color. Saving will change it to Gray unless you choose Orange.') : '',
     ];
     $element['cta'] = [
       '#type' => 'fieldset',

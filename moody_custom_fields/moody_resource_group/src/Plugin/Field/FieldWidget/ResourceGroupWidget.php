@@ -38,12 +38,11 @@ class ResourceGroupWidget extends WidgetBase {
       '#title' => $this->t('Background Color'),
       '#type' => 'radios',
       '#options' => [
-        'blue' => $this->t('Blue'),
         'gray' => $this->t('Gray'),
-        'green' => $this->t('Green'),
         'orange' => $this->t('Orange'),
       ],
-      '#default_value' => isset($items[$delta]->style) ? $items[$delta]->style : 'gray',
+      '#default_value' => in_array($items[$delta]->style ?? '', ['gray', 'orange'], TRUE) ? $items[$delta]->style : 'gray',
+      '#description' => in_array($items[$delta]->style ?? '', ['blue', 'green'], TRUE) ? $this->t('This item uses a retired color. Saving will change it to Gray unless you choose Orange.') : '',
     ];
     // Retrieve the form element that is using this widget.
     $parents = [$field_name, 'widget'];
