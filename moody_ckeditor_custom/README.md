@@ -1,5 +1,15 @@
 # Moody CKEditor Custom
 
+## High-resolution aligned media
+
+The shared utility stylesheet limits left/right-aligned image wrappers to 50%
+of their content area, matching CKEditor's desktop preview. Captioned images
+use block layout rather than an intrinsic-width table. Below 768px, images and
+editor previews stack without a float. Centered/unaligned media, non-image
+embeds, stored content, image styles and Flex HTML restrictions are unchanged.
+Higher-resolution derivatives therefore do not force aligned images full-width.
+This applies wherever this module is enabled, independently of the active theme.
+
 Update 9002 (also used on installation) restores the supported toolbar controls
 on existing CKEditor 5 `flex_html` and `moody_flex_html` formats: Styles, Moody
 Nice Letter, Readable Text Block, and Image Caption. It appends missing UT text

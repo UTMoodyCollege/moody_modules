@@ -267,3 +267,40 @@
 .moody-image-caption--burnt-orange {
   color: #bf5700;
 }
+.align-left:has(> img, .field--type-image),
+.align-right:has(> img, .field--type-image) {
+  /* Match CKEditor's media cap without tying layout to derivative resolution.
+     Block layout prevents Speedway's table-caption wrapper using intrinsic width. */
+  display: block;
+  width: fit-content;
+  max-width: 50%;
+  clear: both;
+}
+
+.align-left:has(> img, .field--type-image) {
+  float: left;
+  margin: 0 1.5rem 1rem 0;
+}
+
+.align-right:has(> img, .field--type-image) {
+  float: right;
+  margin: 0 0 1rem 1.5rem;
+}
+
+:is(.align-left, .align-right):has(> img, .field--type-image) img {
+  max-width: 100%;
+  height: auto;
+}
+
+:is(.align-left, .align-right):has(> img, .field--type-image) > figcaption {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  :is(.align-left, .align-right):has(> img, .field--type-image),
+  .ck-content :is(.drupal-media-style-align-left, .drupal-media-style-align-right) {
+    float: none;
+    max-width: 100%;
+    margin: 0 0 1rem;
+  }
+}
