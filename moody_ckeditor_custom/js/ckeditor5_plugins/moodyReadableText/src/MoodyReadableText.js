@@ -79,6 +79,50 @@ function getPresetFromValues(measure, gutter) {
   })?.[0] || 'custom';
 }
 
+function isReadableText(element) {
+  return element?.getAttribute('htmlDivAttributes')?.classes?.includes('moody-readable-text');
+}
+
+function getReadableText(selection) {
+  const selected = selection?.getSelectedElement();
+  if (isReadableText(selected)) {
+    return selected;
+  }
+  // Only edit a container when the entire selection belongs to it.
+  const range = selection?.getFirstRange();
+  for (let element = range?.start.parent; element; element = element.parent) {
+    if (isReadableText(element) && (range.end.parent === element || range.end.parent.getAncestors().includes(element))) {
+      return element;
+    }
+  }
+  return null;
+}
+
+function getReadableTextValues(element) {
+  if (!element) return DEFAULT_VALUES;
+  const classes = element.getAttribute('htmlDivAttributes').classes;
+  const measure = Object.keys(MEASURE_LABELS).find(value => classes.includes(`moody-readable-text--measure-${value}`)) || DEFAULT_VALUES.measure;
+  const gutter = Object.keys(GUTTER_LABELS).find(value => classes.includes(`moody-readable-text--pad-${value}`)) || DEFAULT_VALUES.gutter;
+  return { measure, gutter, preset: getPresetFromValues(measure, gutter) };
+}
+
+function updateReadableText(writer, element, values) {
+  // Repair older nested chunks without reserializing their media or text.
+  for (let parent = element.parent; parent; parent = parent.parent) {
+    if (isReadableText(parent)) element = parent;
+  }
+  const update = (node, root = false) => {
+    if (isReadableText(node)) {
+      const attributes = node.getAttribute('htmlDivAttributes');
+      const classes = attributes.classes.filter(value => value !== 'moody-readable-text' && !value.startsWith('moody-readable-text--'));
+      if (root) classes.push('moody-readable-text', `moody-readable-text--measure-${values.measure}`, `moody-readable-text--pad-${values.gutter}`);
+      writer.setAttribute('htmlDivAttributes', { ...attributes, classes }, node);
+    }
+    for (const child of node.getChildren?.() || []) update(child);
+  };
+  update(element, true);
+}
+
 function getPreviewText(values) {
   const preset = PRESETS[values.preset];
 
@@ -236,17 +280,25 @@ export default class MoodyReadableText extends Plugin {
 
       button.on('execute', async () => {
         const insertionSelection = getSelectionSnapshot(editor);
+        const existing = getReadableText(insertionSelection);
         const selectedHtml = getSelectedHtml(editor, insertionSelection);
-        const values = await openReadableTextDialog(DEFAULT_VALUES);
+        const values = await openReadableTextDialog(getReadableTextValues(existing));
 
-        if (!values) {
+        if (!values || editor.isReadOnly || (existing && existing.root !== editor.model.document.getRoot())) {
           return;
         }
 
-        const html = buildReadableTextHtml(selectedHtml, values);
-        const modelFragment = editor.data.parse(html);
-
         editor.model.change(writer => {
+          if (existing) {
+            updateReadableText(writer, existing, values);
+            writer.setSelection(insertionSelection);
+            return;
+          }
+          const html = buildReadableTextHtml(selectedHtml, values);
+          const modelFragment = editor.data.parse(html);
+          if (isReadableText(modelFragment.getChild(0))) {
+            updateReadableText(writer, modelFragment.getChild(0), values);
+          }
           if (insertionSelection) {
             editor.model.insertContent(modelFragment, insertionSelection);
             writer.setSelection(insertionSelection);
