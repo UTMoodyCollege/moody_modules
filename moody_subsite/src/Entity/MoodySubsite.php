@@ -206,7 +206,7 @@ class MoodySubsite extends ContentEntityBase implements MoodySubsiteInterface {
     $fields['subsite_nav'] = BaseFieldDefinition::create('moody_subsite_menu')
       ->setLabel(t('Navigation links'))
       ->setDescription(t('Drag links to set their order. Indent a link once, or choose Submenu in its Level field, to nest it beneath the nearest top-level link.'))
-      ->setCardinality('-1')
+      ->setCardinality(-1)
       ->setDisplayOptions('form', [
         'type' => 'moody_subsite_menu_widget',
         'weight' => 10,
@@ -371,7 +371,7 @@ class MoodySubsite extends ContentEntityBase implements MoodySubsiteInterface {
     // Subsite info bars.
     $fields['subsite_info_bars'] = BaseFieldDefinition::create('moody_info_bars')
       ->setLabel(t('Info Bars: custom text/links to display above the hero image.'))
-      ->setCardinality('4')
+      ->setCardinality(4)
       ->setDisplayOptions('form', [
         'type' => 'moody_info_bars_widget',
         'weight' => 26,
