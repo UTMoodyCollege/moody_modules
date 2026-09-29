@@ -29,3 +29,26 @@ before a later config import so older exports do not remove the restored buttons
 
 Check with `php moody_ckeditor_custom/tests/rollout.php`. During Test QA, verify
 Readable Text and Image Caption markup survives editor and text-filter round trips.
+# Responsive utilities and style guide
+
+The shared editor/front-end library includes mobile-first `ut-` layout, sizing,
+positioning, spacing, media, type, and approved-surface utilities. Regenerate CSS,
+the exact AI class allowlist, compact AI context, and the public reference with:
+
+```sh
+node scripts/build-utilities.cjs
+node scripts/build-utilities.cjs --check
+```
+
+Edit that catalog rather than its generated files. The reference is automatically
+appended to the full node view whose alias is `/style-guide`; existing editorial
+content is not overwritten. Clear Drupal caches after deployment. No database
+migration or config import is required. The same stylesheet loads in CKEditor
+and on public pages through the existing module library.
+
+Viewport prefixes are `sm:` 576px, `md:` 768px, `lg:` 992px, `xl:` 1200px.
+These do **not** change Hero/Card Builder's container breakpoints (600/900px).
+Utilities expose their reusable layout ideas without depending on their private
+`mhb-`/`mcb-` markup or loading a builder. Prefer the builders for managed media,
+overlays, interactive editing, and structured cards. No rounded corner options
+or retired accent-color choices are introduced.

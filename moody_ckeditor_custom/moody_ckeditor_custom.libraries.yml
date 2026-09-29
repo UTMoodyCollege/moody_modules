@@ -32,6 +32,7 @@ moody_editor_utility_styles:
   css:
     theme:
       css/moody-editor-utility-styles.css: {}
+      css/moody-responsive-utilities.css: {}
 
 # Loaded in the text format configuration form to provide styling for the icon
 # used in toolbar config.

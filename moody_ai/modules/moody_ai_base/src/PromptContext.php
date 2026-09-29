@@ -13,7 +13,7 @@ final class PromptContext {
    * Returns the built-in context catalog shown read-only to administrators.
    */
   public function builtInSections(): array {
-    return [
+    $sections = [
       'safety' => [
         'label' => 'Safety, permissions, and accuracy',
         'summary' => 'Protects private data and keeps Drupal authoritative for access and changes.',
@@ -66,15 +66,20 @@ Use Moody style-guide classes only when they help communicate the requested pres
 
 - Type: ut-text-{xs,sm,base,lg,xl,2xl,3xl,4xl,5xl}; ut-font-weight-{light,normal,medium,semibold,bold,black}; ut-headline; ut-headline--underline; ut-headline--poster; ut-copy; text-center; dont-break-out.
 - Links: ut-link; ut-link--darker; ut-cta-link; ut-cta-link--darker. Apply link utilities only to anchor elements and keep link text descriptive.
-- Color: text-ut-{black,charcoal,white,burntorange,bluebonnet,turquoise,turtlepond,cactus,shade,tangerine,limestone,sunshine,moody-peach,moody-gray,moody-blue,error-red,bluebonnet--s20}; bg-ut-{the same values}; border-ut-{the same values}.
+- Color: text-ut-{black,charcoal,white,burntorange}; bg-ut-{the same values}; border-ut-{the same values}. Do not offer retired teal/bright accent colors.
 - Spacing: ut-{p,pt,pb,pl,pr,m,mt,mb,ml,mr}-{1,2,4,8,16}.
 - Borders: ut-border-width-{none,thin,medium,thick}; use square corners only (ut-border-radius-none). Do not add rounded corners.
 - Tables: ut-fit-table; ut-50-50-table.
 - Responsive type, weight, spacing, border-width, and border-radius utilities may be prefixed md:, lg:, or xl:.
-- Legacy background classes remain supported: utexas-bg-{074d6a,138791,f9fafb,e6ebed,c4cdd4,7d8a92,5e686e,3e4549,487d39,9d4700,ebeced,c2c5c8,858c91,1f262b,fbfbf9,f2f1ed,e6e4dc,aba89e,807e76,56544e}.
+- Prefer the documented approved palette to legacy hexadecimal background classes.
 CONTEXT,
       ],
     ];
+    $utility_context = dirname(__DIR__, 4) . '/moody_ckeditor_custom/utility-context.txt';
+    if (is_file($utility_context)) {
+      $sections['design_system']['content'] = file_get_contents($utility_context);
+    }
+    return $sections;
   }
 
   /**

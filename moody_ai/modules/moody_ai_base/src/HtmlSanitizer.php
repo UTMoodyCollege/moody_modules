@@ -219,6 +219,15 @@ final class HtmlSanitizer {
    * Returns TRUE for one class published by the Moody style guide.
    */
   private function isAllowedClass(string $class): bool {
+    // Exact catalog entries only, never a wildcard ut-* or builder prefix.
+    static $utilities = NULL;
+    if ($utilities === NULL) {
+      $catalog = dirname(__DIR__, 4) . '/moody_ckeditor_custom/utility-classes.json';
+      $utilities = is_file($catalog) ? array_fill_keys(json_decode(file_get_contents($catalog), TRUE, 512, JSON_THROW_ON_ERROR), TRUE) : [];
+    }
+    if (isset($utilities[$class])) {
+      return TRUE;
+    }
     $patterns = [
       '/^(?:(?:md|lg|xl):)?ut-text-(?:xs|sm|base|lg|xl|2xl|3xl|4xl|5xl)$/',
       '/^(?:(?:md|lg|xl):)?ut-font-weight-(?:light|normal|medium|semibold|bold|black)$/',
@@ -226,7 +235,7 @@ final class HtmlSanitizer {
       '/^utexas-bg-' . self::LEGACY_BACKGROUNDS . '$/',
       '/^(?:(?:md|lg|xl):)?ut-(?:p|pt|pb|pl|pr|m|mt|mb|ml|mr)-(?:1|2|4|8|16)$/',
       '/^(?:(?:md|lg|xl):)?ut-border-width-(?:none|thin|medium|thick)$/',
-      '/^(?:(?:md|lg|xl):)?ut-border-radius-(?:none|sm|md|lg|xl|2xl|full)$/',
+      '/^(?:(?:md|lg|xl):)?ut-border-radius-none$/',
       '/^ut-(?:headline(?:--(?:underline|poster))?|copy|(?:cta-)?link(?:--darker)?)$/',
       '/^(?:text-center|dont-break-out|ut-fit-table|ut-50-50-table)$/',
     ];

@@ -35,7 +35,7 @@ final class HtmlSanitizerTest extends UnitTestCase {
     $html = '<section class="border-ut-bluebonnet ut-border-width-thin md:ut-border-radius-lg fake-card"><h2 class="ut-headline--underline lg:ut-text-3xl">Programs</h2><p class="ut-copy dont-break-out">Explore our work.</p><a class="ut-cta-link--darker" href="/programs">View programs</a><table class="ut-fit-table ut-50-50-table"><caption>Programs</caption></table></section>';
 
     $this->assertSame(
-      '<section class="border-ut-bluebonnet ut-border-width-thin md:ut-border-radius-lg"><h2 class="ut-headline--underline lg:ut-text-3xl">Programs</h2><p class="ut-copy dont-break-out">Explore our work.</p><a class="ut-cta-link--darker" href="/programs">View programs</a><table class="ut-fit-table ut-50-50-table"><caption>Programs</caption></table></section>',
+      '<section class="border-ut-bluebonnet ut-border-width-thin"><h2 class="ut-headline--underline lg:ut-text-3xl">Programs</h2><p class="ut-copy dont-break-out">Explore our work.</p><a class="ut-cta-link--darker" href="/programs">View programs</a><table class="ut-fit-table ut-50-50-table"><caption>Programs</caption></table></section>',
       $sanitizer->sanitize($html),
     );
   }

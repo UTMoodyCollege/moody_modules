@@ -11,3 +11,23 @@
 function moody_ckeditor_custom_page_attachments(array &$attachments) {
   $attachments['#attached']['library'][] = 'moody_ckeditor_custom/moody_editor_utility_styles';
 }
+
+/**
+ * Implements hook_node_view().
+ *
+ * Keep existing style-guide content; append the source-controlled reference.
+ */
+function moody_ckeditor_custom_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $node, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
+  if ($view_mode !== 'full') {
+    return;
+  }
+  $build['#cache']['tags'][] = 'path_alias_list';
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $node->id(), $node->language()->getId());
+  if ($alias === '/style-guide') {
+    $build['moody_responsive_utilities'] = [
+      '#markup' => \Drupal\Core\Render\Markup::create(file_get_contents(__DIR__ . '/utility-guide.html')),
+      '#weight' => 100,
+      '#attached' => ['library' => ['moody_ckeditor_custom/moody_editor_utility_styles']],
+    ];
+  }
+}
