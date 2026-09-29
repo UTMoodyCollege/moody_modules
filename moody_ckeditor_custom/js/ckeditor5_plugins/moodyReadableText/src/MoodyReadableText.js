@@ -80,7 +80,7 @@ function getPresetFromValues(measure, gutter) {
 }
 
 function isReadableText(element) {
-  return element?.getAttribute('htmlDivAttributes')?.classes?.includes('moody-readable-text');
+  return element?.is('element') && element.getAttribute('htmlDivAttributes')?.classes?.includes('moody-readable-text');
 }
 
 function getReadableText(selection) {

@@ -7,6 +7,8 @@ const { chromium } = require('@playwright/test');
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage();
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
     await page.setContent('<div id="editor"></div>');
     for (const name of ['ckeditor5-dll', 'editor-classic', 'essentials', 'html-support']) {
       await page.addScriptTag({ path: path.join(process.argv[2], `core/assets/vendor/ckeditor5/${name}/${name}.js`) });
@@ -49,7 +51,30 @@ const { chromium } = require('@playwright/test');
     await page.getByRole('button', { name: 'Apply', exact: true }).click();
     await page.locator('dialog').waitFor({ state: 'detached' });
     assert.equal(await page.evaluate(() => editor.getData()), after);
-    console.log('Readable Text: existing settings, cancel, nested repair, content preservation, undo/redo, and repeat editing passed.');
+    for (const collapsed of [false, true]) {
+      await page.evaluate(collapsed => {
+        editor.setData('<p>New readable text</p>');
+        editor.model.change(writer => {
+          const paragraph = editor.model.document.getRoot().getChild(0);
+          writer.setSelection(collapsed ? writer.createPositionAt(paragraph, 0) : writer.createRangeIn(paragraph));
+        });
+      }, collapsed);
+      const original = await page.evaluate(() => editor.getData());
+      await page.getByRole('button', { name: 'Readable Text Block', exact: true }).click();
+      assert.equal(await page.locator('[name="measure"]').inputValue(), 'default');
+      assert.equal(await page.locator('[name="gutter"]').inputValue(), 'medium');
+      await page.getByRole('button', { name: 'Apply', exact: true }).click();
+      await page.locator('dialog').waitFor({ state: 'detached' });
+      assert.deepEqual(errors, [], 'Applying a new wrapper must not throw');
+      const inserted = await page.evaluate(() => editor.getData());
+      assert.equal((inserted.match(/moody-readable-text--measure/g) || []).length, 1);
+      assert(inserted.includes('New readable text'));
+      await page.evaluate(() => editor.execute('undo'));
+      assert.equal(await page.evaluate(() => editor.getData()), original);
+      await page.evaluate(() => editor.execute('redo'));
+      assert.equal(await page.evaluate(() => editor.getData()), inserted);
+    }
+    console.log('Readable Text: new insertion, selection wrapping, existing settings, cancel, nested repair, content preservation, undo/redo, and repeat editing passed.');
   }
   finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });
