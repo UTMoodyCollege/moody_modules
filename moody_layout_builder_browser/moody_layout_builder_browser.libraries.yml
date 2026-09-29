@@ -20,14 +20,16 @@ page_shortcuts:
     - core/once
 
 editor_toolbar:
-  version: 1.6.4
+  version: 1.6.5
   css:
     theme:
       css/layout-builder-toolbar.css: {}
   js:
     js/layout-builder-toolbar.js: {}
+    js/layout-builder-scroll.js: {}
   dependencies:
     - core/drupal
     - core/drupal.announce
+    - core/drupal.ajax
     - core/jquery
     - core/once
