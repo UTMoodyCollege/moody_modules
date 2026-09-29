@@ -8,6 +8,21 @@ const { chromium } = require('@playwright/test');
     const page = await browser.newPage();
     await page.setContent(`<style>:root{--drupal-displace-offset-top:160px}body{margin:0}.toolbar{position:fixed;inset:0 0 auto;height:160px;background:black;z-index:1250}.ui-dialog-titlebar-close{box-sizing:border-box}</style><div class="toolbar"></div><div class="ui-dialog--lbim"><div class="ui-dialog-titlebar"><span class="ui-dialog-title">Configure block</span><button class="ui-dialog-titlebar-close" aria-label="Close">×</button></div><div id="drupal-lbim-modal"><iframe class="lbim-dialog-iframe" title="Block editor"></iframe></div></div>`);
     await page.addStyleTag({ path: path.join(__dirname, '../css/layout-builder-toolbar.css') });
+    await page.evaluate(() => {
+      document.body.classList.add('layout-builder-iframe-modal');
+      const container = document.createElement('div');
+      container.className = 'page-content';
+      container.innerHTML = '<form class="layout-builder-configure-block"><div class="form-item form-item--settings-label"><label class="form-item__label">Title</label><input class="form-text"></div><div class="moody-reusable-edit"><a class="button" href="#">Edit this reusable block</a></div></form>';
+      document.body.append(container);
+    });
+    const spacing = await page.evaluate(() => ({
+      label: getComputedStyle(document.querySelector('.form-item__label')).marginTop,
+      page: getComputedStyle(document.querySelector('.page-content')).marginTop,
+      button: document.querySelector('.moody-reusable-edit a').getBoundingClientRect().height,
+    }));
+    assert.equal(spacing.label, '0px');
+    assert.equal(spacing.page, '8px');
+    assert(spacing.button >= 44);
     for (const [width, height] of [[1440, 900], [768, 1024], [390, 844], [844, 390]]) {
       await page.setViewportSize({ width, height });
       const result = await page.evaluate(() => {

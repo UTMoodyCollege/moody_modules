@@ -729,6 +729,58 @@ form:is(.layout-builder-add-block, .layout-builder-configure-block) {
   line-height: 1.5;
 }
 
+/* Override full-page admin spacing only inside the block-editing iframe. */
+body.layout-builder-iframe-modal:has(form.layout-builder-configure-block) .page-content {
+  margin-block: 0.5rem;
+}
+
+body.layout-builder-iframe-modal:has(form.layout-builder-configure-block) .block-system-main-block {
+  margin-block: 0;
+}
+
+body.layout-builder-iframe-modal:has(form.layout-builder-configure-block) .messages {
+  margin-block: 0.5rem;
+  padding-block: 0.75rem;
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .form-item {
+  margin-block: 0.5rem;
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .form-item__label {
+  margin-block: 0 0.25rem;
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .form-item__description {
+  margin-block: 0.25rem 0;
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) > details {
+  margin-block: 0.5rem;
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .moody-reusable-edit {
+  margin-block: 0.75rem;
+  padding: 0.75rem;
+  border-inline-start: 4px solid var(--mlbt-burnt-orange);
+  background: var(--mlbt-paper);
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .moody-reusable-edit a.button {
+  display: inline-flex;
+  align-items: center;
+  white-space: normal;
+  margin: 0;
+  color: var(--mlbt-white);
+  background: var(--mlbt-burnt-orange-hover);
+}
+
+form:is(.layout-builder-add-block, .layout-builder-configure-block) .moody-reusable-edit p {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
 html:has(body.layout-builder-iframe-modal form:is(.layout-builder-add-block, .layout-builder-configure-block)),
 body.layout-builder-iframe-modal:has(form:is(.layout-builder-add-block, .layout-builder-configure-block)) {
   overflow-x: clip;
@@ -823,8 +875,8 @@ form:is(.layout-builder-add-block, .layout-builder-configure-block) > .form-item
   display: grid;
   gap: 0.25rem;
   box-sizing: border-box;
-  margin-block: 0 1.5rem;
-  padding: 0.75rem 1rem;
+  margin-block: 0 0.75rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid var(--mlbt-border);
   border-block-start: 4px solid var(--mlbt-burnt-orange);
   border-radius: 0.25rem;
@@ -895,7 +947,7 @@ form:is(.layout-builder-add-block, .layout-builder-configure-block) > .form-item
   align-items: center;
   gap: 0.25rem 0.5rem;
   min-height: 2.75rem;
-  margin-block: 0 1.5rem;
+  margin-block: 0 0.75rem;
 }
 
 form:is(.layout-builder-add-block, .layout-builder-configure-block) > .form-item--settings-label-display .form-checkbox {

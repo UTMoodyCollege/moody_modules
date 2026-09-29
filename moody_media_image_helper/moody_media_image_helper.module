@@ -96,6 +96,7 @@ function _moody_media_image_helper_alter_media_edit_form(array &$form, MediaInte
     ]),
     '#weight' => 100,
   ];
+  _moody_media_image_helper_form_metadata($widget['moody_media_image_helper'], [...$widget['#parents'], 'moody_media_image_helper'], [...$widget['#array_parents'], 'moody_media_image_helper']);
 
   return TRUE;
 }
@@ -184,6 +185,7 @@ function _moody_media_image_helper_alter_selection_widget(array &$element, array
       'content' => $existing_rendered_entity,
       '#weight' => 5,
     ];
+    _moody_media_image_helper_form_metadata($rendered_entity, $existing_rendered_entity['#parents'], $existing_rendered_entity['#array_parents']);
 
     $action_context = [
       'context_mode' => 'selection',
@@ -202,6 +204,7 @@ function _moody_media_image_helper_alter_selection_widget(array &$element, array
     $item['crop_action'] = moody_media_image_helper_build_crop_action($media, $action_context) + [
       '#weight' => 15,
     ];
+    _moody_media_image_helper_form_metadata($item['crop_action'], [...$item['#parents'], 'crop_action'], [...$item['#array_parents'], 'crop_action']);
 
     $altered = TRUE;
   }
@@ -212,6 +215,20 @@ function _moody_media_image_helper_alter_selection_widget(array &$element, array
   }
 
   return $altered;
+}
+
+/**
+ * Supplies Form API metadata for display-only controls added after form build.
+ *
+ * Inline Form Errors traverses every child, including render-only containers.
+ * Preserve processed descendants' metadata rather than rebuilding their inputs.
+ */
+function _moody_media_image_helper_form_metadata(array &$element, array $parents, array $array_parents): void {
+  $element['#parents'] ??= $parents;
+  $element['#array_parents'] ??= $array_parents;
+  foreach (Element::children($element) as $key) {
+    _moody_media_image_helper_form_metadata($element[$key], [...$element['#parents'], $key], [...$element['#array_parents'], $key]);
+  }
 }
 
 /**
