@@ -41,6 +41,7 @@ function moody_feature_page_theme($existing, $type, $theme, $path)
     'moody_feature_page_editors_picks_mixed' => [
       'variables' => [
         'items' => [],
+        'row_class' => 'col-12 col-sm-6',
       ],
       'template' => 'moody-feature-page-editors-picks-mixed',
     ],

@@ -61,6 +61,7 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
       'selected_nodes' => [],
       'items' => [],
       'image_style' => '',
+      'columns' => 2,
     ];
   }
 
@@ -269,6 +270,14 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
     }
     asort($image_style_options, SORT_NATURAL | SORT_FLAG_CASE);
 
+    $form['columns'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Columns'),
+      '#options' => [1 => $this->t('One'), 2 => $this->t('Two'), 3 => $this->t('Three'), 4 => $this->t('Four')],
+      '#default_value' => $this->configuration['columns'] ?? 2,
+      '#description' => $this->t('Maximum columns on larger screens. Small screens use one column.'),
+    ];
+
     $form['image_style'] = [
       '#type' => 'select',
       '#title' => $this->t('Image style override'),
@@ -329,6 +338,8 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
       array_filter($items, static fn(array $item): bool => $item['type'] === 'node')
     ));
     $this->configuration['image_style'] = (string) $form_state->getValue('image_style');
+    $columns = $form_state->getValue('columns');
+    $this->configuration['columns'] = in_array($columns, [1, 2, 3, 4, '1', '2', '3', '4'], TRUE) ? (int) $columns : 2;
   }
 
   /**
@@ -476,6 +487,7 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
       'content' => [
         '#theme' => 'moody_feature_page_editors_picks_mixed',
         '#items' => $rows,
+        '#row_class' => $this->rowClass(),
         '#attached' => $view_build['#attached'] ?? [],
         '#cache' => $view_build['#cache'] ?? [],
       ],
@@ -528,11 +540,27 @@ final class FeaturePagesEditorsPicksBlock extends BlockBase implements Container
     $view->setDisplay('block_filtered');
     $view->setArguments([$selected_nodes ? implode(',', $selected_nodes) : '0']);
     $view->initDisplay();
+    $style = $view->display_handler->getOption('style');
+    $style['options']['row_class'] = $this->rowClass();
+    $view->display_handler->setOption('style', $style);
     $image_style = (string) ($this->configuration['image_style'] ?? '');
     if ($image_style !== '') {
       $this->applyImageStyleOverride($view, $image_style);
     }
     return $view;
+  }
+
+  /**
+   * Uses only the supported responsive column classes.
+   */
+  private function rowClass(): string
+  {
+    return match ($this->configuration['columns'] ?? 2) {
+      1, '1' => 'col-12',
+      3, '3' => 'col-12 col-sm-6 col-md-4',
+      4, '4' => 'col-12 col-sm-6 col-md-4 col-lg-3',
+      default => 'col-12 col-sm-6',
+    };
   }
 
   /**

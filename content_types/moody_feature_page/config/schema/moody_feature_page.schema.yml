@@ -38,6 +38,9 @@ block.settings.moody_feature_page_feature_pages_editors_picks:
           url:
             type: string
             label: 'Custom link URL'
+    columns:
+      type: integer
+      label: 'Columns'
     image_style:
       type: string
       label: 'Image style override'
