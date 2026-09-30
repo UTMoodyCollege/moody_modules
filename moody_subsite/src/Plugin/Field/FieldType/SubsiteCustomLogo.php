@@ -83,7 +83,7 @@ class SubsiteCustomLogo extends FieldItemBase {
   public function isEmpty() {
     $media = $this->get('media')->getValue();
     $svg_logo = $this->get('svg_logo')->getValue();
-    return ($media === NULL || $media === '') && empty($svg_logo);
+    return empty($media) && empty($svg_logo);
   }
 
 }
