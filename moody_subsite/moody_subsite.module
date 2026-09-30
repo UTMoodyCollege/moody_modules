@@ -12,6 +12,27 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+
+/**
+ * Implements hook_entity_field_access().
+ */
+function moody_subsite_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL) {
+  $access = AccessResult::neutral()->addCacheContexts(['user.roles']);
+  if ($operation !== 'edit' || $field_definition->getName() !== 'path' || !in_array('moody_subsite_editor', $account->getRoles(), TRUE) || !$items) {
+    return $access;
+  }
+
+  $node = $items->getEntity();
+  if ($node->getEntityTypeId() !== 'node' || $node->bundle() !== 'moody_subsite_page' || $node->isNew()) {
+    return $access;
+  }
+
+  // Reuse node/Workbench access; never grant sitewide alias administration.
+  return $access->orIf($node->access('update', $account, TRUE));
+}
 
 /**
  * Implements hook_help().
