@@ -52,11 +52,3 @@ Utilities expose their reusable layout ideas without depending on their private
 `mhb-`/`mcb-` markup or loading a builder. Prefer the builders for managed media,
 overlays, interactive editing, and structured cards. No rounded corner options
 or retired accent-color choices are introduced.
-
-Embedded image alignment uses Drupal's existing `align-left`, `align-center`,
-and `align-right` utilities automatically; editors do not need source markup.
-All three match CKEditor's 50% width cap at tablet/desktop sizes. Below 768px,
-images stack at up to the content width in both editor and page, preserving
-center alignment and keeping captions within the image wrapper. Choosing no
-alignment leaves the normal full-width rendering unchanged. Image resolution
-and display width remain independent.
