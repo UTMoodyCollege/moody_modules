@@ -27,6 +27,7 @@ use Drupal\user\UserInterface;
  *     "form" = {
  *       "default" = "Drupal\moody_subsite\Form\MoodySubsiteForm",
  *       "add" = "Drupal\moody_subsite\Form\MoodySubsiteForm",
+ *       "startup" = "Drupal\moody_subsite\Form\SubsiteStartupForm",
  *       "edit" = "Drupal\moody_subsite\Form\MoodySubsiteForm",
  *       "delete" = "Drupal\moody_subsite\Form\MoodySubsiteDeleteForm",
  *     },

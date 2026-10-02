@@ -3,3 +3,9 @@ entity.moody_subsite.add_form:
   title: 'Add Moody subsite'
   appears_on:
     - entity.moody_subsite.collection
+
+moody_subsite.startup:
+  route_name: moody_subsite.startup
+  title: 'Set up a subsite (preview first)'
+  appears_on:
+    - entity.moody_subsite.collection

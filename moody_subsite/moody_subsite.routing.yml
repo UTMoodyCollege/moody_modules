@@ -1,0 +1,9 @@
+moody_subsite.startup:
+  path: '/admin/structure/moody_subsite/startup'
+  defaults:
+    _entity_form: 'moody_subsite.startup'
+    _title: 'Set up a Moody subsite'
+  requirements:
+    _permission: 'add moody subsite entities+administer permissions+administer users'
+  options:
+    _admin_route: true
