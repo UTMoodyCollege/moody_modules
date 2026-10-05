@@ -6,6 +6,17 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_view().
+ */
+function moody_custom_roles_user_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  if ($view_mode === 'full' && \Drupal::currentUser()->isAuthenticated() && (string) $entity->id() === (string) \Drupal::currentUser()->id()) {
+    $build['editor_home'] = \Drupal\moody_custom_roles\EditorHome::build();
+  }
+}
 
 /**
  * Implements hook_help().

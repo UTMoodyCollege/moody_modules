@@ -1,0 +1,15 @@
+.moody-editor-home {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 1rem;
+  align-items: start;
+  margin-block: 1rem 2rem;
+}
+.moody-editor-home > h2 { grid-column: 1 / -1; margin: 0; }
+.moody-editor-home-panel { border-top: 3px solid #bf5700; padding: 1rem; background: #f7f7f7; }
+.moody-editor-home-panel h3 { margin: 0 0 .75rem; font-size: 1.2rem; }
+.moody-editor-home-panel li { margin-block: .5rem; }
+.moody-editor-home-panel ul { max-height: 24rem; overflow-y: auto; }
+.moody-editor-home-panel small { display: block; }
+.moody-editor-home a { text-underline-offset: .2em; }
+.moody-editor-home a:focus-visible { outline: 2px solid #333f48; outline-offset: 3px; }

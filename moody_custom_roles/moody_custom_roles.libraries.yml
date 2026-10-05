@@ -1,0 +1,4 @@
+editor_home:
+  css:
+    theme:
+      css/editor-home.css: {}
