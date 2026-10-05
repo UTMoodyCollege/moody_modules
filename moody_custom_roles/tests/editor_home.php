@@ -36,6 +36,7 @@ try {
   $build = EditorHome::build();
   $check($build['#cache']['max-age'] === 0, 'Personal dashboard must not share render caches.');
   $check(isset($build['activity']), 'Site-wide editor should see recent activity.');
+  $check(!isset($build['media']), 'Workspace must not include recently uploaded media.');
   $check(in_array($node->label(), array_column($build['recent']['content']['#items'], '#title'), TRUE), 'Edits must use revision author, not node owner.');
   $display = EntityViewDisplay::collectRenderDisplay($editor, 'full');
   $profile = [];

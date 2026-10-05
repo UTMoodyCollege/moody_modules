@@ -95,20 +95,6 @@ final class EditorHome {
         }
       }
       $build['activity'] = ['#theme' => 'item_list', '#title' => t('Recently updated on this site'), '#items' => $items ?: [t('No accessible content yet.')]];
-      if ($manager->hasDefinition('media') && $account->hasPermission('access media overview')) {
-        $items = [];
-        $storage = $manager->getStorage('media');
-        $ids = $storage->getQuery()->accessCheck(TRUE)->sort('created', 'DESC')->range(0, 30)->execute();
-        foreach ($storage->loadMultiple($ids) as $media) {
-          if ($media->access('view', $account)) {
-            $items[] = self::link($media->label(), $media->toUrl());
-          }
-          if (count($items) === 6) {
-            break;
-          }
-        }
-        $build['media'] = ['#theme' => 'item_list', '#title' => t('Recently uploaded media'), '#items' => $items ?: [t('No accessible media yet.')]];
-      }
     }
     foreach ($build as $key => $section) {
       if (!str_starts_with($key, '#') && $key !== 'heading') {

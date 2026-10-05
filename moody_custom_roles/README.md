@@ -12,8 +12,7 @@ profiles. No new permission or configuration import is required.
   edited page candidates are checked; deleted/inaccessible pages are skipped.
 - Site activity is limited to users with `administer nodes` or
   `bypass node access`. Latest revision attribution is not a complete audit log.
-- Recent media additionally requires `access media overview` and individual
-  view access. Optional subsite/media features disappear when unavailable.
+- Optional subsite links disappear when the subsite module is unavailable.
 
 Personalized output is not render-cached. Queries are bounded; no new activity
 storage, tracking, or writes occur during profile rendering.
