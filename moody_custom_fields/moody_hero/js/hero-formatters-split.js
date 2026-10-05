@@ -31,7 +31,6 @@
     { value: 'moody_hero_2',     label: 'Style 2' },
     { value: 'moody_hero_3',     label: 'Style 3' },
     { value: 'moody_hero_4',     label: 'Style 4' },
-    { value: 'moody_hero_5',     label: 'Style 5' },
     { value: 'moody_hero_6',     label: 'Style 6' },
     { value: 'moody_hero_6_short', label: 'Style 6 Short' },
     { value: 'moody_hero_7',     label: 'Style 7' },
@@ -87,6 +86,11 @@
           var heroStyleSelect = $sourceWrapper.parent().find("select[name='hero_style']").first();
           var anchorSelect = $sourceWrapper.parent().find("select[name='anchor_position']").first();
 
+          if (style_and_anchor.style === 'moody_hero_5') {
+            heroStyleSelect.append($('<option>', { value: 'moody_hero_5', text: 'Style 5 (retired — existing instance)', disabled: true }));
+            anchorSelect.prop('disabled', true);
+          }
+
           heroStyleSelect.val(default_style !== "default" ? style_and_anchor.style : default_style);
           if (default_style !== "default") {
             anchorSelect.val(style_and_anchor.anchor);
@@ -97,6 +101,9 @@
             : default_style;
           original_select_element.val(default_style);
           toggleAnchorSelectElement(default_style, anchorSelect);
+          if (style_and_anchor.style === 'moody_hero_5') {
+            anchorSelect.prop('disabled', true);
+          }
 
           var carousel_style = (default_style === "moody_hero" ? "default" : default_style);
           syncCarouselActiveCard(carousel_style, enhancementScope);
@@ -158,10 +165,6 @@
           <option value="moody_hero_4">
             Style 4: Centered image with dark bottom pane containing heading,
             subheading and call-to-action
-          </option>
-          <option value="moody_hero_5">
-            Style 5: Medium image, floated right, with large heading,
-            subheading and burnt orange call-to-action
           </option>
           <option value="moody_hero_6">
             Style 6: Taller image with extra bold headline, subheadline, call-to-action, text color and overlay options.

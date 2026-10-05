@@ -186,6 +186,7 @@ function _moody_hero_simplify_layout_form(&$form) {
   }
   if ($is_hero) {
     $form['settings']['view_mode']['#options'] = _update_moody_hero_view_mode_labels($form['settings']['view_mode']['#options']);
+    _moody_hero_hide_retired_style($form['settings']['view_mode']);
     _moody_hero_attach_formatter_split_assets($form);
   }
 }
@@ -254,8 +255,23 @@ function _moody_hero_formatter_split_entity_type_validation(&$form) {
  * Helper function that creates the necessary form elements to pick a style.
  */
 function _add_new_moody_hero_image_form_elements($form, $entity_type) {
+  if (isset($form['settings']['formatter']['type'])) {
+    _moody_hero_hide_retired_style($form['settings']['formatter']['type']);
+  }
   _moody_hero_attach_formatter_split_assets($form);
   return $form;
+}
+
+/**
+ * Hide Style 5 for new selections, retaining an existing exact view mode.
+ */
+function _moody_hero_hide_retired_style(array &$select): void {
+  $current = $select['#default_value'] ?? '';
+  foreach (['moody_hero_5', 'moody_hero_5_left', 'moody_hero_5_right'] as $style) {
+    if ($style !== $current) {
+      unset($select['#options'][$style]);
+    }
+  }
 }
 
 /**
@@ -286,6 +302,7 @@ function moody_hero_form_block_form_alter(&$form, &$form_state, $form_id) {
         $bundle = $block_content->bundle();
         if ($bundle == 'moody_hero') {
           $form['settings']['view_mode']['#options'] = _update_moody_hero_view_mode_labels($form['settings']['view_mode']['#options']);
+          _moody_hero_hide_retired_style($form['settings']['view_mode']);
           _moody_hero_formatter_split_entity_type_validation($form);
         }
       }
