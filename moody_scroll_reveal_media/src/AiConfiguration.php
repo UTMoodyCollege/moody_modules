@@ -14,7 +14,7 @@ final class AiConfiguration {
       'slides' => '1–6 ordered slides; preserve order and unrelated settings on edits',
       'slide' => [
         'media' => '0 or an exact allowed_media_ids integer; never invent an ID',
-        'video_url' => 'Empty or an exact supplied Vimeo URL; overrides media',
+        'video_url' => 'Empty or an exact supplied HTTPS Vimeo/direct video URL (mp4, m4v, webm, ogv, ogg, mov); overrides media',
         'video_autoplay' => 'boolean; default false',
         'eyebrow' => 'plain text', 'title' => 'plain heading text',
         'body' => ['value' => 'safe formatted subheading HTML', 'format' => 'an exact allowed_formats ID'],
@@ -42,7 +42,12 @@ final class AiConfiguration {
       foreach (['title', 'eyebrow', 'video_url'] as $key) {
         if (!is_string($slide[$key] ?? NULL) || strlen($slide[$key]) > 10000) { throw new \InvalidArgumentException('Invalid slide text.'); }
       }
-      if ($slide['video_url'] !== '' && !preg_match('~^https://(?:www\.)?(?:vimeo\.com/[0-9]+|player\.vimeo\.com/video/[0-9]+)(?:[/?#].*)?$~D', $slide['video_url'])) { throw new \InvalidArgumentException('Provide a valid HTTPS Vimeo URL.'); }
+      if ($slide['video_url'] !== '') {
+        $url = $slide['video_url'];
+        $vimeo = preg_match('~^https://(?:www\.)?(?:vimeo\.com/[0-9]+|player\.vimeo\.com/video/[0-9]+)(?:[/?#].*)?$~D', $url);
+        $file = preg_match('/\.(mp4|m4v|webm|ogv|ogg|mov)$/i', (string) parse_url($url, PHP_URL_PATH));
+        if (!filter_var($url, FILTER_VALIDATE_URL) || parse_url($url, PHP_URL_SCHEME) !== 'https' || (!$vimeo && !$file)) { throw new \InvalidArgumentException('Provide a valid HTTPS Vimeo or direct video URL.'); }
+      }
       foreach (['title_display' => ['inline', 'overlay'], 'direction' => ['top', 'right', 'bottom', 'left'], 'title_position' => ['top-left', 'top-center', 'top-right', 'center-left', 'center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right']] as $key => $allowed) {
         if (!in_array($slide[$key] ?? '', $allowed, TRUE)) { throw new \InvalidArgumentException('Invalid slide display setting.'); }
       }

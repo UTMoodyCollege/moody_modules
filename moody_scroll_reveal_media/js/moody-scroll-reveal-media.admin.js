@@ -178,6 +178,7 @@
           root.querySelectorAll('[data-reveal-device-fields]').forEach(function (panel) { panel.hidden = !enabled || !overlay || panel.dataset.revealDeviceFields !== device; });
           toolbar.querySelectorAll('[data-device]').forEach(function (button) { button.setAttribute('aria-pressed', button.dataset.device === device ? 'true' : 'false'); });
           var size = dimensions[device];
+          viewport.style.maxWidth = size[0] + 'px';
           var scale = Math.min(1, (viewport.clientWidth || 375) / size[0]);
           canvas.style.width = size[0] + 'px';
           canvas.style.height = size[1] + 'px';

@@ -363,7 +363,7 @@ Category ID: `moody_site_building`. It is open by default in the browser.
   wrapping, not truncation. Check each viewport for overlap and overflow.
 - Supports automatic AI composition and focused Edit with AI in the current
   Layout Builder draft. The server validates allowed media, text-format use,
-  supplied video URLs, responsive ranges, layout access and stale edits. Review
+  supplied Vimeo/direct-file video URLs, responsive ranges, layout access and stale edits. Review
   before saving the layout. The visual editor can copy one device's placement
   to the other sizes; each size remains independently editable afterward.
 - Rules: content order must remain understandable without pinning or animation.

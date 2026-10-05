@@ -35,6 +35,10 @@ $stub->payload['slides'][0]['video_url'] = 'https://vimeo.com/123456789';
 reveal_reject(fn() => $stub->composeScrollReveal('Build', ['allowed_formats' => ['flex_html']]));
 $stub->payload = $configuration;
 reveal_reject(fn() => $stub->composeScrollReveal('Build', ['allowed_formats' => []]));
+$stub->payload['slides'][0]['video_url'] = 'https://example.org/clip.mp4';
+$stub->composeScrollReveal('Preserve video', ['allowed_formats' => ['flex_html'], 'supplied_video_urls' => ['https://example.org/clip.mp4']]);
+$stub->payload['slides'][0]['video_url'] = 'https://example.org/page';
+reveal_reject(fn() => $stub->composeScrollReveal('Build', ['allowed_formats' => ['flex_html'], 'supplied_video_urls' => ['https://example.org/page']]));
 
 $switcher = \Drupal::service('account_switcher');
 $switcher->switchTo(\Drupal::entityTypeManager()->getStorage('user')->load(1));

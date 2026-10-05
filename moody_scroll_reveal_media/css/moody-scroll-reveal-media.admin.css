@@ -122,5 +122,9 @@
 .reveal-editor-box--title { font-weight: 800; text-transform: uppercase; }
 .reveal-editor-box:focus-visible, .reveal-editor-resize:focus-visible { outline: 3px solid #f2a900; }
 [data-reveal-editor] button.reveal-editor-resize { position: absolute; right: -12px; top: 0; width: 24px; height: 100%; min-height: 24px; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; cursor: ew-resize; touch-action: none; }
-[data-reveal-device-fields] > .fieldset-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1rem; }
+[data-reveal-device-fields] > .fieldset-wrapper,
+[data-reveal-device-fields] > .fieldset__wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1rem; }
+[data-reveal-device-fields] fieldset > .fieldset-wrapper,
+[data-reveal-device-fields] fieldset > .fieldset__wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); gap: .5rem; }
+[data-reveal-device-fields] fieldset .form-item { margin-block: .5rem; }
 [data-reveal-editor] [hidden] { display: none !important; }

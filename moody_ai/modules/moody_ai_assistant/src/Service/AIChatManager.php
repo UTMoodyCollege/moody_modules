@@ -2635,7 +2635,7 @@ class AIChatManager {
           if (($item['entity_type'] ?? '') === 'media' && in_array($item['bundle'] ?? '', ['utexas_image', 'utexas_video_external'], TRUE)) { $allowed[] = (int) $item['id']; }
         }
       }
-      preg_match_all('~https://(?:www\.)?(?:vimeo\.com/[0-9]+|player\.vimeo\.com/video/[0-9]+)(?:[/?][^\s<>"\']*)?~', $message, $urls);
+      preg_match_all('~https://[^\s<>"\']+~', $message, $urls);
       return $this->planner->composeScrollReveal($message, [
         'allowed_media_ids' => array_values(array_unique(array_map('intval', $allowed))),
         'allowed_formats' => array_keys(filter_formats(\Drupal::currentUser())),
