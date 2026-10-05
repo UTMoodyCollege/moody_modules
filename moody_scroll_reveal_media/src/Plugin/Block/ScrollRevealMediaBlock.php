@@ -131,7 +131,7 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
 
       $form['slides'][$i]['title'] = [
         '#type' => 'textfield',
-        '#title' => $this->t('Title'),
+        '#title' => $this->t('Heading'),
         '#default_value' => $slide['title'] ?? '',
       ];
 
@@ -184,7 +184,7 @@ final class ScrollRevealMediaBlock extends BlockBase implements ContainerFactory
 
       $form['slides'][$i]['body'] = [
         '#type' => 'text_format',
-        '#title' => $this->t('Body'),
+        '#title' => $this->t('Subheading / body'),
         '#format' => $slide['body']['format'] ?? 'flex_html',
         '#default_value' => $slide['body']['value'] ?? '',
       ];

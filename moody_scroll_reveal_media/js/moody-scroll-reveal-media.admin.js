@@ -172,9 +172,11 @@
         function update() {
           var enabled = root.querySelector('input[type="checkbox"]').checked;
           var overlay = slide.querySelector('[name$="[title_display]"]').value === 'overlay';
+          var legacyPicker = slide.querySelector('[data-text-position-picker]');
+          if (legacyPicker) legacyPicker.hidden = enabled && overlay;
           host.hidden = !enabled || !overlay;
           root.querySelectorAll('[data-reveal-device-fields]').forEach(function (panel) { panel.hidden = !enabled || !overlay || panel.dataset.revealDeviceFields !== device; });
-          toolbar.querySelectorAll('button').forEach(function (button) { button.setAttribute('aria-pressed', button.dataset.device === device ? 'true' : 'false'); });
+          toolbar.querySelectorAll('[data-device]').forEach(function (button) { button.setAttribute('aria-pressed', button.dataset.device === device ? 'true' : 'false'); });
           var size = dimensions[device];
           var scale = Math.min(1, (viewport.clientWidth || 375) / size[0]);
           canvas.style.width = size[0] + 'px';
@@ -206,6 +208,22 @@
           button.addEventListener('click', function () { device = name; update(); });
           toolbar.append(button);
         });
+        var copy = document.createElement('button');
+        copy.type = 'button'; copy.textContent = Drupal.t('Copy this layout to other sizes');
+        copy.addEventListener('click', function () {
+          var source = device;
+          ['title', 'body'].forEach(function (element) {
+            ['x', 'y', 'width', 'size', 'align'].forEach(function (key) {
+              var current = field(element, key).value;
+              Object.keys(dimensions).forEach(function (name) {
+                root.querySelector('[data-reveal-field="' + name + ':' + element + ':' + key + '"]').value = current;
+              });
+            });
+          });
+          device = source; update();
+          warning.textContent = Drupal.t('Copied to all sizes. Review Mobile, Tablet and Desktop for wrapping and overlap.');
+        });
+        toolbar.append(copy);
         ['title', 'body'].forEach(function (element) {
           var box = document.createElement('div');
           box.className = 'reveal-editor-box reveal-editor-box--' + element;
@@ -246,6 +264,10 @@
             set(element, key, value(element, key) + (/Left|Up/.test(event.key) ? -step : step));
             update();
           });
+        });
+        root.querySelector('input[type="checkbox"]').addEventListener('change', function (event) {
+          if (event.target.checked) slide.querySelector('[name$="[title_display]"]').value = 'overlay';
+          update();
         });
         slide.addEventListener('input', update);
         slide.addEventListener('change', update);

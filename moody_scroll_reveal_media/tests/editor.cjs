@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const {chromium} = require('playwright');
+const {chromium} = require('@playwright/test');
 (async () => {
   const browser = await chromium.launch({executablePath: process.env.CHROME_PATH || undefined});
   try {
@@ -16,9 +16,17 @@ const {chromium} = require('playwright');
     const heading = page.locator('.reveal-editor-box--title');
     await heading.focus(); await page.keyboard.press('ArrowDown');
     assert.equal(await input('mobile:title:y').inputValue(), '21');
+    await input('mobile:body:size').fill('24');
+    await page.getByRole('button', {name:'Copy this layout to other sizes'}).click();
+    await page.locator('[data-device="tablet"]').click();
+    assert.equal(await input('tablet:body:size').inputValue(), '24');
+    assert.equal(await input('tablet:title:y').inputValue(), '21');
+    await input('tablet:body:size').fill('28');
+    await page.locator('[data-device="mobile"]').click();
+    assert.equal(await input('mobile:body:size').inputValue(), '24');
     assert.equal(await input('mobile:body:y').inputValue(), '55');
     await page.locator('[data-device="desktop"]').click();
-    assert.equal(await input('desktop:title:y').inputValue(), '20');
+    assert.equal(await input('desktop:title:y').inputValue(), '21');
     const handle = heading.locator('button');
     await handle.focus(); await page.keyboard.press('ArrowLeft');
     assert.equal(await input('desktop:title:width').inputValue(), '79');

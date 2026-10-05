@@ -1,0 +1,15 @@
+<?php
+
+/** Standardize existing Flex Color Blocks storage without deleting content. */
+function moody_flex_color_blocks_update_10001(): string {
+  $storage = \Drupal\field\Entity\FieldStorageConfig::load('block_content.field_block_flex_color_blocks');
+  if (!$storage) { return 'No Flex Color Blocks field is installed.'; }
+  $database = \Drupal::database();
+  foreach (['block_content__field_block_flex_color_blocks', 'block_content_revision__field_block_flex_color_blocks'] as $table) {
+    if ($database->schema()->tableExists($table) && $database->select($table)->condition('delta', 4, '>=')->countQuery()->execute()->fetchField()) {
+      throw new \Drupal\Core\Utility\UpdateException('Flex Color Blocks has existing fifth-or-later items (including revisions). Review these before reducing the limit; no content was removed.');
+    }
+  }
+  $storage->setCardinality(4)->save();
+  return 'Flex Color Blocks now allows four items.';
+}

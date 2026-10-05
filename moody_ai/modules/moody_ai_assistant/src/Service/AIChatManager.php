@@ -1096,7 +1096,7 @@ class AIChatManager {
     return array_values(array_filter($context['selected_block_references'] ?? [], static function (array $reference): bool {
       return ($reference['selection_mode'] ?? 'new') === 'new'
         && trim((string) ($reference['plugin_id'] ?? '')) !== ''
-        && !in_array($reference['plugin_id'] ?? '', ['moody_feature_page_feature_pages_editors_picks', 'moody_hero_builder', 'moody_card_builder'], TRUE)
+        && !in_array($reference['plugin_id'] ?? '', ['moody_feature_page_feature_pages_editors_picks', 'moody_hero_builder', 'moody_card_builder', 'moody_scroll_reveal_media_block'], TRUE)
         && trim((string) ($reference['block_type'] ?? '')) === '';
     }));
   }
@@ -1296,7 +1296,7 @@ class AIChatManager {
       }
 
       try {
-        if (in_array($plan_item['selected_block_type'] ?? '', ['moody_hero_builder', 'moody_card_builder'], TRUE)) {
+        if (in_array($plan_item['selected_block_type'] ?? '', ['moody_hero_builder', 'moody_card_builder', 'moody_scroll_reveal_media_block'], TRUE)) {
           $builder_id = $plan_item['selected_block_type'];
           $configuration = $this->composeBuilder($builder_id, $message . "\nComponent goal: " . ($plan_item['goal'] ?? ''), $context, $uploaded_assets, [], $stream_callback);
           $placement = $this->layoutPlacementManager->saveBuilder($builder_id, $entity, $configuration, $runtime_context, $this->buildPlacementTarget($plan_item));
@@ -1669,7 +1669,7 @@ class AIChatManager {
    */
   protected function executeBlockEditStream(ContentEntityInterface $entity, AIChatThread $thread, $message, array $context, array $action_plan, callable $event_callback, callable $stream_callback, array $runtime_context = [], array $uploaded_assets = []) {
     $target_component = $this->findContextComponentByUuid($context, (string) ($action_plan['target_component_uuid'] ?? ''));
-    if (in_array(($target_component['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder'], TRUE)) {
+    if (in_array(($target_component['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder', 'moody_scroll_reveal_media_block'], TRUE)) {
       return $this->editBuilder($entity, $thread, $message, $context, $target_component, $runtime_context, $uploaded_assets, $stream_callback);
     }
     if (!$target_component || empty($target_component['block_type']) || empty($target_component['block_revision_id'])) {
@@ -1789,7 +1789,7 @@ class AIChatManager {
 
     $target_component = $this->findContextComponentByUuid($context, (string) ($action_plan['target_component_uuid'] ?? ''));
     if (!$target_component || empty($target_component['block_type']) || empty($target_component['block_revision_id'])) {
-      if (in_array(($target_component['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder'], TRUE)) {
+      if (in_array(($target_component['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder', 'moody_scroll_reveal_media_block'], TRUE)) {
         return $this->editBuilder($entity, $thread, $message, $context, $target_component, $runtime_context, $uploaded_assets);
       }
       $instructions = $this->instructionGenerator->generate($this->buildPrompt($message, $context, $thread), [
@@ -1890,7 +1890,7 @@ class AIChatManager {
 
     $target_component = $this->findContextComponentByUuid($context, (string) ($action_plan['target_component_uuid'] ?? ''));
     if (!$target_component || empty($target_component['block_type']) || empty($target_component['block_revision_id'])) {
-      if (in_array(($target_component['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder'], TRUE)) {
+      if (in_array(($target_component['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder', 'moody_scroll_reveal_media_block'], TRUE)) {
         return $this->editBuilder($entity, $thread, $message, $context, $target_component, $runtime_context, $uploaded_assets, $stream_callback);
       }
       $instructions = $this->instructionGenerator->generate($this->buildPrompt($message, $context, $thread), [
@@ -2617,7 +2617,7 @@ class AIChatManager {
     }
 
     $candidate = $selected[0];
-    if ((empty($candidate['block_revision_id']) && !in_array(($candidate['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder'], TRUE)) || empty($candidate['block_type']) || empty($candidate['uuid'])) {
+    if ((empty($candidate['block_revision_id']) && !in_array(($candidate['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder', 'moody_scroll_reveal_media_block'], TRUE)) || empty($candidate['block_type']) || empty($candidate['uuid'])) {
       return NULL;
     }
 
@@ -2625,6 +2625,24 @@ class AIChatManager {
   }
 
   protected function composeBuilder(string $plugin_id, string $message, array $context, array $assets, array $existing = [], ?callable $stream_callback = NULL): array {
+    if ($plugin_id === 'moody_scroll_reveal_media_block') {
+      $allowed = array_filter(array_column($existing['slides'] ?? [], 'media'));
+      foreach ($assets as $asset) {
+        if (in_array($asset['media_bundle'] ?? '', ['utexas_image', 'utexas_video_external'], TRUE) && !empty($asset['target_id'])) { $allowed[] = (int) $asset['target_id']; }
+      }
+      foreach ($context['content_lookup_results'] ?? [] as $result) {
+        foreach ($result['items'] ?? [] as $item) {
+          if (($item['entity_type'] ?? '') === 'media' && in_array($item['bundle'] ?? '', ['utexas_image', 'utexas_video_external'], TRUE)) { $allowed[] = (int) $item['id']; }
+        }
+      }
+      preg_match_all('~https://(?:www\.)?(?:vimeo\.com/[0-9]+|player\.vimeo\.com/video/[0-9]+)(?:[/?][^\s<>"\']*)?~', $message, $urls);
+      return $this->planner->composeScrollReveal($message, [
+        'allowed_media_ids' => array_values(array_unique(array_map('intval', $allowed))),
+        'allowed_formats' => array_keys(filter_formats(\Drupal::currentUser())),
+        'supplied_video_urls' => array_values(array_unique(array_filter(array_merge($urls[0], array_column($existing['slides'] ?? [], 'video_url'))))),
+        'uploaded_assets' => $assets, 'content_lookup_results' => $context['content_lookup_results'] ?? [],
+      ], $existing, $stream_callback);
+    }
     $card = $plugin_id === 'moody_card_builder';
     $allowed = $card ? ($existing['images'] ?? []) : (!empty($existing['image']) ? [(int) $existing['image']] : []);
     foreach ($assets as $asset) {
@@ -2675,7 +2693,7 @@ class AIChatManager {
     $fresh = $this->layoutContextCollector->collectBlockEditContext($entity, $runtime, \Drupal::currentUser());
     $current = $fresh['existing_components'][0];
     $plugin_id = $current['plugin_id'];
-    $configuration = $this->composeBuilder($plugin_id, $message, $context, $assets, $current['card_configuration'] ?? $current['hero_configuration'], $stream_callback);
+    $configuration = $this->composeBuilder($plugin_id, $message, $context, $assets, $current['scroll_reveal_configuration'] ?? $current['card_configuration'] ?? $current['hero_configuration'], $stream_callback);
     $placement = $this->layoutPlacementManager->saveBuilder($plugin_id, $entity, $configuration, $runtime, [], $target['uuid'], $current['configuration_hash']);
     $thread->addMessage('assistant', 'Updated the builder in the working layout draft. Review it and save the layout when ready.', ['placements' => [$placement]]);
     $thread->save();

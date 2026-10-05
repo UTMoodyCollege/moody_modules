@@ -246,36 +246,52 @@ class LayoutPlacementManager {
   }
 
   public function saveBuilder(string $plugin_id, ContentEntityInterface $entity, array $configuration, array $runtime_context, array $target = [], string $uuid = '', string $expected_hash = ''): array {
-    if (!in_array($plugin_id, ['moody_hero_builder', 'moody_card_builder'], TRUE)) { throw new \InvalidArgumentException('Unsupported builder.'); }
+    if (!in_array($plugin_id, ['moody_hero_builder', 'moody_card_builder', 'moody_scroll_reveal_media_block'], TRUE)) { throw new \InvalidArgumentException('Unsupported builder.'); }
+    $reveal = $plugin_id === 'moody_scroll_reveal_media_block';
     $card = $plugin_id === 'moody_card_builder';
     $key = $card ? 'collection' : 'hero';
     $media_key = $card ? 'images' : 'image';
     $form_key = $card ? 'card_builder' : 'hero_builder';
-    $keys = [$key, $media_key];
-    if (!$card && (!is_int($configuration['image'] ?? NULL) || $configuration['image'] < 0)) { throw new \InvalidArgumentException('Invalid hero image reference.'); }
+    $keys = $reveal ? ['headline', 'animation_style', 'slides'] : [$key, $media_key];
+    if (!$reveal && !$card && (!is_int($configuration['image'] ?? NULL) || $configuration['image'] < 0)) { throw new \InvalidArgumentException('Invalid hero image reference.'); }
     $account = \Drupal::currentUser();
     [$storage, $draft] = $this->getEditableSectionStorage($entity, $runtime_context);
     if (!$account->hasPermission('use moody ai assistant') || !$entity->access('update', $account) || !$storage || !$draft || !$storage->access('update', $account)) {
       throw new \RuntimeException('Open an editable Layout Builder draft to compose a builder block.');
     }
-    $configuration[$key] = $card
-      ? \Drupal\moody_card_builder\CardConfiguration::decode(json_encode($configuration[$key] ?? NULL, JSON_THROW_ON_ERROR))
-      : \Drupal\moody_hero_builder\HeroConfiguration::decode(json_encode($configuration[$key] ?? NULL, JSON_THROW_ON_ERROR));
-    if ($card) {
-      $images = $configuration['images'] ?? [];
-      if (!is_array($images) || !array_is_list($images) || count(array_filter($images, fn($id) => is_int($id) && $id > 0)) !== count($images)) { throw new \InvalidArgumentException('Invalid card media library.'); }
-      $configuration['images'] = \Drupal\moody_card_builder\Plugin\Block\MoodyCardBuilderBlock::imageIds(implode(',', $images));
+    if ($reveal) {
+      $configuration = \Drupal\moody_scroll_reveal_media\AiConfiguration::validate($configuration);
+      foreach ($configuration['slides'] as $slide) {
+        $format = \Drupal::entityTypeManager()->getStorage('filter_format')->load($slide['body']['format']);
+        $media = $slide['media'] ? \Drupal::entityTypeManager()->getStorage('media')->load($slide['media']) : NULL;
+        if (!$format || !$format->access('use', $account) || ($slide['media'] && (!$media || !in_array($media->bundle(), ['utexas_image', 'utexas_video_external'], TRUE) || !$media->access('view', $account)))) {
+          throw new \InvalidArgumentException('The selected text format or Scroll Reveal media is unavailable.');
+        }
+      }
     }
-    $plugin = \Drupal::service('plugin.manager.block')->createInstance($plugin_id, array_intersect_key($configuration, array_flip($keys)) + ['label' => $card ? 'Moody Card Builder' : 'Moody Hero Builder', 'label_display' => FALSE]);
-    $state = new \Drupal\Core\Form\FormState();
-    $state->setValues([$form_key => ['source' => json_encode($configuration[$key]), $media_key => $card ? implode(',', $configuration[$media_key]) : $configuration[$media_key]]]);
-    $form = $plugin->blockForm([], $state);
-    $form[$form_key]['source']['#parents'] = [$form_key, 'source'];
-    $form[$form_key][$media_key]['#parents'] = [$form_key, $media_key];
-    $plugin->blockValidate($form, $state);
-    if ($state->hasAnyErrors() || !$plugin->access($account)) {
-      throw new \InvalidArgumentException('The builder composition or selected media is unavailable. Choose an accessible image/poster and valid builder settings.');
+    else {
+      $configuration[$key] = $card
+        ? \Drupal\moody_card_builder\CardConfiguration::decode(json_encode($configuration[$key] ?? NULL, JSON_THROW_ON_ERROR))
+        : \Drupal\moody_hero_builder\HeroConfiguration::decode(json_encode($configuration[$key] ?? NULL, JSON_THROW_ON_ERROR));
+      if ($card) {
+        $images = $configuration['images'] ?? [];
+        if (!is_array($images) || !array_is_list($images) || count(array_filter($images, fn($id) => is_int($id) && $id > 0)) !== count($images)) { throw new \InvalidArgumentException('Invalid card media library.'); }
+        $configuration['images'] = \Drupal\moody_card_builder\Plugin\Block\MoodyCardBuilderBlock::imageIds(implode(',', $images));
+      }
     }
+    $plugin = \Drupal::service('plugin.manager.block')->createInstance($plugin_id, array_intersect_key($configuration, array_flip($keys)) + ['label' => $reveal ? 'Moody Scroll Reveal Media' : ($card ? 'Moody Card Builder' : 'Moody Hero Builder'), 'label_display' => FALSE]);
+    if (!$reveal) {
+      $state = new \Drupal\Core\Form\FormState();
+      $state->setValues([$form_key => ['source' => json_encode($configuration[$key]), $media_key => $card ? implode(',', $configuration[$media_key]) : $configuration[$media_key]]]);
+      $form = $plugin->blockForm([], $state);
+      $form[$form_key]['source']['#parents'] = [$form_key, 'source'];
+      $form[$form_key][$media_key]['#parents'] = [$form_key, $media_key];
+      $plugin->blockValidate($form, $state);
+      if ($state->hasAnyErrors()) {
+        throw new \InvalidArgumentException('The builder composition or selected media is unavailable. Choose an accessible image/poster and valid builder settings.');
+      }
+    }
+    if (!$plugin->access($account)) { throw new \InvalidArgumentException('This block is unavailable to your account.'); }
     if ($uuid !== '') {
       foreach ($storage->getSections() as $delta => $section) {
         foreach ($section->getComponents() as $component) {

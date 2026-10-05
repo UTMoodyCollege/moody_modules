@@ -129,14 +129,15 @@ class LayoutContextCollector {
             }
           }
 
-          if (in_array($configuration['id'] ?? '', ['moody_hero_builder', 'moody_card_builder'], TRUE)) {
+          if (in_array($configuration['id'] ?? '', ['moody_hero_builder', 'moody_card_builder', 'moody_scroll_reveal_media_block'], TRUE)) {
             $component_data['block_type'] = $configuration['id'];
             $component_data['block_label'] = $configuration['label'] ?? $configuration['id'];
             $component_data['configuration_hash'] = hash('sha256', serialize($configuration));
             // Full composition is loaded only for a directed edit.
             if ($edit_uuid !== '') {
               $card = $configuration['id'] === 'moody_card_builder';
-              $component_data[$card ? 'card_configuration' : 'hero_configuration'] = array_intersect_key($configuration, array_flip($card ? ['collection', 'images'] : ['hero', 'image']));
+              $reveal = $configuration['id'] === 'moody_scroll_reveal_media_block';
+              $component_data[$reveal ? 'scroll_reveal_configuration' : ($card ? 'card_configuration' : 'hero_configuration')] = array_intersect_key($configuration, array_flip($reveal ? ['headline', 'animation_style', 'slides'] : ($card ? ['collection', 'images'] : ['hero', 'image'])));
             }
           }
           $components[] = $component_data;
@@ -181,7 +182,7 @@ class LayoutContextCollector {
     }
     $context = $this->collectEntityContext($entity, $runtime_context);
     $target = $context['existing_components'][0] ?? [];
-    if (in_array(($target['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder'], TRUE)) {
+    if (in_array(($target['plugin_id'] ?? ''), ['moody_hero_builder', 'moody_card_builder', 'moody_scroll_reveal_media_block'], TRUE)) {
       $context['selected_existing_block_references'] = [$target];
       $context['selected_block_references'] = [$target + ['reference_id' => $uuid, 'selection_mode' => 'edit', 'can_edit' => TRUE]];
       return $context;
