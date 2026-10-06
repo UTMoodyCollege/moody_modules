@@ -22,6 +22,11 @@ $quotation = $entries['moody_quotation'] ?? NULL;
 $thumbnail = $quotation ? $quotation->toArray()['image_path'] : '';
 $valid_thumbnail = $thumbnail && is_file(DRUPAL_ROOT . $thumbnail);
 $missing = [];
+foreach (['inline_block:moody_quotation', 'moody_focal_point_block', 'moody_mini_nav'] as $id) {
+  if (!isset($definitions[$id]) || !in_array($id, $enabled, TRUE)) {
+    $missing[] = $id;
+  }
+}
 $module_path = \Drupal::service('extension.list.module')->getPath('moody_layout_builder_browser');
 foreach (array_merge(glob(DRUPAL_ROOT . '/' . $module_path . '/config/install/layout_builder_browser.layout_builder_browser_block.*.yml'), glob(DRUPAL_ROOT . '/' . $module_path . '/config/optional/layout_builder_browser.layout_builder_browser_block.*.yml')) as $file) {
   $default = \Symfony\Component\Yaml\Yaml::parseFile($file);
