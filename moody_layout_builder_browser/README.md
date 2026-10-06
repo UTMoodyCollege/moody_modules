@@ -6,6 +6,10 @@ normal Layout Builder filtered definitions, so layout restrictions remain in
 effect. Disabled Views displays are excluded. Existing entries are not duplicated;
 new reusable block types do not need a per-site bundle-list update.
 
+Moody Quotation has an optional catalog entry and a thumbnail rendered from its
+real template. The entry requires the Quotation bundle/module and the Moody
+Site Building category; sites without those dependencies do not install it.
+
 Reusable placement forms offer an update-access-checked edit link in a new tab.
 Editing shared content affects every placement; layout changes stay in the
 original tab. No configuration import or permission grant is required.
@@ -25,3 +29,5 @@ Checks:
 - `MOODY_TEST_NODE=7730 drush php:script tests/browser-smoke.php` on a local
   Drupal site with a Layout Builder node, Views displays and a reusable block.
   The smoke test changes no saved content.
+- `drush php:script tests/catalog-report.php` reports enabled entries, unavailable
+  plugin IDs and Quotation thumbnail readiness without saving content or config.

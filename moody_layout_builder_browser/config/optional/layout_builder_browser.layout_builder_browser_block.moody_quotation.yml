@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_quotation
+    - layout_builder_browser.layout_builder_browser_blockcat.moody_site_building
+  module:
+    - moody_quotation
+id: moody_quotation
+block_id: 'inline_block:moody_quotation'
+category: moody_site_building
+label: 'Moody Quotation'
+image_path: /modules/custom/moody_modules/moody_custom_fields/moody_quotation/preview-images/moody-quotation.png
+image_alt: 'Moody Quotation with a large quote and attribution'
+weight: 1
