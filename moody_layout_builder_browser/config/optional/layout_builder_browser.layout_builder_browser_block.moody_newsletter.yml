@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.moody_newsletter
+    - layout_builder_browser.layout_builder_browser_blockcat.moody_site_building
+  module:
+    - moody_newsletter
+id: moody_newsletter
+block_id: 'inline_block:moody_newsletter'
+category: moody_site_building
+label: 'Moody Newsletter'
+image_path: ''
+image_alt: ''
+weight: 0

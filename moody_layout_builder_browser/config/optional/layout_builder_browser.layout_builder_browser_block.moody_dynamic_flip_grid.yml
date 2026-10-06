@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - layout_builder_browser.layout_builder_browser_blockcat.specialty_blocks
+  module:
+    - moody_flip_things
+id: moody_dynamic_flip_grid
+block_id: moody_flip_things_dynamic_flip_grid
+category: specialty_blocks
+label: 'Moody Dynamic Flip Grid'
+image_path: ''
+image_alt: ''
+weight: -100

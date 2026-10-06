@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - layout_builder_browser.layout_builder_browser_blockcat.specialty_blocks
+  module:
+    - moody_feature_page
+id: moody_editors_picks
+block_id: moody_feature_page_feature_pages_editors_picks
+category: specialty_blocks
+label: 'Moody Editors Picks'
+image_path: ''
+image_alt: ''
+weight: -100

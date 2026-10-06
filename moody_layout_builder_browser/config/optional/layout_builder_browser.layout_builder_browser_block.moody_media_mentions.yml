@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - layout_builder_browser.layout_builder_browser_blockcat.specialty_blocks
+  module:
+    - moody_feature_page
+id: moody_media_mentions
+block_id: moody_feature_page_media_mentions
+category: specialty_blocks
+label: 'Moody Media Mentions'
+image_path: ''
+image_alt: ''
+weight: -100
