@@ -7,18 +7,25 @@
     'accordion',
   ]
 %}
+{{ attach_library('moody_accordion/accordion') }}
 <div {{ attributes.addClass(classes) }} x-data="{ openIndex: null }">
   {% for item in items %}
-    <div class="accordion-item">
-      <div class="accordion-title">
+    {% set panel_id = 'moody-accordion-' ~ rand ~ '-' ~ loop.index0 %}
+    <div class="accordion-item" x-id="['accordion-title', 'accordion-panel']">
+      <h3 class="accordion-title">
         <button @click="openIndex === {{ loop.index0 }} ? openIndex = null : openIndex = {{ loop.index0 }}" 
                 :class="{ 'collapsed': openIndex !== {{ loop.index0 }} }" 
-                class="accordion-btn">
+                class="accordion-btn collapsed" type="button"
+                id="{{ panel_id }}-title" :id="$id('accordion-title')"
+                aria-expanded="false" :aria-expanded="openIndex === {{ loop.index0 }}"
+                aria-controls="{{ panel_id }}" :aria-controls="$id('accordion-panel')">
           {{ item.content['#panel_title'] }}
-          <span class="accordion-caret"></span>
+          <span class="accordion-caret" aria-hidden="true"></span>
         </button>
-      </div>
-      <div x-show="openIndex === {{ loop.index0 }}" class="accordion-content">
+      </h3>
+      <div x-cloak x-show="openIndex === {{ loop.index0 }}" class="accordion-content"
+           id="{{ panel_id }}" :id="$id('accordion-panel')" role="region"
+           aria-labelledby="{{ panel_id }}-title" :aria-labelledby="$id('accordion-title')">
         <div class="accordion-body">
           {{ item.content['#panel_content'] }}
         </div>
@@ -26,3 +33,4 @@
     </div>
   {% endfor %}
 </div>
+<noscript><style>.field--type-moody-accordion [x-cloak] { display: block !important; }</style></noscript>

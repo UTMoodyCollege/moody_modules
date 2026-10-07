@@ -24,6 +24,10 @@ class MoodyFlexColorBlocksWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+    $element['#type'] = 'details';
+    $element['#title'] = $this->t('Color block @number', ['@number' => $delta + 1]);
+    $element['#open'] = $delta === 0 || !$items[$delta]->isEmpty();
+    $element['#description'] = $this->t('Usually use one item per block, placing one block in each section column. Up to four items are supported; unused items stay collapsed.');
     $element['headline'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Headline'),

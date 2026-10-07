@@ -2,6 +2,10 @@
   position: relative;
 }
 
+.hero-headline {
+  margin-top: 0;
+}
+
 .moody-hero .hero-content {
   height: 100%;
   margin: auto;

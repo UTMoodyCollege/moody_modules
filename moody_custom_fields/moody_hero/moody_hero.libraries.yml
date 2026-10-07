@@ -46,12 +46,14 @@ hero-style-7:
     theme:
       css/hero-style-base.css: {}
       css/hero-style-7.css: {}
+      css/hero-text-position.css: {}
 hero-style-8:
   version: 1.x
   css:
     theme:
       css/hero-style-base.css: {}
       css/hero-style-8.css: {}
+      css/hero-text-position.css: {}
 hero_formatters_split:
   version: 1.x
   js:

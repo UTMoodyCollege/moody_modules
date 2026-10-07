@@ -45,6 +45,13 @@ function moody_layout_builder_browser_form_alter(array &$form, FormStateInterfac
     'layout_builder_add_block',
     'layout_builder_update_block',
   ], TRUE)) {
+    // Choose the presentation/crop before selecting media.
+    if (isset($form['settings']['view_mode'])) {
+      $form['settings']['view_mode']['#weight'] = -70;
+      if (isset($form['settings']['view_mode']['#options']['utexas_featured_highlight_2'])) {
+        $form['settings']['view_mode']['#options']['utexas_featured_highlight_2'] = new TranslatableMarkup('Charcoal (legacy Medium)');
+      }
+    }
     $form['#attached']['library'][] = 'moody_layout_builder_browser/editor_toolbar';
     _moody_layout_builder_browser_reusable_edit_link($form, $form_state);
     $form['settings']['label']['#description'] = new TranslatableMarkup(
@@ -202,6 +209,55 @@ function moody_layout_builder_browser_form_alter(array &$form, FormStateInterfac
  */
 function moody_layout_builder_browser_layout_builder_browser_alter(array &$build, array $context): void {
   \Drupal\moody_layout_builder_browser\AvailableBlocks::create(\Drupal::getContainer())->append($build, $context);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function moody_layout_builder_browser_form_layout_builder_configure_section_alter(array &$form, FormStateInterface $form_state): void {
+  if (!isset($form['layout_settings']['background-color-wrapper']['background-color'])) {
+    return;
+  }
+  $select = &$form['layout_settings']['background-color-wrapper']['background-color'];
+  foreach (['487d39', '138791', '074d6a'] as $color) {
+    unset($select['#options'][$color]);
+  }
+  if (in_array($select['#default_value'] ?? '', ['487d39', '138791', '074d6a'], TRUE)) {
+    $select['#default_value'] = 'c2c5c8';
+    $select['#description'] = new TranslatableMarkup('This section uses a retired accent. Saving will change it to Charcoal unless you choose another approved background.');
+  }
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function moody_layout_builder_browser_field_formatter_info_alter(array &$definitions): void {
+  if (isset($definitions['utexas_featured_highlight_2'])) {
+    $definitions['utexas_featured_highlight_2']['label'] = new TranslatableMarkup('Charcoal (legacy Medium)');
+  }
+}
+
+/**
+ * Implements hook_preprocess_utexas_featured_highlight().
+ */
+function moody_layout_builder_browser_preprocess_utexas_featured_highlight(array &$variables): void {
+  // Retain stored view modes; render the retired Bluebonnet mode as Charcoal.
+  if (($variables['style'] ?? '') === 'medium') {
+    $variables['style'] = 'dark';
+  }
+  $cta = $variables['cta'] ?? NULL;
+  if ($cta instanceof \Drupal\Core\Link) {
+    // Never mutate the shared URL or its text-link icon.
+    $url = clone $cta->getUrl();
+    $classes = $url->getOption('attributes')['class'] ?? [];
+    $classes = is_array($classes) ? $classes : preg_split('/\s+/', trim($classes));
+    if (in_array('ut-btn', $classes, TRUE)) {
+      $attributes = $url->getOption('attributes') ?? [];
+      $attributes['class'] = array_values(array_diff($classes, ['ut-cta-link--angle-right', 'ut-cta-link--external', 'ut-cta-link--lock']));
+      $url->setOption('attributes', $attributes);
+      $variables['cta'] = \Drupal\Core\Link::fromTextAndUrl($cta->getText(), $url);
+    }
+  }
 }
 
 /**

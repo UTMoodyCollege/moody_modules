@@ -1,0 +1,40 @@
+/* Position controls apply to both homepage styles, after their legacy rules. */
+.moody-hero.extrabold-headline.moody-homepage-hero:is(.top-left, .top-right, .bottom-left, .bottom-right, .centered) .hero-content {
+  inset: 1rem;
+  height: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  transform: none;
+  display: flex;
+}
+.moody-hero.extrabold-headline.moody-homepage-hero .hero-callout {
+  height: auto;
+  margin: 0;
+  max-width: min(840px, 100%);
+}
+.moody-hero.extrabold-headline.moody-homepage-hero:is(.top-left, .top-right) .hero-content {
+  align-items: flex-start;
+}
+.moody-hero.extrabold-headline.moody-homepage-hero:is(.bottom-left, .bottom-right) .hero-content {
+  align-items: flex-end;
+}
+.moody-hero.extrabold-headline.moody-homepage-hero:is(.top-left, .bottom-left) .hero-content {
+  justify-content: flex-start;
+  text-align: left;
+}
+.moody-hero.extrabold-headline.moody-homepage-hero:is(.top-right, .bottom-right) .hero-content {
+  justify-content: flex-end;
+  text-align: right;
+}
+.moody-hero.extrabold-headline.moody-homepage-hero:is(.top-right, .bottom-right) .hero-callout {
+  align-items: flex-end;
+}
+.moody-hero.extrabold-headline.moody-homepage-hero.centered .hero-content {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.moody-hero.extrabold-headline.moody-homepage-hero.centered .hero-callout {
+  align-items: center;
+}

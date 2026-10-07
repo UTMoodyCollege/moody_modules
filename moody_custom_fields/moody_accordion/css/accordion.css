@@ -1,0 +1,10 @@
+.field--type-moody-accordion .accordion-title {
+  margin: 0;
+}
+.field--type-moody-accordion [x-cloak] {
+  display: none !important;
+}
+.field--type-moody-accordion .accordion-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}

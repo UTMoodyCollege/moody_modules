@@ -1,0 +1,4 @@
+accordion:
+  css:
+    component:
+      css/accordion.css: {}

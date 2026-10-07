@@ -1,4 +1,3 @@
-<!-- Add you custom twig html here -->
 <div class="moody-showcase{{ sticky_image ? ' moody-showcase--sticky-media' }}{{ full_media ? ' moody-showcase--full-media' }}{{ pinned_reveal_image ? ' moody-showcase--pinned-reveal' }}">
 	{% if image %}
 		<div class="showcase-image{{ sticky_image ? ' showcase-media--sticky-target' }}{{ pinned_reveal_image ? ' showcase-media--pinned-trigger showcase-media--sticky-target' }}">
@@ -19,8 +18,10 @@
 		</div>
 	{% endif %}
 	<div class="showcase-text">
-		<h3 class="showcase-headline">{{ headline }}</h3>
-		<hr>
+		{% if headline %}
+			<h3 class="showcase-headline">{{ headline }}</h3>
+			<hr>
+		{% endif %}
 		<div class="showcase-copy">{{ copy }}</div>
 		{{ cta }}
 	</div>

@@ -360,16 +360,11 @@ class BlockUsageAuditForm extends FormBase {
         $link = $nid > 0
           ? Link::createFromRoute($title, 'entity.node.canonical', ['node' => $nid])->toRenderable()
           : ['#plain_text' => $title];
-        $usage_prefix = Html::escape($instance_label);
-        if ($view_mode !== '') {
-          $usage_prefix .= ' [' . Html::escape($view_mode) . ']';
-        }
         $usage_links[] = [
-          '#markup' => $usage_prefix . ' - ',
-          'link' => $link,
-          'bundle' => [
-            '#markup' => ' <span>(' . Html::escape($bundle) . ')</span>',
-          ],
+          ['data' => ['#plain_text' => $instance_label]],
+          ['data' => ['#plain_text' => $view_mode !== '' ? $view_mode : '—']],
+          ['data' => $link],
+          ['data' => ['#plain_text' => $bundle]],
         ];
       }
 
@@ -390,8 +385,9 @@ class BlockUsageAuditForm extends FormBase {
               '#title' => $this->t('@count placements', ['@count' => $placements]),
               '#open' => FALSE,
               'list' => [
-                '#theme' => 'item_list',
-                '#items' => $usage_links,
+                '#type' => 'table',
+                '#header' => [$this->t('Block title'), $this->t('View mode'), $this->t('Page'), $this->t('Content type')],
+                '#rows' => $usage_links,
               ],
             ],
           ],

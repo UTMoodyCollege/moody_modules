@@ -19,7 +19,7 @@ final class AvailableBlocks extends BrowserController {
     $existing = self::listedIds($build);
     $groups = [];
     foreach ($definitions as $id => $definition) {
-      $group = str_starts_with($id, 'views_block:') ? 'views' : (str_starts_with($id, 'block_content:') ? 'reusable' : NULL);
+      $group = str_starts_with($id, 'views_block:') ? 'views' : (str_starts_with($id, 'block_content:') ? 'reusable' : (in_array($id, ['moody_hero_builder', 'moody_card_builder'], TRUE) ? 'builders' : NULL));
       if (!$group || isset($existing[$id])) {
         continue;
       }
@@ -35,7 +35,11 @@ final class AvailableBlocks extends BrowserController {
       uasort($blocks, static fn(array $a, array $b): int => strnatcasecmp((string) $a['admin_label'], (string) $b['admin_label']));
       $build['block_categories']['moody_available_' . $group] = [
         '#type' => 'details',
-        '#title' => $group === 'views' ? $this->t('Views blocks') : $this->t('Reusable blocks'),
+        '#title' => match ($group) {
+          'views' => $this->t('Views blocks'),
+          'builders' => $this->t('Visual builders'),
+          default => $this->t('Reusable blocks'),
+        },
         '#open' => FALSE,
         '#attributes' => ['class' => ['js-layout-builder-category']],
         'links' => $this->getBlocks($storage, $context['delta'], $context['region'], $blocks),
