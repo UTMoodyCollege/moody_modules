@@ -1,4 +1,10 @@
 # Moody subsite routing definition
+moody_subsite.add_user:
+  route_name: moody_subsite.add_user
+  base_route: entity.moody_subsite.canonical
+  title: 'Add user to subsite'
+  weight: 5
+
 moody_subsite.settings_tab:
   route_name: moody_subsite.settings
   title: 'Settings'

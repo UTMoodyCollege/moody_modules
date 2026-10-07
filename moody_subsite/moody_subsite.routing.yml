@@ -7,3 +7,16 @@ moody_subsite.startup:
     _permission: 'add moody subsite entities+administer permissions+administer users'
   options:
     _admin_route: true
+
+moody_subsite.add_user:
+  path: '/admin/structure/moody_subsite/{moody_subsite}/add-user'
+  defaults:
+    _form: '\Drupal\moody_subsite\Form\AddSubsiteUserForm'
+    _title: 'Add user to subsite'
+  requirements:
+    _permission: 'administer users+administer moody subsite entities'
+  options:
+    _admin_route: true
+    parameters:
+      moody_subsite:
+        type: entity:moody_subsite

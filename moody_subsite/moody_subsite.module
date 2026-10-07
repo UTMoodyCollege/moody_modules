@@ -205,6 +205,14 @@ function moody_subsite_moody_ai_user_capabilities_alter(array &$capabilities, Ac
  * Implements hook_ENTITY_TYPE_view().
  */
 function moody_subsite_moody_subsite_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  $build['add_subsite_user'] = [
+    '#type' => 'link',
+    '#title' => t('Add user to subsite'),
+    '#url' => Url::fromRoute('moody_subsite.add_user', ['moody_subsite' => $entity->id()]),
+    '#attributes' => ['class' => ['button', 'button--primary']],
+    '#access' => AccessResult::allowedIfHasPermissions(\Drupal::currentUser(), ['administer users', 'administer moody subsite entities']),
+    '#weight' => -100,
+  ];
   $term_ids = array_column($entity->get('directory_structure')->getValue(), 'target_id');
   $rows = [];
   $editor_ids = [];
