@@ -117,8 +117,11 @@ function moody_layout_builder_browser_form_alter(array &$form, FormStateInterfac
     return;
   }
 
-  if (isset($form['actions']['submit'])) {
-    $form['actions']['submit']['#value'] = new TranslatableMarkup('Publish Latest changes');
+  $object = $form_state->getFormObject();
+  if (isset($form['actions']['submit']) && $object instanceof \Drupal\layout_builder\Form\OverridesEntityForm && $object->getEntity() instanceof NodeInterface) {
+    $form['actions']['submit']['#value'] = $object->getEntity()->isPublished()
+      ? new TranslatableMarkup('Publish latest changes')
+      : new TranslatableMarkup('Save latest draft');
   }
 
   $form['actions']['#attributes']['class'][] = 'moody-layout-builder-toolbar';
