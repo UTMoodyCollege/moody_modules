@@ -1,4 +1,7 @@
 /* Position controls apply to both homepage styles, after their legacy rules. */
+.moody-hero.extrabold-headline.moody-homepage-hero .hero-content:not(.orange-text):not(.charcoal-text) .hero-subhead {
+  color: #fff;
+}
 .moody-hero.extrabold-headline.moody-homepage-hero:is(.top-left, .top-right, .bottom-left, .bottom-right, .centered) .hero-content {
   inset: 1rem;
   height: auto;

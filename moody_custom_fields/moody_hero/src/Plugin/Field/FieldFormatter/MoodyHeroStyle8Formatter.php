@@ -40,6 +40,12 @@ class MoodyHeroStyle8Formatter extends MoodyHeroFormatterBase {
     $cache_tags = Cache::mergeTags($cache_tags, $small_image_style->getCacheTags());
 
     foreach ($items as $delta => $item) {
+      $cta_item['link'] = [
+        'uri' => $item->link_uri,
+        'title' => $item->link_title ?? NULL,
+        'options' => $item->link_options ?? [],
+      ];
+      $cta = UtexasLinkOptionsHelper::buildLink($cta_item, ['ut-btn--hero']);
       $id = 'a' . substr(md5(uniqid(mt_rand(), TRUE)), 0, 5);
       if ($media = $this->entityTypeManager->getStorage('media')->load($item->media)) {
         $media_attributes = $media->get('field_utexas_media_image')->getValue();
@@ -86,6 +92,7 @@ class MoodyHeroStyle8Formatter extends MoodyHeroFormatterBase {
         '#alt' => isset($media_attributes) ? $media_attributes[0]['alt'] : '',
         '#heading' => $item->heading,
         '#subheading' => $item->subheading ? $item->subheading : NULL,
+        '#cta' => $cta,
         '#text_position' => $item->text_position,
         '#text_color' => $item->text_color,
         '#overlay' => $item->overlay,

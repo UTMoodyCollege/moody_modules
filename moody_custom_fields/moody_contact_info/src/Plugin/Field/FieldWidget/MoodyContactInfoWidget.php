@@ -44,7 +44,7 @@ class MoodyContactInfoWidget extends WidgetBase {
       '#title' => 'Copy',
       '#type' => 'text_format',
       '#default_value' => isset($items[$delta]->copy_value) ? $items[$delta]->copy_value : NULL,
-      '#format' => isset($items[$delta]->copy_format) ? $items[$delta]->copy_format : 'restricted_html',
+      '#format' => isset($items[$delta]->copy_format) ? $items[$delta]->copy_format : 'flex_html',
     ];
     $element['link'] = [
       '#type' => 'utexas_link_options_element',
