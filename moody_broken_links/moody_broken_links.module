@@ -1,0 +1,9 @@
+<?php
+
+/** Implements hook_file_download(): audits only use the authenticated controller. */
+function moody_broken_links_file_download($uri) {
+  if (str_starts_with($uri, 'private://moody-broken-links-audit/')) {
+    return -1;
+  }
+  return NULL;
+}

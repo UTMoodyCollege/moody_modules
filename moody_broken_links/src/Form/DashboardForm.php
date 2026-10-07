@@ -50,6 +50,11 @@ final class DashboardForm extends FormBase {
     $form['intro'] = [
       '#markup' => '<p>' . $this->t('Scan selected content types or one specific page for HTTP links in fields and Layout Builder inline blocks. Queue several fixes for a page and apply them in one revision. Fixes stop if the source changed after the scan.') . '</p>',
     ];
+    $form['bulk_tools'] = [
+      '#type' => 'container',
+      'remove' => Link::fromTextAndUrl($this->t('Preview bulk removals by HTTP code'), Url::fromRoute('moody_broken_links.bulk_remove', [], ['attributes' => ['class' => ['button']]]))->toRenderable(),
+      'audits' => Link::fromTextAndUrl($this->t('Private removal audit reports'), Url::fromRoute('moody_broken_links.audits', [], ['attributes' => ['class' => ['button']]]))->toRenderable(),
+    ];
     $form['scan'] = [
       '#type' => 'details',
       '#title' => $this->t('Run a scan'),

@@ -6,6 +6,38 @@ moody_broken_links.dashboard:
   requirements:
     _permission: 'administer moody broken links reports'
 
+moody_broken_links.bulk_remove:
+  path: '/admin/content/broken-links/bulk-remove'
+  defaults:
+    _form: '\Drupal\moody_broken_links\Form\BulkRemovalForm'
+    _title: 'Preview bulk link removals'
+  requirements:
+    _permission: 'administer moody broken links reports'
+    _user_is_logged_in: 'TRUE'
+  options:
+    _admin_route: true
+
+moody_broken_links.audits:
+  path: '/admin/content/broken-links/audits'
+  defaults:
+    _controller: '\Drupal\moody_broken_links\Controller\AuditController::listing'
+    _title: 'Private bulk-removal audit reports'
+  requirements:
+    _permission: 'administer moody broken links reports'
+    _user_is_logged_in: 'TRUE'
+  options:
+    _admin_route: true
+
+moody_broken_links.audit_download:
+  path: '/admin/content/broken-links/audits/{date}/{token}'
+  defaults:
+    _controller: '\Drupal\moody_broken_links\Controller\AuditController::download'
+  requirements:
+    _permission: 'administer moody broken links reports'
+    _user_is_logged_in: 'TRUE'
+    date: '[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    token: '[a-f0-9]{32}'
+
 moody_broken_links.page:
   path: '/admin/content/broken-links/{scan_id}/page/{nid}'
   defaults:

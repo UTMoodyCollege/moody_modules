@@ -46,6 +46,13 @@ final class PageRemediationForm extends FormBase {
       throw new \InvalidArgumentException('This page has no active results in the selected scan.');
     }
     $first = reset($results);
+    $request = \Drupal::request();
+    $filter = (string) $request->query->get('status', 'non_200');
+    if (!in_array($filter, ['non_200', 'broken', 'warning', 'all'], TRUE)) {
+      $filter = 'non_200';
+    }
+    $search = trim((string) $request->query->get('search', ''));
+    $results = static::filterResults($results, $filter, $search);
 
     $form['page'] = [
       '#type' => 'item',
@@ -60,6 +67,18 @@ final class PageRemediationForm extends FormBase {
     $form['instructions'] = [
       '#markup' => '<p>' . $this->t('Choose Keep, Revise, or Remove for each link. All queued changes are validated against the scan and saved together in one new page revision. Removing a link retains its text and nested markup.') . '</p>',
     ];
+    $form['filters'] = ['#type' => 'container', '#attributes' => ['class' => ['container-inline']]];
+    $form['filters']['status'] = [
+      '#type' => 'select', '#title' => $this->t('Show'),
+      '#options' => ['non_200' => $this->t('Non-200 results'), 'broken' => $this->t('Broken only'), 'warning' => $this->t('Warnings only'), 'all' => $this->t('All unrepaired results')],
+      '#default_value' => $filter,
+    ];
+    $form['filters']['search'] = ['#type' => 'textfield', '#title' => $this->t('URL, link text, or source'), '#default_value' => $search, '#size' => 30];
+    $form['filters']['apply'] = [
+      '#type' => 'submit', '#value' => $this->t('Filter results'),
+      '#submit' => ['::filterSubmit'], '#limit_validation_errors' => [['status'], ['search']],
+    ];
+    $form['filters']['help'] = ['#markup' => '<p>' . $this->t('Filter before choosing repairs. Filtering reloads this page and discards unsaved choices; it does not change content.') . '</p>'];
     $form['queue'] = [
       '#type' => 'table',
       '#tree' => TRUE,
@@ -71,6 +90,7 @@ final class PageRemediationForm extends FormBase {
         $this->t('Action'),
         $this->t('New URL'),
       ],
+      '#empty' => $this->t('No unrepaired links match these filters. Choose All unrepaired results to see working links too.'),
     ];
     foreach ($results as $result_id => $result) {
       $status = ucfirst((string) $result['result_status']);
@@ -117,6 +137,7 @@ final class PageRemediationForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Apply queued changes'),
       '#button_type' => 'primary',
+      '#disabled' => !$results,
     ];
     $form['actions']['cancel'] = [
       '#type' => 'link',
@@ -127,10 +148,33 @@ final class PageRemediationForm extends FormBase {
     return $form;
   }
 
+  /** Filters display only; repair validation still uses the original results. */
+  public static function filterResults(array $results, string $filter = 'non_200', string $search = ''): array {
+    return array_filter($results, static function (array $result) use ($filter, $search): bool {
+      $matches = match ($filter) {
+        'all' => TRUE,
+        'broken', 'warning' => $result['result_status'] === $filter,
+        default => (int) $result['http_code'] !== 200,
+      };
+      $text = implode(' ', [$result['href'], $result['link_text'] ?? '', $result['source_label']]);
+      return $matches && ($search === '' || stripos($text, $search) !== FALSE);
+    });
+  }
+
+  /** Reloads the filtered queue without executing any repair. */
+  public function filterSubmit(array &$form, FormStateInterface $form_state): void {
+    $form_state->setRedirect('moody_broken_links.page', ['scan_id' => $this->scanId, 'nid' => $this->nid], [
+      'query' => ['status' => $form_state->getValue('status'), 'search' => trim((string) $form_state->getValue('search'))],
+    ]);
+  }
+
   /**
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
+    if (in_array('::filterSubmit', $form_state->getTriggeringElement()['#submit'] ?? [], TRUE)) {
+      return;
+    }
     $queue = (array) $form_state->getValue('queue', []);
     $available = $this->manager->getPageResults($this->scanId, $this->nid);
     $changed = 0;

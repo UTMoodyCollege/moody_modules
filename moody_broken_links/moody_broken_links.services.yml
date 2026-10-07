@@ -1,4 +1,6 @@
 services:
+  moody_broken_links.bulk_removal:
+    class: Drupal\moody_broken_links\BulkRemoval
   moody_broken_links.manager:
     class: Drupal\moody_broken_links\BrokenLinksManager
     arguments:
