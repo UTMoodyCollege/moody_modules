@@ -8,6 +8,17 @@ checked in batches and shown at **Content > Broken links**.
 Scans can target selected content types, all content types, or one specific
 page selected through Drupal's entity autocomplete.
 
+Dashboard scans use Drupal's persistent queue, with one page per item. The
+first item starts after the kickoff response; remaining items run through
+cron, independently of the browser. Refresh the dashboard to see progress.
+CLI workers can drain the same queue with
+`drush queue:run moody_broken_links_scan`; no alternate scanner is used.
+Cron's 30-second budget is checked between items, not a hard timeout for one
+large page. A 15-minute lease/lock prevents ordinary concurrent processing;
+findings and checkpoints commit together, making retry acknowledgement safe.
+Verify each site's cron cadence before claiming continuous/immediate fleet
+processing. No recurring content repairs are enabled by this queue.
+
 Formatted text is also checked for links created by the enabled Drupal
 "Convert URLs into links" filter (including bare `www.example.com` text).
 These results are labelled **auto-linked text (manual edit required)** and

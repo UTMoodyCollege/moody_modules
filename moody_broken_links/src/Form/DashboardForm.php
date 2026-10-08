@@ -103,7 +103,7 @@ final class DashboardForm extends FormBase {
     $form['scan']['actions'] = ['#type' => 'actions'];
     $form['scan']['actions']['start'] = [
       '#type' => 'submit',
-      '#value' => $scan ? $this->t('Run a new scan') : $this->t('Run broken-link scan'),
+      '#value' => $this->t('Start background scan'),
       '#button_type' => 'primary',
       '#validate' => ['::validateScanSelection'],
       '#submit' => ['::startScan'],
@@ -286,18 +286,17 @@ final class DashboardForm extends FormBase {
       return;
     }
     $site_base_url = \Drupal::request()->getSchemeAndHttpHost();
-    $operations = [];
-    foreach (array_chunk($scan['node_ids'], 5) as $node_ids) {
-      $operations[] = [[static::class, 'processNodes'], [$scan['scan_id'], $node_ids, $site_base_url]];
+    try {
+      \Drupal::service('moody_broken_links.background_scan')->enqueue($scan, $site_base_url);
     }
-    batch_set([
-      'title' => $this->t('Checking content links'),
-      'operations' => $operations,
-      'finished' => [static::class, 'scanFinished'],
-      'init_message' => $this->t('Starting broken-link scan.'),
-      'progress_message' => $this->t('Completed @current of @total page batches.'),
-      'error_message' => $this->t('The broken-link scan encountered an error.'),
-    ]);
+    catch (\Throwable $e) {
+      $this->manager->markScanFailed((int) $scan['scan_id']);
+      $this->messenger()->addError($this->t('The background scan could not be queued. No content changed.'));
+      return;
+    }
+    \Drupal::request()->attributes->set('_moody_broken_links_kickoff', TRUE);
+    $this->messenger()->addStatus($this->t('Background scan queued. You may close this page. Refresh this dashboard to see progress; remaining work continues through cron.'));
+    $form_state->setRedirect('moody_broken_links.dashboard');
   }
 
   /**

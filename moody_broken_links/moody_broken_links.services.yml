@@ -1,4 +1,10 @@
 services:
+  moody_broken_links.background_scan:
+    class: Drupal\moody_broken_links\BackgroundScan
+  moody_broken_links.scan_kickoff:
+    class: Drupal\moody_broken_links\EventSubscriber\ScanKickoff
+    tags:
+      - { name: event_subscriber }
   moody_broken_links.bulk_removal:
     class: Drupal\moody_broken_links\BulkRemoval
   moody_broken_links.manager:
