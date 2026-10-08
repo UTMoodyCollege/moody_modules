@@ -208,6 +208,9 @@ final class DashboardForm extends FormBase {
       if ((int) $result->remediated) {
         $actions = ['#plain_text' => ucfirst((string) $result->action) . ' — new scan required'];
       }
+      elseif ((json_decode((string) $result->source_data, TRUE)['value_kind'] ?? '') === 'generated') {
+        $actions = ['#plain_text' => $this->t('Auto-linked text — edit the source text or text-format settings manually.')];
+      }
       else {
         $actions = [
           '#type' => 'container',

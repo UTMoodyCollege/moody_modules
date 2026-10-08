@@ -8,6 +8,15 @@ checked in batches and shown at **Content > Broken links**.
 Scans can target selected content types, all content types, or one specific
 page selected through Drupal's entity autocomplete.
 
+Formatted text is also checked for links created by the enabled Drupal
+"Convert URLs into links" filter (including bare `www.example.com` text).
+These results are labelled **auto-linked text (manual edit required)** and
+excluded from automatic repairs and bulk removals. Removing an anchor while
+retaining URL-shaped text would cause the filter to recreate the link. Edit
+the source text or deliberately change its text-format settings instead.
+This check runs the native URL filter only, not media/embed filters or a
+full-page crawl; it does not claim coverage of every dynamically generated link.
+
 The dashboard can revise a URL or remove an anchor while preserving its linked
 text and markup. Its page workspace can queue several revise/remove choices and
 apply them together in one revision, so links from the same field do not need a

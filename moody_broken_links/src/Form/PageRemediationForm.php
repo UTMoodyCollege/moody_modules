@@ -93,6 +93,7 @@ final class PageRemediationForm extends FormBase {
       '#empty' => $this->t('No unrepaired links match these filters. Choose All unrepaired results to see working links too.'),
     ];
     foreach ($results as $result_id => $result) {
+      $generated = ($result['source_data']['value_kind'] ?? '') === 'generated';
       $status = ucfirst((string) $result['result_status']);
       if ((int) $result['http_code']) {
         $status .= ' (' . $result['http_code'] . ')';
@@ -116,12 +117,14 @@ final class PageRemediationForm extends FormBase {
           'remove' => $this->t('Remove'),
         ],
         '#default_value' => 'keep',
+        '#disabled' => $generated,
       ];
       $form['queue'][$result_id]['replacement'] = [
         '#type' => 'textfield',
         '#title' => $this->t('New URL for @url', ['@url' => $result['href']]),
         '#title_display' => 'invisible',
         '#maxlength' => 2048,
+        '#disabled' => $generated,
         '#size' => 32,
         '#placeholder' => '/new-path or https://…',
         '#states' => [
