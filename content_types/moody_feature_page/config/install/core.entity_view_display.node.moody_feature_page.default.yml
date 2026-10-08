@@ -113,16 +113,6 @@ third_party_settings:
                 third_party_settings: {  }
             weight: 1
             additional: {  }
-          a9db5871-013a-4986-b221-16d71e082a88:
-            uuid: a9db5871-013a-4986-b221-16d71e082a88
-            region: content
-            configuration:
-              id: 'extra_field_block:node:moody_feature_page:addtoany'
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-            weight: 2
-            additional: {  }
           7672b03a-0616-4a94-983e-960873a75de9:
             uuid: 7672b03a-0616-4a94-983e-960873a75de9
             region: content

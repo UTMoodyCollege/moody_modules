@@ -1,0 +1,22 @@
+<?php
+
+/** Remove retired AddToAny placements from active default layouts only. */
+function moody_layout_builder_browser_update_10001(): string {
+  $removed = 0;
+  $storage = \Drupal::service('config.storage');
+  foreach ($storage->listAll('core.entity_view_display.') as $name) {
+    $data = $storage->read($name);
+    $sections = $data['third_party_settings']['layout_builder']['sections'] ?? [];
+    $objects = array_map([\Drupal\layout_builder\Section::class, 'fromArray'], $sections);
+    $count = \Drupal\moody_layout_builder_browser\RetiredAddToAny::prune($objects);
+    if ($count) {
+      \Drupal::configFactory()->getEditable($name)
+        ->set('third_party_settings.layout_builder.sections', array_map(static fn($section) => $section->toArray(), $objects))
+        ->save();
+      $removed += $count;
+    }
+  }
+  // Page overrides and historical revisions are sanitized on load; normal
+  // editor saves persist the cleanup without a mass rewrite of article history.
+  return "Removed $removed retired AddToAny default-layout components. Page overrides are protected on load and save.";
+}
