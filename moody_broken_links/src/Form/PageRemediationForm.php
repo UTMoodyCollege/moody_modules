@@ -65,7 +65,7 @@ final class PageRemediationForm extends FormBase {
       )->toString(),
     ];
     $form['instructions'] = [
-      '#markup' => '<p>' . $this->t('Choose Keep, Revise, or Remove for each link. All queued changes are validated against the scan and saved together in one new page revision. Removing a link retains its text and nested markup.') . '</p>',
+      '#markup' => '<p>' . $this->t('Review the current link and suggested destination. Choose Replace to accept or edit a suggestion, Remove to unlink, or Keep to leave it unchanged. Suggestions are not applied until you save. Changes are checked against the scan and saved in a new revision; removing a link preserves its text where possible.') . '</p>',
     ];
     $form['filters'] = ['#type' => 'container', '#attributes' => ['class' => ['container-inline']]];
     $form['filters']['status'] = [
@@ -88,7 +88,7 @@ final class PageRemediationForm extends FormBase {
         $this->t('Current URL'),
         $this->t('Check'),
         $this->t('Action'),
-        $this->t('New URL'),
+        $this->t('Suggested / custom destination'),
       ],
       '#empty' => $this->t('No unrepaired links match these filters. Choose All unrepaired results to see working links too.'),
     ];
@@ -113,7 +113,7 @@ final class PageRemediationForm extends FormBase {
         '#title_display' => 'invisible',
         '#options' => [
           'keep' => $this->t('Keep'),
-          'revise' => $this->t('Revise'),
+          'revise' => $this->t('Replace'),
           'remove' => $this->t('Remove'),
         ],
         '#default_value' => 'keep',
@@ -127,20 +127,23 @@ final class PageRemediationForm extends FormBase {
         '#disabled' => $generated,
         '#size' => 32,
         '#placeholder' => '/new-path or https://…',
-        '#states' => [
-          'visible' => [
-            ':input[name="queue[' . $result_id . '][action]"]' => ['value' => 'revise'],
-          ],
-        ],
+        '#default_value' => $generated ? '' : $this->suggestDestination((string) $result['href']),
+        '#description' => $this->t('Review before replacing. Blank means no verified alias suggestion.'),
       ];
     }
 
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Apply queued changes'),
+      '#value' => $this->t('Save changes'),
       '#button_type' => 'primary',
       '#disabled' => !$results,
+    ];
+    $form['actions']['next'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Save and next page'),
+      '#disabled' => !$results,
+      '#review_next' => TRUE,
     ];
     $form['actions']['cancel'] = [
       '#type' => 'link',
@@ -149,6 +152,18 @@ final class PageRemediationForm extends FormBase {
       '#attributes' => ['class' => ['button']],
     ];
     return $form;
+  }
+
+  /** Suggest only a published, accessible same-site node's existing alias. */
+  private function suggestDestination(string $href): string {
+    $path = $href;
+    if (str_starts_with($path, 'internal:')) { $path = substr($path, 9); }
+    if (str_starts_with($path, 'entity:node/')) { $path = '/node/' . substr($path, 12); }
+    if (!preg_match('@^/node/(\d+)([?#].*)?$@D', $path, $match)) { return ''; }
+    $node = \Drupal::entityTypeManager()->getStorage('node')->load((int) $match[1]);
+    if (!$node || !$node->isPublished() || !$node->access('view', $this->currentUser())) { return ''; }
+    $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $match[1]);
+    return $alias === '/node/' . $match[1] ? '' : $alias . ($match[2] ?? '');
   }
 
   /** Filters display only; repair validation still uses the original results. */
@@ -228,7 +243,13 @@ final class PageRemediationForm extends FormBase {
         '@nid' => $result['nid'],
         '@revision' => $result['revision_id'],
       ]));
-      $form_state->setRedirect('moody_broken_links.dashboard');
+      $next = $this->manager->getNextReviewPage($this->scanId, $this->nid);
+      if (!empty($form_state->getTriggeringElement()['#review_next']) && $next !== NULL) {
+        $form_state->setRedirect('moody_broken_links.page', ['scan_id' => $this->scanId, 'nid' => $next], ['query' => ['status' => 'non_200']]);
+      }
+      else {
+        $form_state->setRedirect('moody_broken_links.dashboard');
+      }
     }
     catch (\Throwable $exception) {
       $this->messenger()->addError($exception->getMessage());

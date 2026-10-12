@@ -214,7 +214,7 @@ final class DashboardForm extends FormBase {
       else {
         $actions = [
           '#type' => 'container',
-          'page' => Link::fromTextAndUrl($this->t('Queue page fixes'), Url::fromRoute('moody_broken_links.page', [
+          'page' => Link::fromTextAndUrl($this->t('Review & approve fixes'), Url::fromRoute('moody_broken_links.page', [
             'scan_id' => $result->scan_id,
             'nid' => $result->nid,
           ]))->toRenderable(),

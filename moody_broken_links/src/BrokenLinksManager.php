@@ -269,6 +269,18 @@ final class BrokenLinksManager {
     return $results;
   }
 
+  /** Returns the next page with actionable findings in this scan. */
+  public function getNextReviewPage(int $scan_id, int $nid): ?int {
+    $query = $this->database->select(self::RESULT_TABLE, 'r');
+    $query->addField('r', 'nid');
+    $query->condition('scan_id', $scan_id)->condition('remediated', 0);
+    $query->condition('result_status', ['broken', 'warning'], 'IN');
+    $query->condition('nid', $nid, '<>');
+    $query->orderBy('nid')->range(0, 1);
+    $next = $query->execute()->fetchField();
+    return $next === FALSE ? NULL : (int) $next;
+  }
+
   /**
    * Validates a replacement entered by an administrator.
    */
