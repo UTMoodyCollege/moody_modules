@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Url;
 use Drupal\media\Plugin\Field\FieldFormatter\OEmbedFormatter;
@@ -17,11 +18,13 @@ class ResilientOEmbedFormatter extends OEmbedFormatter {
   protected CacheBackendInterface $failureCache;
   protected TimeInterface $clock;
   protected string $siteOrigin;
+  protected KillSwitch $pageCacheKillSwitch;
 
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     $formatter = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $formatter->failureCache = $container->get('cache.data');
     $formatter->clock = $container->get('datetime.time');
+    $formatter->pageCacheKillSwitch = $container->get('page_cache_kill_switch');
     $formatter->siteOrigin = $container->get('request_stack')->getCurrentRequest()?->getSchemeAndHttpHost() ?? '';
     return $formatter;
   }
@@ -34,9 +37,10 @@ class ResilientOEmbedFormatter extends OEmbedFormatter {
       $this->getSettings(), $this->siteOrigin,
     ]));
     if ($cached = $this->failureCache->get($cid)) {
+      $this->pageCacheKillSwitch->trigger();
       $elements = $cached->data;
       CacheableMetadata::createFromRenderArray($elements)
-        ->setCacheMaxAge(max(0, $cached->expire - $this->clock->getCurrentTime()))
+        ->setCacheMaxAge(0)
         ->applyTo($elements);
       return $elements;
     }
@@ -65,11 +69,13 @@ class ResilientOEmbedFormatter extends OEmbedFormatter {
       ];
     }
     if ($hasFallback) {
+      // Page cache ignores positive render max-age: never freeze a failed preview.
+      $this->pageCacheKillSwitch->trigger();
       // Retry after five minutes; media edits and media settings invalidate sooner.
       $metadata = CacheableMetadata::createFromObject($entity)
         ->addCacheableDependency($this->config)
         ->merge(CacheableMetadata::createFromRenderArray($elements))
-        ->merge((new CacheableMetadata())->setCacheMaxAge(300));
+        ->merge((new CacheableMetadata())->setCacheMaxAge(0));
       foreach ($elements as $delta => $element) {
         if (is_int($delta)) {
           $metadata = $metadata->merge(CacheableMetadata::createFromRenderArray($element));

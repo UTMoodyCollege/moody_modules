@@ -65,7 +65,8 @@ $check(!str_contains((string) $first[0]['link']['#title'], '<script>'), 'Escape 
 $clock->now += 60;
 $second = $formatter->viewElements($items, 'en');
 $check($fetcher->calls === 1 && $logger->errors === 1, 'Do not repeatedly fetch or log cached failures');
-$check($second['#cache']['max-age'] === 240, 'Do not extend the failure lifetime');
+$check($second['#cache']['max-age'] === 0, 'Do not freeze a failed preview in HTML caches');
+$check(Drupal::service('page_cache_kill_switch')->check(new \Symfony\Component\HttpFoundation\Response(), new \Symfony\Component\HttpFoundation\Request()) === \Drupal\Core\PageCache\ResponsePolicyInterface::DENY, 'Failed previews must deny page caching');
 $cache->invalidateTags(['config:media.settings']);
 $formatter->viewElements($items, 'en');
 $check($fetcher->calls === 2, 'Settings changes must invalidate failures');

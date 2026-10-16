@@ -30,7 +30,9 @@ Remote YouTube and Vimeo previews retain Drupal's normal oEmbed rendering. If
 the provider rejects a preview, the formatter shows an accessible original-site
 link instead of a blank area. Failures are cached for five minutes to bound
 repeat requests and logging; media edits or media-settings changes invalidate
-that cache. No media is edited or deleted. A fallback does not recover a deleted
+that cache. Pages containing failed previews bypass HTML caching so page cache
+cannot freeze a temporary fallback indefinitely; successful previews retain core
+caching. No media is edited or deleted. A fallback does not recover a deleted
 video or a missing media entity, and unknown providers retain core behavior.
 
 Run `ddev drush php:script web/modules/custom/moody_modules/moody_media_remediation/tests/oembed_smoke.php`
