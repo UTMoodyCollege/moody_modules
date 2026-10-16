@@ -26,6 +26,16 @@ with access to the dashboard. User 1 retains Drupal's normal administrative
 access; assign the dedicated role later only to accounts that should perform
 remediation work.
 
+Remote YouTube and Vimeo previews retain Drupal's normal oEmbed rendering. If
+the provider rejects a preview, the formatter shows an accessible original-site
+link instead of a blank area. Failures are cached for five minutes to bound
+repeat requests and logging; media edits or media-settings changes invalidate
+that cache. No media is edited or deleted. A fallback does not recover a deleted
+video or a missing media entity, and unknown providers retain core behavior.
+
+Run `ddev drush php:script web/modules/custom/moody_modules/moody_media_remediation/tests/oembed_smoke.php`
+to check fallback handling without external requests or entity writes.
+
 For local verification:
 
 ```bash

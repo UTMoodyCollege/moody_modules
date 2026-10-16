@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function moody_media_remediation_field_formatter_info_alter(array &$info): void {
+  if (isset($info['oembed'])) {
+    $info['oembed']['class'] = \Drupal\moody_media_remediation\Plugin\Field\FieldFormatter\ResilientOEmbedFormatter::class;
+  }
+}
