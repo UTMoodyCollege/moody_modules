@@ -37,6 +37,13 @@ function moody_fleet_deploy_update_9020() {
 }
 
 /**
+ * Restore required University footer links without importing other config.
+ */
+function moody_fleet_deploy_update_9021() {
+  _moody_fleet_deploy_place_moody_required_links_block();
+}
+
+/**
  * Preserve active Layout Builder rules before Drupal Kit retires Restrictions.
  */
 function moody_fleet_deploy_update_9019() {
@@ -497,20 +504,19 @@ function _moody_fleet_deploy_install_speedway_theme() {
  * Ensures the Moody required links block exists in footer_right.
  */
 function _moody_fleet_deploy_place_moody_required_links_block() {
-  if (!\Drupal::moduleHandler()->moduleExists('utexas_block_required_links')) {
-    return;
-  }
-
   if (!\Drupal::service('theme_handler')->themeExists('moody')) {
     return;
   }
 
+  if (!\Drupal::moduleHandler()->moduleExists('utexas_block_required_links')) {
+    if (!isset(\Drupal::service('extension.list.module')->getList()['utexas_block_required_links'])) {
+      throw new \RuntimeException('The Moody footer requires the UTexas Required Links module code.');
+    }
+    \Drupal::service('module_installer')->install(['utexas_block_required_links']);
+  }
+
   $block = \Drupal\block\Entity\Block::load('moody_required_links_block');
   $uuid = '35f5a6a4-6bc8-466f-b478-799aa1d59d4e';
-  if ($block && $block->uuid() !== $uuid) {
-    $block->delete();
-    $block = NULL;
-  }
 
   $settings = [
     'id' => 'required_links_block',
@@ -538,6 +544,7 @@ function _moody_fleet_deploy_place_moody_required_links_block() {
       ->set('region', 'footer_right')
       ->set('weight', 0)
       ->set('status', TRUE)
+      ->set('visibility', [])
       ->set('plugin', 'required_links_block')
       ->set('settings', $settings);
   }
