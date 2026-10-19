@@ -22,7 +22,7 @@ ambient-video-natural-height:
     - core/once
 
 ambient-video-fixed-scroll:
-  version: 1.x
+  version: 1.1.1
   js:
     js/ambient-video-fixed-scroll.js: {}
   dependencies:

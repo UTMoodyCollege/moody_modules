@@ -26,38 +26,11 @@
         // Match existing CSS behavior: videos are only shown >= 900px.
         var mm = window.gsap.matchMedia();
 
-        mm.add('(min-width: 900px)', function () {
-          // “Fixed within a window” effect:
-          // - pin the videoWrapper only while the hero is in view
-          // - scrub a parallax drift on the <video> inside it
-          // Short mode is a tighter crop, so use slightly less drift and a small scale to prevent edge reveal.
+        mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', function () {
+          // Keep the wrapper in its crop window; pinning it exposes the block background.
           var isShortMode = block.classList.contains('moody-ambient-video-short');
           var driftPercent = isShortMode ? 8 : 10;
-          var scale = isShortMode ? (1 + (driftPercent * 0.02)) : 1;
-
-          var headerOffset = function () {
-            var brandbar = document.getElementById('brandbar');
-            var header = document.querySelector('header');
-            var brandbarHeight = brandbar ? brandbar.clientHeight : 0;
-            var headerHeight = header ? header.clientHeight : 0;
-            return brandbarHeight + headerHeight;
-          };
-
-          // Pin the wrapper using transforms so it remains clipped by the overflow container.
-          var pinTrigger = window.ScrollTrigger.create({
-            trigger: overflowContainer,
-            start: function () {
-              return 'top top+=' + headerOffset();
-            },
-            end: function () {
-              return 'bottom top+=' + headerOffset();
-            },
-            pin: videoWrapper,
-            pinSpacing: false,
-            pinType: 'transform',
-            anticipatePin: 1,
-            invalidateOnRefresh: true
-          });
+          var scale = 1 + (driftPercent * 0.02);
 
           var tween = window.gsap.fromTo(
             videoEl,
@@ -68,12 +41,8 @@
               ease: 'none',
               scrollTrigger: {
                 trigger: overflowContainer,
-                start: function () {
-                  return 'top top+=' + headerOffset();
-                },
-                end: function () {
-                  return 'bottom top+=' + headerOffset();
-                },
+                start: 'top bottom',
+                end: 'bottom top',
                 scrub: true,
                 invalidateOnRefresh: true
               }
@@ -81,18 +50,16 @@
           );
 
           // Ensure ScrollTrigger recalculates after the ambient video resizes itself.
-          window.setTimeout(function () {
+          var refreshTimer = window.setTimeout(function () {
             if (window.ScrollTrigger && typeof window.ScrollTrigger.refresh === 'function') {
               window.ScrollTrigger.refresh();
             }
           }, 600);
 
           return function () {
+            window.clearTimeout(refreshTimer);
             if (tween && typeof tween.kill === 'function') {
               tween.kill();
-            }
-            if (pinTrigger && typeof pinTrigger.kill === 'function') {
-              pinTrigger.kill();
             }
           };
         });
