@@ -390,6 +390,8 @@ function moody_media_image_helper_build_crop_action(MediaInterface $media, array
       'copy' => [
         '#type' => 'container',
         '#attributes' => [
+          // Added after form processing, so Drupal will not generate this ID.
+          'id' => (string) ($context['guidance_id'] ?? '') . '-copy',
           'class' => ['moody-media-image-helper__guidance-copy'],
         ],
         '#markup' => $guidance,
