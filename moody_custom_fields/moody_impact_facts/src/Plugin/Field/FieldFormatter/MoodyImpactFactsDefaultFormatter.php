@@ -94,7 +94,7 @@ class MoodyImpactFactsDefaultFormatter extends FormatterBase implements Containe
       if (!empty($impact_items)) {
         foreach ($impact_items as $key => $instance) {
           $instance_item = $instance['item'];
-          if (!empty($instance_item['headline'])) {
+          if (isset($instance_item['headline']) && $instance_item['headline'] !== '') {
             $instances[$key]['headline'] = $instance_item['headline'];
           }
           if (!empty($instance_item['subheadline'])) {

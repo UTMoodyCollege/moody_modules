@@ -6,7 +6,7 @@
 <div class="impact-fact-items {{ style }} {{ col_number }}">
   {% for item in impact_items %}
     <div class="impact-fact">
-      {% if item.headline %}
+      {% if item.headline is defined %}
         <h3 class="if-headline">{{ item.headline }}</h3>
       {% endif %}
       {% if item.subheadline %}
