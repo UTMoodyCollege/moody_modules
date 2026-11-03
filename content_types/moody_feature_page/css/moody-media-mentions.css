@@ -62,6 +62,15 @@
   font-weight: 600;
 }
 
+.moody-media-mentions .mention-subheadline {
+  color: var(--ut-charcoal, #333f48);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
 .news-and-announcements .mention-body {
   color: var(--ut-charcoal, #333f48);
   line-height: 1.5;

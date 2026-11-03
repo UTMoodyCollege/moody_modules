@@ -53,6 +53,7 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
   {
     return [
       'items' => [],
+      'sort_order' => 'date_desc',
     ];
   }
 
@@ -61,6 +62,17 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
    */
   public function blockForm($form, FormStateInterface $form_state): array
   {
+    $form['sort_order'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Display order'),
+      '#options' => [
+        'date_desc' => $this->t('Date: newest first'),
+        'date_asc' => $this->t('Date: oldest first'),
+        'manual' => $this->t('As entered'),
+      ],
+      '#default_value' => $this->configuration['sort_order'] ?? 'date_desc',
+      '#description' => $this->t('Items without a valid date appear last. Equal dates keep their entered order. Sorting affects display only.'),
+    ];
     // Get the number of items from form state or default to existing items
     $items_count = $form_state->get('items_count');
     if ($items_count === NULL) {
@@ -121,6 +133,14 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
         '#required' => FALSE,
       ];
 
+      $form['items'][$i]['subheadline'] = [
+        '#type' => 'textarea',
+        '#title' => $this->t('Subheadline'),
+        '#default_value' => $this->configuration['items'][$i]['subheadline'] ?? '',
+        '#rows' => 2,
+        '#description' => $this->t('Optional plain text below the headline. Enter one person per line as Name, Title, Department.'),
+      ];
+
       // Link
       $form['items'][$i]['link'] = [
         '#type' => 'url',
@@ -161,6 +181,7 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
    */
   public function blockSubmit($form, FormStateInterface $form_state): void
   {
+    $this->configuration['sort_order'] = $form_state->getValue('sort_order') ?? 'date_desc';
     $items = $form_state->getValue('items');
     
     // Remove the actions element from items
@@ -231,11 +252,34 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
     
     // Filter out empty items
     $items = array_filter($items, function($item) {
-      return !empty($item['media_source']) || !empty($item['headline']) || !empty($item['link']) || !empty($item['date']);
+      return !empty($item['media_source']) || !empty($item['headline']) || !empty($item['subheadline']) || !empty($item['link']) || !empty($item['date']);
     });
 
     if (empty($items)) {
       return [];
+    }
+
+    $dateKey = static function (array $item): string {
+      $value = $item['date'] ?? '';
+      return is_string($value)
+        && preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D', $value, $parts)
+        && checkdate((int) $parts[2], (int) $parts[3], (int) $parts[1]) ? $value : '';
+    };
+    // Do not send malformed legacy dates to Twig's date filter.
+    foreach ($items as &$item) {
+      $item['date'] = $dateKey($item);
+    }
+    unset($item);
+    $order = $this->configuration['sort_order'] ?? 'date_desc';
+    if ($order !== 'manual') {
+      usort($items, static function (array $a, array $b) use ($order): int {
+        $aDate = $a['date'];
+        $bDate = $b['date'];
+        if ($aDate === '' || $bDate === '') {
+          return ($aDate === '') <=> ($bDate === '');
+        }
+        return $order === 'date_asc' ? $aDate <=> $bDate : $bDate <=> $aDate;
+      });
     }
 
     $build = [

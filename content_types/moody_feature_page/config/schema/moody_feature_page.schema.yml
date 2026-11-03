@@ -49,6 +49,9 @@ block.settings.moody_feature_page_media_mentions:
   type: block_settings
   label: 'Moody Media Mentions block'
   mapping:
+    sort_order:
+      type: string
+      label: 'Display order'
     items:
       type: sequence
       label: 'Media mentions'
@@ -61,6 +64,9 @@ block.settings.moody_feature_page_media_mentions:
           headline:
             type: string
             label: 'Headline'
+          subheadline:
+            type: text
+            label: 'Subheadline'
           link:
             type: string
             label: 'Link'

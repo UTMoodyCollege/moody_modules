@@ -61,9 +61,24 @@ class MoodyMediaMentionsBlockTest extends BrowserTestBase {
    * Tests the default configuration of the block.
    */
   public function testDefaultConfiguration() {
-    // This would test the actual block in a full Drupal environment.
-    // For now, we validate that our implementation follows Drupal standards.
-    $this->assertTrue(TRUE, 'Default configuration test completed');
+    $block = $this->container->get('plugin.manager.block')->createInstance('moody_feature_page_media_mentions');
+    $this->assertSame('date_desc', $block->getConfiguration()['sort_order']);
+  }
+
+  public function testMediaMentionsSubheadline(): void {
+    $block = $this->container->get('plugin.manager.block')->createInstance('moody_feature_page_media_mentions', [
+      'items' => [
+        ['headline' => 'Older entry', 'date' => '2026-01-01'],
+        ['headline' => 'Newer entry', 'date' => '2026-09-01', 'subheadline' => "Person — Professor\n<script>alert(1)</script>"],
+      ],
+    ]);
+    $build = $block->build();
+    $this->assertSame('Newer entry', $build['#items'][0]['headline']);
+    $markup = (string) $this->container->get('renderer')->renderRoot($build);
+    $this->assertSame(1, substr_count($markup, 'class="mention-subheadline"'));
+    $this->assertStringContainsString('Person — Professor', $markup);
+    $this->assertStringContainsString('&lt;script&gt;', $markup);
+    $this->assertStringNotContainsString('<script>alert(1)</script>', $markup);
   }
 
   /**

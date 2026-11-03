@@ -7,6 +7,7 @@
  * - items: Array of media mention items, each containing:
  *   - media_source: The media source name
  *   - headline: The headline text
+ *   - subheadline: Optional plain text, with one person and title per line
  *   - link: The URL link
  *   - date: The date string
  */
@@ -50,6 +51,9 @@
                         </span>
                       {% endif %}
                     </div>
+                  {% endif %}
+                  {% if item.subheadline|default('')|trim %}
+                    <div class="mention-subheadline">{{ item.subheadline }}</div>
                   {% endif %}
                 </div>
                 <div class="col-lg-3 text-lg-end">
