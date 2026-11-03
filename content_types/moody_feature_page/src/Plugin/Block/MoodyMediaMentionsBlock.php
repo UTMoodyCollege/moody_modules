@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\moody_feature_page\Plugin\Block;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -73,19 +74,15 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
       '#default_value' => $this->configuration['sort_order'] ?? 'date_desc',
       '#description' => $this->t('Items without a valid date appear last. Equal dates keep their entered order. Sorting affects display only.'),
     ];
-    // Get the number of items from form state or default to existing items
-    $items_count = $form_state->get('items_count');
-    if ($items_count === NULL) {
-      $existing_items = $this->configuration['items'] ?? [];
-      $items_count = !empty($existing_items) ? count($existing_items) : 1;
-      $form_state->set('items_count', $items_count);
-    }
+    $items = $form_state->get('media_mentions_items') ?? $this->configuration['items'] ?? [];
+    $items_count = max(1, count($items));
 
     // Create a wrapper for AJAX updates
     $wrapper_id = Html::getUniqueId('media-mentions-items-wrapper');
     
     $form['items'] = [
       '#type' => 'fieldset',
+      '#tree' => TRUE,
       '#title' => $this->t('Media Mentions'),
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
@@ -121,7 +118,7 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
       $form['items'][$i]['media_source'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Media Source Name'),
-        '#default_value' => $this->configuration['items'][$i]['media_source'] ?? '',
+        '#default_value' => $items[$i]['media_source'] ?? '',
         '#required' => FALSE,
       ];
 
@@ -129,14 +126,14 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
       $form['items'][$i]['headline'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Headline'),
-        '#default_value' => $this->configuration['items'][$i]['headline'] ?? '',
+        '#default_value' => $items[$i]['headline'] ?? '',
         '#required' => FALSE,
       ];
 
       $form['items'][$i]['subheadline'] = [
         '#type' => 'textarea',
         '#title' => $this->t('Subheadline'),
-        '#default_value' => $this->configuration['items'][$i]['subheadline'] ?? '',
+        '#default_value' => $items[$i]['subheadline'] ?? '',
         '#rows' => 2,
         '#description' => $this->t('Optional plain text below the headline. Enter one person per line as Name, Title, Department.'),
       ];
@@ -145,7 +142,7 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
       $form['items'][$i]['link'] = [
         '#type' => 'url',
         '#title' => $this->t('Link'),
-        '#default_value' => $this->configuration['items'][$i]['link'] ?? '',
+        '#default_value' => $items[$i]['link'] ?? '',
         '#required' => FALSE,
       ];
 
@@ -153,7 +150,7 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
       $form['items'][$i]['date'] = [
         '#type' => 'date',
         '#title' => $this->t('Date'),
-        '#default_value' => $this->configuration['items'][$i]['date'] ?? '',
+        '#default_value' => $items[$i]['date'] ?? '',
         '#required' => FALSE,
       ];
     }
@@ -194,7 +191,7 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
       }
     }
     
-    $this->configuration['items'] = $items;
+    $this->configuration['items'] = array_values($items);
   }
 
   /**
@@ -202,10 +199,7 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
    */
   public function addItemSubmit(array &$form, FormStateInterface $form_state): void
   {
-    $items_count = $form_state->get('items_count');
-    $items_count++;
-    $form_state->set('items_count', $items_count);
-    $form_state->setRebuild();
+    $this->rebuildItems($form_state, FALSE);
   }
 
   /**
@@ -213,25 +207,34 @@ final class MoodyMediaMentionsBlock extends BlockBase implements ContainerFactor
    */
   public function removeItemSubmit(array &$form, FormStateInterface $form_state): void
   {
-    $triggering_element = $form_state->getTriggeringElement();
-    $item_index = $triggering_element['#item_index'];
-    
-    $items_count = $form_state->get('items_count');
-    
-    // Don't allow removing the last item
-    if ($items_count > 1) {
-      $items_count--;
-      $form_state->set('items_count', $items_count);
-      
-      // Remove the item from configuration
-      $items = $this->configuration['items'] ?? [];
-      unset($items[$item_index]);
-      
-      // Re-index the array to avoid gaps
-      $items = array_values($items);
-      $this->configuration['items'] = $items;
+    $this->rebuildItems($form_state, TRUE);
+  }
+
+  /**
+   * Updates submitted rows as well as defaults so AJAX cannot restore a removal.
+   */
+  private function rebuildItems(FormStateInterface $form_state, bool $remove): void
+  {
+    $trigger = $form_state->getTriggeringElement();
+    $parents = array_slice($trigger['#parents'], 0, -2);
+    $input = $form_state->getUserInput();
+    $items = NestedArray::getValue($input, $parents) ?? $this->configuration['items'] ?? [];
+    unset($items['actions']);
+    foreach ($items as &$item) {
+      unset($item['remove_item']);
     }
-    
+    unset($item);
+    if ($remove && count($items) > 1) {
+      unset($items[$trigger['#item_index']]);
+    }
+    elseif (!$remove) {
+      $items[] = [];
+    }
+    $items = array_values($items);
+    NestedArray::setValue($input, $parents, $items);
+    $form_state->setUserInput($input);
+    $form_state->setValue($parents, $items);
+    $form_state->set('media_mentions_items', $items);
     $form_state->setRebuild();
   }
 
