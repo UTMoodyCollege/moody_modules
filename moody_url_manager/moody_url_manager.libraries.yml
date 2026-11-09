@@ -1,0 +1,9 @@
+manager:
+  css:
+    theme:
+      css/manager.css: {}
+  js:
+    js/manager.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

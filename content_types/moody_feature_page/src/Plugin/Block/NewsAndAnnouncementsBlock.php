@@ -73,6 +73,14 @@ final class NewsAndAnnouncementsBlock extends BlockBase {
         ];
       }
 
+      $form['items'][$i]['item_order'] = [
+        '#type' => 'number',
+        '#title' => $this->t('Display order'),
+        '#description' => $this->t('Lower numbers appear first. Change the order and save to move items.'),
+        '#default_value' => $i + 1,
+        '#step' => 1,
+      ];
+
       $form['items'][$i]['category'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Category'),
@@ -149,11 +157,14 @@ final class NewsAndAnnouncementsBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state): void {
-    $items = $form_state->getValue('items');
+    $items = $form_state->getValue('items') ?? [];
     unset($items['actions']);
+    // Stable sorting preserves the existing order when editors use equal numbers.
+    uasort($items, static fn(array $a, array $b): int =>
+      ($a['item_order'] ?? 0) <=> ($b['item_order'] ?? 0));
 
     foreach ($items as $key => $item) {
-      unset($items[$key]['remove_item']);
+      unset($items[$key]['remove_item'], $items[$key]['item_order']);
     }
 
     $this->configuration['items'] = array_values($items);

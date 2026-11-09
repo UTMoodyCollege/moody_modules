@@ -1,0 +1,5 @@
+moody_url_manager.subsite:
+  title: 'URLs & redirects'
+  route_name: moody_url_manager.subsite
+  base_route: entity.moody_subsite.canonical
+  weight: 4

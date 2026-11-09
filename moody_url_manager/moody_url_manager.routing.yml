@@ -1,0 +1,21 @@
+moody_url_manager.overall:
+  path: '/admin/content/moody-urls'
+  defaults:
+    _form: '\Drupal\moody_url_manager\Form\UrlManagerForm'
+    _title: 'URL architecture'
+  requirements:
+    _custom_access: '\Drupal\moody_url_manager\UrlManager::overallAccess'
+  options:
+    _admin_route: true
+moody_url_manager.subsite:
+  path: '/admin/structure/moody_subsite/{moody_subsite}/urls'
+  defaults:
+    _form: '\Drupal\moody_url_manager\Form\UrlManagerForm'
+    _title: 'Subsite URL architecture'
+  requirements:
+    _custom_access: '\Drupal\moody_url_manager\UrlManager::subsiteAccess'
+  options:
+    _admin_route: true
+    parameters:
+      moody_subsite:
+        type: entity:moody_subsite

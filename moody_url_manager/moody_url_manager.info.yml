@@ -1,0 +1,8 @@
+name: Moody URL Manager
+type: module
+description: Preview and batch changes to page aliases while retaining permanent redirects.
+package: Moody
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:path
+  - redirect:redirect

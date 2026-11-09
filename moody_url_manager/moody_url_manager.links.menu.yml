@@ -1,0 +1,5 @@
+moody_url_manager.overall:
+  title: 'URL architecture'
+  description: 'Review page aliases and redirects; preview bulk URL changes.'
+  parent: system.admin_content
+  route_name: moody_url_manager.overall

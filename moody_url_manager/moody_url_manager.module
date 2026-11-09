@@ -1,0 +1,13 @@
+<?php
+
+/** Implements hook_ENTITY_TYPE_view(). */
+function moody_url_manager_moody_subsite_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
+  $build['editor_actions']['url_manager'] = [
+    '#type' => 'link',
+    '#title' => t('Manage URLs & redirects'),
+    '#url' => \Drupal\Core\Url::fromRoute('moody_url_manager.subsite', ['moody_subsite' => $entity->id()]),
+    '#access' => \Drupal\moody_url_manager\UrlManager::subsiteAccess($entity, \Drupal::currentUser()),
+    '#attributes' => ['class' => ['button']],
+    '#weight' => -99,
+  ];
+}
