@@ -12,3 +12,8 @@
 .url-redirect-list code{display:block;font-family:inherit;font-size:.85rem;white-space:normal}
 .url-redirect-list small{display:block;color:#555;font-size:.75rem;margin-top:4px!important}
 @media(max-width:1199px){.url-table:not(.url-preview-table) > tbody > tr > td:nth-child(2){min-width:0}.url-redirect-list{min-width:0!important}}
+
+.url-filters{flex-wrap:wrap}.url-filters .form-item-search{flex:1 1 260px}.url-filters .button{white-space:normal}.url-table .dropbutton-wrapper{min-width:90px}.url-table td:last-child{overflow-wrap:normal;white-space:normal}
+
+.url-row-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-width:90px}.url-row-actions .button{margin:0;padding:6px 10px;white-space:normal}.url-delete-preview td{overflow-wrap:anywhere}.url-filters input[type=submit]{max-width:100%}
+@media(max-width:1199px){.url-delete-preview tr{display:block}.url-delete-preview td{padding:4px 0!important}.url-delete-preview td::before{content:none!important}}

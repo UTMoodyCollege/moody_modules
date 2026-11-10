@@ -47,11 +47,58 @@ try {
     $check(UrlManager::subsiteAccess((string) $sid, \Drupal::currentUser())->isAllowed(), 'Admin raw route parameter is resolved');
     $reject(fn() => UrlManager::plan((int) $node->id(), '/url-manager-qa-next', $sid), 'Out-of-subsite page blocked');
   }
+  $check(UrlManager::csvCell('=SUM(A1)') === "\t=SUM(A1)" && UrlManager::csvCell(' ordinary title') === ' ordinary title', 'CSV formula safety');
+  $fixture_ids = [];
+  for ($i = 0; $i < 27; $i++) {
+    $fixture = Node::create(['type' => 'page', 'title' => 'URL CSV QA fixture ' . $i, 'status' => $i === 26 ? 0 : 1]);
+    if ($i === 26 && $fixture->hasField('moderation_state')) { $fixture->set('moderation_state', 'draft'); }
+    $fixture->save(); $fixture_ids[] = (int) $fixture->id();
+  }
+  $request = \Symfony\Component\HttpFoundation\Request::create('/admin/content/moody-urls?search=URL%20CSV%20QA%20fixture&page=1&per_page=25');
+  $stack = \Drupal::requestStack(); $stack->push($request);
+  try {
+    $form_object = new \Drupal\moody_url_manager\Form\UrlManagerForm();
+    $state = new \Drupal\Core\Form\FormState(); $state->set('scope', NULL); $form = [];
+    $form_object->export($form, $state);
+    ob_start(); $state->getResponse()->sendContent(); $csv = ob_get_clean();
+    $stream = fopen('php://memory', 'r+'); fwrite($stream, $csv); rewind($stream); $rows = [];
+    while (($row = fgetcsv($stream, 0, ',', '"', '')) !== FALSE) { $rows[] = $row; } fclose($stream);
+    $check(count($rows) === 28, 'CSV exports all 27 matches from pager page 2');
+    $check(count(array_filter(array_slice($rows, 1), fn($r) => $r[3] === 'Draft')) === 1, 'CSV includes visible drafts');
+    $check(count(UrlManager::filteredQuery(NULL, 'URL CSV QA fixture', 'published')->execute()) === 26, 'Published filter shared with export');
+    $check($state->getResponse()->headers->get('Cache-Control') === 'no-store, private', 'CSV is not publicly cached');
+  }
+  finally { $stack->pop(); }
+  $delete_id = $fixture_ids[0];
+  $delete_plan = UrlManager::planDelete($delete_id, NULL);
+  $stack->push(\Symfony\Component\HttpFoundation\Request::create('/batch?op=do'));
+  try {
+    \Drupal::entityTypeManager()->getStorage('node')->resetCache([$delete_id]);
+    $check(UrlManager::planDelete($delete_id, NULL) === $delete_plan, 'Deletion preview is stable on a different request URL');
+  }
+  finally { $stack->pop(); }
+  $check((bool) Node::load($delete_id), 'Delete preview changes nothing');
+  $changed = Node::load($delete_id); $changed->setNewRevision(TRUE); $changed->setTitle('Changed after preview'); $changed->save();
+  $reject(function () use ($delete_plan) { $context = []; UrlManager::deletePage($delete_plan, $context); }, 'Stale deletion preview blocked');
+  $switcher->switchTo(new UserSession());
+  try { $reject(fn() => UrlManager::planDelete($delete_id, NULL), 'Anonymous deletion denied'); }
+  finally { $switcher->switchBack(); }
+  $delete_context = [];
+  foreach (array_slice($fixture_ids, 0, 2) as $id) {
+    $delete_plan = UrlManager::planDelete($id, NULL);
+    UrlManager::deletePage($delete_plan, $delete_context);
+    \Drupal::entityTypeManager()->getStorage('node')->resetCache([$id]);
+    $check(!Node::load($id), 'Confirmed page deleted');
+  }
+  $check(count($delete_context['results']) === 2, 'Bulk deletion records every page');
+  $reject(fn() => UrlManager::planDelete((int) $node->id(), $sid ?? 999999), 'Out-of-scope deletion denied');
   $saved->setNewRevision(TRUE); $saved->setUnpublished();
   if ($saved->hasField('moderation_state')) { $saved->set('moderation_state', 'draft'); }
   $saved->isDefaultRevision(FALSE); $saved->save();
   \Drupal::entityTypeManager()->getStorage('node')->resetCache();
   $reject(fn() => UrlManager::plan((int) $node->id(), '/url-manager-qa-next', NULL), 'Pending draft blocks bulk changes');
+
+  $reject(fn() => UrlManager::planDelete((int) $node->id(), NULL), 'Pending draft blocks deletion');
 
   echo json_encode(['passed' => $checks, 'transaction_rolled_back' => TRUE]) . PHP_EOL;
 }

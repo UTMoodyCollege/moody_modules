@@ -1,8 +1,22 @@
 # Moody URL Manager
 
 A native Drupal workspace for reviewing content-page aliases and incoming
-redirect chains, then selecting up to 25 visible rows for a preview-first Batch
+redirect chains, then selecting up to 250 visible rows for a preview-first Batch
 API operation. Search by title, alias or `/node/ID`; filter published/draft.
+The top toolbar exports every filtered match as a private CSV regardless of
+the current pager, and offers 25/50/100/250 rows per screen. CSV includes
+all aliases and incoming redirects as JSON columns, with spreadsheet formula
+protection. Unapplied filter edits do not alter the export; click Filter first.
+
+Edit opens the native page form. Delete and bulk Delete preview the actual
+pages first, require an explicit confirmation checkbox, and use native node
+delete access in addition to workspace scope. Deletion removes all node
+revisions and aliases through Drupal hooks; shared Media is not deleted.
+Incoming redirects and external/menu references may become broken. Conflicting
+previews and newer drafts block deletion. Completed deletions have a private
+per-user receipt and watchdog log; earlier deletions remain applied if a later
+page fails. No Live pages are deleted merely by deploying this feature.
+
 Enter aliases individually or replace a whole path prefix for selected rows.
 
 - Overall site: `/admin/content/moody-urls`, available only to user 1 or the

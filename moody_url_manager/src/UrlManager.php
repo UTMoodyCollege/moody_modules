@@ -54,6 +54,27 @@ final class UrlManager {
     return $q;
   }
 
+  /** One filter definition for the paged workspace and full CSV export. */
+  public static function filteredQuery(?int $scope, string $search, string $status) {
+    $query = self::query($scope);
+    if ($status === 'published' || $status === 'draft') { $query->condition('status', $status === 'published' ? 1 : 0); }
+    if ($search !== '') {
+      $alias_ids = \Drupal::entityQuery('path_alias')->accessCheck(FALSE)->condition('alias', $search, 'CONTAINS')->execute();
+      $nids = [];
+      foreach (\Drupal::entityTypeManager()->getStorage('path_alias')->loadMultiple($alias_ids) as $a) {
+        if (preg_match('@^/node/(\d+)$@D', $a->getPath(), $m)) { $nids[] = (int) $m[1]; }
+      }
+      if (preg_match('@^/node/(\d+)$@D', $search, $m)) { $nids[] = (int) $m[1]; }
+      $query->condition($query->orConditionGroup()->condition('title', $search, 'CONTAINS')->condition('nid', $nids ?: [-1], 'IN'));
+    }
+    return $query;
+  }
+
+  /** CSV cells must never become spreadsheet formulas. */
+  public static function csvCell(string $value): string {
+    return preg_match('/^[\s]*[=+@-]/u', $value) ? "\t" . $value : $value;
+  }
+
   public static function snapshot(NodeInterface $node): array {
     $path = '/node/' . $node->id();
     $langcode = $node->language()->getId();
@@ -171,6 +192,53 @@ final class UrlManager {
       catch (\Throwable $e) { $transaction->rollBack(); throw $e; }
     }
     finally { $lock->release('moody_url_manager.apply'); }
+  }
+
+  /** Preview actual node deletion; never grant more than native delete access. */
+  public static function planDelete(int $nid, ?int $scope): array {
+    if (!self::query($scope)->condition('nid', $nid)->count()->execute()) { throw new AccessDeniedHttpException(); }
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+    $node = $storage->load($nid);
+    if (!$node || !$node->access('delete')) { throw new AccessDeniedHttpException('You cannot delete this page.'); }
+    if ((string) $storage->getLatestRevisionId($nid) !== (string) $node->getRevisionId()) {
+      throw new \InvalidArgumentException('This page has a newer draft revision; review it before deleting.');
+    }
+    $stored = [];
+    // Computed fields (for example metatags) vary with the current request URL.
+    foreach ($node->getFieldDefinitions() as $name => $definition) {
+      if (!$definition->isComputed()) { $stored[$name] = $node->get($name)->getValue(); }
+    }
+    return ['before' => self::snapshot($node), 'fingerprint' => hash('sha256', serialize($stored)), 'subsite_id' => $scope];
+  }
+
+  public static function deletePage(array $plan, array &$context): void {
+    $lock = \Drupal::lock();
+    if (!$lock->acquire('moody_url_manager.apply', 60)) { throw new \RuntimeException('Another URL operation is running.'); }
+    try {
+      $storage = \Drupal::entityTypeManager()->getStorage('node');
+      $nid = $plan['before']['nid'];
+      $storage->resetCache([$nid]);
+      \Drupal::entityTypeManager()->getStorage('path_alias')->resetCache();
+      \Drupal::entityTypeManager()->getStorage('redirect')->resetCache();
+      \Drupal::service('path_alias.manager')->cacheClear();
+      if (self::planDelete($nid, $plan['subsite_id']) !== $plan) {
+        throw new \RuntimeException('Page, aliases or redirects changed after preview. Preview again.');
+      }
+      $transaction = \Drupal::database()->startTransaction();
+      try {
+        $storage->load($nid)->delete();
+        \Drupal::logger('moody_url_manager')->notice('Deleted node @nid (@title), previously @alias, after confirmation by user @uid.', ['@nid' => $nid, '@title' => $plan['before']['title'], '@alias' => $plan['before']['alias'], '@uid' => \Drupal::currentUser()->id()]);
+        $context['results'][] = ['nid' => $nid, 'title' => $plan['before']['title'], 'alias' => $plan['before']['alias'], 'scope' => $plan['subsite_id']];
+      }
+      catch (\Throwable $e) { $transaction->rollBack(); throw $e; }
+    }
+    finally { $lock->release('moody_url_manager.apply'); }
+  }
+
+  public static function deleted(bool $success, array $results, array $operations): void {
+    \Drupal::service('tempstore.private')->get('moody_url_manager')->set('last_deleted', $results);
+    \Drupal::messenger()->addStatus(t('@count pages permanently deleted.', ['@count' => count($results)]));
+    if (!$success) { \Drupal::messenger()->addError(t('Deletion stopped. Earlier completed deletions remain applied; review remaining pages again.')); }
   }
 
   public static function finished(bool $success, array $results, array $operations): void {
