@@ -1,5 +1,17 @@
 # Moody Feature Page
 
+## Authored dates and announcement order
+
+Feature Page editors can set **Authored on** under **Authoring information**
+on pages they can create or edit. This does not grant owner changes or other
+administrative fields; existing node and Workbench access still applies.
+
+In **News and Announcements**, higher display-order numbers appear first and
+lower numbers appear at the bottom. Numbers are retained after saving. New
+items start above the highest existing number, so adding an announcement does
+not require renumbering older items. Existing blocks retain their current order
+until edited, and their initial numbers preserve that order.
+
 ## External stories
 
 Select **External redirect feature page** and enter the full HTTP(S) story URL

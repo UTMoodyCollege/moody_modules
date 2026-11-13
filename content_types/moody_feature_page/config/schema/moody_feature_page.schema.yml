@@ -84,6 +84,9 @@ block.settings.moody_feature_page_news_and_announcements:
       sequence:
         type: mapping
         mapping:
+          item_order:
+            type: integer
+            label: 'Display order (higher numbers first)'
           category:
             type: string
             label: 'Category'

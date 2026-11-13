@@ -32,9 +32,10 @@ final class NewsAndAnnouncementsBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state): array {
+    $existing_items = $this->configuration['items'] ?? [];
+    $next_order = max([count($existing_items), ...array_column($existing_items, 'item_order')]) + 1;
     $items_count = $form_state->get('items_count');
     if ($items_count === NULL) {
-      $existing_items = $this->configuration['items'] ?? [];
       $items_count = $existing_items ? count($existing_items) : 1;
       $form_state->set('items_count', $items_count);
     }
@@ -76,8 +77,8 @@ final class NewsAndAnnouncementsBlock extends BlockBase {
       $form['items'][$i]['item_order'] = [
         '#type' => 'number',
         '#title' => $this->t('Display order'),
-        '#description' => $this->t('Lower numbers appear first. Change the order and save to move items.'),
-        '#default_value' => $i + 1,
+        '#description' => $this->t('Higher numbers appear first. New items start above existing items; lower numbers appear at the bottom.'),
+        '#default_value' => $existing_items[$i]['item_order'] ?? ($i < count($existing_items) ? count($existing_items) - $i : $next_order + $i - count($existing_items)),
         '#step' => 1,
       ];
 
@@ -161,10 +162,11 @@ final class NewsAndAnnouncementsBlock extends BlockBase {
     unset($items['actions']);
     // Stable sorting preserves the existing order when editors use equal numbers.
     uasort($items, static fn(array $a, array $b): int =>
-      ($a['item_order'] ?? 0) <=> ($b['item_order'] ?? 0));
+      ($b['item_order'] ?? 0) <=> ($a['item_order'] ?? 0));
 
     foreach ($items as $key => $item) {
-      unset($items[$key]['remove_item'], $items[$key]['item_order']);
+      unset($items[$key]['remove_item']);
+      $items[$key]['item_order'] = (int) ($item['item_order'] ?? 0);
     }
 
     $this->configuration['items'] = array_values($items);

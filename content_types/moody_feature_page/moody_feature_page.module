@@ -10,6 +10,26 @@ use Drupal\image\Entity\ImageStyle;
 use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_entity_field_access().
+ */
+function moody_feature_page_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL) {
+  $access = AccessResult::neutral();
+  if ($operation !== 'edit' || $field_definition->getName() !== 'created' || !$items) {
+    return $access;
+  }
+  $node = $items->getEntity();
+  if ($node->getEntityTypeId() !== 'node' || $node->bundle() !== 'moody_feature_page') {
+    return $access;
+  }
+  // Reuse node/Workbench access without granting content administration or owner changes.
+  return $access->orIf($node->access($node->isNew() ? 'create' : 'update', $account, TRUE));
+}
 
 /**
  * Implenents hook_theme().
