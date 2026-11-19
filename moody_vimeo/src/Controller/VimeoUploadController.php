@@ -64,13 +64,15 @@ class VimeoUploadController extends ControllerBase {
     }
 
     $video_id = $this->vimeoApi->parseVideoId($session['uri']);
+    $list_url = Url::fromRoute('moody_vimeo.video_list');
+    $can_browse = $list_url->access();
 
     return new JsonResponse([
       'uploadLink' => $session['upload_link'],
       'videoUri' => $session['uri'],
       'videoId' => $video_id,
-      'detailUrl' => $video_id ? Url::fromRoute('moody_vimeo.video_detail', ['video_id' => $video_id])->toString() : '',
-      'listUrl' => Url::fromRoute('moody_vimeo.video_list')->toString(),
+      'detailUrl' => $can_browse && $video_id ? Url::fromRoute('moody_vimeo.video_detail', ['video_id' => $video_id])->toString() : '',
+      'listUrl' => $can_browse ? $list_url->toString() : '',
     ]);
   }
 

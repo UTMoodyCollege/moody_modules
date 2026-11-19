@@ -123,8 +123,16 @@
           });
         })
         .then(function (session) {
-          Drupal.moodyVimeo.setUploadStatus(status, message, meta, progress, Drupal.t('Upload complete. Vimeo is now processing your video.'), 100, Drupal.t('Redirecting to the video page...'), false);
-          window.location.assign(session.detailUrl || session.listUrl || form.getAttribute('action') || window.location.href);
+          var destination = session.detailUrl || session.listUrl;
+          var detail = destination ? Drupal.t('Redirecting to the video page...') : '';
+          if (!destination && session.videoId) {
+            detail = Drupal.t('Vimeo video ID: @id', {'@id': session.videoId});
+          }
+          fileInput.value = '';
+          Drupal.moodyVimeo.setUploadStatus(status, message, meta, progress, Drupal.t('Upload complete. Vimeo is now processing your video.'), 100, detail, false);
+          if (destination) {
+            window.location.assign(destination);
+          }
         })
         .catch(function (error) {
           Drupal.moodyVimeo.setUploadStatus(status, message, meta, progress, error && error.message ? error.message : Drupal.t('Upload failed.'), 0, Drupal.t('No file data was streamed through Drupal.'), true);

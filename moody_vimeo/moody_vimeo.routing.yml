@@ -23,7 +23,7 @@ moody_vimeo.video_upload:
     _form: '\Drupal\moody_vimeo\Form\VimeoVideoUploadForm'
     _title: 'Upload Video to Vimeo'
   requirements:
-    _permission: 'administer moody vimeo'
+    _permission: 'upload moody vimeo+administer moody vimeo'
 
 moody_vimeo.video_upload_session:
   path: '/admin/content/vimeo/upload/session'
@@ -31,7 +31,7 @@ moody_vimeo.video_upload_session:
     _controller: '\Drupal\moody_vimeo\Controller\VimeoUploadController::createUploadSession'
   methods: [POST]
   requirements:
-    _permission: 'administer moody vimeo'
+    _permission: 'upload moody vimeo+administer moody vimeo'
 
 # Single-video detail / link helper
 moody_vimeo.video_detail:

@@ -96,15 +96,12 @@ class VimeoVideoListController extends ControllerBase {
 
     $build = [];
 
+    $upload_url = Url::fromRoute('moody_vimeo.video_upload');
     $build['actions'] = [
       '#type'       => 'container',
       '#attributes' => ['class' => ['moody-vimeo-actions']],
-      'upload_link' => [
-        '#markup' => Link::fromTextAndUrl(
-          $this->t('+ Upload new video'),
-          Url::fromRoute('moody_vimeo.video_upload')
-        )->toString(),
-      ],
+      '#access'     => $upload_url->access(NULL, TRUE),
+      'upload_link' => Link::fromTextAndUrl($this->t('+ Upload new video'), $upload_url)->toRenderable(),
     ];
 
     $build['summary'] = [

@@ -3,6 +3,11 @@ administer moody vimeo:
   description: 'Configure Vimeo API credentials and manage the video library.'
   restrict access: true
 
+upload moody vimeo:
+  title: 'Upload videos to Moody Vimeo'
+  description: 'Create new videos in the connected Vimeo account.'
+  restrict access: true
+
 access moody vimeo library:
   title: 'Access Moody Vimeo video library'
   description: 'Browse the Vimeo video library and copy video links.'

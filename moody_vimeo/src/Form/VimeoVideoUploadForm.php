@@ -46,12 +46,12 @@ class VimeoVideoUploadForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     if (!$this->vimeoApi->isConfigured()) {
-      $settings_url = Url::fromRoute('moody_vimeo.settings')->toString();
+      $settings_url = Url::fromRoute('moody_vimeo.settings');
+      $message = $settings_url->access()
+        ? $this->t('Vimeo API credentials are not configured. <a href="@url">Configure them here</a>.', ['@url' => $settings_url->toString()])
+        : $this->t('Vimeo uploads are unavailable. Contact a site administrator.');
       $form['not_configured'] = [
-        '#markup' => '<p class="messages messages--warning">' . $this->t(
-          'Vimeo API credentials are not configured. <a href="@url">Configure them here</a>.',
-          ['@url' => $settings_url]
-        ) . '</p>',
+        '#markup' => '<p class="messages messages--warning">' . $message . '</p>',
       ];
       return $form;
     }
@@ -205,17 +205,25 @@ class VimeoVideoUploadForm extends FormBase {
     }
 
     $video_id = $this->vimeoApi->parseVideoId($result['uri'] ?? '');
+    if (!Url::fromRoute('moody_vimeo.video_list')->access()) {
+      $message = $video_id
+        ? $this->t('Upload initiated. Vimeo is processing video @id.', ['@id' => $video_id])
+        : $this->t('Upload initiated. Vimeo is processing your video.');
+      $this->messenger()->addStatus($message);
+      $form_state->setRedirect('moody_vimeo.video_upload');
+      return;
+    }
+
     if ($video_id) {
       $this->messenger()->addStatus($this->t(
         'Upload initiated. Vimeo is processing your video. <a href="@url">View video details</a>.',
         ['@url' => Url::fromRoute('moody_vimeo.video_detail', ['video_id' => $video_id])->toString()]
       ));
-      $form_state->setRedirect('moody_vimeo.video_list');
     }
     else {
       $this->messenger()->addStatus($this->t('Upload initiated. Vimeo is processing your video. Check your Vimeo library shortly.'));
-      $form_state->setRedirect('moody_vimeo.video_list');
     }
+    $form_state->setRedirect('moody_vimeo.video_list');
   }
 
 }
